@@ -29,10 +29,6 @@ import org.mybatis.dynamic.sql.util.SqlProviderAdapter;
 @Mapper
 public interface ExamIndicatorJoinMapper {
 
-//    @SelectProvider(type = SqlProviderAdapter.class, method = "select")
-//    @ResultType(Map.class)
-//    public List<Map<String, Object>> selectMany(SelectStatementProvider selectAll);
-
     @SelectProvider(type = SqlProviderAdapter.class, method = "select")
     @ResultType(JoinRecord.class)
     @ConstructorArgs({
