@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC
+        "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+        
+<generatorConfiguration>
+    <context id="mysql" defaultModelType="conditional" targetRuntime="MyBatis3DynamicSql">
+        <property name="javaFileEncoding" value="UTF-8"/>
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+        
+        <plugin type="org.mybatis.generator.plugins.VirtualPrimaryKeyPlugin"/>
+        <plugin type="org.mybatis.generator.plugins.ToStringPlugin"/>
+        <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin"/>
+
+        <commentGenerator>
+            <property name="addRemarkComments" value="false"/>
+        </commentGenerator>
+        
+        <jdbcConnection connectionURL="jdbc:h2:mem:gen"
+                        driverClass="org.h2.Driver"
+                        userId="MyBatisDomainModelGenerator"/>
+        
+        <javaModelGenerator targetProject="src/main/java"
+                            targetPackage="org.eth.demo.sebserver.batis.gen.model">
+            <property name="enableSubPackages" value="false"/>
+            <property name="trimStrings" value="true"/>
+            <property name="immutable" value="true"/>
+            
+        </javaModelGenerator>
+        
+        <javaClientGenerator type="ANNOTATEDMAPPER"
+                             targetProject="src/main/java"
+                             targetPackage="org.eth.demo.sebserver.batis.gen.mapper">
+            <property name="enableSubPackages" value="false"/>
+        </javaClientGenerator>
+        
+        <table tableName="exam" domainObjectName="ExamRecord">
+            <property name="virtualKeyColumns" value="id"/>
+            <property name="immutable" value="true"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <columnOverride column="id" property="id" javaType="java.lang.Long" />
+        </table>
+        <table tableName="indicator" domainObjectName="IndicatorRecord" >
+            <property name="virtualKeyColumns" value="id"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <columnOverride column="id" property="id" javaType="java.lang.Long" />
+        </table>
+        <table tableName="exam_indicator" domainObjectName="ExamIndicatorRecord">
+            <property name="virtualKeyColumns" value="id"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <columnOverride column="id" property="id" javaType="java.lang.Long" />
+        </table>
+        <table tableName="client_event" domainObjectName="ClientEventRecord">
+            <property name="virtualKeyColumns" value="id"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <columnOverride column="id" property="id" javaType="java.lang.Long" />
+        </table>
+        <table tableName="indicator_value" domainObjectName="IndicatorValueRecord">
+            <property name="virtualKeyColumns" value="id"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <columnOverride column="id" property="id" javaType="java.lang.Long" />
+        </table>
+        
+    </context>
+</generatorConfiguration>
