@@ -12,7 +12,6 @@ import static org.eth.demo.sebserver.batis.gen.mapper.IndicatorRecordDynamicSqlS
 import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -54,99 +53,72 @@ public class ExamDaoImpl implements ExamDao {
     @Transactional(readOnly = true)
     @Override
     public Exam byId(final Long id) {
-        try {
-            final ExamRecord record = this.examMapper.selectByPrimaryKey(id);
-
-            if (record == null) {
-                return Exam.NULL_MODEL;
-            }
-
-            final List<IndicatorRecord> indicators = this.indicatorMapper.selectByExample()
-                    .where(examId, isEqualTo(id))
-                    .build()
-                    .execute();
-
-            return Exam.fromRecord(record, indicators);
-        } catch (final Throwable t) {
-            log.error("Unexpected Exception: ", t);
-            return Exam.NULL_MODEL;
+        final ExamRecord record = this.examMapper.selectByPrimaryKey(id);
+        if (record == null) {
+            log.info("Exam with id {} requested but not exists", id);
+            throw new RuntimeException("No Exam with id: " + id);
         }
+
+        final List<IndicatorRecord> indicators = this.indicatorMapper.selectByExample()
+                .where(examId, isEqualTo(id))
+                .build()
+                .execute();
+
+        return Exam.fromRecord(record, indicators);
     }
 
     @Transactional(readOnly = true)
     @Override
     public Collection<Exam> getAll() {
-        try {
-            return this.examIndicatorJoinMapper.selectAll();
-        } catch (final Throwable t) {
-            log.error("Unexpected Exception: ", t);
-            return Collections.emptyList();
-        }
+        return this.examIndicatorJoinMapper.selectAll();
     }
 
     @Transactional(readOnly = true)
     @Override
     public Collection<Exam> getAll(final Predicate<Exam> predicate) {
-        try {
-            return getAll()
-                    .stream()
-                    .filter(predicate)
-                    .collect(Collectors.toList());
-        } catch (final Throwable t) {
-            log.error("Unexpected Exception: ", t);
-            return Collections.emptyList();
-        }
+        return getAll().stream()
+                .filter(predicate)
+                .collect(Collectors.toList());
     }
 
     @Transactional
     @Override
     public Exam save(final Exam model) {
-        try {
-            Exam result;
-            if (model.getId() == null) {
-                final long id = this.examMapper.insert(model.toRecord());
-                if (id < 0) {
-                    return Exam.NULL_MODEL;
-                }
+        Long id;
+        if (model.getId() == null) {
+            final ExamRecord record = model.toRecord();
+            this.examMapper.insert(record);
+            id = record.getId();
+        } else {
+            this.examMapper.updateByPrimaryKeySelective(model.toRecord());
 
-                result = model.withId(id);
+            // NOTE: delete all existing indicators for this exam. The new ones form request gets inserted after
+            this.indicatorMapper.deleteByExample()
+                    .where(examId, isEqualTo(model.id))
+                    .build()
+                    .execute();
 
-                // TODO
-
-            } else {
-                this.examMapper.updateByPrimaryKey(model.toRecord());
-                result = model;
-            }
-
-            return result;
-        } catch (final Throwable t) {
-            log.error("Unexpected Exception: ", t);
-            return Exam.NULL_MODEL;
+            id = model.id;
         }
+
+        // save Indicators
+        model.getIndicators().stream()
+                .map(indicator -> indicator.toRecord(id))
+                .forEach(this.indicatorMapper::insert);
+
+        return byId(id);
     }
 
     @Transactional
     @Override
-    public Exam delete(final Long id) {
-        try {
-            final Exam exam = byId(id);
-            if (isNull(exam)) {
-                return exam;
-            }
+    public boolean delete(final Long id) {
+        this.indicatorMapper.deleteByExample()
+                .where(examId, isEqualTo(id))
+                .build()
+                .execute();
 
-            final int del = this.examMapper.deleteByPrimaryKey(id);
-            System.out.println("************************************ del:" + del);
-
-            return exam.withId(null);
-        } catch (final Throwable t) {
-            log.error("Unexpected Exception: ", t);
-            return Exam.NULL_MODEL;
-        }
-    }
-
-    @Override
-    public boolean isNull(final Exam model) {
-        return Exam.NULL_MODEL == model;
+        final int del = this.examMapper.deleteByPrimaryKey(id);
+        return del > 0;
     }
 
 }

@@ -6,15 +6,10 @@
         </encoder>
     </appender>
  
-    <Logger name="org.eth.demo.sebserver" level="TRACE" additivity="false">
-        <appender-ref ref="STDOUT" />
-    </Logger>
-    
-    <Logger name="org.mybatis.generator" level="TRACE" additivity="false">
-        <appender-ref ref="STDOUT" />
-    </Logger>
+    <Logger name="org.eth.demo.sebserver" level="TRACE" additivity="true" />
+    <Logger name="org.mybatis.generator" level="TRACE" additivity="true" />
  
-    <root level="INFO" additivity="false">
+    <root level="INFO" additivity="true">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

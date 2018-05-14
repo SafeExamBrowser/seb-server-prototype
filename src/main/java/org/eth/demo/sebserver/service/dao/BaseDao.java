@@ -57,13 +57,7 @@ public interface BaseDao<M> {
     /** Use this to delete a domain model from persistence store by id (primary key)
      *
      * @param id the identifier (primary key) of the data row to get from persistent
-     * @return the domain mode of the deleted row (primary-key is null) or a NULL-Model instance on exception or
-     *         failure */
-    M delete(Long id);
+     * @return true if the deletion was executed correctly */
+    boolean delete(Long id);
 
-    /** Use this to check whether a specified concrete domain Model instance is the NULL-Model or not.
-     *
-     * @param model the domain Model instance to check against NULL
-     * @return true if the specified concrete domain Model instance is the NULL-Model */
-    boolean isNull(final M model);
 }

@@ -18,14 +18,14 @@ import org.eth.demo.sebserver.batis.gen.model.IndicatorRecord;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Exam {
+public final class Exam {
 
     public enum Status {
         NONE(-1, "NO STATUS"), IN_PROGRESS(0, "In Progress"), READY(1, "Ready to run"), RUNNING(2,
                 "Running"), FINISHED(3, "Finished");
 
-        int id;
-        String displayName;
+        public final int id;
+        public final String displayName;
 
         private Status(final int id, final String displayName) {
             this.id = id;
@@ -42,13 +42,6 @@ public class Exam {
             return NONE.displayName;
         }
     }
-
-    public static final Exam NULL_MODEL = new Exam(-1L, "NULL", -1, -1L, null) {
-        @Override
-        public void addIndicator(final Indicator indicator) {
-            throw new UnsupportedOperationException("Not supported for immutable NULL-Exam");
-        }
-    };
 
     public final Long id;
     public final String name;
@@ -109,16 +102,6 @@ public class Exam {
 
     public final Exam withId(final Long id) {
         return new Exam(id, this.name, this.status, this.configurationId, this.indicators);
-    }
-
-    public final boolean isValid() {
-        if (NULL_MODEL == this) {
-            return false;
-        }
-
-        // TODO some additional checks may needed here
-
-        return true;
     }
 
     public static final Exam fromRecord(final ExamRecord record, final Collection<IndicatorRecord> indicators) {

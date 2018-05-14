@@ -38,7 +38,7 @@ import org.mybatis.dynamic.sql.util.SqlProviderAdapter;
 public interface ExamIndicatorJoinMapper {
 
     @SelectProvider(type = SqlProviderAdapter.class, method = "select")
-    @ResultType(JoinRecord.class)
+    @ResultType(ExamIndicatorJoinMapper.JoinResultHandler.JoinRecord.class)
     @ConstructorArgs({
             @Arg(column = "id", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -50,7 +50,8 @@ public interface ExamIndicatorJoinMapper {
             @Arg(column = "threshold2", javaType = BigDecimal.class, jdbcType = JdbcType.DECIMAL),
             @Arg(column = "threshold3", javaType = BigDecimal.class, jdbcType = JdbcType.DECIMAL)
     })
-    void selectMany(SelectStatementProvider select, ResultHandler<JoinRecord> resultHandler);
+    void selectMany(SelectStatementProvider select,
+            ResultHandler<ExamIndicatorJoinMapper.JoinResultHandler.JoinRecord> resultHandler);
 
     default Collection<Exam> selectMany(final SelectStatementProvider select) {
         final JoinResultHandler resultHandler = new JoinResultHandler();

@@ -11,6 +11,7 @@ package org.eth.demo.sebserver.web;
 import java.util.Collection;
 
 import org.eth.demo.sebserver.domain.rest.Exam;
+import org.eth.demo.sebserver.service.ExamSessionService;
 import org.eth.demo.sebserver.service.dao.ExamDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,8 @@ public class ExamController {
 
     @Autowired
     private ExamDao examDao;
+    @Autowired
+    private ExamSessionService examSessionService;
 
     @RequestMapping(method = RequestMethod.GET)
     final Collection<Exam> exams() {
@@ -36,9 +39,24 @@ public class ExamController {
         return this.examDao.byId(examId);
     }
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    final void addExam(@RequestBody final Exam exam) {
-        this.examDao.save(exam);
+    @RequestMapping(value = "/delete/{examId}", method = RequestMethod.POST)
+    final void deleteExam(@PathVariable final Long examId) {
+        this.examDao.delete(examId);
+    }
+
+    @RequestMapping(value = "/save", method = RequestMethod.POST)
+    final Exam saveExam(@RequestBody final Exam exam) {
+        return this.examDao.save(exam);
+    }
+
+    @RequestMapping(value = "/start/{examId}", method = RequestMethod.POST)
+    final void startExam(@PathVariable final Long examId) {
+        this.examSessionService.startExam(examId);
+    }
+
+    @RequestMapping(value = "/end/{examId}", method = RequestMethod.POST)
+    final void endExam(@PathVariable final Long examId) {
+        this.examSessionService.endExam(examId);
     }
 
 }

@@ -36,30 +36,24 @@
         </javaClientGenerator>
         
         <table tableName="exam" domainObjectName="ExamRecord">
-            <property name="virtualKeyColumns" value="id"/>
             <property name="immutable" value="true"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-            <columnOverride column="id" property="id" javaType="java.lang.Long" />
         </table>
         <table tableName="indicator" domainObjectName="IndicatorRecord" >
             <property name="virtualKeyColumns" value="id"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-            <columnOverride column="id" property="id" javaType="java.lang.Long" />
         </table>
         <table tableName="exam_indicator" domainObjectName="ExamIndicatorRecord">
             <property name="virtualKeyColumns" value="id"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-            <columnOverride column="id" property="id" javaType="java.lang.Long" />
         </table>
         <table tableName="client_event" domainObjectName="ClientEventRecord">
             <property name="virtualKeyColumns" value="id"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-            <columnOverride column="id" property="id" javaType="java.lang.Long" />
         </table>
         <table tableName="indicator_value" domainObjectName="IndicatorValueRecord">
             <property name="virtualKeyColumns" value="id"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-            <columnOverride column="id" property="id" javaType="java.lang.Long" />
         </table>
         
     </context>
