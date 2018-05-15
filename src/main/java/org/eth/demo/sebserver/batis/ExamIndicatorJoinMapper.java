@@ -27,7 +27,7 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.eth.demo.sebserver.batis.ExamIndicatorJoinMapper.JoinResultHandler.JoinRecord;
 import org.eth.demo.sebserver.domain.rest.Exam;
-import org.eth.demo.sebserver.domain.rest.Indicator;
+import org.eth.demo.sebserver.domain.rest.IndicatorDefinition;
 import org.mybatis.dynamic.sql.select.MyBatis3SelectModelAdapter;
 import org.mybatis.dynamic.sql.select.QueryExpressionDSL;
 import org.mybatis.dynamic.sql.select.SelectDSL;
@@ -102,7 +102,7 @@ public interface ExamIndicatorJoinMapper {
             private final String name;
             private final Integer status;
             private final Long configurationId;
-            public final Indicator indicator;
+            public final IndicatorDefinition indicator;
 
             private JoinRecord(final Long id, final String name, final Integer status, final Long configurationId,
                     final Long indicatorId, final String type, final BigDecimal threshold1, final BigDecimal threshold2,
@@ -113,7 +113,7 @@ public interface ExamIndicatorJoinMapper {
                 this.status = status;
                 this.configurationId = configurationId;
                 indicator = (indicatorId != null)
-                        ? new Indicator(type, threshold1, threshold2, threshold3) : null;
+                        ? new IndicatorDefinition(type, threshold1, threshold2, threshold3) : null;
             }
         }
     }

@@ -8,18 +8,17 @@
 
 package org.eth.demo.sebserver.service;
 
-import static org.eth.demo.sebserver.batis.gen.mapper.ExamRecordDynamicSqlSupport.examRecord;
-import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
-
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordMapper;
-import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
-import org.eth.demo.sebserver.batis.gen.model.ExamRecord;
+import org.eth.demo.sebserver.batis.gen.model.ClientEventRecord;
 import org.eth.demo.sebserver.domain.rest.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.Exam;
-import org.eth.demo.sebserver.service.dao.ExamDao;
+import org.eth.demo.sebserver.domain.rest.IndicatorInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,87 +26,72 @@ import org.springframework.transaction.annotation.Transactional;
 public class ExamSessionService {
 
     private final ClientEventRecordMapper clientEventRecordMapper;
-    private final ExamRecordMapper examRecordMapper;
-    private final ExamDao examDao;
-
-    private final Map<Long, Exam> runningExamsCache = new HashMap<>();
+    private final ExamStateService examStateService;
+    private final ClientConnectionService clientConnectionService;
 
     public ExamSessionService(final ClientEventRecordMapper clientEventRecordMapper,
-            final ExamRecordMapper examRecordMapper,
-            final ExamDao examDao) {
+            final ExamStateService examStateService,
+            final ClientConnectionService clientConnectionService) {
 
-        super();
         this.clientEventRecordMapper = clientEventRecordMapper;
-        this.examRecordMapper = examRecordMapper;
-        this.examDao = examDao;
+        this.examStateService = examStateService;
+        this.clientConnectionService = clientConnectionService;
     }
 
-    @Transactional
-    public void startExam(final Long id) {
-        final Long count = this.examRecordMapper.countByExample()
-                .where(examRecord.id, isEqualTo(id))
-                .and(examRecord.status, isEqualTo(Exam.Status.READY.id))
-                .build()
-                .execute();
-
-        if (count <= 0) {
-            throw new RuntimeException("No Exam in READY state with id: " + id);
+    public UUID connectClient(final Long examId) {
+        if (!this.examStateService.isRunning(examId)) {
+            throw new IllegalStateException("Exam with id: " + examId + " is not running");
         }
 
-        this.examRecordMapper.updateByPrimaryKeySelective(
-                new ExamRecord(id, null, Exam.Status.RUNNING.id, null));
+        final Exam runningExam = this.examStateService.getRunningExam(examId);
 
-        if (!cacheRunningExam(id)) {
-            throw new RuntimeException("Unexpected Error while trying to cache started Exam; id: " + id);
-        }
+        return this.clientConnectionService.establishConnection(runningExam);
     }
 
-    @Transactional
-    public void endExam(final Long id) {
-        if (!isRunning(id)) {
-            return;
-        }
-
-        this.examRecordMapper.updateByPrimaryKeySelective(
-                new ExamRecord(id, null, Exam.Status.FINISHED.id, null));
-
-        this.runningExamsCache.remove(id);
+    public void disconnectClient(final UUID clientUUID) {
+        this.clientConnectionService.disposeConnection(clientUUID);
     }
 
-    @Transactional(readOnly = true)
-    public boolean isRunning(final Long id) {
-        if (this.runningExamsCache.containsKey(id)) {
-            return true;
+    public Map<UUID, Map<String, IndicatorInfo>> getStatusReport(final Long examId) {
+        if (!this.examStateService.isRunning(examId)) {
+            throw new IllegalStateException("Exam with id: " + examId + " is not running");
         }
 
-        return cacheRunningExam(id);
+        final Map<UUID, Map<String, IndicatorInfo>> result = new LinkedHashMap<>();
+        for (final UUID uuid : this.clientConnectionService.getConnectedClientUUIDs(examId)) {
+            result.put(uuid, getIndicatorInfo(examId, uuid));
+        }
+
+        return result;
+    }
+
+    public Map<String, IndicatorInfo> getIndicatorInfo(final Long examId, final UUID clientUUID) {
+        return this.clientConnectionService
+                .getClientConnection(examId, clientUUID)
+                .getIndicatorInfo()
+                .stream()
+                .collect(Collectors.toMap(
+                        IndicatorInfo::getName,
+                        Function.identity()));
     }
 
     @Transactional
     public void logClientEvent(final Long examId,
-            final Long clientUUID,
+            final UUID clientUUID,
             final ClientEvent event) {
 
-        if (!isRunning(examId)) {
-            return;
+        if (!this.examStateService.isRunning(examId)) {
+            throw new IllegalStateException("Exam with id: " + examId + " is not running");
         }
 
-        this.clientEventRecordMapper.insert(event.toRecord(examId, clientUUID));
-    }
-
-    private boolean cacheRunningExam(final Long id) {
-        final Long count = this.examRecordMapper.countByExample()
-                .where(examRecord.id, isEqualTo(id))
-                .and(examRecord.status, isEqualTo(Exam.Status.RUNNING.id))
-                .build()
-                .execute();
-
-        if (count <= 0) {
-            return false;
+        if (!this.clientConnectionService.checkActiveConnection(examId, clientUUID)) {
+            throw new IllegalStateException("Client with UUID: " + clientUUID + " is not registered");
         }
 
-        this.runningExamsCache.put(id, this.examDao.byId(id));
-        return true;
+        final ClientEventRecord record = event.toRecord(
+                examId,
+                this.clientConnectionService.getActiveClientPK(examId, clientUUID));
+        this.clientEventRecordMapper.insert(record);
     }
 
 }

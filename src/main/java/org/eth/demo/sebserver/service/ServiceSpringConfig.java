@@ -12,12 +12,18 @@ import org.eth.demo.sebserver.batis.ExamIndicatorJoinMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.IndicatorRecordMapper;
+import org.eth.demo.sebserver.domain.ClientConnectionFactory;
 import org.eth.demo.sebserver.service.dao.ExamDao;
 import org.eth.demo.sebserver.service.dao.ExamDaoImpl;
+import org.eth.demo.sebserver.service.indicator.ClientIndicator;
+import org.eth.demo.sebserver.service.indicator.ErrorCountIndicator;
+import org.eth.demo.sebserver.service.indicator.PingIntervalIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 
 @Configuration
 public class ServiceSpringConfig {
@@ -41,10 +47,42 @@ public class ServiceSpringConfig {
 
     @Lazy
     @Bean
-    public ExamSessionService examSessionService() {
+    public ExamStateService examStateService() {
+        return new ExamStateService(this.examRecordMapper, examDao());
+    }
+
+    @Lazy
+    @Bean
+    public ExamSessionService examSessionService(final ApplicationContext context) {
         return new ExamSessionService(this.clientEventRecordMapper,
-                this.examRecordMapper,
-                this.examDao());
+                examStateService(),
+                clientConnectionService(context));
+    }
+
+    @Lazy
+    @Bean(ErrorCountIndicator.BEAN_NAME)
+    @Scope("prototype")
+    public ClientIndicator errorCountIndicator() {
+        return new ErrorCountIndicator(this.clientEventRecordMapper);
+    }
+
+    @Lazy
+    @Bean(PingIntervalIndicator.BEAN_NAME)
+    @Scope("prototype")
+    public ClientIndicator pingIntervalIndicator() {
+        return new PingIntervalIndicator();
+    }
+
+    @Lazy
+    @Bean
+    public ClientConnectionFactory clientConnectionFactory(final ApplicationContext context) {
+        return new ClientConnectionFactory(context);
+    }
+
+    public ClientConnectionService clientConnectionService(final ApplicationContext context) {
+        return new ClientConnectionService(
+                clientConnectionFactory(context),
+                examStateService());
     }
 
 }

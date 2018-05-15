@@ -17,25 +17,44 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class ClientEvent {
 
-    public final int type;
+    public static enum EventType {
+        UNKNOWN(-1), PING(1), ERROR(2);
+
+        public final int id;
+
+        private EventType(final int id) {
+            this.id = id;
+        }
+
+        public static EventType byId(final int id) {
+            for (final EventType status : EventType.values()) {
+                if (status.id == id) {
+                    return status;
+                }
+            }
+
+            return UNKNOWN;
+        }
+    }
+
+    public final EventType type;
     public final Long timestamp;
     public final BigDecimal numValue;
     public final String text;
 
     @JsonCreator
-    ClientEvent(@JsonProperty("type") final int type,
+    ClientEvent(@JsonProperty("type") final Integer type,
             @JsonProperty("timestamp") final Long timestamp,
             @JsonProperty("numValue") final BigDecimal numValue,
             @JsonProperty("text") final String text) {
 
-        super();
-        this.type = type;
-        this.timestamp = timestamp;
+        this.type = (type != null) ? EventType.byId(type) : EventType.UNKNOWN;
+        this.timestamp = (timestamp != null) ? timestamp : System.currentTimeMillis();
         this.numValue = numValue;
         this.text = text;
     }
 
-    public int getType() {
+    public EventType getType() {
         return this.type;
     }
 
@@ -51,8 +70,8 @@ public final class ClientEvent {
         return this.text;
     }
 
-    public ClientEventRecord toRecord(final Long examId, final Long clientUUID) {
-        return new ClientEventRecord(null, examId, clientUUID, this.type, this.timestamp, this.numValue,
+    public ClientEventRecord toRecord(final Long examId, final Long clientId) {
+        return new ClientEventRecord(null, examId, clientId, this.type.id, this.timestamp, this.numValue,
                 this.text);
     }
 

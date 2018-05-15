@@ -1,0 +1,110 @@
+/*
+ * Copyright (c) 2018 ETH Zürich, Educational Development and Technology (LET)
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+package org.eth.demo.sebserver.service;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
+
+import org.eth.demo.sebserver.domain.ClientConnection;
+import org.eth.demo.sebserver.domain.ClientConnectionFactory;
+import org.eth.demo.sebserver.domain.rest.Exam;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ClientConnectionService {
+
+    private final ClientConnectionFactory clientConnectionFactory;
+    private final ExamStateService examStateService;
+
+    public ClientConnectionService(
+            final ClientConnectionFactory clientConnectionFactory,
+            final ExamStateService examStateService) {
+
+        this.clientConnectionFactory = clientConnectionFactory;
+        this.examStateService = examStateService;
+    }
+
+    // TODO: this state should go the persistent store
+    private final Map<UUID, Long> connectionRecord = new ConcurrentHashMap<>();
+    private final AtomicLong idCounter = new AtomicLong();
+
+    private final Map<UUID, ClientConnection> connectionCache = new ConcurrentHashMap<>();
+
+    public UUID establishConnection(final Exam runningExam) {
+
+        final Long newId = this.idCounter.incrementAndGet();
+        final UUID clientUUID = UUID.randomUUID();
+
+        // TODO later we have to store an active connection record for the client here
+        this.connectionRecord.put(clientUUID, newId);
+
+        final ClientConnection clientConnection = createClientConnection(runningExam, clientUUID);
+        this.connectionCache.put(clientUUID, clientConnection);
+
+        return clientUUID;
+    }
+
+    public void disposeConnection(final UUID clientUUID) {
+        if (!this.connectionCache.containsKey(clientUUID)) {
+            throw new IllegalStateException("Client with UUID: " + clientUUID + " is not registered");
+        }
+
+        // TODO later w have to delete the active connection record for the client here
+
+        this.connectionCache.remove(clientUUID);
+    }
+
+    public Collection<UUID> getConnectedClientUUIDs(final Long examId) {
+        return this.connectionCache
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().examId == examId)
+                .map(entry -> entry.getKey())
+                .collect(Collectors.toList());
+    }
+
+    public ClientConnection getClientConnection(final Long examId, final UUID clientUUID) {
+        if (!this.connectionCache.containsKey(clientUUID)) {
+            // TODO later we have to check here if the client as an active connection record and if so, create and cache
+            //      a specified ClientConnection
+            if (this.connectionRecord.containsKey(clientUUID)) {
+                final Exam runningExam = this.examStateService.getRunningExam(examId);
+                if (runningExam != null) {
+                    final ClientConnection clientConnection = createClientConnection(runningExam, clientUUID);
+                    this.connectionCache.put(clientUUID, clientConnection);
+                }
+            }
+        }
+
+        return this.connectionCache.get(clientUUID);
+    }
+
+    public Long getActiveClientPK(final Long examId, final UUID clientUUID) {
+        final ClientConnection clientConnection = getClientConnection(examId, clientUUID);
+        return (clientConnection != null) ? clientConnection.clientId : null;
+    }
+
+    public boolean checkActiveConnection(final Long examId, final UUID clientUUID) {
+        return getClientConnection(examId, clientUUID) != null;
+    }
+
+    private ClientConnection createClientConnection(final Exam runningExam, final UUID clientUUID) {
+        final ClientConnection clientConnection = this.clientConnectionFactory.create(
+                runningExam.id,
+                this.connectionRecord.get(clientUUID),
+                clientUUID,
+                runningExam);
+        return clientConnection;
+    }
+
+}

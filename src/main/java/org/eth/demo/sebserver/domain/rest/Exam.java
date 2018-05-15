@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class Exam {
 
-    public enum Status {
+    public static enum Status {
         NONE(-1, "NO STATUS"), IN_PROGRESS(0, "In Progress"), READY(1, "Ready to run"), RUNNING(2,
                 "Running"), FINISHED(3, "Finished");
 
@@ -32,14 +32,18 @@ public final class Exam {
             this.displayName = displayName;
         }
 
-        public static String getDisplayName(final int id) {
+        public static Status byId(final int id) {
             for (final Status status : Status.values()) {
                 if (status.id == id) {
-                    return status.displayName;
+                    return status;
                 }
             }
 
-            return NONE.displayName;
+            return NONE;
+        }
+
+        public static String getDisplayName(final int id) {
+            return byId(id).displayName;
         }
     }
 
@@ -48,14 +52,14 @@ public final class Exam {
     public final Integer status;
     public final String statusName;
     public final Long configurationId;
-    private final Collection<Indicator> indicators;
+    private final Collection<IndicatorDefinition> indicators;
 
     @JsonCreator
     Exam(@JsonProperty("id") final Long id,
             @JsonProperty("name") final String name,
             @JsonProperty("status") final Integer status,
             @JsonProperty("configurationId") final Long configurationId,
-            @JsonProperty("indicators") final Collection<Indicator> indicators) {
+            @JsonProperty("indicators") final Collection<IndicatorDefinition> indicators) {
 
         this.id = id;
         this.name = name;
@@ -85,11 +89,11 @@ public final class Exam {
         return this.configurationId;
     }
 
-    public Collection<Indicator> getIndicators() {
+    public Collection<IndicatorDefinition> getIndicators() {
         return this.indicators;
     }
 
-    public void addIndicator(final Indicator indicator) {
+    public void addIndicator(final IndicatorDefinition indicator) {
         if (indicator == null) {
             return;
         }
@@ -111,7 +115,7 @@ public final class Exam {
                 record.getStatus(),
                 record.getConfigurationId(),
                 indicators.stream()
-                        .map(Indicator::fromRecord)
+                        .map(IndicatorDefinition::fromRecord)
                         .collect(Collectors.toList()));
     }
 
@@ -123,24 +127,5 @@ public final class Exam {
             final Long configurationId) {
         return new Exam(id, name, status, configurationId, null);
     }
-
-//    public final static class ExamDeserializer extends StdDeserializer<Exam> {
-//
-//        private static final long serialVersionUID = 2022986122392930339L;
-//
-//        protected ExamDeserializer(final Class<?> vc) {
-//            super(vc);
-//        }
-//
-//        @Override
-//        public Exam deserialize(final JsonParser p, final DeserializationContext ctxt)
-//                throws IOException, JsonProcessingException {
-//
-//            TreeNode examNode = p.readValueAsTree();
-//            Long id = ((LongNode) examNode.get("id")).asLong();
-//            return null;
-//        }
-//
-//    }
 
 }

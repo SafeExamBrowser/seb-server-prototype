@@ -11,7 +11,7 @@ package org.eth.demo.sebserver.web;
 import java.util.Collection;
 
 import org.eth.demo.sebserver.domain.rest.Exam;
-import org.eth.demo.sebserver.service.ExamSessionService;
+import org.eth.demo.sebserver.service.ExamStateService;
 import org.eth.demo.sebserver.service.dao.ExamDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +27,7 @@ public class ExamController {
     @Autowired
     private ExamDao examDao;
     @Autowired
-    private ExamSessionService examSessionService;
+    private ExamStateService examStateService;
 
     @RequestMapping(method = RequestMethod.GET)
     final Collection<Exam> exams() {
@@ -49,14 +49,9 @@ public class ExamController {
         return this.examDao.save(exam);
     }
 
-    @RequestMapping(value = "/start/{examId}", method = RequestMethod.POST)
-    final void startExam(@PathVariable final Long examId) {
-        this.examSessionService.startExam(examId);
-    }
-
-    @RequestMapping(value = "/end/{examId}", method = RequestMethod.POST)
-    final void endExam(@PathVariable final Long examId) {
-        this.examSessionService.endExam(examId);
+    @RequestMapping(value = "/statechange/{examId}/{stateId}", method = RequestMethod.POST)
+    final Exam saveExam(@PathVariable final Long examId, @PathVariable final Integer stateId) {
+        return this.examStateService.processStateChange(examId, Exam.Status.byId(stateId));
     }
 
 }

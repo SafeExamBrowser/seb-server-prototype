@@ -15,7 +15,7 @@ import org.eth.demo.sebserver.batis.gen.model.IndicatorRecord;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public final class Indicator {
+public final class IndicatorDefinition {
 
     public final String type;
     public final BigDecimal threshold1;
@@ -23,7 +23,7 @@ public final class Indicator {
     public final BigDecimal threshold3;
 
     @JsonCreator
-    public Indicator(@JsonProperty("type") final String type,
+    public IndicatorDefinition(@JsonProperty("type") final String type,
             @JsonProperty("threshold1") final BigDecimal threshold1,
             @JsonProperty("threshold2") final BigDecimal threshold2,
             @JsonProperty("threshold3") final BigDecimal threshold3) {
@@ -52,12 +52,37 @@ public final class Indicator {
                 this.threshold3);
     }
 
-    public static final Indicator fromRecord(final IndicatorRecord record) {
-        return new Indicator(
+    public static final IndicatorDefinition fromRecord(final IndicatorRecord record) {
+        return new IndicatorDefinition(
                 record.getType(),
                 record.getThreshold1(),
                 record.getThreshold2(),
                 record.getThreshold3());
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((this.type == null) ? 0 : this.type.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final IndicatorDefinition other = (IndicatorDefinition) obj;
+        if (this.type == null) {
+            if (other.type != null)
+                return false;
+        } else if (!this.type.equals(other.type))
+            return false;
+        return true;
     }
 
 }
