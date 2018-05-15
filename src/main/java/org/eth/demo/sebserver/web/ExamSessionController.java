@@ -42,12 +42,10 @@ public class ExamSessionController {
     }
 
     @RequestMapping(value = "/event/{examId}", method = RequestMethod.POST)
-    final void clientEvent(@PathVariable final Long examId,
-            @RequestHeader(value = "Token") final String clientUUID,
+    final void clientEvent(@RequestHeader(value = "Token") final String clientUUID,
             @RequestBody final ClientEvent clientEvent) {
 
         this.examSessionService.logClientEvent(
-                examId,
                 UUID.fromString(clientUUID),
                 clientEvent);
     }

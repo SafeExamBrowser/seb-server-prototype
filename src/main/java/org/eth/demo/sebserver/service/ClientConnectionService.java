@@ -35,7 +35,7 @@ public class ClientConnectionService {
     }
 
     // TODO: this state should go the persistent store
-    private final Map<UUID, Long> connectionRecord = new ConcurrentHashMap<>();
+    private final Map<UUID, ActiveConnectionRecord> activeConnections = new ConcurrentHashMap<>();
     private final AtomicLong idCounter = new AtomicLong();
 
     private final Map<UUID, ClientConnection> connectionCache = new ConcurrentHashMap<>();
@@ -46,9 +46,11 @@ public class ClientConnectionService {
         final UUID clientUUID = UUID.randomUUID();
 
         // TODO later we have to store an active connection record for the client here
-        this.connectionRecord.put(clientUUID, newId);
+        this.activeConnections.put(
+                clientUUID,
+                new ActiveConnectionRecord(clientUUID, runningExam.id, newId));
 
-        final ClientConnection clientConnection = createClientConnection(runningExam, clientUUID);
+        final ClientConnection clientConnection = createClientConnection(clientUUID);
         this.connectionCache.put(clientUUID, clientConnection);
 
         return clientUUID;
@@ -73,38 +75,46 @@ public class ClientConnectionService {
                 .collect(Collectors.toList());
     }
 
-    public ClientConnection getClientConnection(final Long examId, final UUID clientUUID) {
+    public ClientConnection getClientConnection(final UUID clientUUID) {
         if (!this.connectionCache.containsKey(clientUUID)) {
             // TODO later we have to check here if the client as an active connection record and if so, create and cache
             //      a specified ClientConnection
-            if (this.connectionRecord.containsKey(clientUUID)) {
-                final Exam runningExam = this.examStateService.getRunningExam(examId);
-                if (runningExam != null) {
-                    final ClientConnection clientConnection = createClientConnection(runningExam, clientUUID);
-                    this.connectionCache.put(clientUUID, clientConnection);
-                }
+            if (this.activeConnections.containsKey(clientUUID)) {
+                final ClientConnection clientConnection = createClientConnection(clientUUID);
+                this.connectionCache.put(clientUUID, clientConnection);
             }
         }
 
         return this.connectionCache.get(clientUUID);
     }
 
-    public Long getActiveClientPK(final Long examId, final UUID clientUUID) {
-        final ClientConnection clientConnection = getClientConnection(examId, clientUUID);
-        return (clientConnection != null) ? clientConnection.clientId : null;
+    public boolean checkActiveConnection(final UUID clientUUID) {
+        return getClientConnection(clientUUID) != null;
     }
 
-    public boolean checkActiveConnection(final Long examId, final UUID clientUUID) {
-        return getClientConnection(examId, clientUUID) != null;
-    }
-
-    private ClientConnection createClientConnection(final Exam runningExam, final UUID clientUUID) {
+    private ClientConnection createClientConnection(final UUID clientUUID) {
+        final ActiveConnectionRecord activeConnectionRecord = this.activeConnections.get(clientUUID);
+        final Exam runningExam = this.examStateService.getRunningExam(activeConnectionRecord.examId);
         final ClientConnection clientConnection = this.clientConnectionFactory.create(
                 runningExam.id,
-                this.connectionRecord.get(clientUUID),
+                activeConnectionRecord.clientId,
                 clientUUID,
                 runningExam);
         return clientConnection;
+    }
+
+    private static final class ActiveConnectionRecord {
+        @SuppressWarnings("unused")
+        public final UUID clientUUID;
+        public final Long examId;
+        public final Long clientId;
+
+        public ActiveConnectionRecord(final UUID clientUUID, final Long examId, final Long clientId) {
+            super();
+            this.clientUUID = clientUUID;
+            this.examId = examId;
+            this.clientId = clientId;
+        }
     }
 
 }

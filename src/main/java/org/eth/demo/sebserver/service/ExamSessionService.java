@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ClientEventRecord;
+import org.eth.demo.sebserver.domain.ClientConnection;
 import org.eth.demo.sebserver.domain.rest.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.Exam;
 import org.eth.demo.sebserver.domain.rest.IndicatorInfo;
@@ -59,15 +60,15 @@ public class ExamSessionService {
 
         final Map<UUID, Map<String, IndicatorInfo>> result = new LinkedHashMap<>();
         for (final UUID uuid : this.clientConnectionService.getConnectedClientUUIDs(examId)) {
-            result.put(uuid, getIndicatorInfo(examId, uuid));
+            result.put(uuid, getIndicatorInfo(uuid));
         }
 
         return result;
     }
 
-    public Map<String, IndicatorInfo> getIndicatorInfo(final Long examId, final UUID clientUUID) {
+    public Map<String, IndicatorInfo> getIndicatorInfo(final UUID clientUUID) {
         return this.clientConnectionService
-                .getClientConnection(examId, clientUUID)
+                .getClientConnection(clientUUID)
                 .getIndicatorInfo()
                 .stream()
                 .collect(Collectors.toMap(
@@ -76,21 +77,15 @@ public class ExamSessionService {
     }
 
     @Transactional
-    public void logClientEvent(final Long examId,
-            final UUID clientUUID,
-            final ClientEvent event) {
-
-        if (!this.examStateService.isRunning(examId)) {
-            throw new IllegalStateException("Exam with id: " + examId + " is not running");
-        }
-
-        if (!this.clientConnectionService.checkActiveConnection(examId, clientUUID)) {
+    public void logClientEvent(final UUID clientUUID, final ClientEvent event) {
+        if (!this.clientConnectionService.checkActiveConnection(clientUUID)) {
             throw new IllegalStateException("Client with UUID: " + clientUUID + " is not registered");
         }
 
+        final ClientConnection clientConnection = this.clientConnectionService.getClientConnection(clientUUID);
         final ClientEventRecord record = event.toRecord(
-                examId,
-                this.clientConnectionService.getActiveClientPK(examId, clientUUID));
+                clientConnection.examId,
+                clientConnection.clientId);
         this.clientEventRecordMapper.insert(record);
     }
 

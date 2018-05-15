@@ -13,9 +13,13 @@ import java.util.UUID;
 import org.eth.demo.sebserver.domain.rest.Exam;
 import org.eth.demo.sebserver.domain.rest.IndicatorDefinition;
 import org.eth.demo.sebserver.service.indicator.ClientIndicator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 public class ClientConnectionFactory {
+
+    private static final Logger log = LoggerFactory.getLogger(ClientConnectionFactory.class);
 
     private final ApplicationContext applicationContext;
 
@@ -27,7 +31,11 @@ public class ClientConnectionFactory {
         final ClientConnection result = new ClientConnection(examId, clientId, uuid);
 
         for (final IndicatorDefinition indicator : exam.getIndicators()) {
-            result.add(indicator, this.applicationContext.getBean(indicator.type, ClientIndicator.class));
+            try {
+                result.add(indicator, this.applicationContext.getBean(indicator.type, ClientIndicator.class));
+            } catch (final Exception e) {
+                log.warn("No Indicator with type: {} found as registered bean. Ignore this one.", indicator.type);
+            }
         }
 
         return result;
