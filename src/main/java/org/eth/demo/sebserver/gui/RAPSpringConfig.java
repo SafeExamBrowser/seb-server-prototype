@@ -21,7 +21,9 @@ import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class RAPSpringConfig {
 
     @Bean
@@ -46,8 +48,8 @@ public class RAPSpringConfig {
     }
 
     @Bean
-    public ServletRegistrationBean<RWTServlet> servletRegistrationBean() {
-        return new ServletRegistrationBean<>(new RWTServlet(), "/examview");
+    public ServletRegistrationBean servletRegistrationBean() {
+        return new ServletRegistrationBean(new RWTServlet(), "/examview");
     }
 
     @Bean

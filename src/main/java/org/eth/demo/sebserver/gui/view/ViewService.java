@@ -3,9 +3,7 @@ package org.eth.demo.sebserver.gui.view;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
 
-@Service
 public class ViewService {
 
     private final ApplicationContext applicationContext;

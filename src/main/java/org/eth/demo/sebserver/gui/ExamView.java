@@ -9,7 +9,12 @@
 package org.eth.demo.sebserver.gui;
 
 import org.eclipse.rap.rwt.application.AbstractEntryPoint;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 
 public class ExamView extends AbstractEntryPoint {
 
@@ -17,7 +22,13 @@ public class ExamView extends AbstractEntryPoint {
 
     @Override
     protected void createContents(final Composite parent) {
-        // TODO Auto-generated method stub
+        final RowLayout layout = new RowLayout();
+        layout.type = SWT.HORIZONTAL;
+        parent.setLayout(layout);
+
+        final Label label = new Label(parent, SWT.NONE);
+        label.setText("Hello RAP World");
+        label.setBackground(new Color(label.getDisplay(), new RGB(0, 0, 255)));
 
     }
 
