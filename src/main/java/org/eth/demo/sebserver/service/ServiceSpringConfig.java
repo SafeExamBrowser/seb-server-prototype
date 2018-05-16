@@ -8,6 +8,7 @@
 
 package org.eth.demo.sebserver.service;
 
+import org.eth.demo.sebserver.batis.ClientEventExtentionMapper;
 import org.eth.demo.sebserver.batis.ExamIndicatorJoinMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
@@ -36,6 +37,8 @@ public class ServiceSpringConfig {
     private IndicatorRecordMapper indicatorRecordMapper;
     @Autowired
     private ExamIndicatorJoinMapper examIndicatorJoinMapper;
+    @Autowired
+    private ClientEventExtentionMapper clientEventExtentionMapper;
 
     @Lazy
     @Bean
@@ -70,7 +73,7 @@ public class ServiceSpringConfig {
     @Bean(PingIntervalIndicator.BEAN_NAME)
     @Scope("prototype")
     public ClientIndicator pingIntervalIndicator() {
-        return new PingIntervalIndicator();
+        return new PingIntervalIndicator(this.clientEventExtentionMapper);
     }
 
     @Lazy

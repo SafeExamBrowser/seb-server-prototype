@@ -8,20 +8,39 @@
 
 package org.eth.demo.sebserver.service.indicator;
 
+import static org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordDynamicSqlSupport.clientEventRecord;
+import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
+import static org.mybatis.dynamic.sql.SqlBuilder.isLessThan;
+
 import java.math.BigDecimal;
+
+import org.eth.demo.sebserver.batis.ClientEventExtentionMapper;
+import org.eth.demo.sebserver.domain.rest.ClientEvent;
 
 public final class PingIntervalIndicator implements ClientIndicator {
 
     public static final String BEAN_NAME = "pingIntervalIndicator";
     private static final String DISPLAY_NAME = "Last Ping";
 
+    private final ClientEventExtentionMapper clientEventExtentionMapper;
+
+    public PingIntervalIndicator(final ClientEventExtentionMapper clientEventExtentionMapper) {
+        this.clientEventExtentionMapper = clientEventExtentionMapper;
+    }
+
     @Override
     public final BigDecimal computeValue(final Long examId, final Long clientId, final Long timestamp) {
         final Long time = (timestamp != null) ? timestamp : System.currentTimeMillis();
 
-        // TODO
+        final Long lastPing = this.clientEventExtentionMapper.maxByExample(clientEventRecord.timestamp)
+                .where(clientEventRecord.examId, isEqualTo(examId))
+                .and(clientEventRecord.clientId, isEqualTo(clientId))
+                .and(clientEventRecord.type, isEqualTo(ClientEvent.EventType.ERROR.id))
+                .and(clientEventRecord.timestamp, isLessThan(time))
+                .build()
+                .execute();
 
-        return null;
+        return new BigDecimal(time - lastPing);
     }
 
     @Override
