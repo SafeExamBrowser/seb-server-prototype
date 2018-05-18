@@ -8,36 +8,55 @@
 
 package org.eth.demo.sebserver.gui.push;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.eclipse.rap.rwt.service.ServerPushSession;
-import org.eclipse.swt.widgets.Display;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ServerPushService {
 
-    public <T extends ServerPushData> void runServerPush(
-            final Supplier<T> business,
-            final Function<T, Runnable> update) {
+    private static final Logger log = LoggerFactory.getLogger(ServerPushService.class);
+
+    public void runServerPush(
+            final ServerPushContext context,
+            final Consumer<ServerPushContext> business,
+            final Function<ServerPushContext, Runnable> update) {
 
         final ServerPushSession pushSession = new ServerPushSession();
 
         pushSession.start();
         final Thread bgThread = new Thread(() -> {
-            T data = business.get();
-            while (!data.isDisposed()) {
-                final Display display = data.getDisplay();
-                if (!display.isDisposed()) {
-                    display.asyncExec(update.apply(data));
-                }
+            while (!context.isDisposed() && context.runAgain()) {
 
-                data = business.get();
+                log.debug("Call business on Server Push Session on: {}", Thread.currentThread().getName());
+
+                business.accept(context);
+
+                if (!context.isDisposed()) {
+
+                    log.debug("Call update on Server Push Session on: {}", Thread.currentThread().getName());
+
+                    context.getDisplay().asyncExec(update.apply(context));
+                }
             }
 
-            pushSession.stop();
+            log.info("Stop Server Push Session on: {}", Thread.currentThread().getName());
+            try {
+                pushSession.stop();
+            } catch (final Exception e) {
+                log.warn(
+                        "Failed to stop Server Push Session on: {}. It seems that the UISession is not available anymore. This may source from a connection interruption",
+                        Thread.currentThread().getName(), e);
+            }
+
         });
+
+        log.info("Start new Server Push Session on: {}", bgThread.getName());
+
         bgThread.setDaemon(true);
         bgThread.start();
     }

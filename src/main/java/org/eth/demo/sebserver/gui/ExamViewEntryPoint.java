@@ -9,27 +9,20 @@
 package org.eth.demo.sebserver.gui;
 
 import org.eclipse.rap.rwt.application.AbstractEntryPoint;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eth.demo.sebserver.gui.view.ViewService;
+import org.eth.demo.sebserver.gui.views.ExamOverview;
+import org.springframework.context.ApplicationContext;
 
-public class ExamView extends AbstractEntryPoint {
+public class ExamViewEntryPoint extends AbstractEntryPoint {
 
     private static final long serialVersionUID = -1106183608032715804L;
 
     @Override
     protected void createContents(final Composite parent) {
-        final RowLayout layout = new RowLayout();
-        layout.type = SWT.HORIZONTAL;
-        parent.setLayout(layout);
-
-        final Label label = new Label(parent, SWT.NONE);
-        label.setText("Hello RAP World");
-        label.setBackground(new Color(label.getDisplay(), new RGB(0, 0, 255)));
-
+        final ApplicationContext applicationContext = RAPSpringConfig.RAPSpringContext.getApplicationContext();
+        final ViewService viewService = applicationContext.getBean(ViewService.class);
+        viewService.composeView(parent, ExamOverview.class);
     }
 
 }

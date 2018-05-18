@@ -48,8 +48,8 @@ public class RAPSpringConfig {
     }
 
     @Bean
-    public ServletRegistrationBean servletRegistrationBean() {
-        return new ServletRegistrationBean(new RWTServlet(), "/examview");
+    public ServletRegistrationBean<RWTServlet> servletRegistrationBean() {
+        return new ServletRegistrationBean<>(new RWTServlet(), "/examview");
     }
 
     @Bean

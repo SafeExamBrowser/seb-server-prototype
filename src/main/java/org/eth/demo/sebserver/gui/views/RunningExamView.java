@@ -14,14 +14,17 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eth.demo.sebserver.gui.push.ServerPushData;
+import org.eth.demo.sebserver.gui.push.ServerPushContext;
 import org.eth.demo.sebserver.gui.push.ServerPushService;
 import org.eth.demo.sebserver.gui.view.ViewComposer;
 import org.eth.demo.sebserver.gui.view.ViewService;
+import org.eth.demo.sebserver.util.TypedMap.TypedKey;
 
 public class RunningExamView implements ViewComposer {
+
+    private static final TypedKey<Color> CURRENT_COLOR = new TypedKey<>("CURRENT_COLOR", Color.class);
+    private static final TypedKey<Label> LABEL = new TypedKey<>("LABEL", Label.class);
 
     private final ServerPushService serverPushService;
 
@@ -42,55 +45,32 @@ public class RunningExamView implements ViewComposer {
         final Button button = new Button(parent, SWT.FLAT);
         button.setText("Back to Home");
         button.addListener(SWT.Selection, event -> {
-            viewService.composeInitView(parent);
+            viewService.composeView(parent, ExamOverview.class);
         });
 
-        final UpdateData updateData = new UpdateData(label);
+        final ServerPushContext context = new ServerPushContext(label, runAgainContext -> true);
+        final Color color1 = new Color(label.getDisplay(), new RGB(0, 255, 0));
+        final Color color2 = new Color(label.getDisplay(), new RGB(0, 0, 255));
+        context.getDataMapping().put(CURRENT_COLOR, color1);
+        context.getDataMapping().put(LABEL, label);
 
         this.serverPushService.runServerPush(
-                () -> {
+                context,
+                ctx -> {
                     try {
                         Thread.sleep(2000);
                     } catch (final Exception e) {
                     }
-                    updateData.toggle();
-                    return updateData;
+                    final Color color = ctx.getDataMapping().get(CURRENT_COLOR);
+                    ctx.getDataMapping().put(
+                            CURRENT_COLOR,
+                            (color == color1) ? color2 : color1);
                 },
-                data -> () -> {
-                    data.label.setBackground(data.currentColor);
-                    data.label.setText(label.getText() + "A");
-                    data.label.requestLayout();
+                ctx -> () -> {
+                    final Label l = ctx.getDataMapping().get(LABEL);
+                    l.setBackground(ctx.getDataMapping().get(CURRENT_COLOR));
+                    l.setText(label.getText() + "A");
+                    l.requestLayout();
                 });
     }
-
-    private static class UpdateData implements ServerPushData {
-
-        final Label label;
-        final Color color1;
-        final Color color2;
-        Color currentColor;
-
-        UpdateData(final Label label) {
-            this.label = label;
-            this.color1 = new Color(label.getDisplay(), new RGB(0, 255, 0));
-            this.color2 = new Color(label.getDisplay(), new RGB(0, 0, 255));
-            this.currentColor = this.color1;
-        }
-
-        void toggle() {
-            this.currentColor = (this.currentColor == this.color1) ? this.color2 : this.color1;
-        }
-
-        @Override
-        public boolean isDisposed() {
-            return this.label.isDisposed();
-        }
-
-        @Override
-        public Display getDisplay() {
-            return this.label.getDisplay();
-        }
-
-    }
-
 }

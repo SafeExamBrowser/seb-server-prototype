@@ -15,7 +15,7 @@ public class RAPConfiguration implements ApplicationConfiguration {
 
     @Override
     public void configure(final Application application) {
-        application.addEntryPoint("/examview", ExamView.class, null);
+        application.addEntryPoint("/examview", ExamViewEntryPoint.class, null);
     }
 
 }

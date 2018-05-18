@@ -20,9 +20,10 @@ import org.springframework.context.annotation.Lazy;
 @Configuration
 public class GUISpringConfig {
 
+    @Lazy
     @Bean
-    public ViewService ViewService(final ApplicationContext context) {
-        return new ViewService(context, ExamOverview.class);
+    public ViewService viewService(final ApplicationContext context) {
+        return new ViewService(context);
     }
 
     @Lazy
