@@ -19,11 +19,16 @@ import org.eth.demo.sebserver.gui.push.ServerPushContext;
 import org.eth.demo.sebserver.gui.push.ServerPushService;
 import org.eth.demo.sebserver.gui.view.ViewComposer;
 import org.eth.demo.sebserver.gui.view.ViewService;
+import org.eth.demo.sebserver.util.TypedMap;
 import org.eth.demo.sebserver.util.TypedMap.TypedKey;
 
-public class RunningExamView implements ViewComposer {
+public final class RunningExamView implements ViewComposer {
 
-    private static final TypedKey<Color> CURRENT_COLOR = new TypedKey<>("CURRENT_COLOR", Color.class);
+    private static final RGB COLOR_1 = new RGB(0, 255, 0);
+    private static final RGB COLOR_2 = new RGB(0, 0, 255);
+
+    public static final TypedKey<Long> EXAM_ID = new TypedKey<>("EXAM_ID", Long.class);
+    private static final TypedKey<RGB> CURRENT_COLOR = new TypedKey<>("CURRENT_COLOR", RGB.class);
     private static final TypedKey<Label> LABEL = new TypedKey<>("LABEL", Label.class);
 
     private final ServerPushService serverPushService;
@@ -33,7 +38,12 @@ public class RunningExamView implements ViewComposer {
     }
 
     @Override
-    public void composeView(final ViewService viewService, final Composite parent) {
+    public boolean validateAttributes(final TypedMap attributes) {
+        return attributes.containsKey(EXAM_ID);
+    }
+
+    @Override
+    public void composeView(final ViewService viewService, final Composite parent, final TypedMap attributes) {
         final RowLayout layout = new RowLayout();
         layout.type = SWT.HORIZONTAL;
         parent.setLayout(layout);
@@ -49,28 +59,33 @@ public class RunningExamView implements ViewComposer {
         });
 
         final ServerPushContext context = new ServerPushContext(label, runAgainContext -> true);
-        final Color color1 = new Color(label.getDisplay(), new RGB(0, 255, 0));
-        final Color color2 = new Color(label.getDisplay(), new RGB(0, 0, 255));
-        context.getDataMapping().put(CURRENT_COLOR, color1);
+        context.getDataMapping().put(CURRENT_COLOR, COLOR_1);
         context.getDataMapping().put(LABEL, label);
 
         this.serverPushService.runServerPush(
                 context,
-                ctx -> {
-                    try {
-                        Thread.sleep(2000);
-                    } catch (final Exception e) {
-                    }
-                    final Color color = ctx.getDataMapping().get(CURRENT_COLOR);
-                    ctx.getDataMapping().put(
-                            CURRENT_COLOR,
-                            (color == color1) ? color2 : color1);
-                },
-                ctx -> () -> {
-                    final Label l = ctx.getDataMapping().get(LABEL);
-                    l.setBackground(ctx.getDataMapping().get(CURRENT_COLOR));
-                    l.setText(label.getText() + "A");
-                    l.requestLayout();
-                });
+                RunningExamView::pollData,
+                RunningExamView::update);
     }
+
+    private final static void pollData(final ServerPushContext context) {
+        try {
+            Thread.sleep(2000);
+        } catch (final Exception e) {
+        }
+        final RGB color = context.getDataMapping().get(CURRENT_COLOR);
+        context.getDataMapping().put(
+                CURRENT_COLOR,
+                (color == COLOR_1) ? COLOR_2 : COLOR_1);
+    }
+
+    private final static Runnable update(final ServerPushContext context) {
+        return () -> {
+            final Label l = context.getDataMapping().get(LABEL);
+            l.setBackground(new Color(l.getDisplay(), context.getDataMapping().get(CURRENT_COLOR)));
+            l.setText(l.getText() + "A");
+            l.requestLayout();
+        };
+    }
+
 }

@@ -9,9 +9,16 @@
 package org.eth.demo.sebserver.gui.view;
 
 import org.eclipse.swt.widgets.Composite;
+import org.eth.demo.sebserver.util.TypedMap;
 
 public interface ViewComposer {
 
-    void composeView(ViewService viewService, Composite parent);
+    /** This is used to indicate if a set of attributes are valid to process the specified ViewComposers compose method.
+     *
+     * @param attributes the given attributes to test
+     * @return true if the given attributes has all the information the composer needs to compose the view */
+    boolean validateAttributes(TypedMap attributes);
+
+    void composeView(ViewService viewService, Composite parent, TypedMap attributes);
 
 }

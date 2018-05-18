@@ -44,14 +44,21 @@ public class ExamStateService {
         final Status currentStatus = Exam.Status.byId(examRecord.getStatus());
 
         switch (toState) {
+            case IN_PROGRESS: {
+                if (currentStatus != Status.READY) {
+                    invalidStateException(toState, currentStatus);
+                }
+
+                save(examId, toState);
+                log.info("Exam: {} is now back to edit", examId);
+                return this.examDao.byId(examId);
+            }
             case READY: {
                 if (currentStatus != Status.IN_PROGRESS) {
                     invalidStateException(toState, currentStatus);
                 }
                 save(examId, toState);
-
                 log.info("Exam: {} is now ready to run", examId);
-
                 return this.examDao.byId(examId);
             }
             case RUNNING: {

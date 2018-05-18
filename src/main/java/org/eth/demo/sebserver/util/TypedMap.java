@@ -8,12 +8,23 @@
 
 package org.eth.demo.sebserver.util;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class TypedMap {
 
-    private final Map<String, Object> mapping = new LinkedHashMap<>();
+    public static final TypedMap EMPTY_MAP = new TypedMap(true);
+
+    private final Map<String, Object> mapping;
+
+    public TypedMap() {
+        this.mapping = new LinkedHashMap<>();
+    }
+
+    private TypedMap(final boolean emptyMap) {
+        this.mapping = (emptyMap) ? Collections.emptyMap() : new LinkedHashMap<>();
+    }
 
     public <T> TypedMap put(final TypedKey<T> key, final T value) {
         this.mapping.put(key.name, value);
@@ -26,6 +37,14 @@ public final class TypedMap {
         }
 
         return key.type.cast(this.mapping.get(key.name));
+    }
+
+    public boolean isEmpty() {
+        return this.mapping.isEmpty();
+    }
+
+    public boolean containsKey(final TypedKey<Long> key) {
+        return this.mapping.containsKey(key.name);
     }
 
     @Override
@@ -87,5 +106,4 @@ public final class TypedMap {
             return "TypedKey [name=" + this.name + ", type=" + this.type + "]";
         }
     }
-
 }

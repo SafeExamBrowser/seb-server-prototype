@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public final class Exam {
 
     public static enum Status {
-        NONE(-1, "NO STATUS"), IN_PROGRESS(0, "In Progress"), READY(1, "Ready to run"), RUNNING(2,
+        NONE(-1, "NO STATUS"), IN_PROGRESS(0, "In Progress"), READY(1, "Ready To Run"), RUNNING(2,
                 "Running"), FINISHED(3, "Finished");
 
         public final int id;
