@@ -9,7 +9,6 @@
 package org.eth.demo.sebserver.gui.push;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.eclipse.rap.rwt.service.ServerPushSession;
 import org.slf4j.Logger;
@@ -24,7 +23,7 @@ public class ServerPushService {
     public void runServerPush(
             final ServerPushContext context,
             final Consumer<ServerPushContext> business,
-            final Function<ServerPushContext, Runnable> update) {
+            final Consumer<ServerPushContext> update) {
 
         final ServerPushSession pushSession = new ServerPushSession();
 
@@ -40,7 +39,15 @@ public class ServerPushService {
 
                     log.debug("Call update on Server Push Session on: {}", Thread.currentThread().getName());
 
-                    context.getDisplay().asyncExec(update.apply(context));
+                    context.getDisplay().asyncExec(() -> {
+                        try {
+                            update.accept(context);
+                        } catch (final Exception e) {
+                            log.warn(
+                                    "Failed to update on Server Push Session {}. It seems that the UISession is not available anymore. This may source from a connection interruption",
+                                    Thread.currentThread().getName(), e);
+                        }
+                    });
                 }
             }
 

@@ -30,7 +30,7 @@ public final class PingIntervalIndicator implements ClientIndicator {
 
     @Override
     public final BigDecimal computeValue(final Long examId, final Long clientId, final Long timestamp) {
-        final Long time = (timestamp != null) ? timestamp : System.currentTimeMillis();
+        final long time = (timestamp != null) ? timestamp : System.currentTimeMillis();
 
         final Long lastPing = this.clientEventExtentionMapper.maxByExample(clientEventRecord.timestamp)
                 .where(clientEventRecord.examId, isEqualTo(examId))
@@ -40,11 +40,15 @@ public final class PingIntervalIndicator implements ClientIndicator {
                 .build()
                 .execute();
 
+        if (lastPing == null) {
+            return BigDecimal.ZERO;
+        }
+
         return new BigDecimal(time - lastPing);
     }
 
     @Override
-    public String getBeanName() {
+    public String getType() {
         return BEAN_NAME;
     }
 

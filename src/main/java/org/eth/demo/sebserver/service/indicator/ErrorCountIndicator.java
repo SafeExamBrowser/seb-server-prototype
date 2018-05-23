@@ -45,7 +45,7 @@ public class ErrorCountIndicator implements ClientIndicator {
     }
 
     @Override
-    public String getBeanName() {
+    public String getType() {
         return BEAN_NAME;
     }
 

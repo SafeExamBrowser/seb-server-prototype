@@ -43,7 +43,7 @@ public final class TypedMap {
         return this.mapping.isEmpty();
     }
 
-    public boolean containsKey(final TypedKey<Long> key) {
+    public boolean containsKey(final TypedKey<?> key) {
         return this.mapping.containsKey(key.name);
     }
 

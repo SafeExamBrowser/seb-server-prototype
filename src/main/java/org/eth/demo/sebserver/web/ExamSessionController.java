@@ -8,11 +8,11 @@
 
 package org.eth.demo.sebserver.web;
 
-import java.util.Map;
+import java.util.Collection;
 import java.util.UUID;
 
 import org.eth.demo.sebserver.domain.rest.ClientEvent;
-import org.eth.demo.sebserver.domain.rest.IndicatorInfo;
+import org.eth.demo.sebserver.domain.rest.IndicatorValue;
 import org.eth.demo.sebserver.service.ExamSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,9 +50,9 @@ public class ExamSessionController {
                 clientEvent);
     }
 
-    @RequestMapping(value = "/status/{examId}", method = RequestMethod.GET)
-    public Map<UUID, Map<String, IndicatorInfo>> statusReport(@PathVariable final Long examId) {
-        return this.examSessionService.getStatusReport(examId);
+    @RequestMapping(value = "/indicatorValues/{examId}", method = RequestMethod.GET)
+    public Collection<IndicatorValue> indicatorValues(@PathVariable final Long examId) {
+        return this.examSessionService.getIndicatorValues(examId);
     }
 
 }

@@ -14,10 +14,12 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eth.demo.sebserver.domain.ClientConnection;
 import org.eth.demo.sebserver.domain.ClientConnectionFactory;
 import org.eth.demo.sebserver.domain.rest.Exam;
+import org.eth.demo.sebserver.domain.rest.IndicatorValue;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -86,6 +88,10 @@ public class ClientConnectionService {
         }
 
         return this.connectionCache.get(clientUUID);
+    }
+
+    public Stream<IndicatorValue> indicatorValues(final UUID clientUUID) {
+        return getClientConnection(clientUUID).getIndicatorValues().stream();
     }
 
     public boolean checkActiveConnection(final UUID clientUUID) {

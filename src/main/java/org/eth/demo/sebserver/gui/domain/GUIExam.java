@@ -8,6 +8,9 @@
 
 package org.eth.demo.sebserver.gui.domain;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -17,17 +20,20 @@ public class GUIExam {
     public final String name;
     public final Integer status;
     public final String statusName;
+    private final Collection<GUIIndicatorDef> indicators;
 
     @JsonCreator
     public GUIExam(@JsonProperty("id") final Long id,
             @JsonProperty("name") final String name,
             @JsonProperty("status") final Integer status,
-            @JsonProperty("statusName") final String statusName) {
+            @JsonProperty("statusName") final String statusName,
+            @JsonProperty("indicators") final Collection<GUIIndicatorDef> indicators) {
 
         this.id = id;
         this.name = name;
         this.status = status;
         this.statusName = statusName;
+        this.indicators = (indicators != null) ? new ArrayList<>(indicators) : new ArrayList<>();
     }
 
     public Long getId() {
@@ -44,6 +50,10 @@ public class GUIExam {
 
     public String getStatusName() {
         return this.statusName;
+    }
+
+    public Collection<GUIIndicatorDef> getIndicators() {
+        return this.indicators;
     }
 
     @Override
@@ -73,8 +83,11 @@ public class GUIExam {
 
     @Override
     public String toString() {
-        return "GUIExam [id=" + this.id + ", name=" + this.name + ", status=" + this.status + ", statusName="
-                + this.statusName + "]";
+        return "GUIExam [id=" + this.id
+                + ", name=" + this.name
+                + ", status=" + this.status
+                + ", statusName=" + this.statusName
+                + ", indicators=" + this.indicators + "]";
     }
 
 }

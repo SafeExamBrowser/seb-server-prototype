@@ -15,7 +15,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.eth.demo.sebserver.domain.rest.IndicatorDefinition;
-import org.eth.demo.sebserver.domain.rest.IndicatorInfo;
+import org.eth.demo.sebserver.domain.rest.IndicatorValue;
 import org.eth.demo.sebserver.service.indicator.ClientIndicator;
 
 public class ClientConnection {
@@ -44,20 +44,19 @@ public class ClientConnection {
         return this;
     }
 
-    public Collection<IndicatorInfo> getIndicatorInfo() {
+    public Collection<IndicatorValue> getIndicatorValues() {
         return this.indicatorMapping
                 .entrySet()
                 .stream()
-                .map(this::createIndicatorInfo)
+                .map(this::indicatorValue)
                 .collect(Collectors.toList());
     }
 
-    private final IndicatorInfo createIndicatorInfo(final Map.Entry<IndicatorDefinition, ClientIndicator> entry) {
-        return new IndicatorInfo(
+    private final IndicatorValue indicatorValue(final Map.Entry<IndicatorDefinition, ClientIndicator> entry) {
+        return new IndicatorValue(
                 this.clientUUID,
-                entry.getValue().getDisplayName(),
-                entry.getValue().computeValue(this.examId, this.clientId, null),
-                entry.getKey());
+                entry.getValue().getType(),
+                entry.getValue().computeValue(this.examId, this.clientId, null));
     }
 
 }

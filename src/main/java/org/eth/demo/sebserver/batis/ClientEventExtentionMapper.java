@@ -25,7 +25,7 @@ import org.mybatis.dynamic.sql.util.SqlProviderAdapter;
 public interface ClientEventExtentionMapper {
 
     @SelectProvider(type = SqlProviderAdapter.class, method = "select")
-    long num(SelectStatementProvider selectStatement);
+    Long num(SelectStatementProvider selectStatement);
 
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<Long>> maxByExample(final BasicColumn column) {
         return SelectDSL.selectWithMapper(this::num, SqlBuilder.max(column))
