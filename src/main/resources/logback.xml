@@ -6,7 +6,7 @@
         </encoder>
     </appender>
  
-    <Logger name="org.eth.demo.sebserver" level="TRACE" additivity="true" />
+    <Logger name="org.eth.demo.sebserver" level="DEBUG" additivity="true" />
     <Logger name="org.mybatis.generator" level="TRACE" additivity="true" />
  
     <root level="INFO" additivity="true">

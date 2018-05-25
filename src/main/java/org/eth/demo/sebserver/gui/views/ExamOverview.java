@@ -86,10 +86,7 @@ public final class ExamOverview implements ViewComposer {
             });
         }
 
-        table.setBounds(20, 20, 500, 500);
         table.layout();
-
-        group.layout();
     }
 
     private Collection<GUIExam> getExams() {

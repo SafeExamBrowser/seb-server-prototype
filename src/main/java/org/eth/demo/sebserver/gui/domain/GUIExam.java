@@ -10,6 +10,9 @@ package org.eth.demo.sebserver.gui.domain;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -20,20 +23,33 @@ public class GUIExam {
     public final String name;
     public final Integer status;
     public final String statusName;
-    private final Collection<GUIIndicatorDef> indicators;
+    private final List<String> indicatorTypeList;
+    private final List<GUIIndicatorDef> indicatorList;
+    private final Map<String, GUIIndicatorDef> indicators;
 
     @JsonCreator
     public GUIExam(@JsonProperty("id") final Long id,
             @JsonProperty("name") final String name,
             @JsonProperty("status") final Integer status,
             @JsonProperty("statusName") final String statusName,
-            @JsonProperty("indicators") final Collection<GUIIndicatorDef> indicators) {
+            @JsonProperty("indicators") final Collection<GUIIndicatorDef> indicatorList) {
 
         this.id = id;
         this.name = name;
         this.status = status;
         this.statusName = statusName;
-        this.indicators = (indicators != null) ? new ArrayList<>(indicators) : new ArrayList<>();
+
+        this.indicatorTypeList = new ArrayList<>();
+        this.indicatorList = new ArrayList<>();
+        this.indicators = new HashMap<>();
+        if (indicatorList != null) {
+            indicatorList.stream()
+                    .forEach(i -> {
+                        this.indicatorTypeList.add(i.type);
+                        this.indicatorList.add(i);
+                        this.indicators.put(i.type, i);
+                    });
+        }
     }
 
     public Long getId() {
@@ -53,7 +69,23 @@ public class GUIExam {
     }
 
     public Collection<GUIIndicatorDef> getIndicators() {
-        return this.indicators;
+        return this.indicatorList;
+    }
+
+    public GUIIndicatorDef getIndicator(final String type) {
+        return this.indicators.get(type);
+    }
+
+    public int getIndicatorIndex(final String indicatorType) {
+        return this.indicatorTypeList.indexOf(indicatorType);
+    }
+
+    public GUIIndicatorDef getIndicator(final int indicatorIndex) {
+        return this.indicatorList.get(indicatorIndex);
+    }
+
+    public int getNumberOfIndicators() {
+        return this.indicatorTypeList.size();
     }
 
     @Override

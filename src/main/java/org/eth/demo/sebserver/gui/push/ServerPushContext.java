@@ -10,8 +10,8 @@ package org.eth.demo.sebserver.gui.push;
 
 import java.util.function.Predicate;
 
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Widget;
 import org.eth.demo.sebserver.util.TypedMap;
 import org.eth.demo.sebserver.util.TypedMap.TypedKey;
 import org.springframework.web.client.RestTemplate;
@@ -21,18 +21,18 @@ import org.springframework.web.client.RestTemplate;
  * @author anhefti */
 public final class ServerPushContext {
 
-    private final Widget anchor;
+    private final Composite anchor;
     private final Predicate<ServerPushContext> runAgain;
     private final TypedMap dataMapping;
     private final RestTemplate restTemplate;
 
-    public ServerPushContext(final Widget anchor) {
+    public ServerPushContext(final Composite anchor) {
         this(anchor, context -> false);
 
     }
 
     public ServerPushContext(
-            final Widget anchor,
+            final Composite anchor,
             final Predicate<ServerPushContext> runAgain) {
 
         this.anchor = anchor;
@@ -64,6 +64,12 @@ public final class ServerPushContext {
 
     public RestTemplate getRestTemplate() {
         return this.restTemplate;
+    }
+
+    public void layout() {
+        this.anchor.pack();
+        this.anchor.layout();
+        this.anchor.getParent().layout(true, true);
     }
 
 }

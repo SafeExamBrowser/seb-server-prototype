@@ -35,7 +35,7 @@ public final class PingIntervalIndicator implements ClientIndicator {
         final Long lastPing = this.clientEventExtentionMapper.maxByExample(clientEventRecord.timestamp)
                 .where(clientEventRecord.examId, isEqualTo(examId))
                 .and(clientEventRecord.clientId, isEqualTo(clientId))
-                .and(clientEventRecord.type, isEqualTo(ClientEvent.EventType.ERROR.id))
+                .and(clientEventRecord.type, isEqualTo(ClientEvent.EventType.PING.id))
                 .and(clientEventRecord.timestamp, isLessThan(time))
                 .build()
                 .execute();

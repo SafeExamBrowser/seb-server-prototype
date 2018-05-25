@@ -8,9 +8,6 @@
 
 package org.eth.demo.sebserver.gui.domain;
 
-import java.math.BigDecimal;
-
-import org.eth.demo.sebserver.batis.gen.model.IndicatorRecord;
 import org.eth.demo.sebserver.domain.rest.IndicatorDefinition;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -19,15 +16,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class GUIIndicatorDef {
 
     public final String type;
-    public final BigDecimal threshold1;
-    public final BigDecimal threshold2;
-    public final BigDecimal threshold3;
+    public final Float threshold1;
+    public final Float threshold2;
+    public final Float threshold3;
 
     @JsonCreator
     public GUIIndicatorDef(@JsonProperty("type") final String type,
-            @JsonProperty("threshold1") final BigDecimal threshold1,
-            @JsonProperty("threshold2") final BigDecimal threshold2,
-            @JsonProperty("threshold3") final BigDecimal threshold3) {
+            @JsonProperty("threshold1") final Float threshold1,
+            @JsonProperty("threshold2") final Float threshold2,
+            @JsonProperty("threshold3") final Float threshold3) {
 
         this.type = type;
         this.threshold1 = threshold1;
@@ -41,24 +38,6 @@ public class GUIIndicatorDef {
                 + ", threshold1=" + this.threshold1
                 + ", threshold2=" + this.threshold2
                 + ", threshold3=" + this.threshold3 + "]";
-    }
-
-    public final IndicatorRecord toRecord(final Long examId) {
-        return new IndicatorRecord(
-                null,
-                examId,
-                this.type,
-                this.threshold1,
-                this.threshold2,
-                this.threshold3);
-    }
-
-    public static final IndicatorDefinition fromRecord(final IndicatorRecord record) {
-        return new IndicatorDefinition(
-                record.getType(),
-                record.getThreshold1(),
-                record.getThreshold2(),
-                record.getThreshold3());
     }
 
     @Override

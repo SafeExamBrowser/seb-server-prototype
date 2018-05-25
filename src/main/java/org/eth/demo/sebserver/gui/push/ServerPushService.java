@@ -31,13 +31,13 @@ public class ServerPushService {
         final Thread bgThread = new Thread(() -> {
             while (!context.isDisposed() && context.runAgain()) {
 
-                log.debug("Call business on Server Push Session on: {}", Thread.currentThread().getName());
+                log.trace("Call business on Server Push Session on: {}", Thread.currentThread().getName());
 
                 business.accept(context);
 
                 if (!context.isDisposed()) {
 
-                    log.debug("Call update on Server Push Session on: {}", Thread.currentThread().getName());
+                    log.trace("Call update on Server Push Session on: {}", Thread.currentThread().getName());
 
                     context.getDisplay().asyncExec(() -> {
                         try {

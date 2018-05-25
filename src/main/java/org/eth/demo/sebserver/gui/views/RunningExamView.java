@@ -8,9 +8,11 @@
 
 package org.eth.demo.sebserver.gui.views;
 
-import java.util.Collection;
+import java.util.BitSet;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -34,13 +36,15 @@ import org.eth.demo.sebserver.gui.GUISpringConfig;
 import org.eth.demo.sebserver.gui.domain.GUIExam;
 import org.eth.demo.sebserver.gui.domain.GUIIndicatorDef;
 import org.eth.demo.sebserver.gui.domain.GUIIndicatorValue;
-import org.eth.demo.sebserver.gui.domain.IndicatorValueMapping;
 import org.eth.demo.sebserver.gui.push.ServerPushContext;
 import org.eth.demo.sebserver.gui.push.ServerPushService;
 import org.eth.demo.sebserver.gui.view.ViewComposer;
 import org.eth.demo.sebserver.gui.view.ViewService;
 import org.eth.demo.sebserver.util.TypedMap;
 import org.eth.demo.sebserver.util.TypedMap.TypedKey;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -48,10 +52,7 @@ public final class RunningExamView implements ViewComposer {
 
     public static final TypedKey<Long> EXAM_ID = new TypedKey<>("EXAM_ID", Long.class);
 
-    private static final TypedKey<Table> CLIENT_TABLE = new TypedKey<>("CLIENT_TABLE", Table.class);
-    private static final TypedKey<GUIExam> EXAM_DATA = new TypedKey<>("EXAM_DATA", GUIExam.class);
-    private static final TypedKey<IndicatorValueMapping> INDICATOR_VALUES =
-            new TypedKey<>("INDICATOR_VALUES", IndicatorValueMapping.class);
+    private static final TypedKey<ClientTable> CLIENT_TABLE = new TypedKey<>("CLIENT_TABLE", ClientTable.class);
 
     private final ServerPushService serverPushService;
 
@@ -70,11 +71,17 @@ public final class RunningExamView implements ViewComposer {
         final GUIExam exam = requestExamData(examId);
         final Display display = parent.getDisplay();
 
+        final RowLayout rootlayout = new RowLayout();
+        rootlayout.type = SWT.VERTICAL;
+        parent.setLayout(rootlayout);
+
+        final Composite root = new Composite(parent, SWT.SHADOW_NONE);
+
         final RowLayout layout = new RowLayout();
         layout.type = SWT.VERTICAL;
-        parent.setLayout(layout);
+        root.setLayout(layout);
 
-        final Label title = new Label(parent, SWT.BOLD);
+        final Label title = new Label(root, SWT.BOLD);
         title.setText("Running Exam View");
         final FontData fontData = title.getFont().getFontData()[0];
         final Font boldFont = new Font(display,
@@ -82,9 +89,7 @@ public final class RunningExamView implements ViewComposer {
                         fontData.getHeight(), SWT.BOLD));
         title.setFont(boldFont);
 
-        final Composite group = new Composite(parent, SWT.SHADOW_NONE);
-        group.setBounds(20, 20, 200, 400);
-
+        final Composite group = new Composite(root, SWT.SHADOW_NONE);
         final GridLayout gridLayout = new GridLayout();
         gridLayout.numColumns = 4;
         group.setLayout(gridLayout);
@@ -111,33 +116,20 @@ public final class RunningExamView implements ViewComposer {
             indT3.setBackground(new Color(display, new RGB(255, 0, 0), 100));
         }
 
-        final Label clients = new Label(parent, SWT.NONE);
+        final Label clients = new Label(root, SWT.NONE);
         clients.setText("Connected Clients:");
         clients.setFont(boldFont);
 
-        final Table table = new Table(parent, SWT.NULL);
-        final TableColumn t1c = new TableColumn(table, SWT.LEFT);
-        t1c.setText("UUID");
-        t1c.setWidth(200);
-        for (final GUIIndicatorDef indDef : exam.getIndicators()) {
-            final TableColumn tc = new TableColumn(table, SWT.LEFT);
-            tc.setText(indDef.type);
-            tc.setWidth(300);
-        }
+        final ClientTable clientTable = new ClientTable(display, root, exam);
 
-        table.setHeaderVisible(true);
-        table.setLinesVisible(true);
-        table.layout();
-
-        final Button button = new Button(parent, SWT.FLAT);
+        final Button button = new Button(root, SWT.FLAT);
         button.setText("Back to Home");
         button.addListener(SWT.Selection, event -> {
             viewService.composeView(parent, ExamOverview.class);
         });
 
-        final ServerPushContext context = new ServerPushContext(title, runAgainContext -> true)
-                .setData(EXAM_DATA, exam)
-                .setData(CLIENT_TABLE, table);
+        final ServerPushContext context = new ServerPushContext(root, runAgainContext -> true)
+                .setData(CLIENT_TABLE, clientTable);
         this.serverPushService.runServerPush(
                 context,
                 RunningExamView::pollData,
@@ -153,67 +145,154 @@ public final class RunningExamView implements ViewComposer {
 
     private final static void pollData(final ServerPushContext context) {
         try {
-            Thread.sleep(500);
+            Thread.sleep(100);
         } catch (final Exception e) {
         }
 
-        final GUIExam exam = context.getData(EXAM_DATA);
-        final UriComponentsBuilder builder = UriComponentsBuilder
-                .fromHttpUrl(GUISpringConfig.ROOT_LOCATION + "/exam/indicatorValues/" + exam.id);
-
-        @SuppressWarnings("unchecked")
-        final Collection<GUIIndicatorValue> indicatorValues =
-                context.getRestTemplate().getForObject(builder.toUriString(), Collection.class);
-        if (!indicatorValues.isEmpty()) {
-            System.out.println("********************** indicatorValues: " + indicatorValues);
-        }
-        final IndicatorValueMapping indicatorValueMapping = new IndicatorValueMapping();
-        for (final GUIIndicatorValue value : indicatorValues) {
-            final Map<String, Float> computeIfAbsent = indicatorValueMapping.computeIfAbsent(
-                    value.clientUUID,
-                    uuid -> new LinkedHashMap<>());
-            computeIfAbsent.put(value.type, value.value);
-        }
-        context.setData(INDICATOR_VALUES, indicatorValueMapping);
-
-    }
-
-    private final static void update(final ServerPushContext context) {
-        final Table table = context.getData(CLIENT_TABLE);
-        final IndicatorValueMapping indicatorValueMapping = context.getData(INDICATOR_VALUES);
-        if (indicatorValueMapping == null || table == null) {
+        final ClientTable clientTable = context.getData(CLIENT_TABLE);
+        if (clientTable == null) {
             return;
         }
 
-        final Set<UUID> newClients = new HashSet<>(indicatorValueMapping.keySet());
-        for (final TableItem item : table.getItems()) {
-            final UUID uuid = UUID.fromString(item.getText(0));
-            if (!indicatorValueMapping.containsKey(uuid)) {
-                // client has no data anymore
-                item.dispose();
-                newClients.remove(uuid);
-                continue;
-            }
-            final Map<String, Float> map = indicatorValueMapping.get(uuid);
-            int i = 1;
-            for (final Float value : map.values()) {
-                item.setText(i, String.valueOf(value));
-                i++;
-            }
+        final UriComponentsBuilder builder = UriComponentsBuilder
+                .fromHttpUrl(GUISpringConfig.ROOT_LOCATION + "/exam/indicatorValues/" + clientTable.exam.id);
+        final ResponseEntity<List<GUIIndicatorValue>> responseEntity =
+                context.getRestTemplate().exchange(
+                        builder.toUriString(),
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference<List<GUIIndicatorValue>>() {
+                        });
+        final List<GUIIndicatorValue> indicatorValues = responseEntity.getBody();
+        clientTable.updateValues(indicatorValues);
+    }
 
-            newClients.remove(uuid);
+    private final static void update(final ServerPushContext context) {
+        final ClientTable clientTable = context.getData(CLIENT_TABLE);
+        if (clientTable == null) {
+            return;
         }
 
-        if (!newClients.isEmpty()) {
-            for (final UUID uuid : newClients) {
-                final TableItem item = new TableItem(table, SWT.LEFT);
-                item.setText(0, uuid.toString());
-                final Map<String, Float> map = indicatorValueMapping.get(uuid);
-                int i = 1;
-                for (final Float value : map.values()) {
-                    item.setText(i, String.valueOf(value));
-                    i++;
+        clientTable.updateGUI();
+        context.layout();
+    }
+
+    private final static class ClientTable {
+
+        final GUIExam exam;
+        Table table;
+
+        final Color color1;
+        final Color color2;
+        final Color color3;
+
+        final Set<UUID> toRemove;
+        final Map<UUID, float[]> indicatorValues;
+        final Map<UUID, UpdatableTableItem> tableMapping;
+
+        ClientTable(final Display display, final Composite tableRoot, final GUIExam exam) {
+            this.exam = exam;
+            this.toRemove = new HashSet<>();
+            this.indicatorValues = new HashMap<>();
+
+            this.table = new Table(tableRoot, SWT.NULL);
+            final TableColumn t1c = new TableColumn(this.table, SWT.NONE);
+            t1c.setText("UUID");
+            t1c.setWidth(200);
+            for (final GUIIndicatorDef indDef : exam.getIndicators()) {
+                final TableColumn tc = new TableColumn(this.table, SWT.NONE);
+                tc.setText(indDef.type);
+                tc.setWidth(300);
+            }
+
+            this.table.setHeaderVisible(true);
+            this.table.setLinesVisible(true);
+            this.table.layout();
+
+            this.color1 = new Color(display, new RGB(0, 255, 0), 100);
+            this.color2 = new Color(display, new RGB(249, 166, 2), 100);
+            this.color3 = new Color(display, new RGB(255, 0, 0), 100);
+
+            this.tableMapping = new HashMap<>();
+        }
+
+        void updateValues(final List<GUIIndicatorValue> indicatorValues) {
+            this.toRemove.addAll(this.indicatorValues.keySet());
+            for (final GUIIndicatorValue value : indicatorValues) {
+                final float[] valueMapping = this.indicatorValues.computeIfAbsent(
+                        value.clientUUID,
+                        uuid -> new float[this.exam.getNumberOfIndicators()]);
+
+                final int indicatorIndex = this.exam.getIndicatorIndex(value.type);
+                valueMapping[indicatorIndex] = value.value;
+                if (!this.tableMapping.containsKey(value.clientUUID)) {
+                    this.tableMapping.put(
+                            value.clientUUID,
+                            new UpdatableTableItem(this.table, value.clientUUID));
+                } else {
+                    this.tableMapping.get(value.clientUUID).needsUpdate.set(indicatorIndex);
                 }
+                this.toRemove.remove(value.clientUUID);
+            }
+
+            this.indicatorValues.keySet()
+                    .removeAll(this.toRemove);
+        }
+
+        void updateGUI() {
+            final Iterator<UpdatableTableItem> iterator = this.tableMapping.values().iterator();
+            while (iterator.hasNext()) {
+                final UpdatableTableItem item = iterator.next();
+                item.update(this.table);
+
+                if (!this.indicatorValues.containsKey(item.clientId)) {
+                    item.tableItem.dispose();
+                    iterator.remove();
+                } else {
+                    final float[] values = this.indicatorValues.get(item.clientId);
+                    for (int i = item.needsUpdate.nextSetBit(0); i >= 0; i = item.needsUpdate.nextSetBit(i + 1)) {
+                        item.tableItem.setText(i + 1, String.valueOf(values[i]));
+                        item.tableItem.setBackground(i + 1, getColorForValue(i, values[i]));
+                    }
+
+                }
+
+                item.needsUpdate.clear();
+            }
+
+            this.table.pack();
+            this.table.layout();
+        }
+
+        private Color getColorForValue(final int indicatorIndex, final float value) {
+            final GUIIndicatorDef indicator = this.exam.getIndicator(indicatorIndex);
+            if (value >= indicator.threshold3) {
+                return this.color3;
+            } else if (value >= indicator.threshold2) {
+                return this.color2;
+            } else {
+                return this.color1;
+            }
+        }
+    }
+
+    private static final class UpdatableTableItem {
+
+        final BitSet needsUpdate = new BitSet();
+        final UUID clientId;
+        TableItem tableItem;
+
+        UpdatableTableItem(final Table parent, final UUID clientId) {
+            this.tableItem = null;
+            this.clientId = clientId;
+        }
+
+        void update(final Table parent) {
+            if (this.tableItem == null) {
+                this.tableItem = new TableItem(parent, SWT.NONE);
+                this.tableItem.setText(0, this.clientId.toString());
+                this.needsUpdate.set(0);
+                this.needsUpdate.set(1);
             }
         }
     }
