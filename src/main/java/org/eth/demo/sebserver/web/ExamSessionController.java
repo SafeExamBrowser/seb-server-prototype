@@ -49,7 +49,7 @@ public class ExamSessionController {
             @RequestBody final ClientEvent clientEvent) {
 
         return Mono.fromRunnable(() -> {
-            this.examSessionService.logClientEvent(
+            this.examSessionService.saveClientEvent(
                     UUID.fromString(clientUUID),
                     clientEvent);
         });

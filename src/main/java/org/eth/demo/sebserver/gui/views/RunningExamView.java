@@ -198,11 +198,11 @@ public final class RunningExamView implements ViewComposer {
             this.table = new Table(tableRoot, SWT.NULL);
             final TableColumn t1c = new TableColumn(this.table, SWT.NONE);
             t1c.setText("UUID");
-            t1c.setWidth(200);
+            t1c.setWidth(300);
             for (final GUIIndicatorDef indDef : exam.getIndicators()) {
                 final TableColumn tc = new TableColumn(this.table, SWT.NONE);
                 tc.setText(indDef.type);
-                tc.setWidth(300);
+                tc.setWidth(200);
             }
 
             this.table.setHeaderVisible(true);

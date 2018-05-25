@@ -48,7 +48,6 @@ public class ExamSessionService {
     }
 
     public void disconnectClient(final UUID clientUUID) {
-        System.out.println("********************** disconnectClient: " + clientUUID);
         this.clientConnectionService.disposeConnection(clientUUID);
     }
 
@@ -66,7 +65,7 @@ public class ExamSessionService {
     }
 
     @Transactional
-    public void logClientEvent(final UUID clientUUID, final ClientEvent event) {
+    public void saveClientEvent(final UUID clientUUID, final ClientEvent event) {
         if (!this.clientConnectionService.checkActiveConnection(clientUUID)) {
             throw new IllegalStateException("Client with UUID: " + clientUUID + " is not registered");
         }
@@ -76,6 +75,13 @@ public class ExamSessionService {
                 clientConnection.examId,
                 clientConnection.clientId);
         this.clientEventRecordMapper.insert(record);
+    }
+
+    public void sendClientEvent(final UUID clientUUID, final ClientEvent event) {
+        // TODO try to avoid SQL insert for each client event.
+        //      instead store them in a queue that is shared with a batched insert service running in its own thread (maybe one per core)
+        //      the batched insert should empty the shared queue and make a batch update: http://www.mybatis.org/mybatis-dynamic-sql/docs/insert.html
+        // https://stackoverflow.com/questions/1301691/java-queue-implementations-which-one
     }
 
 }
