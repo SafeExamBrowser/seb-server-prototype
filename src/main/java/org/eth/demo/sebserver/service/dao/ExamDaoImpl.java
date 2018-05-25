@@ -22,6 +22,7 @@ import org.eth.demo.sebserver.batis.gen.mapper.IndicatorRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ExamRecord;
 import org.eth.demo.sebserver.batis.gen.model.IndicatorRecord;
 import org.eth.demo.sebserver.domain.rest.Exam;
+import org.eth.demo.sebserver.service.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,7 +57,7 @@ public class ExamDaoImpl implements ExamDao {
         final ExamRecord record = this.examMapper.selectByPrimaryKey(id);
         if (record == null) {
             log.info("Exam with id {} requested but not exists", id);
-            throw new RuntimeException("No Exam with id: " + id);
+            throw new ResourceNotFoundException("Exam", String.valueOf(id));
         }
 
         final List<IndicatorRecord> indicators = this.indicatorMapper.selectByExample()

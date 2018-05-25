@@ -8,7 +8,9 @@
 
 package org.eth.demo.sebserver.service.dao;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,7 +18,7 @@ import static org.mockito.Mockito.when;
 import org.eth.demo.sebserver.batis.ExamIndicatorJoinMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.IndicatorRecordMapper;
-import org.eth.demo.sebserver.domain.rest.Exam;
+import org.eth.demo.sebserver.service.ResourceNotFoundException;
 import org.eth.demo.sebserver.testing.TestWithLogging;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -31,8 +33,16 @@ public class ExamDaoImplTest extends TestWithLogging {
 
         when(tester.examMapperMock.selectByPrimaryKey(1L)).thenReturn(null);
 
-        final Exam exam = tester.candidate.byId(1L);
-        assertNotNull(exam);
+        try {
+            tester.candidate.byId(1L);
+            fail("ResourceNotFoundException expected");
+        } catch (final ResourceNotFoundException e) {
+            assertEquals("Resource Exam with ID: 1 not found", e.getMessage());
+        }
+
+        verify(this.mockAppender).doAppend(this.captorLoggingEvent.capture());
+        final LoggingEvent loggingEvent = this.captorLoggingEvent.getValue();
+        assertNotNull(loggingEvent);
     }
 
     @Test
@@ -42,12 +52,12 @@ public class ExamDaoImplTest extends TestWithLogging {
         Mockito.when(tester.examMapperMock.selectByPrimaryKey(1L))
                 .thenThrow(new RuntimeException("UnexpectedException"));
 
-        final Exam exam = tester.candidate.byId(1L);
-        assertNotNull(exam);
-
-        verify(this.mockAppender).doAppend(this.captorLoggingEvent.capture());
-        final LoggingEvent loggingEvent = this.captorLoggingEvent.getValue();
-        assertNotNull(loggingEvent);
+        try {
+            tester.candidate.byId(1L);
+            fail("ResourceNotFoundException expected");
+        } catch (final RuntimeException e) {
+            assertEquals("UnexpectedException", e.getMessage());
+        }
     }
 
     private static class TestHelper {
