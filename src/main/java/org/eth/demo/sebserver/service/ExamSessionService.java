@@ -48,6 +48,7 @@ public class ExamSessionService {
     }
 
     public void disconnectClient(final UUID clientUUID) {
+        System.out.println("********************** disconnectClient: " + clientUUID);
         this.clientConnectionService.disposeConnection(clientUUID);
     }
 

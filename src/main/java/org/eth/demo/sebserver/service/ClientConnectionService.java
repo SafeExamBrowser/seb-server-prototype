@@ -64,7 +64,7 @@ public class ClientConnectionService {
         }
 
         // TODO later w have to delete the active connection record for the client here
-
+        this.activeConnections.remove(clientUUID);
         this.connectionCache.remove(clientUUID);
     }
 

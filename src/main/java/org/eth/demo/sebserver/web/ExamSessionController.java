@@ -8,7 +8,6 @@
 
 package org.eth.demo.sebserver.web;
 
-import java.util.Collection;
 import java.util.UUID;
 
 import org.eth.demo.sebserver.domain.rest.ClientEvent;
@@ -22,6 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 @RestController
 @RequestMapping("/exam")
 public class ExamSessionController {
@@ -30,29 +32,33 @@ public class ExamSessionController {
     private ExamSessionService examSessionService;
 
     @RequestMapping(value = "/connect/{examId}", method = RequestMethod.GET)
-    final String connect(@PathVariable final Long examId) {
-        return this.examSessionService
+    final Mono<String> connect(@PathVariable final Long examId) {
+        return Mono.fromCallable(() -> this.examSessionService
                 .connectClient(examId)
-                .toString();
+                .toString());
     }
 
     @RequestMapping(value = "/disconnect", method = RequestMethod.POST)
-    final void disconnect(@RequestHeader(value = "Token") final String clientUUID) {
-        this.examSessionService.disconnectClient(UUID.fromString(clientUUID));
+    final Mono<Void> disconnect(@RequestHeader(value = "Token") final String clientUUID) {
+        return Mono.fromRunnable(() -> this.examSessionService
+                .disconnectClient(UUID.fromString(clientUUID)));
     }
 
     @RequestMapping(value = "/event/{examId}", method = RequestMethod.POST)
-    final void clientEvent(@RequestHeader(value = "Token") final String clientUUID,
+    final Mono<Void> clientEvent(@RequestHeader(value = "Token") final String clientUUID,
             @RequestBody final ClientEvent clientEvent) {
 
-        this.examSessionService.logClientEvent(
-                UUID.fromString(clientUUID),
-                clientEvent);
+        return Mono.fromRunnable(() -> {
+            this.examSessionService.logClientEvent(
+                    UUID.fromString(clientUUID),
+                    clientEvent);
+        });
     }
 
     @RequestMapping(value = "/indicatorValues/{examId}", method = RequestMethod.GET)
-    public Collection<IndicatorValue> indicatorValues(@PathVariable final Long examId) {
-        return this.examSessionService.getIndicatorValues(examId);
+    public Flux<IndicatorValue> indicatorValues(@PathVariable final Long examId) {
+        return Flux.fromIterable(
+                this.examSessionService.getIndicatorValues(examId));
     }
 
 }
