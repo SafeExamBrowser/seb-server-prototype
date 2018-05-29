@@ -61,15 +61,24 @@ public class PingIntervalIndicator extends ClientIndicatorAdapter {
 
         if (lastPing == null) {
             return BigDecimal.ZERO;
+        } else {
+            return new BigDecimal(lastPing);
+        }
+    }
+
+    @Override
+    public BigDecimal getCurrentValue() {
+        if (this.currentValue == null) {
+            this.currentValue = computeValueAt(System.currentTimeMillis());
         }
 
-        return new BigDecimal(time - lastPing);
+        return new BigDecimal(System.currentTimeMillis() - this.currentValue.longValue());
     }
 
     @Override
     public void notifyClientEvent(final ClientEvent event) {
         if (event.type == EventType.PING) {
-            this.currentValue = new BigDecimal(System.currentTimeMillis() - event.timestamp);
+            this.currentValue = new BigDecimal(event.timestamp);
         }
     }
 

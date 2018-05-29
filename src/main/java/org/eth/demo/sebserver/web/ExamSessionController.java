@@ -13,7 +13,6 @@ import java.util.UUID;
 import org.eth.demo.sebserver.domain.rest.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.IndicatorValue;
 import org.eth.demo.sebserver.service.ExamSessionService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -28,8 +27,11 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/exam")
 public class ExamSessionController {
 
-    @Autowired
-    private ExamSessionService examSessionService;
+    private final ExamSessionService examSessionService;
+
+    public ExamSessionController(final ExamSessionService examSessionService) {
+        this.examSessionService = examSessionService;
+    }
 
     @RequestMapping(value = "/connect/{examId}", method = RequestMethod.GET)
     final Mono<String> connect(@PathVariable final Long examId) {

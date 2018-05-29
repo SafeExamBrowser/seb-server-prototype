@@ -46,4 +46,8 @@ public class ClientConnection {
         return this.indicatorMapping.values().stream();
     }
 
+    public Stream<ClientIndicator> indicators() {
+        return this.indicatorMapping.values().stream();
+    }
+
 }

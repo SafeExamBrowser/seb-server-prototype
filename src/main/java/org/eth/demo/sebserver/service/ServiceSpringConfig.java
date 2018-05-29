@@ -11,6 +11,7 @@ package org.eth.demo.sebserver.service;
 import java.util.concurrent.Executor;
 
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.eth.demo.sebserver.SEBServer;
 import org.eth.demo.sebserver.batis.ClientEventExtentionMapper;
 import org.eth.demo.sebserver.batis.ExamIndicatorJoinMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordMapper;
@@ -26,12 +27,12 @@ import org.eth.demo.sebserver.service.indicator.ClientIndicator;
 import org.eth.demo.sebserver.service.indicator.ErrorCountIndicator;
 import org.eth.demo.sebserver.service.indicator.PingIntervalIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
-import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -39,11 +40,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 @EnableAsync
 public class ServiceSpringConfig implements AsyncConfigurer {
-
-    public static final String PROPERTY_NAME_INDICATOR_CACHING = "sebserver.indicator.caching";
-    public static final String PROPERTY_NAME_EVENT_CONSUMER_STRATEGY = "sebserver.event.consumerstrategy";
-    public static final String EVENT_CONSUMER_STRATEGY_SINGLE_EVENT_STORE = "SINGLE_EVENT_STORE_STRATEGY";
-    public static final String EVENT_CONSUMER_STRATEGY_ASYNC_BATCH_STORE = "ASYNC_BATCH_STORE_STRATEGY";
 
     @Autowired
     private ClientEventRecordMapper clientEventRecordMapper;
@@ -58,9 +54,12 @@ public class ServiceSpringConfig implements AsyncConfigurer {
     @Autowired
     private SqlSessionFactory sqlSessionFactory;
     @Autowired
-    private Environment environment;
-    @Autowired
     private ApplicationContext applicationContext;
+
+    @Value("${" + SEBServer.PROPERTY_NAME_INDICATOR_CACHING + "}")
+    private boolean indicatorValueCachingEnabled;
+    @Value("${" + SEBServer.PROPERTY_NAME_EVENT_CONSUMER_STRATEGY + "}")
+    private String eventHandlingStrategyBeanName;
 
     @Lazy
     @Bean
@@ -79,14 +78,14 @@ public class ServiceSpringConfig implements AsyncConfigurer {
     @Lazy
     @Bean
     public ExamSessionService examSessionService() {
-        final String property = this.environment.getProperty(PROPERTY_NAME_EVENT_CONSUMER_STRATEGY);
         final EventHandlingStrategy eventHandlingStrategy = this.applicationContext
-                .getBean(property, EventHandlingStrategy.class);
+                .getBean(this.eventHandlingStrategyBeanName, EventHandlingStrategy.class);
 
         return new ExamSessionService(
                 examStateService(),
                 clientConnectionService(),
-                eventHandlingStrategy);
+                eventHandlingStrategy,
+                this.indicatorValueCachingEnabled);
     }
 
     @Lazy
@@ -118,7 +117,7 @@ public class ServiceSpringConfig implements AsyncConfigurer {
     }
 
     @Lazy
-    @Bean(name = EVENT_CONSUMER_STRATEGY_SINGLE_EVENT_STORE)
+    @Bean(name = SEBServer.EVENT_CONSUMER_STRATEGY_SINGLE_EVENT_STORE)
     public SingleEventStoreStrategy singleEventStoreStrategy() {
         return new SingleEventStoreStrategy(
                 clientConnectionService(),
@@ -126,7 +125,7 @@ public class ServiceSpringConfig implements AsyncConfigurer {
     }
 
     @Lazy
-    @Bean(name = EVENT_CONSUMER_STRATEGY_ASYNC_BATCH_STORE)
+    @Bean(name = SEBServer.EVENT_CONSUMER_STRATEGY_ASYNC_BATCH_STORE)
     public AsyncBatchEventSaveStrategy ayncBatchEventSaveService() {
         return new AsyncBatchEventSaveStrategy(
                 clientConnectionService(),

@@ -13,7 +13,6 @@ import java.util.Collection;
 import org.eth.demo.sebserver.domain.rest.Exam;
 import org.eth.demo.sebserver.service.ExamStateService;
 import org.eth.demo.sebserver.service.dao.ExamDao;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,10 +23,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/exam")
 public class ExamController {
 
-    @Autowired
-    private ExamDao examDao;
-    @Autowired
-    private ExamStateService examStateService;
+    private final ExamDao examDao;
+    private final ExamStateService examStateService;
+
+    public ExamController(final ExamDao examDao, final ExamStateService examStateService) {
+        this.examDao = examDao;
+        this.examStateService = examStateService;
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     final Collection<Exam> exams() {
