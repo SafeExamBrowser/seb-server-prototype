@@ -59,6 +59,8 @@ public class ServiceSpringConfig implements AsyncConfigurer {
     private SqlSessionFactory sqlSessionFactory;
     @Autowired
     private Environment environment;
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Lazy
     @Bean
@@ -76,13 +78,14 @@ public class ServiceSpringConfig implements AsyncConfigurer {
 
     @Lazy
     @Bean
-    public ExamSessionService examSessionService(final ApplicationContext context) {
+    public ExamSessionService examSessionService() {
         final String property = this.environment.getProperty(PROPERTY_NAME_EVENT_CONSUMER_STRATEGY);
-        final EventHandlingStrategy eventHandlingStrategy = context.getBean(property, EventHandlingStrategy.class);
+        final EventHandlingStrategy eventHandlingStrategy = this.applicationContext
+                .getBean(property, EventHandlingStrategy.class);
 
         return new ExamSessionService(
                 examStateService(),
-                clientConnectionService(context),
+                clientConnectionService(),
                 eventHandlingStrategy);
     }
 
@@ -102,31 +105,31 @@ public class ServiceSpringConfig implements AsyncConfigurer {
 
     @Lazy
     @Bean
-    public ClientConnectionFactory clientConnectionFactory(final ApplicationContext context) {
-        return new ClientConnectionFactory(context);
+    public ClientConnectionFactory clientConnectionFactory() {
+        return new ClientConnectionFactory(this.applicationContext);
     }
 
     @Lazy
     @Bean
-    public ClientConnectionService clientConnectionService(final ApplicationContext context) {
+    public ClientConnectionService clientConnectionService() {
         return new ClientConnectionService(
-                clientConnectionFactory(context),
+                clientConnectionFactory(),
                 examStateService());
     }
 
     @Lazy
     @Bean(name = EVENT_CONSUMER_STRATEGY_SINGLE_EVENT_STORE)
-    public SingleEventStoreStrategy singleEventStoreStrategy(final ApplicationContext context) {
+    public SingleEventStoreStrategy singleEventStoreStrategy() {
         return new SingleEventStoreStrategy(
-                clientConnectionService(context),
+                clientConnectionService(),
                 this.clientEventRecordMapper);
     }
 
     @Lazy
     @Bean(name = EVENT_CONSUMER_STRATEGY_ASYNC_BATCH_STORE)
-    public AsyncBatchEventSaveStrategy ayncBatchEventSaveService(final ApplicationContext context) {
+    public AsyncBatchEventSaveStrategy ayncBatchEventSaveService() {
         return new AsyncBatchEventSaveStrategy(
-                clientConnectionService(context),
+                clientConnectionService(),
                 this.sqlSessionFactory,
                 getAsyncExecutor());
     }
