@@ -8,14 +8,12 @@
 
 package org.eth.demo.sebserver.domain;
 
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eth.demo.sebserver.domain.rest.IndicatorDefinition;
-import org.eth.demo.sebserver.domain.rest.IndicatorValue;
 import org.eth.demo.sebserver.service.indicator.ClientIndicator;
 
 public class ClientConnection {
@@ -39,24 +37,13 @@ public class ClientConnection {
         return this.clientUUID;
     }
 
-    ClientConnection add(final IndicatorDefinition indicator, final ClientIndicator clientIndicator) {
+    public ClientConnection add(final IndicatorDefinition indicator, final ClientIndicator clientIndicator) {
         this.indicatorMapping.put(indicator, clientIndicator);
         return this;
     }
 
-    public Collection<IndicatorValue> getIndicatorValues() {
-        return this.indicatorMapping
-                .entrySet()
-                .stream()
-                .map(this::indicatorValue)
-                .collect(Collectors.toList());
-    }
-
-    private final IndicatorValue indicatorValue(final Map.Entry<IndicatorDefinition, ClientIndicator> entry) {
-        return new IndicatorValue(
-                this.clientUUID,
-                entry.getValue().getType(),
-                entry.getValue().computeValue(this.examId, this.clientId, null));
+    public Stream<ClientIndicator> valuesStream() {
+        return this.indicatorMapping.values().stream();
     }
 
 }

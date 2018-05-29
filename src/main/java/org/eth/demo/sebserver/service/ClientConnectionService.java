@@ -10,6 +10,7 @@ package org.eth.demo.sebserver.service;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -17,9 +18,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eth.demo.sebserver.domain.ClientConnection;
-import org.eth.demo.sebserver.domain.ClientConnectionFactory;
 import org.eth.demo.sebserver.domain.rest.Exam;
 import org.eth.demo.sebserver.domain.rest.IndicatorValue;
+import org.eth.demo.sebserver.service.indicator.ClientConnectionFactory;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -77,7 +78,7 @@ public class ClientConnectionService {
                 .collect(Collectors.toList());
     }
 
-    public ClientConnection getClientConnection(final UUID clientUUID) {
+    public Optional<ClientConnection> getClientConnection(final UUID clientUUID) {
         if (!this.connectionCache.containsKey(clientUUID)) {
             // TODO later we have to check here if the client as an active connection record and if so, create and cache
             //      a specified ClientConnection
@@ -87,11 +88,21 @@ public class ClientConnectionService {
             }
         }
 
-        return this.connectionCache.get(clientUUID);
+        if (this.connectionCache.containsKey(clientUUID)) {
+            return Optional.of(this.connectionCache.get(clientUUID));
+        } else {
+            return Optional.empty();
+        }
     }
 
     public Stream<IndicatorValue> indicatorValues(final UUID clientUUID) {
-        return getClientConnection(clientUUID).getIndicatorValues().stream();
+        return getClientConnection(clientUUID)
+                .map(cc -> cc.valuesStream()
+                        .map(ci -> new IndicatorValue(
+                                cc.clientUUID,
+                                ci.getType(),
+                                ci.getCurrentValue())))
+                .orElse(Stream.empty());
     }
 
     public boolean checkActiveConnection(final UUID clientUUID) {

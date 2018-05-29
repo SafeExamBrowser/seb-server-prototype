@@ -9,6 +9,10 @@
 package org.eth.demo.sebserver.service.indicator;
 
 import java.math.BigDecimal;
+import java.util.UUID;
+
+import org.eth.demo.sebserver.domain.rest.ClientEvent;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface ClientIndicator {
 
@@ -16,6 +20,19 @@ public interface ClientIndicator {
 
     String getDisplayName();
 
-    BigDecimal computeValue(Long examId, Long clientId, Long timestamp);
+    void init(Long examId, Long clientId, UUID clientUUID, boolean alwaysCompute);
+
+    Long examId();
+
+    Long clientId();
+
+    UUID clientUUID();
+
+    BigDecimal getCurrentValue();
+
+    @Transactional(readOnly = true)
+    BigDecimal computeValueAt(Long timestamp);
+
+    void notifyClientEvent(ClientEvent event);
 
 }

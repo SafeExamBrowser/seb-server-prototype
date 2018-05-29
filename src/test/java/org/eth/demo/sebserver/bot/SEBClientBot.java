@@ -23,6 +23,7 @@ public class SEBClientBot {
     public static final int DEFAULT_CONNECT_ATTEMPTS = 3;
 
     private static final Logger log = LoggerFactory.getLogger(SEBClientBot.class);
+
     private static final long ONE_SECOND = 1000; // milliseconds
     private static final long TEN_SECONDS = 10 * ONE_SECOND;
     private static final long ONE_MINUTE = 60 * ONE_SECOND;
@@ -34,7 +35,7 @@ public class SEBClientBot {
                 DEFAULT_ROOT_URL,
                 DEFAULT_EXAM_ID,
                 DEFAULT_CONNECT_ATTEMPTS,
-                TEN_SECONDS, ONE_SECOND,
+                TEN_SECONDS, 100,
                 ONE_MINUTE);
     }
 
@@ -102,7 +103,7 @@ public class SEBClientBot {
 
     private String connect(final String rootURL, final long examId) {
         final String url = rootURL + "/connect/" + examId;
-        log.info("Trying to connect to exam: {}", url);
+        log.trace("Trying to connect to exam: {}", url);
 
         final UriComponentsBuilder builder = UriComponentsBuilder
                 .fromHttpUrl(url);
@@ -126,7 +127,7 @@ public class SEBClientBot {
             final String text) {
 
         final String url = rootURL + "/event/" + examId;
-        log.info("Trying to post a ping event to {} using token: {}", url, token);
+        log.trace("Trying to post a ping event to {} using token: {}", url, token);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("Content-Type", "application/json");
@@ -134,6 +135,7 @@ public class SEBClientBot {
 
         final JSONObject json = new JSONObject();
         try {
+            json.put("clientId", token);
             json.put("type", eventType);
             json.put("timestamp", System.currentTimeMillis());
             json.put("text", text);
@@ -141,7 +143,7 @@ public class SEBClientBot {
             throw new RuntimeException("Unexpected Error: ", e);
         }
 
-        log.debug("event data: {}", json.toString());
+        log.trace("event data: {}", json.toString());
 
         final HttpEntity<String> httpEntity = new HttpEntity<>(json.toString(), httpHeaders);
 
@@ -152,12 +154,12 @@ public class SEBClientBot {
                 builder.toUriString(),
                 httpEntity, String.class);
 
-        log.debug("response data: {}", response);
+        log.trace("response data: {}", response);
     }
 
     private void disconnect(final String rootURL, final String token) {
         final String url = rootURL + "/disconnect";
-        log.info("Trying to disconnect uuid: {}", token);
+        log.trace("Trying to disconnect uuid: {}", token);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("Content-Type", "application/json");
@@ -172,7 +174,7 @@ public class SEBClientBot {
                 builder.toUriString(),
                 httpEntity, String.class);
 
-        log.debug("response data: {}", response);
+        log.trace("response data: {}", response);
     }
 
 }

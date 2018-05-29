@@ -16,32 +16,20 @@ import java.math.BigDecimal;
 
 import org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordMapper;
 import org.eth.demo.sebserver.domain.rest.ClientEvent;
+import org.eth.demo.sebserver.domain.rest.ClientEvent.EventType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
-public class ErrorCountIndicator implements ClientIndicator {
+public class ErrorCountIndicator extends ClientIndicatorAdapter {
 
     public static final String BEAN_NAME = "errorCountIndicator";
     private static final String DISPLAY_NAME = "Error Logs";
 
     private final ClientEventRecordMapper clientEventRecordMapper;
 
+    @Autowired // TODO check if this is necessary because of proxying
     public ErrorCountIndicator(final ClientEventRecordMapper clientEventRecordMapper) {
-        super();
         this.clientEventRecordMapper = clientEventRecordMapper;
-    }
-
-    @Override
-    public BigDecimal computeValue(final Long examId, final Long clientId, final Long timestamp) {
-        final Long time = (timestamp != null) ? timestamp : System.currentTimeMillis();
-
-        final Long errors = this.clientEventRecordMapper.countByExample()
-                .where(clientEventRecord.examId, isEqualTo(examId))
-                .and(clientEventRecord.clientId, isEqualTo(clientId))
-                .and(clientEventRecord.type, isEqualTo(ClientEvent.EventType.ERROR.id))
-                .and(clientEventRecord.timestamp, isLessThan(time))
-                .build()
-                .execute();
-
-        return new BigDecimal(errors);
     }
 
     @Override
@@ -52,6 +40,29 @@ public class ErrorCountIndicator implements ClientIndicator {
     @Override
     public String getDisplayName() {
         return DISPLAY_NAME;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal computeValueAt(final Long timestamp) {
+        final Long time = (timestamp != null) ? timestamp : System.currentTimeMillis();
+
+        final Long errors = this.clientEventRecordMapper.countByExample()
+                .where(clientEventRecord.examId, isEqualTo(this.examId))
+                .and(clientEventRecord.clientId, isEqualTo(this.clientId))
+                .and(clientEventRecord.type, isEqualTo(ClientEvent.EventType.ERROR.id))
+                .and(clientEventRecord.timestamp, isLessThan(time))
+                .build()
+                .execute();
+
+        return new BigDecimal(errors);
+    }
+
+    @Override
+    public void notifyClientEvent(final ClientEvent event) {
+        if (event.type == EventType.ERROR) {
+            this.currentValue = getCurrentValue().add(BigDecimal.ONE);
+        }
     }
 
 }

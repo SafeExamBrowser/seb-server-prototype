@@ -49,9 +49,7 @@ public class ExamSessionController {
             @RequestBody final ClientEvent clientEvent) {
 
         return Mono.fromRunnable(() -> {
-            this.examSessionService.saveClientEvent(
-                    UUID.fromString(clientUUID),
-                    clientEvent);
+            this.examSessionService.notifyClientEvent(clientEvent);
         });
     }
 

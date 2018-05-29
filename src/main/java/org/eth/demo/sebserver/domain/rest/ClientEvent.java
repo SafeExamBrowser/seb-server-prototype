@@ -9,6 +9,7 @@
 package org.eth.demo.sebserver.domain.rest;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import org.eth.demo.sebserver.batis.gen.model.ClientEventRecord;
 
@@ -37,21 +38,28 @@ public final class ClientEvent {
         }
     }
 
+    public final UUID clientId;
     public final EventType type;
     public final Long timestamp;
     public final BigDecimal numValue;
     public final String text;
 
     @JsonCreator
-    ClientEvent(@JsonProperty("type") final Integer type,
+    ClientEvent(@JsonProperty("clientId") final UUID clientId,
+            @JsonProperty("type") final Integer type,
             @JsonProperty("timestamp") final Long timestamp,
             @JsonProperty("numValue") final BigDecimal numValue,
             @JsonProperty("text") final String text) {
 
+        this.clientId = clientId;
         this.type = (type != null) ? EventType.byId(type) : EventType.UNKNOWN;
         this.timestamp = (timestamp != null) ? timestamp : System.currentTimeMillis();
         this.numValue = numValue;
         this.text = text;
+    }
+
+    public UUID getClientId() {
+        return this.clientId;
     }
 
     public EventType getType() {

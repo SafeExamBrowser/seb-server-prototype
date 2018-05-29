@@ -16,25 +16,44 @@ import java.math.BigDecimal;
 
 import org.eth.demo.sebserver.batis.ClientEventExtentionMapper;
 import org.eth.demo.sebserver.domain.rest.ClientEvent;
+import org.eth.demo.sebserver.domain.rest.ClientEvent.EventType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
-public final class PingIntervalIndicator implements ClientIndicator {
+public class PingIntervalIndicator extends ClientIndicatorAdapter {
 
     public static final String BEAN_NAME = "pingIntervalIndicator";
     private static final String DISPLAY_NAME = "Last Ping";
 
-    private final ClientEventExtentionMapper clientEventExtentionMapper;
+    private ClientEventExtentionMapper clientEventExtentionMapper;
 
     public PingIntervalIndicator(final ClientEventExtentionMapper clientEventExtentionMapper) {
         this.clientEventExtentionMapper = clientEventExtentionMapper;
     }
 
+    @Autowired
+    public void setClientEventExtentionMapper(final ClientEventExtentionMapper clientEventExtentionMapper) {
+        this.clientEventExtentionMapper = clientEventExtentionMapper;
+    }
+
     @Override
-    public final BigDecimal computeValue(final Long examId, final Long clientId, final Long timestamp) {
+    public String getType() {
+        return BEAN_NAME;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return DISPLAY_NAME;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal computeValueAt(final Long timestamp) {
         final long time = (timestamp != null) ? timestamp : System.currentTimeMillis();
 
         final Long lastPing = this.clientEventExtentionMapper.maxByExample(clientEventRecord.timestamp)
-                .where(clientEventRecord.examId, isEqualTo(examId))
-                .and(clientEventRecord.clientId, isEqualTo(clientId))
+                .where(clientEventRecord.examId, isEqualTo(this.examId))
+                .and(clientEventRecord.clientId, isEqualTo(this.clientId))
                 .and(clientEventRecord.type, isEqualTo(ClientEvent.EventType.PING.id))
                 .and(clientEventRecord.timestamp, isLessThan(time))
                 .build()
@@ -48,13 +67,10 @@ public final class PingIntervalIndicator implements ClientIndicator {
     }
 
     @Override
-    public String getType() {
-        return BEAN_NAME;
-    }
-
-    @Override
-    public String getDisplayName() {
-        return DISPLAY_NAME;
+    public void notifyClientEvent(final ClientEvent event) {
+        if (event.type == EventType.PING) {
+            this.currentValue = new BigDecimal(System.currentTimeMillis() - event.timestamp);
+        }
     }
 
 }
