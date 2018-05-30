@@ -33,6 +33,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -40,6 +41,12 @@ public final class ExamOverview implements ViewComposer {
 
     private static final String ITEM_DATA_EXAM = "ITEM_DATA_EXAM";
     private static final String ROOT_COMPOSITE_SUPPLIER = "ROOT_COMPOSITE_SUPPLIER";
+
+    private final RestTemplate restTemplate;
+
+    public ExamOverview(final RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @Override
     public boolean validateAttributes(final TypedMap attributes) {
@@ -93,13 +100,14 @@ public final class ExamOverview implements ViewComposer {
         final UriComponentsBuilder builder = UriComponentsBuilder
                 .fromHttpUrl(GUISpringConfig.ROOT_LOCATION + "/exam");
 
-        final RestTemplate restTemplate = new RestTemplate();
-        return restTemplate.exchange(
+        final ResponseEntity<List<GUIExam>> request = this.restTemplate.exchange(
                 builder.toUriString(),
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<GUIExam>>() {
-                }).getBody();
+                });
+
+        return request.getBody();
     }
 
     private static final void tableRowMenuEvent(final Event event) {

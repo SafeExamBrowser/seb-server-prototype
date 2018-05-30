@@ -25,7 +25,6 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.session.ResultContext;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.type.JdbcType;
-import org.eth.demo.sebserver.batis.ExamIndicatorJoinMapper.JoinResultHandler.JoinRecord;
 import org.eth.demo.sebserver.domain.rest.Exam;
 import org.eth.demo.sebserver.domain.rest.IndicatorDefinition;
 import org.mybatis.dynamic.sql.select.MyBatis3SelectModelAdapter;
@@ -38,7 +37,7 @@ import org.mybatis.dynamic.sql.util.SqlProviderAdapter;
 public interface ExamIndicatorJoinMapper {
 
     @SelectProvider(type = SqlProviderAdapter.class, method = "select")
-    @ResultType(ExamIndicatorJoinMapper.JoinResultHandler.JoinRecord.class)
+    @ResultType(ExamIndicatorJoinMapper.JoinRecord.class)
     @ConstructorArgs({
             @Arg(column = "id", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -51,7 +50,7 @@ public interface ExamIndicatorJoinMapper {
             @Arg(column = "threshold3", javaType = BigDecimal.class, jdbcType = JdbcType.DECIMAL)
     })
     void selectMany(SelectStatementProvider select,
-            ResultHandler<ExamIndicatorJoinMapper.JoinResultHandler.JoinRecord> resultHandler);
+            ResultHandler<ExamIndicatorJoinMapper.JoinRecord> resultHandler);
 
     default Collection<Exam> selectMany(final SelectStatementProvider select) {
         final JoinResultHandler resultHandler = new JoinResultHandler();
@@ -96,25 +95,25 @@ public interface ExamIndicatorJoinMapper {
             resultMap.computeIfAbsent(rec.id, id -> Exam.create(id, rec.name, rec.status, rec.configurationId))
                     .addIndicator(rec.indicator);
         }
+    }
 
-        static final class JoinRecord {
-            private final Long id;
-            private final String name;
-            private final Integer status;
-            private final Long configurationId;
-            public final IndicatorDefinition indicator;
+    static final class JoinRecord {
+        private final Long id;
+        private final String name;
+        private final Integer status;
+        private final Long configurationId;
+        public final IndicatorDefinition indicator;
 
-            private JoinRecord(final Long id, final String name, final Integer status, final Long configurationId,
-                    final Long indicatorId, final String type, final BigDecimal threshold1, final BigDecimal threshold2,
-                    final BigDecimal threshold3) {
+        private JoinRecord(final Long id, final String name, final Integer status, final Long configurationId,
+                final Long indicatorId, final String type, final BigDecimal threshold1, final BigDecimal threshold2,
+                final BigDecimal threshold3) {
 
-                this.id = id;
-                this.name = name;
-                this.status = status;
-                this.configurationId = configurationId;
-                indicator = (indicatorId != null)
-                        ? new IndicatorDefinition(type, threshold1, threshold2, threshold3) : null;
-            }
+            this.id = id;
+            this.name = name;
+            this.status = status;
+            this.configurationId = configurationId;
+            indicator = (indicatorId != null)
+                    ? new IndicatorDefinition(type, threshold1, threshold2, threshold3) : null;
         }
     }
 

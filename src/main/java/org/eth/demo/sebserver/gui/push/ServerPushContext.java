@@ -26,19 +26,20 @@ public final class ServerPushContext {
     private final TypedMap dataMapping;
     private final RestTemplate restTemplate;
 
-    public ServerPushContext(final Composite anchor) {
-        this(anchor, context -> false);
+    public ServerPushContext(final Composite anchor, final RestTemplate restTemplate) {
+        this(anchor, context -> false, restTemplate);
 
     }
 
     public ServerPushContext(
             final Composite anchor,
-            final Predicate<ServerPushContext> runAgain) {
+            final Predicate<ServerPushContext> runAgain,
+            final RestTemplate restTemplate) {
 
         this.anchor = anchor;
         this.runAgain = runAgain;
         this.dataMapping = new TypedMap();
-        this.restTemplate = new RestTemplate();
+        this.restTemplate = restTemplate;
     }
 
     public boolean runAgain() {

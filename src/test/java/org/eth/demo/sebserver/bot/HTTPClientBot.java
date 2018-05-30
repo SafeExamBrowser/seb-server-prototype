@@ -16,13 +16,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public class SEBClientBot {
+public class HTTPClientBot {
 
     public static final String DEFAULT_ROOT_URL = "http://localhost:8080/exam";
     public static final long DEFAULT_EXAM_ID = 4;
     public static final int DEFAULT_CONNECT_ATTEMPTS = 3;
 
-    private static final Logger log = LoggerFactory.getLogger(SEBClientBot.class);
+    private static final Logger log = LoggerFactory.getLogger(HTTPClientBot.class);
 
     private static final long ONE_SECOND = 1000; // milliseconds
     private static final long TEN_SECONDS = 10 * ONE_SECOND;
@@ -31,7 +31,7 @@ public class SEBClientBot {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public static void main(final String[] args) {
-        new SEBClientBot(
+        new HTTPClientBot(
                 DEFAULT_ROOT_URL,
                 DEFAULT_EXAM_ID,
                 DEFAULT_CONNECT_ATTEMPTS,
@@ -39,7 +39,7 @@ public class SEBClientBot {
                 ONE_MINUTE);
     }
 
-    private SEBClientBot(
+    private HTTPClientBot(
             final String rootURL,
             final long examId,
             final int connectAttempts,

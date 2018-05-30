@@ -55,9 +55,14 @@ public final class RunningExamView implements ViewComposer {
     private static final TypedKey<ClientTable> CLIENT_TABLE = new TypedKey<>("CLIENT_TABLE", ClientTable.class);
 
     private final ServerPushService serverPushService;
+    private final RestTemplate restTemplate;
 
-    public RunningExamView(final ServerPushService serverPushService) {
+    public RunningExamView(
+            final ServerPushService serverPushService,
+            final RestTemplate restTemplate) {
+
         this.serverPushService = serverPushService;
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -128,8 +133,11 @@ public final class RunningExamView implements ViewComposer {
             viewService.composeView(parent, ExamOverview.class);
         });
 
-        final ServerPushContext context = new ServerPushContext(root, runAgainContext -> true)
-                .setData(CLIENT_TABLE, clientTable);
+        final ServerPushContext context = new ServerPushContext(
+                root,
+                runAgainContext -> true,
+                this.restTemplate)
+                        .setData(CLIENT_TABLE, clientTable);
         this.serverPushService.runServerPush(
                 context,
                 RunningExamView::pollData,

@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.web;
+package org.eth.demo.sebserver.web.http;
 
 import java.util.UUID;
 
@@ -25,11 +25,11 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/exam")
-public class ExamSessionController {
+public class ExamSessionControllerHTTP {
 
     private final ExamSessionService examSessionService;
 
-    public ExamSessionController(final ExamSessionService examSessionService) {
+    public ExamSessionControllerHTTP(final ExamSessionService examSessionService) {
         this.examSessionService = examSessionService;
     }
 
