@@ -8,12 +8,15 @@
 
 package org.eth.demo.sebserver.service.event;
 
+import org.eth.demo.sebserver.SEBServer;
 import org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordMapper;
 import org.eth.demo.sebserver.domain.rest.ClientEvent;
 import org.eth.demo.sebserver.service.ClientConnectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /** Approach 1 to handle/save client events internally
@@ -24,14 +27,16 @@ import org.springframework.transaction.annotation.Transactional;
  * transactional.
  *
  * An advantage of this approach is minimal data loss on server fail. **/
-public class SingleEventStoreStrategy implements EventHandlingStrategy {
+@Lazy
+@Component(SEBServer.EVENT_CONSUMER_STRATEGY_SINGLE_EVENT_STORE)
+public class SingleEventSaveStrategy implements EventHandlingStrategy {
 
-    private static final Logger log = LoggerFactory.getLogger(SingleEventStoreStrategy.class);
+    private static final Logger log = LoggerFactory.getLogger(SingleEventSaveStrategy.class);
 
     private final ClientConnectionService clientConnectionService;
     private final ClientEventRecordMapper clientEventRecordMapper;
 
-    public SingleEventStoreStrategy(
+    public SingleEventSaveStrategy(
             final ClientConnectionService clientConnectionService,
             final ClientEventRecordMapper clientEventRecordMapper) {
 

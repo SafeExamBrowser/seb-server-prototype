@@ -19,23 +19,35 @@ import org.eth.demo.sebserver.batis.gen.model.ExamRecord;
 import org.eth.demo.sebserver.domain.rest.Exam;
 import org.eth.demo.sebserver.domain.rest.Exam.Status;
 import org.eth.demo.sebserver.service.dao.ExamDao;
+import org.eth.demo.sebserver.service.events.ExamFinishedEvent;
+import org.eth.demo.sebserver.service.events.ExamStartedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Lazy
+@Service
 public class ExamStateService {
 
     private static final Logger log = LoggerFactory.getLogger(ExamStateService.class);
 
     private final ExamRecordMapper examRecordMapper;
     private final ExamDao examDao;
+    private final ApplicationEventPublisher publisher;
 
     private final Map<Long, Exam> runningExamsCache = new HashMap<>();
 
-    public ExamStateService(final ExamRecordMapper examRecordMapper, final ExamDao examDao) {
-        super();
+    public ExamStateService(
+            final ExamRecordMapper examRecordMapper,
+            final ExamDao examDao,
+            final ApplicationEventPublisher publisher) {
+
         this.examRecordMapper = examRecordMapper;
         this.examDao = examDao;
+        this.publisher = publisher;
     }
 
     @Transactional
@@ -70,6 +82,7 @@ public class ExamStateService {
                 this.runningExamsCache.put(examId, exam);
 
                 log.info("Exam: {} is now running", examId);
+                this.publisher.publishEvent(new ExamStartedEvent(exam));
 
                 return exam;
             }
@@ -81,6 +94,7 @@ public class ExamStateService {
                 this.runningExamsCache.remove(examId);
 
                 log.info("Exam: {} is now finished", examId);
+                this.publisher.publishEvent(new ExamFinishedEvent(examId));
 
                 return this.examDao.byId(examId);
             }

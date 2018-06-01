@@ -25,8 +25,12 @@ import org.eth.demo.sebserver.domain.rest.Exam;
 import org.eth.demo.sebserver.service.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+@Lazy
+@Component
 public class ExamDaoImpl implements ExamDao {
 
     private static final Logger log = LoggerFactory.getLogger(ExamDaoImpl.class);

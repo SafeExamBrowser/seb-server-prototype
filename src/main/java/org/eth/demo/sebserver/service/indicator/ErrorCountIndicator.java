@@ -17,9 +17,14 @@ import java.math.BigDecimal;
 import org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordMapper;
 import org.eth.demo.sebserver.domain.rest.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.ClientEvent.EventType;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+@Lazy
+@Component(ErrorCountIndicator.BEAN_NAME)
+@Scope("prototype")
 public class ErrorCountIndicator extends ClientIndicatorAdapter {
 
     public static final String BEAN_NAME = "errorCountIndicator";
@@ -27,7 +32,6 @@ public class ErrorCountIndicator extends ClientIndicatorAdapter {
 
     private final ClientEventRecordMapper clientEventRecordMapper;
 
-    @Autowired // TODO check if this is necessary because of proxying
     public ErrorCountIndicator(final ClientEventRecordMapper clientEventRecordMapper) {
         this.clientEventRecordMapper = clientEventRecordMapper;
     }

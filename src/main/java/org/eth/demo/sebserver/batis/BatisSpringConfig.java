@@ -23,8 +23,12 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 @MapperScan(basePackages = "org.eth.demo.sebserver.batis")
 public class BatisSpringConfig {
 
+    public static final String TRANSACTION_MANAGER = "transactionManager";
+    public static final String SQL_SESSION_TEMPLATE = "sqlSessionTemplate";
+    public static final String SQL_SESSION_FACTORY = "sqlSessionFactory";
+
     @Lazy
-    @Bean(name = "sqlSessionFactory")
+    @Bean(name = SQL_SESSION_FACTORY)
     public SqlSessionFactory sqlSessionFactory(final DataSource dataSource) throws Exception {
         final SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
         factoryBean.setDataSource(dataSource);
@@ -32,14 +36,14 @@ public class BatisSpringConfig {
     }
 
     @Lazy
-    @Bean(name = "sqlSessionTemplate")
+    @Bean(name = SQL_SESSION_TEMPLATE)
     public SqlSessionTemplate sqlSessionTemplate(final DataSource dataSource) throws Exception {
         final SqlSessionTemplate sqlSessionTemplate = new SqlSessionTemplate(sqlSessionFactory(dataSource));
         return sqlSessionTemplate;
     }
 
     @Lazy
-    @Bean(name = "transactionManager")
+    @Bean(name = TRANSACTION_MANAGER)
     public DataSourceTransactionManager transactionManager(final DataSource dataSource) {
         final DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
         transactionManager.setDataSource(dataSource);

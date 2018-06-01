@@ -33,13 +33,14 @@ public class WebSocketClientBot {
                 Stream.of(new WebSocketTransport(new StandardWebSocketClient())).collect(Collectors.toList())));
 
         final StompHeaders headers = new StompHeaders();
-        headers.add("examId", "4");
 
         final SessionHandler sessionHandler = new SessionHandler();
 
         try {
             final StompSession stompSession =
-                    this.client.connect("wss://localhost:8080/ws", sessionHandler, headers).get();
+                    this.client.connect("ws://localhost:8080/ws", sessionHandler, headers).get();
+
+            stompSession.send("/app/connect/examId=4", "");
 
             while (sessionHandler.connected) {
                 try {
@@ -66,8 +67,7 @@ public class WebSocketClientBot {
 
         @Override
         public Type getPayloadType(final StompHeaders headers) {
-            // TODO Auto-generated method stub
-            return null;
+            return String.class;
         }
 
         @Override

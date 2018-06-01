@@ -14,15 +14,31 @@ import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.eth.demo.sebserver.SEBServer;
 import org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ClientEventRecord;
 import org.eth.demo.sebserver.domain.rest.ClientEvent;
+import org.eth.demo.sebserver.domain.rest.Exam.Status;
 import org.eth.demo.sebserver.service.ClientConnectionService;
+import org.eth.demo.sebserver.service.dao.ExamDao;
+import org.eth.demo.sebserver.service.events.ExamStartedEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /** Approach 2 to handle/save client events internally
  *
@@ -36,32 +52,47 @@ import org.eth.demo.sebserver.service.ClientConnectionService;
  * If the performance of this approach is not enough or the potentially data loss on total server fail is a risk that
  * not can be taken, we have to consider using a messaging system/server like rabbitMQ or Apache-Kafka that brings the
  * ability to effectively store and recover message queues but also comes with more complexity on setup and installation
- * side as well as for the whole server system.
- *
- * TODO trigger the run of worker threads on exam start and stop them if no exam is currently running */
+ * side as well as for the whole server system. */
+@Lazy
+@Component(SEBServer.EVENT_CONSUMER_STRATEGY_ASYNC_BATCH_STORE)
 public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
 
-    public static final int BATCH_SIZE = 100;
+    private static final Logger log = LoggerFactory.getLogger(AsyncBatchEventSaveStrategy.class);
+
+    private static final int NUMBER_OF_WORKER_THREADS = 4;
+    private static final int BATCH_SIZE = 100;
 
     private final ClientConnectionService clientConnectionService;
     private final SqlSessionFactory sqlSessionFactory;
+    private final ExamDao examDao;
     private final Executor executor;
+    private final PlatformTransactionManager transactionManager;
 
     private final BlockingDeque<ClientEvent> eventQueue = new LinkedBlockingDeque<>();
+    private final boolean workersRunning = false;
 
     public AsyncBatchEventSaveStrategy(
             final ClientConnectionService clientConnectionService,
             final SqlSessionFactory sqlSessionFactory,
-            final Executor executor) {
+            final ExamDao examDao,
+            final AsyncConfigurer asyncConfigurer,
+            final PlatformTransactionManager transactionManager) {
 
         this.clientConnectionService = clientConnectionService;
         this.sqlSessionFactory = sqlSessionFactory;
-        this.executor = executor;
+        this.examDao = examDao;
+        this.executor = asyncConfigurer.getAsyncExecutor();
+        this.transactionManager = transactionManager;
+    }
 
-        executor.execute(batchSave());
-        executor.execute(batchSave());
-        executor.execute(batchSave());
-        executor.execute(batchSave());
+    @EventListener(ApplicationReadyEvent.class)
+    protected void recover() {
+        runWorkers();
+    }
+
+    @EventListener(ExamStartedEvent.class)
+    protected void examStarted() {
+        runWorkers();
     }
 
     @Override
@@ -69,31 +100,43 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
         this.eventQueue.add(event);
     }
 
-    // TODO add missing transaction
+    private void runWorkers() {
+        if (this.workersRunning) {
+            log.warn("runWorkers called when workers are running already. Ignore that");
+            return;
+        }
+
+        if (this.examDao.getAll(exam -> exam.status == Status.RUNNING.id).isEmpty()) {
+            log.info("runWorkers called but no exam is running");
+            return;
+        }
+
+        log.info("Start {} Event-Batch-Store Worker-Threads", NUMBER_OF_WORKER_THREADS);
+        for (int i = 0; i < NUMBER_OF_WORKER_THREADS; i++) {
+            this.executor.execute(batchSave());
+        }
+    }
+
+    private final boolean anyRunningExam() {
+        return !this.examDao.getAll(exam -> exam.status == Status.RUNNING.id).isEmpty();
+    }
+
     private Runnable batchSave() {
         return () -> {
+
+            log.debug("Worker Thread {} running", Thread.currentThread());
+
             final Collection<ClientEvent> events = new ArrayList<>();
             final SqlSession batchedSession = this.sqlSessionFactory.openSession(ExecutorType.BATCH, false);
+            final Consumer<Runnable> transactionBounds = transactionBounds(this.transactionManager);
+            final Runnable batchStore = batchStore(this.clientConnectionService, events, batchedSession);
 
             try {
-                while (true) {
+                while (anyRunningExam()) {
                     events.clear();
-                    this.eventQueue.drainTo(events, 100);
+                    this.eventQueue.drainTo(events, BATCH_SIZE);
 
-                    final List<ClientEventRecord> records = events.stream()
-                            .map(event -> this.clientConnectionService.getClientConnection(event.clientId)
-                                    .map(cc -> event.toRecord(
-                                            cc.examId,
-                                            cc.clientId))
-                                    .orElse(null))
-                            .filter(cer -> cer != null)
-                            .collect(Collectors.toList());
-
-                    final ClientEventRecordMapper mapper = batchedSession.getMapper(ClientEventRecordMapper.class);
-                    for (final ClientEventRecord record : records) {
-                        mapper.insert(record);
-                    }
-                    batchedSession.commit();
+                    transactionBounds.accept(batchStore);
 
                     try {
                         Thread.sleep(20);
@@ -103,7 +146,50 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
                 }
             } finally {
                 batchedSession.close();
+                log.debug("Worker Thread {} stopped", Thread.currentThread());
             }
+        };
+    }
+
+    private static final Runnable batchStore(
+            final ClientConnectionService clientConnectionService,
+            final Collection<ClientEvent> events,
+            final SqlSession batchedSession) {
+
+        return () -> {
+            final ClientEventRecordMapper mapper = batchedSession.getMapper(ClientEventRecordMapper.class);
+            final List<ClientEventRecord> records = events.stream()
+                    .map(event -> clientConnectionService.getClientConnection(event.clientId)
+                            .map(cc -> event.toRecord(
+                                    cc.examId,
+                                    cc.clientId))
+                            .orElse(null))
+                    .filter(cer -> cer != null)
+                    .collect(Collectors.toList());
+
+            for (final ClientEventRecord record : records) {
+                mapper.insert(record);
+            }
+
+            batchedSession.commit();
+        };
+    }
+
+    private static final Consumer<Runnable> transactionBounds(final PlatformTransactionManager transactionManager) {
+        return runnable -> {
+            final TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+            transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+                @Override
+                protected void doInTransactionWithoutResult(final TransactionStatus status) {
+                    try {
+                        runnable.run();
+                    } catch (final Exception e) {
+                        log.error(
+                                "Error while trying to store event batch. TODO handle transaction rollback correctly");
+                        //TODO handle transaction rollback correctly
+                    }
+                }
+            });
         };
     }
 

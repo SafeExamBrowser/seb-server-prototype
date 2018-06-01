@@ -21,8 +21,10 @@ import org.eth.demo.sebserver.domain.ClientConnection;
 import org.eth.demo.sebserver.domain.rest.Exam;
 import org.eth.demo.sebserver.domain.rest.IndicatorValue;
 import org.eth.demo.sebserver.service.indicator.ClientConnectionFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+@Lazy
 @Service
 public class ClientConnectionService {
 

@@ -18,8 +18,14 @@ import org.eth.demo.sebserver.batis.ClientEventExtentionMapper;
 import org.eth.demo.sebserver.domain.rest.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.ClientEvent.EventType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+@Lazy
+@Component(PingIntervalIndicator.BEAN_NAME)
+@Scope("prototype")
 public class PingIntervalIndicator extends ClientIndicatorAdapter {
 
     public static final String BEAN_NAME = "pingIntervalIndicator";
