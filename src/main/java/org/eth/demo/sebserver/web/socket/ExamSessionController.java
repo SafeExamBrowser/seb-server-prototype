@@ -9,6 +9,7 @@
 package org.eth.demo.sebserver.web.socket;
 
 import org.eth.demo.sebserver.service.ExamSessionService;
+import org.eth.demo.sebserver.web.socket.Message.Type;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -25,17 +26,19 @@ public class ExamSessionController {
     }
 
     @MessageMapping("/connect/{examId}")
-    @SendToUser(value = "/user/reply", broadcast = false)
-    public String connect(
-            @DestinationVariable final String examId,
+    @SendToUser(value = "/queue/reply", broadcast = false)
+    public Message connect(
+            @DestinationVariable final long examId,
             final SimpMessageHeaderAccessor headerAccessor) {
 
         try {
-            return this.examSessionService
-                    .connectClient(Long.valueOf(examId))
-                    .toString();
+            return new Message(Type.CONNECT, "{tocken=\"test\"}"
+//                    this.examSessionService
+//                            .connectClient(Long.valueOf(examId))
+//                            .toString()
+            );
         } catch (final Exception e) {
-            return "ERROR";
+            return new Message(Type.ERROR, e.getMessage());
         }
     }
 

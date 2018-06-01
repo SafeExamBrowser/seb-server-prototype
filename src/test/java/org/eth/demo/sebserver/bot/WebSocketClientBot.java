@@ -14,9 +14,11 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.messaging.simp.stomp.StompSession.Subscription;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -31,8 +33,10 @@ public class WebSocketClientBot {
 
         this.client = new WebSocketStompClient(new SockJsClient(
                 Stream.of(new WebSocketTransport(new StandardWebSocketClient())).collect(Collectors.toList())));
+        this.client.setMessageConverter(new StringMessageConverter());
 
         final StompHeaders headers = new StompHeaders();
+        headers.add(StompHeaders.CONTENT_TYPE, "application/json");
 
         final SessionHandler sessionHandler = new SessionHandler();
 
@@ -40,9 +44,13 @@ public class WebSocketClientBot {
             final StompSession stompSession =
                     this.client.connect("ws://localhost:8080/ws", sessionHandler, headers).get();
 
-            stompSession.send("/app/connect/examId=4", "");
+            System.out.println("********************** connected: " + stompSession.isConnected());
 
-            while (sessionHandler.connected) {
+            final Subscription subscribe = stompSession.subscribe("/user/queue/reply", sessionHandler);
+
+            stompSession.send("/app/connect/4", "{}");
+
+            while (stompSession.isConnected()) {
                 try {
                     Thread.sleep(1000);
                 } catch (final InterruptedException e) {
@@ -50,6 +58,9 @@ public class WebSocketClientBot {
                     e.printStackTrace();
                 }
             }
+
+            subscribe.unsubscribe();
+            stompSession.disconnect();
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -63,8 +74,6 @@ public class WebSocketClientBot {
 
         private static final Logger log = LoggerFactory.getLogger(WebSocketClientBot.SessionHandler.class);
 
-        boolean connected = false;
-
         @Override
         public Type getPayloadType(final StompHeaders headers) {
             return String.class;
@@ -72,13 +81,12 @@ public class WebSocketClientBot {
 
         @Override
         public void handleFrame(final StompHeaders headers, final Object payload) {
-            // TODO Auto-generated method stub
-
+            log.info("connection replied: {}, {}", headers, payload);
         }
 
         @Override
         public void afterConnected(final StompSession session, final StompHeaders connectedHeaders) {
-            this.connected = true;
+            log.info("connected: {}, {}", session, connectedHeaders);
 
         }
 

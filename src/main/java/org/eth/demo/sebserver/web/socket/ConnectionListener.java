@@ -8,6 +8,7 @@
 
 package org.eth.demo.sebserver.web.socket;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -27,7 +28,12 @@ public class ConnectionListener {
     public void handleWebSocketConnectListener(final SessionConnectedEvent event) {
         log.info("Received a new web socket connection");
         final StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-        final Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
+        Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
+        if (sessionAttributes == null) {
+            sessionAttributes = new HashMap<>();
+        }
+        sessionAttributes.put("testAttr", "token");
+        headerAccessor.setSessionAttributes(sessionAttributes);
     }
 
     @EventListener
