@@ -27,6 +27,7 @@ import org.eth.demo.sebserver.domain.rest.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.Exam.Status;
 import org.eth.demo.sebserver.service.ClientConnectionService;
 import org.eth.demo.sebserver.service.dao.ExamDao;
+import org.eth.demo.sebserver.service.events.ExamFinishedEvent;
 import org.eth.demo.sebserver.service.events.ExamStartedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,8 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
     private final PlatformTransactionManager transactionManager;
 
     private final BlockingDeque<ClientEvent> eventQueue = new LinkedBlockingDeque<>();
-    private final boolean workersRunning = false;
+
+    private boolean workersRunning = false;
 
     public AsyncBatchEventSaveStrategy(
             final ClientConnectionService clientConnectionService,
@@ -95,6 +97,11 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
         runWorkers();
     }
 
+    @EventListener(ExamFinishedEvent.class)
+    protected void examFinished() {
+        this.workersRunning = !this.examDao.getAll(exam -> exam.status == Status.RUNNING.id).isEmpty();
+    }
+
     @Override
     public void accept(final ClientEvent event) {
         this.eventQueue.add(event);
@@ -111,14 +118,12 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
             return;
         }
 
+        this.workersRunning = true;
+
         log.info("Start {} Event-Batch-Store Worker-Threads", NUMBER_OF_WORKER_THREADS);
         for (int i = 0; i < NUMBER_OF_WORKER_THREADS; i++) {
             this.executor.execute(batchSave());
         }
-    }
-
-    private final boolean anyRunningExam() {
-        return !this.examDao.getAll(exam -> exam.status == Status.RUNNING.id).isEmpty();
     }
 
     private Runnable batchSave() {
@@ -132,7 +137,7 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
             final Runnable batchStore = batchStore(this.clientConnectionService, events, batchedSession);
 
             try {
-                while (anyRunningExam()) {
+                while (this.workersRunning) {
                     events.clear();
                     this.eventQueue.drainTo(events, BATCH_SIZE);
 

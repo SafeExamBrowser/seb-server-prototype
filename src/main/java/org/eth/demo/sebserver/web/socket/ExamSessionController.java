@@ -54,7 +54,6 @@ public class ExamSessionController {
             @Payload final ClientEvent clientEvent,
             final SimpMessageHeaderAccessor accessor) {
 
-        //final List<String> nativeHeader = accessor.getNativeHeader("TOKEN");
         this.examSessionService.notifyClientEvent(clientEvent);
     }
 

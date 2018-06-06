@@ -34,15 +34,18 @@ public class ConnectionListener {
     @EventListener
     public void handleWebSocketConnect(final SessionConnectedEvent event) {
         log.info("Received a new web socket connection: {}", event);
-        final StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
     }
 
     @EventListener
-    public void handleunsbscribe(final SessionUnsubscribeEvent event) {
+    public void handleUnsbscribe(final SessionUnsubscribeEvent event) {
         log.info("unsubscribe: {}", event);
         final StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         final String token = headerAccessor.getFirstNativeHeader("TOKEN");
-        this.examSessionService.disconnectClient(UUID.fromString(token));
+
+        // TODO how can we dedicate in which channel the unsubscribe event ha been applied
+        if (token != null) {
+            this.examSessionService.disconnectClient(UUID.fromString(token));
+        }
     }
 
     @EventListener

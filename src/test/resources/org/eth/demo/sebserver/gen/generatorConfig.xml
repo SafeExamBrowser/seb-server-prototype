@@ -35,8 +35,37 @@
             <property name="enableSubPackages" value="false"/>
         </javaClientGenerator>
         
+        <table tableName="configuration" domainObjectName="ConfigurationRecord">
+            <property name="immutable" value="true"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+        <table tableName="configuration_attribute" domainObjectName="ConfigurationAttributeRecord">
+            <property name="immutable" value="true"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+        <table tableName="configuration_value" domainObjectName="ConfigurationValueRecord">
+            <property name="immutable" value="true"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+        <table tableName="orientation" domainObjectName="OrientationRecord">
+            <property name="immutable" value="true"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+        <table tableName="exam_configuration_map" domainObjectName="ExamConfigurationMapRecord">
+            <property name="immutable" value="true"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+        
         <table tableName="exam" domainObjectName="ExamRecord">
             <property name="immutable" value="true"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+        <table tableName="client_connection" domainObjectName="ClientConnectionRecord">
+            <property name="immutable" value="true"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+        <table tableName="client_event" domainObjectName="ClientEventRecord">
+            <property name="virtualKeyColumns" value="id"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
         <table tableName="indicator" domainObjectName="IndicatorRecord" >
@@ -47,14 +76,8 @@
             <property name="virtualKeyColumns" value="id"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
-        <table tableName="client_event" domainObjectName="ClientEventRecord">
-            <property name="virtualKeyColumns" value="id"/>
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table tableName="indicator_value" domainObjectName="IndicatorValueRecord">
-            <property name="virtualKeyColumns" value="id"/>
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
+        
+        
         
     </context>
 </generatorConfiguration>

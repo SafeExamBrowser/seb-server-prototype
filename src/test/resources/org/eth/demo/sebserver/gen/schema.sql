@@ -1,3 +1,4 @@
+
 -- -----------------------------------------------------
 -- Table `exam`
 -- -----------------------------------------------------
@@ -7,8 +8,25 @@ CREATE TABLE IF NOT EXISTS `exam` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
   `status` INT(1) NOT NULL,
-  `configuration_id` BIGINT NOT NULL,
   PRIMARY KEY (`id`));
+
+
+-- -----------------------------------------------------
+-- Table `client_connection`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `client_connection` ;
+
+CREATE TABLE IF NOT EXISTS `client_connection` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `exam_id` BIGINT UNSIGNED NOT NULL,
+  `token` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `connection_exam_ref_idx` (`exam_id` ASC),
+  CONSTRAINT `client_connection_exam_ref`
+    FOREIGN KEY (`exam_id`)
+    REFERENCES `exam` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -19,16 +37,16 @@ DROP TABLE IF EXISTS `client_event` ;
 CREATE TABLE IF NOT EXISTS `client_event` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `exam_id` BIGINT UNSIGNED NOT NULL,
-  `client_id` BIGINT NOT NULL,
+  `client_id` BIGINT UNSIGNED NOT NULL,
   `type` INT(2) UNSIGNED NOT NULL,
   `timestamp` BIGINT UNSIGNED NOT NULL,
   `numeric_value` DECIMAL(10,4) NULL,
   `text` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
-  INDEX `ClientEventExamID_idx` (`exam_id` ASC),
-  CONSTRAINT `client_event_exam_ref`
-    FOREIGN KEY (`exam_id`)
-    REFERENCES `exam` (`id`)
+  INDEX `client_connection_ref_idx` (`client_id` ASC),
+  CONSTRAINT `client_connection_ref`
+    FOREIGN KEY (`client_id`)
+    REFERENCES `client_connection` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
@@ -45,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `indicator` (
   `threshold1` DECIMAL(10,4) NULL,
   `threshold2` DECIMAL(10,4) NULL,
   `threshold3` DECIMAL(10,4) NULL,
-  INDEX `ExamRef_idx` (`exam_id` ASC),
+  INDEX `indicator_exam_idx` (`exam_id` ASC),
   PRIMARY KEY (`id`),
   CONSTRAINT `exam_ref`
     FOREIGN KEY (`exam_id`)
@@ -55,21 +73,102 @@ CREATE TABLE IF NOT EXISTS `indicator` (
 
 
 -- -----------------------------------------------------
--- Table `indicator_value`
+-- Table `configuration`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `indicator_value` ;
+DROP TABLE IF EXISTS `configuration` ;
 
-CREATE TABLE IF NOT EXISTS `indicator_value` (
+CREATE TABLE IF NOT EXISTS `configuration` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `indicator_id` BIGINT UNSIGNED NOT NULL,
-  `client_id` BIGINT NOT NULL,
-  `value` DECIMAL(10,4) NULL,
-  `timestamp` BIGINT NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  `type` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`));
+
+
+-- -----------------------------------------------------
+-- Table `orientation`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `orientation` ;
+
+CREATE TABLE IF NOT EXISTS `orientation` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `view` VARCHAR(45) NOT NULL,
+  `x_position` INT NOT NULL DEFAULT 0,
+  `y_position` INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`));
+
+
+-- -----------------------------------------------------
+-- Table `configuration_attribute`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `configuration_attribute` ;
+
+CREATE TABLE IF NOT EXISTS `configuration_attribute` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `type` VARCHAR(45) NOT NULL,
+  `parent_id` BIGINT UNSIGNED NULL,
+  `orientation_id` BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `ExamIndicatorRef_idx` (`indicator_id` ASC),
-  CONSTRAINT `indicator_ref`
-    FOREIGN KEY (`indicator_id`)
-    REFERENCES `indicator` (`id`)
+  INDEX `parent_ref_idx` (`parent_id` ASC),
+  INDEX `orientation_ref_idx` (`orientation_id` ASC),
+  CONSTRAINT `parent_ref`
+    FOREIGN KEY (`parent_id`)
+    REFERENCES `configuration_attribute` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `orientation_ref`
+    FOREIGN KEY (`orientation_id`)
+    REFERENCES `orientation` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
+
+-- -----------------------------------------------------
+-- Table `configuration_value`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `configuration_value` ;
+
+CREATE TABLE IF NOT EXISTS `configuration_value` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `configuration_id` BIGINT UNSIGNED NOT NULL,
+  `configuration_attribute_id` BIGINT UNSIGNED NOT NULL,
+  `value` VARCHAR(255) NULL,
+  `text` MEDIUMTEXT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `configuration_value_ref_idx` (`configuration_id` ASC),
+  INDEX `configuration_attribute_ref_idx` (`configuration_attribute_id` ASC),
+  CONSTRAINT `configuration_ref`
+    FOREIGN KEY (`configuration_id`)
+    REFERENCES `configuration` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `configuration_value_attribute_ref`
+    FOREIGN KEY (`configuration_attribute_id`)
+    REFERENCES `configuration_attribute` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+-- -----------------------------------------------------
+-- Table `exam_configuration_map`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `exam_configuration_map` ;
+
+CREATE TABLE IF NOT EXISTS `exam_configuration_map` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `exam_id` BIGINT UNSIGNED NOT NULL,
+  `configuration_id` BIGINT UNSIGNED NOT NULL,
+  `client_info` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`),
+  INDEX `exam_ref_idx` (`exam_id` ASC),
+  INDEX `configuration_exam_ref_idx` (`configuration_id` ASC),
+  CONSTRAINT `exam_map_ref`
+    FOREIGN KEY (`exam_id`)
+    REFERENCES `exam` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `configuration_map_ref`
+    FOREIGN KEY (`configuration_id`)
+    REFERENCES `configuration` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);

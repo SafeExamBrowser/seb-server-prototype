@@ -42,7 +42,6 @@ public interface ExamIndicatorJoinMapper {
             @Arg(column = "id", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "status", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Arg(column = "configuration_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
             @Arg(column = "indicatorId", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "threshold1", javaType = BigDecimal.class, jdbcType = JdbcType.DECIMAL),
@@ -64,7 +63,6 @@ public interface ExamIndicatorJoinMapper {
                 examRecord.id,
                 examRecord.name,
                 examRecord.status,
-                examRecord.configurationId,
                 indicatorRecord.id.as("indicatorId"),
                 indicatorRecord.type,
                 indicatorRecord.threshold1,
@@ -73,7 +71,6 @@ public interface ExamIndicatorJoinMapper {
                 .from(examRecord)
                 .leftJoin(indicatorRecord)
                 .on(examRecord.id, equalTo(indicatorRecord.examId));
-
     }
 
     default Collection<Exam> selectAll() {
@@ -92,7 +89,7 @@ public interface ExamIndicatorJoinMapper {
         @Override
         public void handleResult(final ResultContext<? extends JoinRecord> resultContext) {
             final JoinRecord rec = resultContext.getResultObject();
-            resultMap.computeIfAbsent(rec.id, id -> Exam.create(id, rec.name, rec.status, rec.configurationId))
+            resultMap.computeIfAbsent(rec.id, id -> Exam.create(id, rec.name, rec.status))
                     .addIndicator(rec.indicator);
         }
     }
@@ -101,17 +98,20 @@ public interface ExamIndicatorJoinMapper {
         private final Long id;
         private final String name;
         private final Integer status;
-        private final Long configurationId;
         public final IndicatorDefinition indicator;
 
-        private JoinRecord(final Long id, final String name, final Integer status, final Long configurationId,
-                final Long indicatorId, final String type, final BigDecimal threshold1, final BigDecimal threshold2,
+        private JoinRecord(final Long id,
+                final String name,
+                final Integer status,
+                final Long indicatorId,
+                final String type,
+                final BigDecimal threshold1,
+                final BigDecimal threshold2,
                 final BigDecimal threshold3) {
 
             this.id = id;
             this.name = name;
             this.status = status;
-            this.configurationId = configurationId;
             indicator = (indicatorId != null)
                     ? new IndicatorDefinition(type, threshold1, threshold2, threshold3) : null;
         }

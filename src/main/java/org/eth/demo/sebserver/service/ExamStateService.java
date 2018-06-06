@@ -139,7 +139,7 @@ public class ExamStateService {
     }
 
     private void save(final Long examId, final Exam.Status toState) {
-        this.examRecordMapper.updateByPrimaryKeySelective(new ExamRecord(examId, null, toState.id, null));
+        this.examRecordMapper.updateByPrimaryKeySelective(new ExamRecord(examId, null, toState.id));
     }
 
     private void invalidStateException(final Exam.Status toState, final Status currentStatus) {

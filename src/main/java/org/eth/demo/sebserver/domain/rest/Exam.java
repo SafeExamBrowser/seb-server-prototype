@@ -51,21 +51,18 @@ public final class Exam {
     public final String name;
     public final Integer status;
     public final String statusName;
-    public final Long configurationId;
     private final Collection<IndicatorDefinition> indicators;
 
     @JsonCreator
     Exam(@JsonProperty("id") final Long id,
             @JsonProperty("name") final String name,
             @JsonProperty("status") final Integer status,
-            @JsonProperty("configurationId") final Long configurationId,
             @JsonProperty("indicators") final Collection<IndicatorDefinition> indicators) {
 
         this.id = id;
         this.name = name;
         this.status = status;
         this.statusName = Status.getDisplayName(status);
-        this.configurationId = configurationId;
         this.indicators = (indicators != null) ? new ArrayList<>(indicators) : new ArrayList<>();
     }
 
@@ -85,10 +82,6 @@ public final class Exam {
         return this.statusName;
     }
 
-    public Long getConfigurationId() {
-        return this.configurationId;
-    }
-
     public Collection<IndicatorDefinition> getIndicators() {
         return this.indicators;
     }
@@ -101,31 +94,35 @@ public final class Exam {
     }
 
     public final ExamRecord toRecord() {
-        return new ExamRecord(this.id, this.name, this.status, this.configurationId);
+        return new ExamRecord(this.id, this.name, this.status);
     }
 
     public final Exam withId(final Long id) {
-        return new Exam(id, this.name, this.status, this.configurationId, this.indicators);
+        return new Exam(id, this.name, this.status, this.indicators);
     }
 
-    public static final Exam fromRecord(final ExamRecord record, final Collection<IndicatorRecord> indicators) {
+    public static final Exam fromRecord(
+            final ExamRecord record,
+
+            final Collection<IndicatorRecord> indicators) {
         return new Exam(
                 record.getId(),
                 record.getName(),
                 record.getStatus(),
-                record.getConfigurationId(),
                 indicators.stream()
                         .map(IndicatorDefinition::fromRecord)
                         .collect(Collectors.toList()));
     }
 
     public static final Exam fromRecord(final ExamRecord record) {
-        return new Exam(record.getId(), record.getName(), record.getStatus(), record.getConfigurationId(), null);
+        return new Exam(record.getId(), record.getName(), record.getStatus(), null);
     }
 
-    public static final Exam create(final Long id, final String name, final Integer status,
-            final Long configurationId) {
-        return new Exam(id, name, status, configurationId, null);
+    public static final Exam create(final Long id,
+            final String name,
+            final Integer status) {
+
+        return new Exam(id, name, status, null);
     }
 
 }
