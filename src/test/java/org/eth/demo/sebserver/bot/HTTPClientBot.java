@@ -143,7 +143,7 @@ public class HTTPClientBot {
             throw new RuntimeException("Unexpected Error: ", e);
         }
 
-        log.trace("event data: {}", json.toString());
+        log.info("event data: {}", json.toString());
 
         final HttpEntity<String> httpEntity = new HttpEntity<>(json.toString(), httpHeaders);
 
