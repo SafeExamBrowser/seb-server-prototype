@@ -108,21 +108,6 @@ DEFAULT CHARACTER SET = utf8mb4;
 
 
 -- -----------------------------------------------------
--- Table `orientation`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `orientation` ;
-
-CREATE TABLE IF NOT EXISTS `orientation` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `view` VARCHAR(45) NOT NULL,
-  `x_position` INT NOT NULL DEFAULT 0,
-  `y_position` INT NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
-
-
--- -----------------------------------------------------
 -- Table `configuration_attribute`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `configuration_attribute` ;
@@ -132,18 +117,11 @@ CREATE TABLE IF NOT EXISTS `configuration_attribute` (
   `name` VARCHAR(45) NOT NULL,
   `type` VARCHAR(45) NOT NULL,
   `parent_id` BIGINT UNSIGNED NULL,
-  `orientation_id` BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `parent_ref_idx` (`parent_id` ASC),
-  INDEX `orientation_ref_idx` (`orientation_id` ASC),
   CONSTRAINT `parent_ref`
     FOREIGN KEY (`parent_id`)
     REFERENCES `configuration_attribute` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `orientation_ref`
-    FOREIGN KEY (`orientation_id`)
-    REFERENCES `orientation` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -159,6 +137,7 @@ CREATE TABLE IF NOT EXISTS `configuration_value` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `configuration_id` BIGINT UNSIGNED NOT NULL,
   `configuration_attribute_id` BIGINT UNSIGNED NOT NULL,
+  `list_index` INT NOT NULL DEFAULT 0,
   `value` VARCHAR(255) NULL,
   `text` MEDIUMTEXT NULL,
   PRIMARY KEY (`id`),
@@ -171,6 +150,28 @@ CREATE TABLE IF NOT EXISTS `configuration_value` (
     ON UPDATE NO ACTION,
   CONSTRAINT `configuration_value_attribute_ref`
     FOREIGN KEY (`configuration_attribute_id`)
+    REFERENCES `configuration_attribute` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4;
+
+
+-- -----------------------------------------------------
+-- Table `orientation`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `orientation` ;
+
+CREATE TABLE IF NOT EXISTS `orientation` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `config_attribute_id` BIGINT UNSIGNED NOT NULL,
+  `view` VARCHAR(45) NOT NULL,
+  `x_position` INT NOT NULL DEFAULT 0,
+  `y_position` INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  INDEX `config_attribute_orientation_rev_idx` (`config_attribute_id` ASC),
+  CONSTRAINT `config_attribute_orientation_rev`
+    FOREIGN KEY (`config_attribute_id`)
     REFERENCES `configuration_attribute` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)

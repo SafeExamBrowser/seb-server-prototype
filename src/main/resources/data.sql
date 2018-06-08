@@ -1,11 +1,8 @@
-INSERT INTO `orientation` VALUES
-    (1, "", 0, 0);
-    
 INSERT INTO `configuration_attribute` values
-    (1, "additionalDictionaries", "COMPLEX_ATTRIBUTE", null, 1),
-    (2, "dictionaryData", "BASE64_BINARY", 1, 1),
-    (3, "dictionaryFormat", "INTEGER", 1, 1),
-    (4, "localeName", "STRING", 1, 1);
+    (1, "additionalDictionaries", "COMPLEX_ATTRIBUTE", null),
+    (2, "dictionaryData", "BASE64_BINARY", 1),
+    (3, "dictionaryFormat", "INTEGER", 1),
+    (4, "localeName", "STRING", 1);
 
 INSERT INTO `exam` VALUES 
     (1,'Demo Exam 1',0),
