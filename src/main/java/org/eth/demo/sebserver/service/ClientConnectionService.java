@@ -23,8 +23,8 @@ import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordDynamicSqlS
 import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ClientConnectionRecord;
 import org.eth.demo.sebserver.domain.ClientConnection;
-import org.eth.demo.sebserver.domain.rest.Exam;
-import org.eth.demo.sebserver.domain.rest.IndicatorValue;
+import org.eth.demo.sebserver.domain.rest.exam.Exam;
+import org.eth.demo.sebserver.domain.rest.exam.IndicatorValue;
 import org.eth.demo.sebserver.service.indicator.ClientConnectionFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;

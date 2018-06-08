@@ -6,8 +6,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.domain.sebconfig;
+package org.eth.demo.sebserver.domain.rest.sebconfig;
 
-public enum ConfigurationType {
-    DEFAULT, TEMPLATE, CLIENT, VIRTUAL_CLIENT
+//@formatter:off
+public enum AttributeType {
+    TEXT_FIELD,
+    TEXT_AREA,
+    CHECKBOX,
+    INTEGER,
+    DECIMAL,
+    SELECTION,
+    RADIO_SELECTION,
+    BASE64_BINARY,
+
+    COMPLEX_ATTRIBUTE,
+    ;
 }
+//@formatter:on

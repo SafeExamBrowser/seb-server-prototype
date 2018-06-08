@@ -10,7 +10,7 @@ package org.eth.demo.sebserver.web.http;
 
 import java.util.Collection;
 
-import org.eth.demo.sebserver.domain.rest.Exam;
+import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.service.ExamStateService;
 import org.eth.demo.sebserver.service.dao.ExamDao;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -8,7 +8,7 @@
 
 package org.eth.demo.sebserver.web.socket;
 
-import org.eth.demo.sebserver.domain.rest.ClientEvent;
+import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 import org.eth.demo.sebserver.service.ExamSessionService;
 import org.eth.demo.sebserver.web.socket.Message.Type;
 import org.springframework.messaging.handler.annotation.DestinationVariable;

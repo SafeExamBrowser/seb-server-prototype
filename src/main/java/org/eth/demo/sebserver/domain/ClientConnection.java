@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import org.eth.demo.sebserver.domain.rest.IndicatorDefinition;
+import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
 import org.eth.demo.sebserver.service.indicator.ClientIndicator;
 
 public class ClientConnection {

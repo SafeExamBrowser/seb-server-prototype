@@ -10,7 +10,7 @@ package org.eth.demo.sebserver.service.event;
 
 import java.util.function.Consumer;
 
-import org.eth.demo.sebserver.domain.rest.ClientEvent;
+import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 
 public interface EventHandlingStrategy extends Consumer<ClientEvent> {
 }

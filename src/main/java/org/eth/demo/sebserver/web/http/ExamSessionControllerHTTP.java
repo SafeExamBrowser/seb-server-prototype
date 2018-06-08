@@ -10,8 +10,8 @@ package org.eth.demo.sebserver.web.http;
 
 import java.util.UUID;
 
-import org.eth.demo.sebserver.domain.rest.ClientEvent;
-import org.eth.demo.sebserver.domain.rest.IndicatorValue;
+import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
+import org.eth.demo.sebserver.domain.rest.exam.IndicatorValue;
 import org.eth.demo.sebserver.service.ExamSessionService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

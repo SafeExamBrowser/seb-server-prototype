@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.domain.rest;
+package org.eth.demo.sebserver.domain.rest.exam;
 
 import java.util.ArrayList;
 import java.util.Collection;

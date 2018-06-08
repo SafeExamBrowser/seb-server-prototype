@@ -13,9 +13,9 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.eth.demo.sebserver.domain.rest.ClientEvent;
-import org.eth.demo.sebserver.domain.rest.Exam;
-import org.eth.demo.sebserver.domain.rest.IndicatorValue;
+import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
+import org.eth.demo.sebserver.domain.rest.exam.Exam;
+import org.eth.demo.sebserver.domain.rest.exam.IndicatorValue;
 import org.springframework.stereotype.Service;
 
 @Service

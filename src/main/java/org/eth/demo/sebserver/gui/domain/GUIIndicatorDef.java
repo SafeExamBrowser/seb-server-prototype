@@ -8,7 +8,7 @@
 
 package org.eth.demo.sebserver.gui.domain;
 
-import org.eth.demo.sebserver.domain.rest.IndicatorDefinition;
+import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

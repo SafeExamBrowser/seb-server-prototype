@@ -15,8 +15,8 @@ import static org.mybatis.dynamic.sql.SqlBuilder.isLessThan;
 import java.math.BigDecimal;
 
 import org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordMapper;
-import org.eth.demo.sebserver.domain.rest.ClientEvent;
-import org.eth.demo.sebserver.domain.rest.ClientEvent.EventType;
+import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
+import org.eth.demo.sebserver.domain.rest.exam.ClientEvent.EventType;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

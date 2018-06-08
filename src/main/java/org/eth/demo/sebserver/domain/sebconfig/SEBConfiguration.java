@@ -8,42 +8,41 @@
 
 package org.eth.demo.sebserver.domain.sebconfig;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import org.eth.demo.sebserver.domain.rest.sebconfig.AttributeValue;
 
-import org.eth.demo.sebserver.domain.sebconfig.attribute.ComplexAttribute;
-import org.xml.sax.SAXException;
-
-public class SEBConfiguration {
+public final class SEBConfiguration {
 
     public final Long id;
     public final Long examId;
     public final String name;
 
-    private final ComplexAttribute attributes;
+    private final List<AttributeValue> values;
 
-    public SEBConfiguration(final Long id, final Long examId, final String name, final ComplexAttribute attributes) {
+    public SEBConfiguration(final Long id, final Long examId, final String name) {
         this.id = id;
         this.examId = examId;
         this.name = name;
-        this.attributes = attributes;
+        this.values = new ArrayList<>();
     }
 
-    public void fromXMLConfig(final InputStream in) throws ParserConfigurationException, SAXException, IOException {
-        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        final DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-        final org.w3c.dom.Document w3cDocument = documentBuilder.parse(in);
-
-        // TODO
+    public void addValue(final AttributeValue value) {
+        this.values.add(value);
     }
 
-    public String toXMLConfig() {
-        // TODO
-        return "";
-    }
+//    public void fromXMLConfig(final InputStream in) throws ParserConfigurationException, SAXException, IOException {
+//        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//        final DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+//        final org.w3c.dom.Document w3cDocument = documentBuilder.parse(in);
+//
+//        // TODO
+//    }
+//
+//    public String toXMLConfig() {
+//        // TODO
+//        return "";
+//    }
 
 }

@@ -12,8 +12,8 @@ import java.util.UUID;
 
 import org.eth.demo.sebserver.SEBServer;
 import org.eth.demo.sebserver.domain.ClientConnection;
-import org.eth.demo.sebserver.domain.rest.Exam;
-import org.eth.demo.sebserver.domain.rest.IndicatorDefinition;
+import org.eth.demo.sebserver.domain.rest.exam.Exam;
+import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;

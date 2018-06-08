@@ -11,7 +11,7 @@ package org.eth.demo.sebserver.service.indicator;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import org.eth.demo.sebserver.domain.rest.ClientEvent;
+import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface ClientIndicator {

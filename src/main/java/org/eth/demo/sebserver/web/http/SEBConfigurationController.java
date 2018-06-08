@@ -6,15 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.domain.sebconfig.attribute;
+package org.eth.demo.sebserver.web.http;
 
-public interface ConfigAttribute {
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-    String getName();
+@RestController
+@RequestMapping("/sebconfig")
+public class SEBConfigurationController {
 
-    AttributeType getType();
-
-    Orientation getOrientation();
-
-    <T> T getValueAs(Class<T> type);
 }

@@ -10,7 +10,7 @@ package org.eth.demo.sebserver.service.event;
 
 import org.eth.demo.sebserver.SEBServer;
 import org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordMapper;
-import org.eth.demo.sebserver.domain.rest.ClientEvent;
+import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 import org.eth.demo.sebserver.service.ClientConnectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

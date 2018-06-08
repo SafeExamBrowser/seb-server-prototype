@@ -16,8 +16,8 @@ import java.util.Map;
 
 import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ExamRecord;
-import org.eth.demo.sebserver.domain.rest.Exam;
-import org.eth.demo.sebserver.domain.rest.Exam.Status;
+import org.eth.demo.sebserver.domain.rest.exam.Exam;
+import org.eth.demo.sebserver.domain.rest.exam.Exam.Status;
 import org.eth.demo.sebserver.service.dao.ExamDao;
 import org.eth.demo.sebserver.service.events.ExamFinishedEvent;
 import org.eth.demo.sebserver.service.events.ExamStartedEvent;
