@@ -66,11 +66,11 @@ public class ExamDaoImplTest extends TestWithLogging {
         final IndicatorRecordMapper indicatorMapperMock = mock(IndicatorRecordMapper.class);
         final ExamIndicatorJoinMapper examIndicatorJoinMapperMock = mock(ExamIndicatorJoinMapper.class);
 
-        final ExamDao candidate;
+        final ExamDaoImpl candidate;
 
         TestHelper() {
             super();
-            this.candidate = new ExamDao(
+            this.candidate = new ExamDaoImpl(
                     this.examMapperMock,
                     this.indicatorMapperMock,
                     this.examIndicatorJoinMapperMock);

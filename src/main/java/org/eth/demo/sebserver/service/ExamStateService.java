@@ -14,13 +14,13 @@ import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eth.demo.sebserver.appevents.ExamFinishedEvent;
+import org.eth.demo.sebserver.appevents.ExamStartedEvent;
 import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ExamRecord;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.Exam.Status;
 import org.eth.demo.sebserver.service.dao.ExamDao;
-import org.eth.demo.sebserver.service.events.ExamFinishedEvent;
-import org.eth.demo.sebserver.service.events.ExamStartedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
