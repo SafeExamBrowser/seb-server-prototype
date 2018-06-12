@@ -8,24 +8,24 @@
 
 package org.eth.demo.sebserver.domain.rest.sebconfig;
 
-public final class AttributeOfView {
+public final class ViewAttribute {
 
     public final String name;
     public final AttributeType type;
     public final String parentAttributeName;
     public final String resources;
+    public final String dependencies;
 
     public final String view;
     public final String group;
     public final int xpos;
     public final int ypos;
 
-    private final int hash;
-
-    public AttributeOfView(final String name,
+    public ViewAttribute(final String name,
             final AttributeType type,
             final String parentAttributeName,
             final String resources,
+            final String dependencies,
             final String view,
             final String group,
             final int xpos,
@@ -35,17 +35,11 @@ public final class AttributeOfView {
         this.type = type;
         this.parentAttributeName = parentAttributeName;
         this.resources = resources;
+        this.dependencies = dependencies;
         this.view = view;
         this.group = group;
         this.xpos = xpos;
         this.ypos = ypos;
-
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((parentAttributeName == null) ? 0 : parentAttributeName.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
-        this.hash = result;
     }
 
     public String getName() {
@@ -81,11 +75,6 @@ public final class AttributeOfView {
     }
 
     @Override
-    public int hashCode() {
-        return this.hash;
-    }
-
-    @Override
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
@@ -93,7 +82,7 @@ public final class AttributeOfView {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final AttributeOfView other = (AttributeOfView) obj;
+        final ViewAttribute other = (ViewAttribute) obj;
         if (this.name == null) {
             if (other.name != null)
                 return false;
@@ -111,11 +100,11 @@ public final class AttributeOfView {
 
     @Override
     public String toString() {
-        return "ConfigAttribute [name=" + this.name + ", type=" + this.type + ", parentAttributeName="
+        return "ViewAttribute [name=" + this.name + ", type=" + this.type + ", parentAttributeName="
                 + this.parentAttributeName
-                + ", resources=" + this.resources + ", view=" + this.view + ", group=" + this.group + ", xpos="
-                + this.xpos + ", ypos="
-                + this.ypos + ", hash=" + this.hash + "]";
+                + ", resources=" + this.resources + ", dependencies=" + this.dependencies + ", view=" + this.view
+                + ", group=" + this.group
+                + ", xpos=" + this.xpos + ", ypos=" + this.ypos + "]";
     }
 
 }

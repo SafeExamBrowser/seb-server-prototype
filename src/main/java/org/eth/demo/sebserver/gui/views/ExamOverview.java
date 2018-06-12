@@ -25,19 +25,23 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eth.demo.sebserver.gui.GUISpringConfig;
 import org.eth.demo.sebserver.gui.RAPSpringConfig.RAPSpringContext;
-import org.eth.demo.sebserver.gui.domain.GUIExam;
-import org.eth.demo.sebserver.gui.view.ViewComposer;
-import org.eth.demo.sebserver.gui.view.ViewService;
+import org.eth.demo.sebserver.gui.domain.exam.GUIExam;
+import org.eth.demo.sebserver.gui.service.ViewComposer;
+import org.eth.demo.sebserver.gui.service.ViewService;
 import org.eth.demo.sebserver.util.TypedMap;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public final class ExamOverview implements ViewComposer {
+@Lazy
+@Component
+public class ExamOverview implements ViewComposer {
 
     private static final String ITEM_DATA_EXAM = "ITEM_DATA_EXAM";
     private static final String ROOT_COMPOSITE_SUPPLIER = "ROOT_COMPOSITE_SUPPLIER";

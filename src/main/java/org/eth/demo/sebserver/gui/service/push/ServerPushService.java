@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.push;
+package org.eth.demo.sebserver.gui.service.push;
 
 import java.util.function.Consumer;
 

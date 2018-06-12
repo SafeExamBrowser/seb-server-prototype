@@ -33,22 +33,26 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eth.demo.sebserver.gui.GUISpringConfig;
-import org.eth.demo.sebserver.gui.domain.GUIExam;
-import org.eth.demo.sebserver.gui.domain.GUIIndicatorDef;
-import org.eth.demo.sebserver.gui.domain.GUIIndicatorValue;
-import org.eth.demo.sebserver.gui.push.ServerPushContext;
-import org.eth.demo.sebserver.gui.push.ServerPushService;
-import org.eth.demo.sebserver.gui.view.ViewComposer;
-import org.eth.demo.sebserver.gui.view.ViewService;
+import org.eth.demo.sebserver.gui.domain.exam.GUIExam;
+import org.eth.demo.sebserver.gui.domain.exam.GUIIndicatorDef;
+import org.eth.demo.sebserver.gui.domain.exam.GUIIndicatorValue;
+import org.eth.demo.sebserver.gui.service.ViewComposer;
+import org.eth.demo.sebserver.gui.service.ViewService;
+import org.eth.demo.sebserver.gui.service.push.ServerPushContext;
+import org.eth.demo.sebserver.gui.service.push.ServerPushService;
 import org.eth.demo.sebserver.util.TypedMap;
 import org.eth.demo.sebserver.util.TypedMap.TypedKey;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public final class RunningExamView implements ViewComposer {
+@Lazy
+@Component
+public class RunningExamView implements ViewComposer {
 
     public static final TypedKey<Long> EXAM_ID = new TypedKey<>("EXAM_ID", Long.class);
 

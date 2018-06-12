@@ -15,7 +15,8 @@ public enum AttributeType {
     CHECKBOX,
     INTEGER,
     DECIMAL,
-    SELECTION,
+    SINGLE_SELECTION,
+    MULTI_SELECTION,
     RADIO_SELECTION,
     BASE64_BINARY,
 

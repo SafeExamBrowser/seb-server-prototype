@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.view;
+package org.eth.demo.sebserver.gui.service;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eth.demo.sebserver.util.TypedMap;

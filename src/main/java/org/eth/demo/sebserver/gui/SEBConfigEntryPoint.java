@@ -11,18 +11,18 @@ package org.eth.demo.sebserver.gui;
 import org.eclipse.rap.rwt.application.AbstractEntryPoint;
 import org.eclipse.swt.widgets.Composite;
 import org.eth.demo.sebserver.gui.service.ViewService;
-import org.eth.demo.sebserver.gui.views.ExamOverview;
+import org.eth.demo.sebserver.gui.views.SEBConfigView1;
 import org.springframework.context.ApplicationContext;
 
-public class ExamViewEntryPoint extends AbstractEntryPoint {
+public class SEBConfigEntryPoint extends AbstractEntryPoint {
 
-    private static final long serialVersionUID = -1106183608032715804L;
+    private static final long serialVersionUID = -5074876749330076628L;
 
     @Override
     protected void createContents(final Composite parent) {
         final ApplicationContext applicationContext = RAPSpringConfig.RAPSpringContext.getApplicationContext();
         final ViewService viewService = applicationContext.getBean(ViewService.class);
-        viewService.composeView(parent, ExamOverview.class);
+        viewService.composeView(parent, SEBConfigView1.class);
     }
 
 }

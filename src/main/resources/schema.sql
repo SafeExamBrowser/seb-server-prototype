@@ -10,8 +10,6 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 -- -----------------------------------------------------
 -- Schema SEBServerDemo
 -- -----------------------------------------------------
-
-
 -- -----------------------------------------------------
 -- Table `exam`
 -- -----------------------------------------------------
@@ -117,6 +115,9 @@ CREATE TABLE IF NOT EXISTS `configuration_attribute` (
   `name` VARCHAR(45) NOT NULL,
   `type` VARCHAR(45) NOT NULL,
   `parent_id` BIGINT UNSIGNED NULL,
+  `resources` VARCHAR(255) NULL,
+  `validator` VARCHAR(45) NULL,
+  `dependencies` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
   INDEX `parent_ref_idx` (`parent_id` ASC),
   CONSTRAINT `parent_ref`
@@ -166,6 +167,7 @@ CREATE TABLE IF NOT EXISTS `orientation` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `config_attribute_id` BIGINT UNSIGNED NOT NULL,
   `view` VARCHAR(45) NOT NULL,
+  `group` VARCHAR(45) NULL,
   `x_position` INT NOT NULL DEFAULT 0,
   `y_position` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
@@ -204,7 +206,6 @@ CREATE TABLE IF NOT EXISTS `exam_configuration_map` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4;
-
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

@@ -95,9 +95,9 @@ public interface ExamIndicatorJoinMapper {
     }
 
     static final class JoinRecord {
-        private final Long id;
-        private final String name;
-        private final Integer status;
+        public final Long id;
+        public final String name;
+        public final Integer status;
         public final IndicatorDefinition indicator;
 
         private JoinRecord(final Long id,
