@@ -6,11 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.service.sebconfig;
+package org.eth.demo.sebserver.domain.rest.sebconfig;
 
-import org.springframework.stereotype.Service;
-
-@Service
-public class InputComponentFactory {
-
+public enum ConfigurationValueType {
+    NONE, TEXT, LARGE_TEXT, BASE64_BINARY, LIST, COMPOSITE, COMPOSITE_LIST
 }

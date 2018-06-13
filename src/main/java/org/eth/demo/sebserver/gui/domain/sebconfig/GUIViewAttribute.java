@@ -8,15 +8,19 @@
 
 package org.eth.demo.sebserver.gui.domain.sebconfig;
 
-import org.eth.demo.sebserver.domain.rest.sebconfig.AttributeType;
+import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GUIViewAttribute {
 
+    private static final Logger log = LoggerFactory.getLogger(GUIViewAttribute.class);
+
     public final String name;
-    public final AttributeType type;
+    public final String type;
     public final String parentAttributeName;
     public final String resources;
     public final String dependencies;
@@ -29,7 +33,7 @@ public class GUIViewAttribute {
     @JsonCreator
     public GUIViewAttribute(
             @JsonProperty("name") final String name,
-            @JsonProperty("type") final AttributeType type,
+            @JsonProperty("type") final String type,
             @JsonProperty("parentAttributeName") final String parentAttributeName,
             @JsonProperty("resources") final String resources,
             @JsonProperty("dependencies") final String dependencies,
@@ -53,7 +57,7 @@ public class GUIViewAttribute {
         return this.name;
     }
 
-    public AttributeType getType() {
+    public String getType() {
         return this.type;
     }
 
@@ -79,6 +83,24 @@ public class GUIViewAttribute {
 
     public int getYpos() {
         return this.ypos;
+    }
+
+    public FieldType getFieldType() {
+        try {
+            return FieldType.valueOf(this.type);
+        } catch (final Exception e) {
+            log.error("Unknown FieldType: {}", this.type);
+            return FieldType.UNKNOWN;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "GUIViewAttribute [name=" + this.name + ", type=" + this.type + ", parentAttributeName="
+                + this.parentAttributeName
+                + ", resources=" + this.resources + ", dependencies=" + this.dependencies + ", view=" + this.view
+                + ", group=" + this.group
+                + ", xpos=" + this.xpos + ", ypos=" + this.ypos + "]";
     }
 
 }
