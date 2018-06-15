@@ -93,7 +93,7 @@ public class ExamOverview implements ViewComposer {
             item.setText(2, exam.statusName);
             item.setData(ITEM_DATA_EXAM, exam);
             item.addListener(SWT.Selection, event -> {
-                System.out.println("table tiem selection: ");
+                System.out.println("table item selection: ");
             });
         }
 
@@ -177,8 +177,13 @@ public class ExamOverview implements ViewComposer {
         });
     }
 
-    private static final void addStateChangeAction(final String name, final Menu menu, final TableItem tItem,
-            final Long examId, final int toState) {
+    private static final void addStateChangeAction(
+            final String name,
+            final Menu menu,
+            final TableItem tItem,
+            final Long examId,
+            final int toState) {
+
         final MenuItem item = new MenuItem(menu, SWT.NULL);
         item.setText(name);
         item.addListener(SWT.Selection, event -> {

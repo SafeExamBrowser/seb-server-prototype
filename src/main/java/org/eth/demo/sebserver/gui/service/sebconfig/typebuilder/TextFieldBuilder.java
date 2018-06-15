@@ -8,7 +8,7 @@
 
 package org.eth.demo.sebserver.gui.service.sebconfig.typebuilder;
 
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -18,6 +18,8 @@ import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputComponentBuilder;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
+import org.eth.demo.sebserver.gui.service.sebconfig.ValueChangeListener;
+import org.eth.demo.sebserver.gui.service.sebconfig.ViewContext;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,12 +29,17 @@ public class TextFieldBuilder implements InputComponentBuilder {
     public FieldType[] supportedTypes() {
         return new FieldType[] {
                 FieldType.TEXT_FIELD,
+                FieldType.TEXT_AREA,
                 FieldType.INTEGER,
                 FieldType.DECIMAL };
     };
 
     @Override
-    public InputField createInputComponent(final Composite parent, final GUIViewAttribute attribute) {
+    public InputField createInputComponent(
+            final Composite parent,
+            final GUIViewAttribute attribute,
+            final ViewContext viewContext) {
+
         final FieldType fieldType = attribute.getFieldType();
         final Text text;
         if (fieldType == FieldType.INTEGER || fieldType == FieldType.DECIMAL) {
@@ -41,55 +48,67 @@ public class TextFieldBuilder implements InputComponentBuilder {
             text = new Text(parent, SWT.LEFT | SWT.BORDER);
         }
 
+        addValueChangeListener(text, attribute, viewContext.getValueChangeListener());
+
         return new TextInputField(attribute, text);
     }
 
-    public static final class TextInputField extends ControlFieldAdapter<Text> {
+    public void addValueChangeListener(
+            final Text control,
+            final GUIViewAttribute attribute,
+            final ValueChangeListener valueListener) {
+
+        final FieldType fieldType = attribute.getFieldType();
+        if (fieldType == FieldType.INTEGER) {
+            addNumberCheckListener(control, attribute, s -> Integer.parseInt(s), valueListener);
+        } else if (fieldType == FieldType.DECIMAL) {
+            addNumberCheckListener(control, attribute, s -> Double.parseDouble(s), valueListener);
+        } else {
+            control.addListener(
+                    SWT.FocusOut,
+                    event -> valueListener.valueChanged(
+                            attribute,
+                            String.valueOf(control.getText()),
+                            0));
+        }
+    }
+
+    private void addNumberCheckListener(
+            final Text control,
+            final GUIViewAttribute attribute,
+            final Consumer<String> numberCheck,
+            final ValueChangeListener valueListener) {
+
+        control.addListener(SWT.FocusOut, event -> {
+            try {
+                final String text = control.getText();
+                numberCheck.accept(text);
+                control.setBackground(null);
+                valueListener.valueChanged(attribute, text, 0);
+            } catch (final NumberFormatException e) {
+                control.setBackground(new Color(control.getDisplay(), 100, 0, 0));
+            }
+        });
+    }
+
+    static final class TextInputField extends ControlFieldAdapter<Text> {
 
         TextInputField(final GUIViewAttribute attribute, final Text control) {
             super(attribute, control);
         }
 
         @Override
-        public String getValue() {
-            return this.control.getText();
+        public InputValue getValue() {
+            return InputField.createSingleValue(this.control.getText());
         }
 
         @Override
-        public void setValue(final String value) {
-            this.control.setText(value);
-        }
-
-        @Override
-        public void setValueListener(final BiConsumer<String, GUIViewAttribute> valueListener) {
-            final FieldType fieldType = this.attribute.getFieldType();
-            if (fieldType == FieldType.INTEGER) {
-                this.control.addListener(SWT.Verify, event -> {
-                    try {
-                        Integer.parseInt(event.text);
-                        this.control.setBackground(null);
-                        valueListener.accept(event.text, this.attribute);
-                    } catch (final NumberFormatException e) {
-                        this.control.setBackground(new Color(this.control.getDisplay(), 100, 0, 0));
-                    }
-                });
-            } else if (fieldType == FieldType.DECIMAL) {
-                this.control.addListener(SWT.Verify, event -> {
-                    try {
-                        Double.parseDouble(event.text);
-                        this.control.setBackground(null);
-                        valueListener.accept(event.text, this.attribute);
-                    } catch (final NumberFormatException e) {
-                        this.control.setBackground(new Color(this.control.getDisplay(), 100, 0, 0));
-                    }
-                });
-            } else {
-                this.control.addListener(
-                        SWT.Verify,
-                        event -> valueListener.accept(
-                                String.valueOf(event.text),
-                                this.attribute));
+        public void setValue(final InputValue value) {
+            if (!value.isSingle()) {
+                throw new IllegalArgumentException("TextInputField only supports single InputValues");
             }
+
+            this.control.setText(value.asString());
         }
-    };
+    }
 }

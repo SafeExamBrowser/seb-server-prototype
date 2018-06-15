@@ -8,9 +8,6 @@
 
 package org.eth.demo.sebserver.gui.service.sebconfig.typebuilder;
 
-import java.util.function.BiConsumer;
-
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField;
@@ -45,13 +42,10 @@ public abstract class ControlFieldAdapter<T extends Control> implements InputFie
         return this.control;
     }
 
-    @Override
-    public void setValueListener(final BiConsumer<String, GUIViewAttribute> valueListener) {
-        this.control.addListener(
-                SWT.Verify,
-                event -> valueListener.accept(
-                        String.valueOf(event.data),
-                        this.attribute));
-    }
+//    public void setValueChangeListener(final ValueChangeListener listener) {
+//        this.control.addListener(
+//                SWT.Verify,
+//                event -> listener.valueChanged(this.attribute, getValue().asString(), 0));
+//    }
 
 }

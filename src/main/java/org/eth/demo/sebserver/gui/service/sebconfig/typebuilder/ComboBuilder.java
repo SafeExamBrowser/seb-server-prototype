@@ -8,8 +8,9 @@
 
 package org.eth.demo.sebserver.gui.service.sebconfig.typebuilder;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputComponentBuilder;
@@ -19,14 +20,14 @@ import org.eth.demo.sebserver.gui.service.sebconfig.ViewContext;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CheckBoxBuilder implements InputComponentBuilder {
+public class ComboBuilder implements InputComponentBuilder {
 
     @Override
     public FieldType[] supportedTypes() {
         return new FieldType[] {
-                FieldType.CHECKBOX,
-                FieldType.CHECK_FIELD };
-    };
+                FieldType.SINGLE_SELECTION,
+                FieldType.MULTI_SELECTION };
+    }
 
     @Override
     public InputField createInputComponent(
@@ -34,36 +35,33 @@ public class CheckBoxBuilder implements InputComponentBuilder {
             final GUIViewAttribute attribute,
             final ViewContext viewContext) {
 
-        final FieldType fieldType = attribute.getFieldType();
-        final Button checkbox = new Button(parent, SWT.CHECK);
-        if (fieldType == FieldType.CHECKBOX) {
-            checkbox.setText(attribute.name);
-        }
+        final Combo combo = new Combo(parent, SWT.READ_ONLY);
+        combo.setItems(StringUtils.split(attribute.resources, ","));
 
-        checkbox.addListener(
+        combo.addListener(
                 SWT.Selection,
                 event -> viewContext.getValueChangeListener().valueChanged(
                         attribute,
-                        String.valueOf(checkbox.getSelection()),
+                        String.valueOf(combo.getSelectionIndex()),
                         0));
 
-        return new CheckboxField(attribute, checkbox);
+        return new ComboField(attribute, combo);
     }
 
-    static final class CheckboxField extends ControlFieldAdapter<Button> {
+    public static final class ComboField extends ControlFieldAdapter<Combo> {
 
-        CheckboxField(final GUIViewAttribute attribute, final Button control) {
+        ComboField(final GUIViewAttribute attribute, final Combo control) {
             super(attribute, control);
         }
 
         @Override
         public InputValue getValue() {
-            return InputField.createSingleValue(String.valueOf(this.control.getSelection()));
+            return InputField.createSingleValue(String.valueOf(this.control.getSelectionIndex()));
         }
 
         @Override
         public void setValue(final InputValue value) {
-            this.control.setSelection(Boolean.valueOf(value.asString()));
+            this.control.select(Integer.parseInt(value.asString()));
         }
     }
 

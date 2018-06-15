@@ -10,8 +10,8 @@ package org.eth.demo.sebserver.gui.service.sebconfig;
 
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 
-public interface AttributeValueListener {
+public interface ValueChangeListener {
 
-    void valueEntered(String value, GUIViewAttribute attribute);
+    void valueChanged(GUIViewAttribute attribute, String value, int listIndex);
 
 }

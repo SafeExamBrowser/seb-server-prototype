@@ -8,13 +8,15 @@
 
 package org.eth.demo.sebserver.gui.service.sebconfig;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormLayout;
@@ -24,7 +26,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eth.demo.sebserver.gui.GUISpringConfig;
 import org.eth.demo.sebserver.gui.domain.sebconfig.Cell;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
-import org.eth.demo.sebserver.gui.domain.sebconfig.ViewContext;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -39,8 +40,6 @@ public class ConfigViewService {
     private final RestTemplate restTemplate;
     private final Map<FieldType, InputComponentBuilder> builderTypeMapping;
 
-    private final Map<String, Map<String, GUIViewAttribute>> attributeCache;
-
     public ConfigViewService(final RestTemplate restTemplate,
             final Collection<InputComponentBuilder> builders) {
 
@@ -51,11 +50,83 @@ public class ConfigViewService {
                 this.builderTypeMapping.put(type, builder);
             }
         }
-
-        this.attributeCache = new HashMap<>();
     }
 
-    public Map<String, GUIViewAttribute> loadConfigAttributes(final String viewName) {
+    public ViewContext createViewContext(
+            final String name,
+            final int xpos,
+            final int ypos,
+            final int width,
+            final int height,
+            final int columns,
+            final int rows) {
+
+        final ValueChangeListener valueChangeListener = new ValueChangeListener() {
+            @Override
+            public void valueChanged(final GUIViewAttribute attribute, final String value, final int listIndex) {
+                System.out.println("****************** value entered: " + value + " attribute: " + attribute.name
+                        + " listIndex: " + listIndex);
+            }
+        };
+
+        return new ViewContext(name, xpos, ypos, width, height, columns, rows,
+                loadConfigAttributes(name), valueChangeListener);
+    }
+
+    public ViewContext createComponents(final Composite parent, final ViewContext viewContext) {
+        final Map<String, List<GUIViewAttribute>> groups = new LinkedHashMap<>();
+        for (final GUIViewAttribute attribute : viewContext.getAttributes()) {
+
+            // ignore nested attributes
+            if (StringUtils.isNotBlank(attribute.parentAttributeName)) {
+                continue;
+            }
+
+            // check and handle builder availability for specified type
+            if (!this.builderTypeMapping.containsKey(attribute.getFieldType())) {
+                final Label errorLabel = getErrorLabel(parent, "No Builder for type: " + attribute.type);
+                errorLabel.setLayoutData(Cell.createFormData(viewContext.getCell(attribute.xpos, attribute.ypos)));
+                continue;
+            }
+
+            // collect attributes that belongs to a group for later processing
+            if (StringUtils.isNotBlank(attribute.group)) {
+                groups.computeIfAbsent(
+                        attribute.group,
+                        a -> new ArrayList<>()).add(attribute);
+                continue;
+            }
+
+            // TODO the span information should also come within the orientation form back-end
+            Cell cell = viewContext.getCell(attribute.xpos, attribute.ypos);
+            if (FieldType.TABLE == attribute.getFieldType()) {
+                cell = cell.span(3, 6);
+            }
+
+            createSingleInputComponent(
+                    parent,
+                    attribute,
+                    viewContext,
+                    cell);
+        }
+
+        if (!groups.isEmpty()) {
+            for (final List<GUIViewAttribute> group : groups.values()) {
+                createInputComponentGroup(parent, group, viewContext);
+            }
+        }
+
+        return viewContext;
+    }
+
+    public ViewContext initInputFieldValues(final ViewContext viewContext) {
+
+        // TODO get all values of the view form back-end and inject them to the appropriate input fields
+
+        return viewContext;
+    }
+
+    private Map<String, GUIViewAttribute> loadConfigAttributes(final String viewName) {
         final UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(
                 GUISpringConfig.ROOT_LOCATION + "/sebconfig/" + viewName);
 
@@ -72,40 +143,10 @@ public class ConfigViewService {
                         a -> a));
     }
 
-    public Map<String, GUIViewAttribute> getConfigAttributes(final String viewName, final boolean reload) {
-        return this.attributeCache.computeIfAbsent(
-                viewName,
-                this::loadConfigAttributes);
-    }
-
-    public Map<String, GUIViewAttribute> getConfigAttributes(final ViewContext view) {
-        return getConfigAttributes(view.name, false);
-    }
-
-    public GUIViewAttribute getConfigAttribute(final String viewName, final String attrName) {
-        return getConfigAttributes(viewName, false).get(attrName);
-    }
-
-    public Collection<GUIViewAttribute> getChildAttributes(final String viewName, final String parentName) {
-        return getConfigAttributes(viewName, false)
-                .values()
-                .stream()
-                .filter(a -> parentName.equals(a.parentAttributeName))
-                .collect(Collectors.toList());
-    }
-
-    public void createInputComponent(
-            final Composite parent,
-            final GUIViewAttribute attribute,
-            final ViewContext view) {
-
-        createInputComponent(parent, attribute, view.getCell(attribute.xpos, attribute.ypos));
-    }
-
-    public void createInputComponentGroup(
+    private void createInputComponentGroup(
             final Composite parent,
             final List<GUIViewAttribute> groupAttrs,
-            final ViewContext view) {
+            final ViewContext viewContext) {
 
         if (groupAttrs == null || groupAttrs.isEmpty()) {
             return;
@@ -125,48 +166,42 @@ public class ConfigViewService {
         group.setLayoutData(Cell.createFormData(new Cell(
                 groupBounds.x,
                 groupBounds.y,
-                view.getCellRelativeWidth() * groupBounds.width,
-                view.getCellRelativeHeight() * (groupBounds.height + Cell.GROUP_CELL_HEIGHT_ADJUSTMENT),
-                view.getCellPixelWidth() * groupBounds.width,
-                view.getCellPixelHeight() * (groupBounds.height + Cell.GROUP_CELL_HEIGHT_ADJUSTMENT))));
+                viewContext.getCellRelativeWidth() * groupBounds.width,
+                viewContext.getCellRelativeHeight() * (groupBounds.height + Cell.GROUP_CELL_HEIGHT_ADJUSTMENT),
+                viewContext.getCellPixelWidth() * groupBounds.width,
+                viewContext.getCellPixelHeight() * (groupBounds.height + Cell.GROUP_CELL_HEIGHT_ADJUSTMENT))));
 
         final int cellWidth = 100 / groupBounds.width;
         final int cellHeight = 100 / groupBounds.height;
 
         for (final GUIViewAttribute attr : groupAttrs) {
-            createInputComponent(
+            createSingleInputComponent(
                     group,
                     attr,
+                    viewContext,
                     new Cell(
                             attr.xpos - groupBounds.x,
                             attr.ypos - groupBounds.y,
                             cellWidth,
                             cellHeight,
-                            view.getCellPixelWidth(),
-                            view.getCellPixelHeight()));
+                            viewContext.getCellPixelWidth(),
+                            viewContext.getCellPixelHeight()));
         }
     }
 
-    private void createInputComponent(
+    private void createSingleInputComponent(
             final Composite parent,
             final GUIViewAttribute attribute,
+            final ViewContext viewContext,
             final Cell cell) {
 
         final InputComponentBuilder inputComponentBuilder = this.builderTypeMapping.get(attribute.getFieldType());
-        if (inputComponentBuilder == null) {
-            final Label errorLabel = getErrorLabel(parent, "No Builder for type: " + attribute.type);
-            errorLabel.setLayoutData(Cell.createFormData(cell));
-            return;
-        }
+        final InputField inputField = inputComponentBuilder.createInputComponent(parent, attribute, viewContext);
 
-        final InputField inputField = inputComponentBuilder.createInputComponent(parent, attribute);
         createTitleLabel(parent, inputField, cell, attribute.name);
         inputField.getControl().setLayoutData(Cell.createFormData(cell));
         inputField.getControl().setToolTipText(attribute.name);
-        inputField.setValueListener((value, attr) -> {
-            // TODO send value to back-end
-            System.out.println("****************** value entered: " + value + " attribute: " + attr.name);
-        });
+        viewContext.registerInputField(inputField);
     }
 
     private void createTitleLabel(
@@ -177,7 +212,7 @@ public class ConfigViewService {
 
         final FieldType fieldType = inputField.getType();
         final Label label = new Label(parent, SWT.NONE);
-        label.setText(" " + title + " ");
+        label.setText(" " + title + "   ");
         switch (fieldType.titleOrientation) {
             case LEFT: {
                 if (cell.column > 0) {

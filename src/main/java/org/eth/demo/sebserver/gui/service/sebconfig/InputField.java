@@ -10,26 +10,10 @@ package org.eth.demo.sebserver.gui.service.sebconfig;
 
 import static org.eth.demo.sebserver.gui.service.sebconfig.InputField.TitleOrientation.*;
 
-import java.util.function.BiConsumer;
-
 import org.eclipse.swt.widgets.Control;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 
 public interface InputField {
-
-    FieldType getType();
-
-    String getName();
-
-    String getValue();
-
-    void setValue(String name);
-
-    Control getControl();
-
-    GUIViewAttribute getAttribute();
-
-    void setValueListener(final BiConsumer<String, GUIViewAttribute> valueListener);
 
     // TODO this should go to a column in orientation table
     public enum TitleOrientation {
@@ -37,8 +21,6 @@ public interface InputField {
     }
 
     //@formatter:off
-
-
     public enum FieldType {
         LABEL(NONE),
         TEXT_FIELD(LEFT),
@@ -64,5 +46,46 @@ public interface InputField {
 
     }
     //@formatter:on
+
+    FieldType getType();
+
+    String getName();
+
+    InputValue getValue();
+
+    void setValue(InputValue value);
+
+    Control getControl();
+
+    GUIViewAttribute getAttribute();
+
+    public interface InputValue {
+        boolean isSingle();
+
+        String asString();
+    }
+
+    public final static class SingleInputFieldValue implements InputValue {
+
+        public final String value;
+
+        public SingleInputFieldValue(final String value) {
+            this.value = value;
+        }
+
+        @Override
+        public boolean isSingle() {
+            return true;
+        }
+
+        @Override
+        public String asString() {
+            return value;
+        }
+    }
+
+    public static SingleInputFieldValue createSingleValue(final String value) {
+        return new SingleInputFieldValue(value);
+    }
 
 }

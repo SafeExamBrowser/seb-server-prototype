@@ -18,11 +18,12 @@ INSERT INTO `configuration_attribute` values
     (13, "text1", "TEXT_FIELD", null, "", "", ""),
     (14, "number1", "INTEGER", null, "", "", ""),
     (15, "checkField1", "CHECK_FIELD", null, "", "", ""),
-    (16, "checkField2", "CHECK_FIELD", null, "", "", "")
+    (16, "checkField2", "CHECK_FIELD", null, "", "", ""),
+    (17, "selection1", "SINGLE_SELECTION", null, "One,Two,Three", "", "")
     ;
     
 INSERT INTO `orientation` values 
-    (1, 1, "view1", null, 0, 15),
+    (1, 1, "view1", null, 0, 13),
     (2, 2, "view1", null, 0, 0),
     (3, 3, "view1", null, 1, 0),
     (4, 4, "view1", null, 2, 0),
@@ -41,7 +42,8 @@ INSERT INTO `orientation` values
     (13, 13, "view1", null, 1, 6),
     (14, 14, "view1", null, 1, 7),
     (15, 15, "view1", null, 1, 8),
-    (16, 16, "view1", null, 1, 9)
+    (16, 16, "view1", null, 1, 9),
+    (17, 17, "view1", null, 1, 10)
     ;
 
 INSERT INTO `exam` VALUES 

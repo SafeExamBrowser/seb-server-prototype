@@ -16,6 +16,9 @@ public interface InputComponentBuilder {
 
     FieldType[] supportedTypes();
 
-    InputField createInputComponent(final Composite parent, final GUIViewAttribute attribute);
+    InputField createInputComponent(
+            final Composite parent,
+            final GUIViewAttribute attribute,
+            final ViewContext viewContext);
 
 }

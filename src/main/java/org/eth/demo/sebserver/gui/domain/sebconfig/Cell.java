@@ -10,6 +10,7 @@ package org.eth.demo.sebserver.gui.domain.sebconfig;
 
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
+import org.eth.demo.sebserver.gui.service.sebconfig.ViewContext;
 
 public class Cell {
 
@@ -47,6 +48,18 @@ public class Cell {
         this.relHeight = relHeight;
         this.pixelWidth = pixelWidth;
         this.pixelHeight = pixelHeight;
+    }
+
+    public Cell span(final int columnSpan, final int rowSpan) {
+        return new Cell(
+                this.column,
+                this.row,
+                columnSpan,
+                rowSpan,
+                this.relWidth,
+                this.relHeight,
+                this.pixelWidth,
+                this.pixelHeight);
     }
 
     @Override

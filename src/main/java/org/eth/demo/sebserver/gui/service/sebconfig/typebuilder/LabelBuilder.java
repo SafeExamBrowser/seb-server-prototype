@@ -15,6 +15,7 @@ import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputComponentBuilder;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
+import org.eth.demo.sebserver.gui.service.sebconfig.ViewContext;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -26,27 +27,31 @@ public class LabelBuilder implements InputComponentBuilder {
     };
 
     @Override
-    public InputField createInputComponent(final Composite parent, final GUIViewAttribute attribute) {
+    public InputField createInputComponent(
+            final Composite parent,
+            final GUIViewAttribute attribute,
+            final ViewContext viewContext) {
+
         final Label label = new Label(parent, SWT.NONE);
         label.setText(attribute.name);
 
         return new LabelField(attribute, label);
     }
 
-    public static final class LabelField extends ControlFieldAdapter<Label> {
+    static final class LabelField extends ControlFieldAdapter<Label> {
 
-        public LabelField(final GUIViewAttribute attribute, final Label control) {
+        LabelField(final GUIViewAttribute attribute, final Label control) {
             super(attribute, control);
         }
 
         @Override
-        public String getValue() {
-            return this.control.getText();
+        public InputValue getValue() {
+            return InputField.createSingleValue(this.control.getText());
         }
 
         @Override
-        public void setValue(final String value) {
-            this.control.setText(value);
+        public void setValue(final InputValue value) {
+            this.control.setText(value.asString());
         }
     };
 

@@ -6,27 +6,41 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.domain.sebconfig;
+package org.eth.demo.sebserver.gui.service.sebconfig;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormData;
+import org.eth.demo.sebserver.gui.domain.sebconfig.Cell;
+import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 
-public class ViewContext {
+public final class ViewContext {
 
     public final String name;
 
     public final int xpos, ypos, width, height;
     public final int columns, rows;
-
     private final Cell protoCell;
 
-    public ViewContext(final String name,
+    private final Map<String, GUIViewAttribute> attributes;
+    private final Map<String, InputField> inputFields;
+
+    private final ValueChangeListener valueChangeListener;
+
+    ViewContext(final String name,
             final int xpos,
             final int ypos,
             final int width,
             final int height,
             final int columns,
-            final int rows) {
+            final int rows,
+            final Map<String, GUIViewAttribute> attributes,
+            final ValueChangeListener valueChangeListener) {
 
         this.name = name;
         this.xpos = xpos;
@@ -42,6 +56,10 @@ public class ViewContext {
                 100 / rows,
                 width / columns,
                 height / rows);
+
+        this.attributes = attributes;
+        this.inputFields = new HashMap<>();
+        this.valueChangeListener = valueChangeListener;
     }
 
     public String getName() {
@@ -98,6 +116,24 @@ public class ViewContext {
 
     public FormData getFormData(final int column, final int row) {
         return Cell.createFormData(getCell(column, row));
+    }
+
+    public List<GUIViewAttribute> getAttributes() {
+        return new ArrayList<>(this.attributes.values());
+    }
+
+    public List<GUIViewAttribute> getChildAttributes(final GUIViewAttribute attribute) {
+        return this.attributes.values().stream()
+                .filter(a -> attribute.name.equals(a.parentAttributeName))
+                .collect(Collectors.toList());
+    }
+
+    public ValueChangeListener getValueChangeListener() {
+        return this.valueChangeListener;
+    }
+
+    void registerInputField(final InputField inputField) {
+        this.inputFields.put(inputField.getName(), inputField);
     }
 
     @Override
