@@ -112,21 +112,21 @@
       <version>3.7</version>
     </dependency>
     
-<!--     <dependency> -->
-<!--       <groupId>org.eclipse.rap</groupId> -->
-<!--       <artifactId>org.eclipse.rap.rwt</artifactId> -->
-<!--       <version>3.4.0</version> -->
-<!--     </dependency> -->
     <dependency>
       <groupId>org.eclipse.rap</groupId>
-      <artifactId>org.eclipse.rap.jface</artifactId>
+      <artifactId>org.eclipse.rap.rwt</artifactId>
       <version>3.4.0</version>
     </dependency>
-    <dependency>
-      <groupId>org.eclipse.platform</groupId>
-      <artifactId>org.eclipse.equinox.common</artifactId>
-      <version>3.9.0</version>
-    </dependency>
+<!--     <dependency> -->
+<!--       <groupId>org.eclipse.rap</groupId> -->
+<!--       <artifactId>org.eclipse.rap.jface</artifactId> -->
+<!--       <version>3.4.0</version> -->
+<!--     </dependency> -->
+<!--     <dependency> -->
+<!--       <groupId>org.eclipse.platform</groupId> -->
+<!--       <artifactId>org.eclipse.equinox.common</artifactId> -->
+<!--       <version>3.9.0</version> -->
+<!--     </dependency> -->
 <!-- Thanks for using https://jar-download.com -->
     
     

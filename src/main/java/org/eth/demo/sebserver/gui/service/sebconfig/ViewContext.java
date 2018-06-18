@@ -125,6 +125,7 @@ public final class ViewContext {
     public List<GUIViewAttribute> getChildAttributes(final GUIViewAttribute attribute) {
         return this.attributes.values().stream()
                 .filter(a -> attribute.name.equals(a.parentAttributeName))
+                .sorted((a1, a2) -> Integer.valueOf(a1.xpos).compareTo(a2.xpos))
                 .collect(Collectors.toList());
     }
 

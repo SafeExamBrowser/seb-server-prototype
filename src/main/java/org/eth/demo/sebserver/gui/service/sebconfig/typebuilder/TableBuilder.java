@@ -8,17 +8,20 @@
 
 package org.eth.demo.sebserver.gui.service.sebconfig.typebuilder;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ICellModifier;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
@@ -35,6 +38,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class TableBuilder implements InputComponentBuilder {
 
+    public static final String LIST_INDEX_REF = "ListIndex";
+
+    private Map<FieldType, TableCellEditorBuilder> cellEditorBuilderMap;
+
+    public TableBuilder(final Collection<TableCellEditorBuilder> cellEditorBuilderList) {
+        if (cellEditorBuilderList != null) {
+            this.cellEditorBuilderMap = cellEditorBuilderList.stream()
+                    .collect(Collectors.toMap(
+                            b -> b.getType(),
+                            b -> b));
+        } else {
+            this.cellEditorBuilderMap = Collections.emptyMap();
+        }
+    }
+
     @Override
     public FieldType[] supportedTypes() {
         return new FieldType[] { FieldType.TABLE };
@@ -47,55 +65,25 @@ public class TableBuilder implements InputComponentBuilder {
             final ViewContext viewContext) {
 
         final List<GUIViewAttribute> columnAttributes = viewContext.getChildAttributes(attribute);
-        final TableViewer tableViewer = new TableViewer(parent, SWT.NONE);
-        final Table table = tableViewer.getTable();
-
-        final TextCellEditor textCellEditor = new TextCellEditor(table);
-        tableViewer.setCellEditors(new CellEditor[] { textCellEditor });
-
-        tableViewer.setContentProvider(new ArrayContentProvider());
-
-        tableViewer.setCellModifier(new ICellModifier() {
-
-            @Override
-            public boolean canModify(final Object element, final String property) {
-                System.out.println("############### canModify property: " + property + " element: " + element);
-                return true;
-            }
-
-            @Override
-            public Object getValue(final Object element, final String property) {
-                System.out.println("############### getValue property: " + property + " element: " + element);
-                return null;
-            }
-
-            @Override
-            public void modify(final Object element, final String property, final Object value) {
-                // TODO Auto-generated method stub
-                System.out.println(
-                        "############### getValue property: " + property + " element: " + element + " value: " + value);
-            }
-
-        });
-
+        final Table table = new Table(parent, SWT.NONE);
         final Menu menu = new Menu(table);
         table.setMenu(menu);
 
         for (final GUIViewAttribute columnAttr : columnAttributes) {
             final TableColumn column = new TableColumn(table, SWT.NONE);
             column.setText(columnAttr.name);
-
             // TODO this information should also come within the orientation form back-end
             column.setWidth(200);
         }
 
         final TableField tableField = new TableField(
                 attribute,
-                tableViewer,
+                table,
                 columnAttributes,
                 viewContext.getValueChangeListener());
 
         table.addMenuDetectListener(new TableMenuListener(tableField));
+        table.addMouseListener(new TableCellListener(tableField));
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
         table.layout();
@@ -105,20 +93,31 @@ public class TableBuilder implements InputComponentBuilder {
 
     static final class TableField extends ControlFieldAdapter<Table> {
 
-        private final TableViewer tableViewer;
-        private final List<GUIViewAttribute> columnAttributes;
-        private final ValueChangeListener valueChangeListener;
+        final List<GUIViewAttribute> columnAttributes;
+        final ValueChangeListener valueChangeListener;
+        final TableEditor[] editor;
 
         TableField(
                 final GUIViewAttribute attribute,
-                final TableViewer control,
+                final Table control,
                 final List<GUIViewAttribute> columnAttributes,
                 final ValueChangeListener valueChangeListener) {
 
-            super(attribute, control.getTable());
-            this.tableViewer = control;
+            super(attribute, control);
             this.columnAttributes = columnAttributes;
             this.valueChangeListener = valueChangeListener;
+            this.editor = new TableEditor[columnAttributes.size()];
+
+            for (int i = 0; i < this.editor.length; i++) {
+                this.editor[i] = new TableEditor(control);
+                this.editor[i].horizontalAlignment = SWT.LEFT;
+                this.editor[i].grabHorizontal = true;
+            }
+
+            // editor cleanup on row selection
+            control.addListener(SWT.Selection, e -> editorCleanup());
+            // and on focus loss on table
+            //control.addListener(SWT.FocusOut, e -> editorCleanup());
         }
 
         @Override
@@ -140,17 +139,39 @@ public class TableBuilder implements InputComponentBuilder {
                 item.setText(index, "--");
                 index++;
             }
+
+            item.setData(LIST_INDEX_REF, this.control.getItemCount() - 1);
+
+            // TODO notify value change
         }
 
         void deleteRow(final int index) {
-            System.out.println("******************* deleteRow: " + index);
             this.control.getItem(index).dispose();
             this.control.setSelection(-1);
+
+            for (final TableItem item : this.control.getItems()) {
+                final int listIndex = (Integer) item.getData(LIST_INDEX_REF);
+                if (listIndex > index) {
+                    item.setData(LIST_INDEX_REF, listIndex - 1);
+                }
+            }
+
+            // TODO notify value change
+        }
+
+        void editorCleanup() {
+            for (int i = 0; i < this.editor.length; i++) {
+                final Control editor = this.editor[i].getEditor();
+                if (editor != null) {
+                    editor.dispose();
+                }
+            }
         }
     };
 
     private static final class TableMenuListener implements MenuDetectListener {
 
+        private static final long serialVersionUID = 2097739147685555217L;
         private final TableField tableField;
 
         public TableMenuListener(final TableField tableField) {
@@ -165,6 +186,7 @@ public class TableBuilder implements InputComponentBuilder {
                     mItem.dispose();
                 }
             }
+            this.tableField.editorCleanup();
 
             final MenuItem addItem = new MenuItem(menu, SWT.NULL);
             addItem.setText("Add");
@@ -173,13 +195,42 @@ public class TableBuilder implements InputComponentBuilder {
             });
 
             final int selectionIndex = this.tableField.control.getSelectionIndex();
-            System.out.println("******************* selectionIndex: " + selectionIndex);
             if (selectionIndex >= 0) {
                 final MenuItem delItem = new MenuItem(menu, SWT.NULL);
                 delItem.setText("Delete");
                 delItem.addListener(SWT.Selection, e -> {
                     this.tableField.deleteRow(selectionIndex);
                 });
+            }
+        }
+    }
+
+    private final class TableCellListener extends MouseAdapter {
+
+        private static final long serialVersionUID = -400266849205933608L;
+        private final TableField tableField;
+
+        public TableCellListener(final TableField tableField) {
+            this.tableField = tableField;
+        }
+
+        @Override
+        public void mouseDoubleClick(final MouseEvent event) {
+
+            final int selectedIndex = this.tableField.control.getSelectionIndex();
+            if (selectedIndex < 0) {
+                return;
+            }
+
+            final TableItem item = this.tableField.control.getItem(selectedIndex);
+            final int listIndex = (Integer) item.getData(LIST_INDEX_REF);
+
+            for (int i = 0; i < this.tableField.editor.length; i++) {
+                final GUIViewAttribute guiViewAttribute = this.tableField.columnAttributes.get(i);
+                final TableCellEditorBuilder tableCellEditorBuilder = TableBuilder.this.cellEditorBuilderMap.get(
+                        guiViewAttribute.getFieldType());
+                final Control cellEditor = tableCellEditorBuilder.buildEditor(this.tableField, item, i, listIndex);
+                this.tableField.editor[i].setEditor(cellEditor, item, i);
             }
         }
     }

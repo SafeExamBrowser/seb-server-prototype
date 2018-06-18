@@ -86,7 +86,7 @@ public class TextFieldBuilder implements InputComponentBuilder {
                 control.setBackground(null);
                 valueListener.valueChanged(attribute, text, 0);
             } catch (final NumberFormatException e) {
-                control.setBackground(new Color(control.getDisplay(), 100, 0, 0));
+                control.setBackground(new Color(control.getDisplay(), 255, 0, 0, 50));
             }
         });
     }
