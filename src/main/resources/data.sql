@@ -1,8 +1,8 @@
 INSERT INTO `configuration_attribute` values
     (1, "table1", "TABLE", null, "", "", ""),
-    (2, "table1Param1", "TEXT_FIELD", 1, "", "", ""),
-    (3, "table1Param2", "SINGLE_SELECTION", 1, "One,Two,Tree", "", ""),
-    (4, "table1Param3", "TEXT_FIELD", 1, "", "", ""),
+    (2, "param1", "TEXT_FIELD", 1, "", "", ""),
+    (3, "param2", "SINGLE_SELECTION", 1, "One,Two,Tree", "", ""),
+    (4, "param3", "TEXT_FIELD", 1, "", "", ""),
     
     (5, "check1", "CHECKBOX", null, "", "", ""),
     (6, "check2", "CHECKBOX", null, "", "", ""),

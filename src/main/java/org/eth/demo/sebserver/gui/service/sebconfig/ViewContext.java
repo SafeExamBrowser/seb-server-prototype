@@ -9,6 +9,7 @@
 package org.eth.demo.sebserver.gui.service.sebconfig;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,11 +18,13 @@ import java.util.stream.Collectors;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormData;
 import org.eth.demo.sebserver.gui.domain.sebconfig.Cell;
+import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 
 public final class ViewContext {
 
     public final String name;
+    public final Long configurationId;
 
     public final int xpos, ypos, width, height;
     public final int columns, rows;
@@ -32,7 +35,9 @@ public final class ViewContext {
 
     private final ValueChangeListener valueChangeListener;
 
-    ViewContext(final String name,
+    ViewContext(
+            final String name,
+            final Long configurationId,
             final int xpos,
             final int ypos,
             final int width,
@@ -43,6 +48,7 @@ public final class ViewContext {
             final ValueChangeListener valueChangeListener) {
 
         this.name = name;
+        this.configurationId = configurationId;
         this.xpos = xpos;
         this.ypos = ypos;
         this.width = width;
@@ -64,6 +70,10 @@ public final class ViewContext {
 
     public String getName() {
         return this.name;
+    }
+
+    public Long getConfigurationId() {
+        return this.configurationId;
     }
 
     public int getXpos() {
@@ -122,6 +132,10 @@ public final class ViewContext {
         return new ArrayList<>(this.attributes.values());
     }
 
+    public List<String> getAttributeNames() {
+        return new ArrayList<>(this.attributes.keySet());
+    }
+
     public List<GUIViewAttribute> getChildAttributes(final GUIViewAttribute attribute) {
         return this.attributes.values().stream()
                 .filter(a -> attribute.name.equals(a.parentAttributeName))
@@ -135,6 +149,11 @@ public final class ViewContext {
 
     void registerInputField(final InputField inputField) {
         this.inputFields.put(inputField.getName(), inputField);
+    }
+
+    void setValuesToInputFields(final Collection<GUIAttributeValue> values) {
+        this.inputFields.values().stream()
+                .forEach(field -> field.initValue(values));
     }
 
     @Override

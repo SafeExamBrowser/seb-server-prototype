@@ -6,12 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.domain.rest.sebconfig;
+package org.eth.demo.sebserver.gui.domain.sebconfig;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public final class AttributeValue {
+public final class GUIAttributeValue {
 
     public final Long configId;
     public final String attributeName;
@@ -19,16 +19,8 @@ public final class AttributeValue {
     public final Integer listIndex;
     public final String value;
 
-    public AttributeValue(
-            final Long configId,
-            final String attributeName,
-            final String value) {
-
-        this(configId, attributeName, attributeName, 0, value);
-    }
-
     @JsonCreator
-    public AttributeValue(
+    public GUIAttributeValue(
             @JsonProperty("configId") final Long configId,
             @JsonProperty("attributeName") final String attributeName,
             @JsonProperty("fullyQualifiedAttributeName") final String fullyQualifiedAttributeName,

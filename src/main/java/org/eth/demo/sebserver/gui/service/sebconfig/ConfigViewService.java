@@ -10,10 +10,12 @@ package org.eth.demo.sebserver.gui.service.sebconfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -25,17 +27,31 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eth.demo.sebserver.gui.GUISpringConfig;
 import org.eth.demo.sebserver.gui.domain.sebconfig.Cell;
+import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Service
 public class ConfigViewService {
+
+    private static final Logger log = LoggerFactory.getLogger(ConfigViewService.class);
+
+    public static final String CONFIG_LOCATION = GUISpringConfig.ROOT_LOCATION + "sebconfig/";
+    public static final String ATTRIBUTE_LOCATION = CONFIG_LOCATION + "attributes/";
+    public static final String VALUE_LOCATION = CONFIG_LOCATION + "values/";
 
     private final RestTemplate restTemplate;
     private final Map<FieldType, InputComponentBuilder> builderTypeMapping;
@@ -54,6 +70,7 @@ public class ConfigViewService {
 
     public ViewContext createViewContext(
             final String name,
+            final Long configurationId,
             final int xpos,
             final int ypos,
             final int width,
@@ -61,16 +78,43 @@ public class ConfigViewService {
             final int columns,
             final int rows) {
 
+        final Map<String, GUIViewAttribute> attributes = loadConfigAttributes(name);
         final ValueChangeListener valueChangeListener = new ValueChangeListener() {
             @Override
             public void valueChanged(final GUIViewAttribute attribute, final String value, final int listIndex) {
                 System.out.println("****************** value entered: " + value + " attribute: " + attribute.name
                         + " listIndex: " + listIndex);
+
+                final String url = VALUE_LOCATION + "save";
+                final HttpHeaders httpHeaders = new HttpHeaders();
+                httpHeaders.set("Content-Type", "application/json");
+
+                final GUIAttributeValue valueObj = new GUIAttributeValue(
+                        configurationId,
+                        attribute.name,
+                        getFQName(attribute, attributes.values()),
+                        listIndex,
+                        value);
+
+                final ObjectMapper mapper = new ObjectMapper();
+                String json;
+                try {
+                    json = mapper.writeValueAsString(valueObj);
+                    final UriComponentsBuilder builder = UriComponentsBuilder
+                            .fromHttpUrl(url);
+                    final HttpEntity<String> httpEntity = new HttpEntity<>(json, httpHeaders);
+                    final String response = ConfigViewService.this.restTemplate.postForObject(
+                            builder.toUriString(),
+                            httpEntity,
+                            String.class);
+                } catch (final JsonProcessingException e) {
+                    log.error("Failed to send value to back-end: ", e);
+                }
             }
         };
 
-        return new ViewContext(name, xpos, ypos, width, height, columns, rows,
-                loadConfigAttributes(name), valueChangeListener);
+        return new ViewContext(name, configurationId, xpos, ypos, width, height, columns, rows,
+                attributes, valueChangeListener);
     }
 
     public ViewContext createComponents(final Composite parent, final ViewContext viewContext) {
@@ -121,26 +165,54 @@ public class ConfigViewService {
 
     public ViewContext initInputFieldValues(final ViewContext viewContext) {
 
-        // TODO get all values of the view form back-end and inject them to the appropriate input fields
+        final List<String> attributeNames = viewContext.getAttributeNames();
+        final UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(
+                VALUE_LOCATION + viewContext.configurationId);
+
+        final HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("attributeNames", StringUtils.join(attributeNames, ","));
+        final HttpEntity<String> httpEntity = new HttpEntity<>(null, httpHeaders);
+
+        try {
+            final ResponseEntity<Collection<GUIAttributeValue>> request = this.restTemplate.exchange(
+                    builder.toUriString(),
+                    HttpMethod.GET,
+                    httpEntity,
+                    new ParameterizedTypeReference<Collection<GUIAttributeValue>>() {
+                    });
+
+            viewContext.setValuesToInputFields(request.getBody());
+
+        } catch (final Exception e) {
+            log.error("Error while trying to get values: ", e);
+        }
 
         return viewContext;
     }
 
     private Map<String, GUIViewAttribute> loadConfigAttributes(final String viewName) {
         final UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(
-                GUISpringConfig.ROOT_LOCATION + "/sebconfig/" + viewName);
+                GUISpringConfig.ROOT_LOCATION + ATTRIBUTE_LOCATION + viewName);
 
-        final ResponseEntity<List<GUIViewAttribute>> request = this.restTemplate.exchange(
-                builder.toUriString(),
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<GUIViewAttribute>>() {
-                });
+        try {
+            final ResponseEntity<List<GUIViewAttribute>> request = this.restTemplate.exchange(
+                    builder.toUriString(),
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<GUIViewAttribute>>() {
+                    });
 
-        return request.getBody().stream()
-                .collect(Collectors.toMap(
-                        a -> a.name,
-                        a -> a));
+            final Map<String, GUIViewAttribute> result = request.getBody()
+                    .stream()
+                    .collect(Collectors.toMap(
+                            a -> getFQName(a, request.getBody()),
+                            a -> a));
+
+            return result;
+        } catch (final Exception e) {
+            log.error("Error while trying to get attributes of view: {} ", viewName, e);
+            return Collections.emptyMap();
+        }
     }
 
     private void createInputComponentGroup(
@@ -242,6 +314,18 @@ public class ConfigViewService {
         final Label label = new Label(parent, SWT.NONE);
         label.setText(errorText);
         return label;
+    }
+
+    private String getFQName(final GUIViewAttribute a, final Collection<GUIViewAttribute> attrs) {
+        if (a.parentAttributeName == null) {
+            return a.name;
+        }
+
+        final Optional<GUIViewAttribute> parentAttr = attrs.stream()
+                .filter(attr -> attr.name.equals(a.parentAttributeName))
+                .findFirst();
+
+        return getFQName(parentAttr.get(), attrs) + "." + a.name;
     }
 
 }

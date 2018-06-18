@@ -102,7 +102,7 @@ public class ExamOverview implements ViewComposer {
 
     private Collection<GUIExam> getExams() {
         final UriComponentsBuilder builder = UriComponentsBuilder
-                .fromHttpUrl(GUISpringConfig.ROOT_LOCATION + "/exam");
+                .fromHttpUrl(GUISpringConfig.ROOT_LOCATION + "exam");
 
         final ResponseEntity<List<GUIExam>> request = this.restTemplate.exchange(
                 builder.toUriString(),
@@ -188,7 +188,7 @@ public class ExamOverview implements ViewComposer {
         item.setText(name);
         item.addListener(SWT.Selection, event -> {
             final UriComponentsBuilder builder = UriComponentsBuilder
-                    .fromHttpUrl(GUISpringConfig.ROOT_LOCATION + "/exam/statechange/" + examId + "/" + toState);
+                    .fromHttpUrl(GUISpringConfig.ROOT_LOCATION + "exam/statechange/" + examId + "/" + toState);
             final RestTemplate restTemplate = new RestTemplate();
             final HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.set("Content-Type", "application/json");

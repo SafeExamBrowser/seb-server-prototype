@@ -8,9 +8,12 @@
 
 package org.eth.demo.sebserver.gui.service.sebconfig.typebuilder;
 
+import java.util.Collection;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputComponentBuilder;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField;
@@ -45,13 +48,8 @@ public class LabelBuilder implements InputComponentBuilder {
         }
 
         @Override
-        public InputValue getValue() {
-            return InputField.createSingleValue(this.control.getText());
-        }
-
-        @Override
-        public void setValue(final InputValue value) {
-            this.control.setText(value.asString());
+        public void initValue(final Collection<GUIAttributeValue> values) {
+            // Does Nothing
         }
     };
 

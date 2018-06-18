@@ -27,6 +27,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/exam")
 public class ExamSessionControllerHTTP {
 
+    private static final String REQUEST_HEADER_KEY_TOKEN = "Token";
     private final ExamSessionService examSessionService;
 
     public ExamSessionControllerHTTP(final ExamSessionService examSessionService) {
@@ -41,13 +42,14 @@ public class ExamSessionControllerHTTP {
     }
 
     @RequestMapping(value = "/disconnect", method = RequestMethod.POST)
-    final Mono<Void> disconnect(@RequestHeader(value = "Token") final String clientUUID) {
+    final Mono<Void> disconnect(@RequestHeader(value = REQUEST_HEADER_KEY_TOKEN) final String clientUUID) {
         return Mono.fromRunnable(() -> this.examSessionService
                 .disconnectClient(UUID.fromString(clientUUID)));
     }
 
     @RequestMapping(value = "/event/{examId}", method = RequestMethod.POST)
-    final Mono<Void> clientEvent(@RequestHeader(value = "Token") final String clientUUID,
+    final Mono<Void> clientEvent(
+            @RequestHeader(value = REQUEST_HEADER_KEY_TOKEN) final String clientUUID,
             @RequestBody final ClientEvent clientEvent) {
 
         return Mono.fromRunnable(() -> {

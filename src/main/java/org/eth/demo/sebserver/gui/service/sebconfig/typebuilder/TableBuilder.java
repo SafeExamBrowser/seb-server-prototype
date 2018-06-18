@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputComponentBuilder;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField;
@@ -121,13 +122,7 @@ public class TableBuilder implements InputComponentBuilder {
         }
 
         @Override
-        public InputValue getValue() {
-            // TODO
-            return null;
-        }
-
-        @Override
-        public void setValue(final InputValue value) {
+        public void initValue(final Collection<GUIAttributeValue> values) {
             // TODO
         }
 

@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Lazy;
 @Configuration
 public class GUISpringConfig {
 
-    public static final String ROOT_LOCATION = "http://localhost:8080";
+    public static final String ROOT_LOCATION = "http://localhost:8080/";
 
     @Lazy
     @Bean

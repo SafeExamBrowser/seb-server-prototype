@@ -151,7 +151,7 @@ public class RunningExamView implements ViewComposer {
     private GUIExam requestExamData(final Long examId) {
         final RestTemplate restTemplate = new RestTemplate();
         final UriComponentsBuilder builder = UriComponentsBuilder
-                .fromHttpUrl(GUISpringConfig.ROOT_LOCATION + "/exam/" + examId);
+                .fromHttpUrl(GUISpringConfig.ROOT_LOCATION + "exam/" + examId);
         return restTemplate.getForObject(builder.toUriString(), GUIExam.class);
     }
 
@@ -167,7 +167,7 @@ public class RunningExamView implements ViewComposer {
         }
 
         final UriComponentsBuilder builder = UriComponentsBuilder
-                .fromHttpUrl(GUISpringConfig.ROOT_LOCATION + "/exam/indicatorValues/" + clientTable.exam.id);
+                .fromHttpUrl(GUISpringConfig.ROOT_LOCATION + "exam/indicatorValues/" + clientTable.exam.id);
         final ResponseEntity<List<GUIIndicatorValue>> responseEntity =
                 context.getRestTemplate().exchange(
                         builder.toUriString(),

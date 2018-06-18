@@ -8,9 +8,13 @@
 
 package org.eth.demo.sebserver.gui.service.sebconfig.typebuilder;
 
+import java.util.Collection;
+import java.util.Optional;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputComponentBuilder;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField;
@@ -57,13 +61,14 @@ public class CheckBoxBuilder implements InputComponentBuilder {
         }
 
         @Override
-        public InputValue getValue() {
-            return InputField.createSingleValue(String.valueOf(this.control.getSelection()));
-        }
+        public void initValue(final Collection<GUIAttributeValue> values) {
+            final Optional<GUIAttributeValue> value = values.stream()
+                    .filter(a -> this.attribute.name.equals(a.attributeName))
+                    .findFirst();
 
-        @Override
-        public void setValue(final InputValue value) {
-            this.control.setSelection(Boolean.valueOf(value.asString()));
+            if (value.isPresent()) {
+                this.control.setSelection(Boolean.valueOf(value.get().value));
+            }
         }
     }
 

@@ -8,12 +8,15 @@
 
 package org.eth.demo.sebserver.gui.service.sebconfig.typebuilder;
 
+import java.util.Collection;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputComponentBuilder;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField;
@@ -98,17 +101,14 @@ public class TextFieldBuilder implements InputComponentBuilder {
         }
 
         @Override
-        public InputValue getValue() {
-            return InputField.createSingleValue(this.control.getText());
-        }
+        public void initValue(final Collection<GUIAttributeValue> values) {
+            final Optional<GUIAttributeValue> value = values.stream()
+                    .filter(a -> this.attribute.name.equals(a.attributeName))
+                    .findFirst();
 
-        @Override
-        public void setValue(final InputValue value) {
-            if (!value.isSingle()) {
-                throw new IllegalArgumentException("TextInputField only supports single InputValues");
+            if (value.isPresent()) {
+                this.control.setText(value.get().value);
             }
-
-            this.control.setText(value.asString());
         }
     }
 }

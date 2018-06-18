@@ -152,7 +152,8 @@ public class HTTPClientBot {
 
         final String response = this.restTemplate.postForObject(
                 builder.toUriString(),
-                httpEntity, String.class);
+                httpEntity,
+                String.class);
 
         log.trace("response data: {}", response);
     }

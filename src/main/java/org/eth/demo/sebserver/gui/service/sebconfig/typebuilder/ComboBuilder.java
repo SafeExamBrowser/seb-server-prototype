@@ -8,10 +8,14 @@
 
 package org.eth.demo.sebserver.gui.service.sebconfig.typebuilder;
 
+import java.util.Collection;
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputComponentBuilder;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField;
@@ -55,13 +59,14 @@ public class ComboBuilder implements InputComponentBuilder {
         }
 
         @Override
-        public InputValue getValue() {
-            return InputField.createSingleValue(String.valueOf(this.control.getSelectionIndex()));
-        }
+        public void initValue(final Collection<GUIAttributeValue> values) {
+            final Optional<GUIAttributeValue> value = values.stream()
+                    .filter(a -> this.attribute.name.equals(a.attributeName))
+                    .findFirst();
 
-        @Override
-        public void setValue(final InputValue value) {
-            this.control.select(Integer.parseInt(value.asString()));
+            if (value.isPresent()) {
+                this.control.select(Integer.parseInt(value.get().value));
+            }
         }
     }
 

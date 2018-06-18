@@ -10,7 +10,10 @@ package org.eth.demo.sebserver.gui.service.sebconfig;
 
 import static org.eth.demo.sebserver.gui.service.sebconfig.InputField.TitleOrientation.*;
 
+import java.util.Collection;
+
 import org.eclipse.swt.widgets.Control;
+import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 
 public interface InputField {
@@ -51,41 +54,10 @@ public interface InputField {
 
     String getName();
 
-    InputValue getValue();
-
-    void setValue(InputValue value);
+    void initValue(Collection<GUIAttributeValue> values);
 
     Control getControl();
 
     GUIViewAttribute getAttribute();
-
-    public interface InputValue {
-        boolean isSingle();
-
-        String asString();
-    }
-
-    public final static class SingleInputFieldValue implements InputValue {
-
-        public final String value;
-
-        public SingleInputFieldValue(final String value) {
-            this.value = value;
-        }
-
-        @Override
-        public boolean isSingle() {
-            return true;
-        }
-
-        @Override
-        public String asString() {
-            return value;
-        }
-    }
-
-    public static SingleInputFieldValue createSingleValue(final String value) {
-        return new SingleInputFieldValue(value);
-    }
 
 }
