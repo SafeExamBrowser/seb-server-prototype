@@ -10,10 +10,12 @@ package org.eth.demo.sebserver.web.http;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eth.demo.sebserver.domain.rest.sebconfig.AttributeValue;
+import org.eth.demo.sebserver.domain.rest.sebconfig.TableValue;
 import org.eth.demo.sebserver.domain.rest.sebconfig.ViewAttribute;
 import org.eth.demo.sebserver.service.dao.ConfigViewDaoImpl;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,17 +41,28 @@ public class SEBConfigurationController {
     }
 
     @RequestMapping(value = "values/{configId}", method = RequestMethod.GET)
-    final Collection<AttributeValue> getValuesOfView(
+    final Collection<AttributeValue> getValues(
             @RequestHeader(value = "attributeNames") final String attributeNames,
             @PathVariable final Long configId) {
 
         final List<String> attrNames = Arrays.asList(StringUtils.split(attributeNames, ","));
+        if (attrNames == null || attrNames.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         return this.configViewDaoImpl.getValues(configId, attrNames);
     }
 
+    // TODO here we should add a validation error response
     @RequestMapping(value = "values/save", method = RequestMethod.POST)
     final void saveValue(@RequestBody final AttributeValue value) {
         this.configViewDaoImpl.saveValue(value);
+    }
+
+    // TODO here we should add a validation error response
+    @RequestMapping(value = "values/savetable", method = RequestMethod.POST)
+    final void saveValue(@RequestBody final TableValue value) {
+        this.configViewDaoImpl.saveTableValue(value);
     }
 
 }

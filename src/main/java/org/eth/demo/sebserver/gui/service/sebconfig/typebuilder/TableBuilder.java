@@ -8,6 +8,7 @@
 
 package org.eth.demo.sebserver.gui.service.sebconfig.typebuilder;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -28,11 +29,11 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
+import org.eth.demo.sebserver.gui.domain.sebconfig.GUITableValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputComponentBuilder;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
-import org.eth.demo.sebserver.gui.service.sebconfig.ValueChangeListener;
 import org.eth.demo.sebserver.gui.service.sebconfig.ViewContext;
 import org.springframework.stereotype.Component;
 
@@ -81,7 +82,7 @@ public class TableBuilder implements InputComponentBuilder {
                 attribute,
                 table,
                 columnAttributes,
-                viewContext.getValueChangeListener());
+                viewContext);
 
         table.addMenuDetectListener(new TableMenuListener(tableField));
         table.addMouseListener(new TableCellListener(tableField));
@@ -95,18 +96,18 @@ public class TableBuilder implements InputComponentBuilder {
     static final class TableField extends ControlFieldAdapter<Table> {
 
         final List<GUIViewAttribute> columnAttributes;
-        final ValueChangeListener valueChangeListener;
+        final ViewContext viewContext;
         final TableEditor[] editor;
 
         TableField(
                 final GUIViewAttribute attribute,
                 final Table control,
                 final List<GUIViewAttribute> columnAttributes,
-                final ValueChangeListener valueChangeListener) {
+                final ViewContext viewContext) {
 
             super(attribute, control);
             this.columnAttributes = columnAttributes;
-            this.valueChangeListener = valueChangeListener;
+            this.viewContext = viewContext;
             this.editor = new TableEditor[columnAttributes.size()];
 
             for (int i = 0; i < this.editor.length; i++) {
@@ -123,35 +124,82 @@ public class TableBuilder implements InputComponentBuilder {
 
         @Override
         public void initValue(final Collection<GUIAttributeValue> values) {
-            // TODO
+            final List<GUIAttributeValue> allValues = values.stream()
+                    .filter(a -> this.attribute.name.equals(a.parentAttributeName))
+                    .collect(Collectors.toList());
+
+            int index = 0;
+            while (index >= 0) {
+                final int listIndex = index;
+                final Map<String, GUIAttributeValue> rowValues = allValues.stream()
+                        .filter(a -> a.listIndex == listIndex)
+                        .collect(Collectors.toMap(a -> a.attributeName, a -> a));
+
+                if (!rowValues.isEmpty()) {
+                    final TableItem item = new TableItem(this.control, SWT.NONE);
+                    int columnIndex = 0;
+                    for (final GUIViewAttribute attr : this.columnAttributes) {
+                        final String value = (rowValues.containsKey(attr.name) ? rowValues.get(attr.name).value
+                                : attr.getDefaultValue());
+                        item.setText(columnIndex, value);
+                        columnIndex++;
+                    }
+                    item.setData(LIST_INDEX_REF, listIndex);
+                    index++;
+                } else {
+                    index = -1;
+                }
+            }
         }
 
         void addRow() {
-            // TODO
+            final int listIndex = this.control.getItemCount();
             final TableItem item = new TableItem(this.control, SWT.NONE);
+
             int index = 0;
             for (final GUIViewAttribute attr : this.columnAttributes) {
-                item.setText(index, "--");
+                final String defaultValue = attr.getDefaultValue();
+                item.setText(index, defaultValue);
+                valueChanged(index, listIndex, defaultValue);
                 index++;
             }
 
-            item.setData(LIST_INDEX_REF, this.control.getItemCount() - 1);
-
-            // TODO notify value change
+            item.setData(LIST_INDEX_REF, listIndex);
         }
 
         void deleteRow(final int index) {
             this.control.getItem(index).dispose();
             this.control.setSelection(-1);
 
+            final List<String> values = new ArrayList<>();
             for (final TableItem item : this.control.getItems()) {
                 final int listIndex = (Integer) item.getData(LIST_INDEX_REF);
                 if (listIndex > index) {
                     item.setData(LIST_INDEX_REF, listIndex - 1);
                 }
+
+                for (int i = 0; i < this.columnAttributes.size(); i++) {
+                    values.add(item.getText(i));
+                }
             }
 
-            // TODO notify value change
+            final List<String> columnNames = this.columnAttributes.stream()
+                    .map(a -> a.name)
+                    .collect(Collectors.toList());
+            final GUITableValue tableValue = new GUITableValue(
+                    this.viewContext.configurationId,
+                    this.attribute.name,
+                    columnNames,
+                    values);
+
+            this.viewContext.getValueChangeListener().tableChanged(tableValue);
+        }
+
+        public void valueChanged(final int columnIndex, final int rowIndex, final String value) {
+            this.viewContext.getValueChangeListener().valueChanged(
+                    this.columnAttributes.get(columnIndex),
+                    value,
+                    rowIndex);
         }
 
         void editorCleanup() {

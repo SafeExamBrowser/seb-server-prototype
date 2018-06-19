@@ -1,4 +1,4 @@
-INSERT INTO `configuration_attribute` values
+INSERT INTO `configuration_attribute` VALUES
     (1, "table1", "TABLE", null, "", "", ""),
     (2, "param1", "TEXT_FIELD", 1, "", "", ""),
     (3, "param2", "SINGLE_SELECTION", 1, "One,Two,Tree", "", ""),
@@ -22,7 +22,7 @@ INSERT INTO `configuration_attribute` values
     (17, "selection1", "SINGLE_SELECTION", null, "One,Two,Three", "", "")
     ;
     
-INSERT INTO `orientation` values 
+INSERT INTO `orientation` VALUES 
     (1, 1, "view1", null, 0, 13),
     (2, 2, "view1", null, 0, 0),
     (3, 3, "view1", null, 1, 0),
@@ -45,6 +45,9 @@ INSERT INTO `orientation` values
     (16, 16, "view1", null, 1, 9),
     (17, 17, "view1", null, 1, 10)
     ;
+    
+INSERT INTO `configuration` VALUES
+    (1, "Demo Config", "CLIENT");
 
 INSERT INTO `exam` VALUES 
     (1,'Demo Exam 1',0),

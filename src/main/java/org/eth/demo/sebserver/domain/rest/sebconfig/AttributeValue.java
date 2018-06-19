@@ -15,7 +15,7 @@ public final class AttributeValue {
 
     public final Long configId;
     public final String attributeName;
-    public final String fullyQualifiedAttributeName;
+    public final String parentAttributeName;
     public final Integer listIndex;
     public final String value;
 
@@ -31,13 +31,13 @@ public final class AttributeValue {
     public AttributeValue(
             @JsonProperty("configId") final Long configId,
             @JsonProperty("attributeName") final String attributeName,
-            @JsonProperty("fullyQualifiedAttributeName") final String fullyQualifiedAttributeName,
+            @JsonProperty("parentAttributeName") final String parentAttributeName,
             @JsonProperty("listIndex") final Integer listIndex,
             @JsonProperty("value") final String value) {
 
         this.configId = configId;
         this.attributeName = attributeName;
-        this.fullyQualifiedAttributeName = fullyQualifiedAttributeName;
+        this.parentAttributeName = parentAttributeName;
         this.listIndex = listIndex;
         this.value = value;
     }
@@ -50,8 +50,8 @@ public final class AttributeValue {
         return this.attributeName;
     }
 
-    public String getFullyQualifiedAttributeName() {
-        return this.fullyQualifiedAttributeName;
+    public String getParentAttributeName() {
+        return this.parentAttributeName;
     }
 
     public int getListIndex() {
@@ -64,8 +64,8 @@ public final class AttributeValue {
 
     @Override
     public String toString() {
-        return "SEBConfigValue [attributeName=" + this.attributeName + ", fullyQualifiedAttributeName="
-                + this.fullyQualifiedAttributeName + ", listIndex=" + this.listIndex + ", value=" + this.value + "]";
+        return "SEBConfigValue [attributeName=" + this.attributeName + ", parentAttributeName="
+                + this.parentAttributeName + ", listIndex=" + this.listIndex + ", value=" + this.value + "]";
     }
 
 }

@@ -41,9 +41,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Service
 public class ConfigViewService {
 
@@ -56,7 +53,8 @@ public class ConfigViewService {
     private final RestTemplate restTemplate;
     private final Map<FieldType, InputComponentBuilder> builderTypeMapping;
 
-    public ConfigViewService(final RestTemplate restTemplate,
+    public ConfigViewService(
+            final RestTemplate restTemplate,
             final Collection<InputComponentBuilder> builders) {
 
         this.restTemplate = restTemplate;
@@ -79,42 +77,8 @@ public class ConfigViewService {
             final int rows) {
 
         final Map<String, GUIViewAttribute> attributes = loadConfigAttributes(name);
-        final ValueChangeListener valueChangeListener = new ValueChangeListener() {
-            @Override
-            public void valueChanged(final GUIViewAttribute attribute, final String value, final int listIndex) {
-                System.out.println("****************** value entered: " + value + " attribute: " + attribute.name
-                        + " listIndex: " + listIndex);
-
-                final String url = VALUE_LOCATION + "save";
-                final HttpHeaders httpHeaders = new HttpHeaders();
-                httpHeaders.set("Content-Type", "application/json");
-
-                final GUIAttributeValue valueObj = new GUIAttributeValue(
-                        configurationId,
-                        attribute.name,
-                        getFQName(attribute, attributes.values()),
-                        listIndex,
-                        value);
-
-                final ObjectMapper mapper = new ObjectMapper();
-                String json;
-                try {
-                    json = mapper.writeValueAsString(valueObj);
-                    final UriComponentsBuilder builder = UriComponentsBuilder
-                            .fromHttpUrl(url);
-                    final HttpEntity<String> httpEntity = new HttpEntity<>(json, httpHeaders);
-                    final String response = ConfigViewService.this.restTemplate.postForObject(
-                            builder.toUriString(),
-                            httpEntity,
-                            String.class);
-                } catch (final JsonProcessingException e) {
-                    log.error("Failed to send value to back-end: ", e);
-                }
-            }
-        };
-
         return new ViewContext(name, configurationId, xpos, ypos, width, height, columns, rows,
-                attributes, valueChangeListener);
+                attributes, this.restTemplate);
     }
 
     public ViewContext createComponents(final Composite parent, final ViewContext viewContext) {
@@ -192,7 +156,7 @@ public class ConfigViewService {
 
     private Map<String, GUIViewAttribute> loadConfigAttributes(final String viewName) {
         final UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(
-                GUISpringConfig.ROOT_LOCATION + ATTRIBUTE_LOCATION + viewName);
+                ATTRIBUTE_LOCATION + viewName);
 
         try {
             final ResponseEntity<List<GUIViewAttribute>> request = this.restTemplate.exchange(
@@ -325,7 +289,11 @@ public class ConfigViewService {
                 .filter(attr -> attr.name.equals(a.parentAttributeName))
                 .findFirst();
 
-        return getFQName(parentAttr.get(), attrs) + "." + a.name;
+        if (parentAttr.isPresent()) {
+            return parentAttr.get().name + "." + a.name;
+        } else {
+            throw new IllegalArgumentException("No Attribute found with name: " + a.parentAttributeName);
+        }
     }
 
 }

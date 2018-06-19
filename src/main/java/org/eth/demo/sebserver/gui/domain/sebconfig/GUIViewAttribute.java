@@ -94,6 +94,28 @@ public class GUIViewAttribute {
         }
     }
 
+    // TODO we should support default values from back-end (DB)
+    public String getDefaultValue() {
+        final FieldType fieldType = getFieldType();
+        switch (fieldType) {
+            case CHECKBOX:
+            case CHECK_FIELD: {
+                return String.valueOf(Boolean.FALSE);
+            }
+            case DECIMAL:
+            case INTEGER: {
+                return "";
+            }
+            case TEXT_AREA:
+            case TEXT_FIELD: {
+                return "--";
+            }
+            default: {
+                return "";
+            }
+        }
+    }
+
     @Override
     public String toString() {
         return "GUIViewAttribute [name=" + this.name + ", type=" + this.type + ", parentAttributeName="

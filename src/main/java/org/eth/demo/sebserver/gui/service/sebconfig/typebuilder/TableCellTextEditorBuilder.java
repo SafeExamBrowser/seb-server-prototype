@@ -38,12 +38,15 @@ public class TableCellTextEditorBuilder implements TableCellEditorBuilder {
             final Text text = (Text) tableField.editor[columnIndex].getEditor();
             final String value = text.getText();
             tableField.editor[columnIndex].getItem().setText(columnIndex, value);
-
-            final GUIViewAttribute columnAttribute = tableField.columnAttributes.get(columnIndex);
-            tableField.valueChangeListener.valueChanged(columnAttribute, value, rowIndex);
+            tableField.valueChanged(columnIndex, rowIndex, value);
         });
 
         return cellEditor;
+    }
+
+    @Override
+    public String getValue(final GUIViewAttribute attribute, final String displayValue) {
+        return displayValue;
     }
 
 }

@@ -8,13 +8,12 @@
 
 package org.eth.demo.sebserver.service.dao;
 
-import static org.eth.demo.sebserver.batis.gen.mapper.ConfigurationAttributeRecordDynamicSqlSupport.*;
+import static org.eth.demo.sebserver.batis.gen.mapper.ConfigurationAttributeRecordDynamicSqlSupport.name;
 import static org.eth.demo.sebserver.batis.gen.mapper.ConfigurationValueRecordDynamicSqlSupport.*;
-import static org.eth.demo.sebserver.batis.gen.mapper.ConfigurationValueRecordDynamicSqlSupport.id;
 import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,16 +21,16 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.eth.demo.sebserver.batis.AttributeOrientationJoinMapper;
 import org.eth.demo.sebserver.batis.AttributeOrientationJoinMapper.JoinRecord;
+import org.eth.demo.sebserver.batis.gen.mapper.ConfigurationAttributeRecordDynamicSqlSupport;
 import org.eth.demo.sebserver.batis.gen.mapper.ConfigurationAttributeRecordMapper;
-import org.eth.demo.sebserver.batis.gen.mapper.ConfigurationValueRecordDynamicSqlSupport;
 import org.eth.demo.sebserver.batis.gen.mapper.ConfigurationValueRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ConfigurationAttributeRecord;
 import org.eth.demo.sebserver.batis.gen.model.ConfigurationValueRecord;
 import org.eth.demo.sebserver.domain.rest.sebconfig.AttributeType;
 import org.eth.demo.sebserver.domain.rest.sebconfig.AttributeValue;
+import org.eth.demo.sebserver.domain.rest.sebconfig.TableValue;
 import org.eth.demo.sebserver.domain.rest.sebconfig.ViewAttribute;
 import org.mybatis.dynamic.sql.SqlBuilder;
-import org.mybatis.dynamic.sql.select.SelectDSL;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,10 +43,6 @@ public class ConfigViewDaoImpl {
     private final ConfigurationAttributeRecordMapper configurationAttributeRecordMapper;
     private final ConfigurationValueRecordMapper configurationValueRecordMapper;
 
-    // TODO Try to get rid of this mappings. Try to use mybatis built in caches for attributes and always make a request
-    private final Map<String, ConfigurationAttributeRecord> attributeFQNameMapping;
-    private final Map<Long, String> attributeIdFQNameMapping;
-
     public ConfigViewDaoImpl(
             final AttributeOrientationJoinMapper attributeOrientationJoinMapper,
             final ConfigurationAttributeRecordMapper configurationAttributeRecordMapper,
@@ -56,8 +51,6 @@ public class ConfigViewDaoImpl {
         this.attributeOrientationJoinMapper = attributeOrientationJoinMapper;
         this.configurationAttributeRecordMapper = configurationAttributeRecordMapper;
         this.configurationValueRecordMapper = configurationValueRecordMapper;
-        this.attributeFQNameMapping = new HashMap<>();
-        this.attributeIdFQNameMapping = new HashMap<>();
     }
 
     @Transactional(readOnly = true)
@@ -85,15 +78,29 @@ public class ConfigViewDaoImpl {
     @Transactional(readOnly = true)
     public Collection<AttributeValue> getValues(final Long configId, final List<String> attributeNames) {
 
-        // TODO do this with a join
+        final List<String> tableAttributeNames = attributeNames.stream()
+                .filter(a -> a.contains("."))
+                .collect(Collectors.toList());
+        final List<String> singleAttributeNames = new ArrayList<>(attributeNames);
+        singleAttributeNames.removeAll(tableAttributeNames);
+
+        // TODO do this with a join!?
 
         final List<Long> attributeIds = this.configurationAttributeRecordMapper.selectByExample()
-                .where(name, SqlBuilder.isIn(attributeNames))
+                .where(name, SqlBuilder.isIn(singleAttributeNames))
                 .build()
                 .execute()
                 .stream()
                 .map(a -> a.getId())
                 .collect(Collectors.toList());
+
+        attributeIds.addAll(
+                tableAttributeNames.stream()
+                        .map(name -> {
+                            final String[] names = StringUtils.split(name, ".");
+                            return getAttribute(names[1], names[0]).getId();
+                        })
+                        .collect(Collectors.toList()));
 
         return this.configurationValueRecordMapper.selectByExample()
                 .where(configurationId, SqlBuilder.isEqualTo(configId))
@@ -107,33 +114,38 @@ public class ConfigViewDaoImpl {
     }
 
     public AttributeValue attributeValueFromRecord(final ConfigurationValueRecord record) {
+        final ConfigurationAttributeRecord attribute = this.configurationAttributeRecordMapper
+                .selectByPrimaryKey(record.getConfigurationAttributeId());
+        final Long parentId = attribute.getParentId();
+        final String parentName = (parentId != null) ? getAttributeName(parentId) : null;
+
         return new AttributeValue(
                 record.getConfigurationId(),
-                getAttributeName(record.getConfigurationAttributeId()),
-                getAttributeFQName(record.getConfigurationAttributeId()),
+                attribute.getName(),
+                parentName,
                 record.getListIndex(),
                 record.getValue());
     }
 
     @Transactional
     public Long saveValue(final AttributeValue value) {
-        final ConfigurationAttributeRecord attribute = attributeByFQName(value.fullyQualifiedAttributeName);
-        final ConfigurationAttributeRecord attRecord =
-                this.configurationAttributeRecordMapper.selectByPrimaryKey(attribute.getId());
-        final AttributeType type = AttributeType.valueOf(attRecord.getType());
+        final ConfigurationAttributeRecord attribute = getAttribute(value.attributeName, value.parentAttributeName);
+        final AttributeType type = AttributeType.valueOf(attribute.getType());
 
-        ConfigurationValueRecord valueRecord = SelectDSL.selectWithMapper(
-                this.configurationValueRecordMapper::selectOne,
-                id, configurationId, configurationAttributeId, listIndex,
-                ConfigurationValueRecordDynamicSqlSupport.value, text)
-                .from(configurationValueRecord)
+        final List<ConfigurationValueRecord> records = this.configurationValueRecordMapper.selectByExample()
                 .where(configurationId, isEqualTo(value.configId))
+                .and(configurationAttributeId, isEqualTo(attribute.getId()))
+                .and(listIndex, isEqualTo(value.listIndex))
                 .build()
                 .execute();
 
-        final boolean insert = valueRecord == null;
-        valueRecord = new ConfigurationValueRecord(
-                (insert) ? null : valueRecord.getId(),
+        if (records != null && records.size() > 1) {
+            throw new IllegalArgumentException("To many ConfigurationValueRecord found for value: " + value);
+        }
+
+        final boolean insert = (records == null || records.isEmpty());
+        final ConfigurationValueRecord valueRecord = new ConfigurationValueRecord(
+                (insert) ? null : records.get(0).getId(),
                 value.configId,
                 attribute.getId(),
                 value.listIndex,
@@ -148,62 +160,93 @@ public class ConfigViewDaoImpl {
         return valueRecord.getId();
     }
 
+    @Transactional
+    public void saveTableValue(final TableValue value) {
+        final ConfigurationAttributeRecord attribute = getAttribute(value.attributeName, null);
+        final List<ConfigurationAttributeRecord> columnAttributes =
+                this.configurationAttributeRecordMapper.selectByExample()
+                        .where(ConfigurationAttributeRecordDynamicSqlSupport.parentId, isEqualTo(attribute.getId()))
+                        .build()
+                        .execute();
+        final List<Long> columnAttributeIds = columnAttributes.stream()
+                .map(a -> a.getId())
+                .collect(Collectors.toList());
+
+        final int columns = columnAttributeIds.size();
+
+        // first delete all old values of this table
+        final Integer deleteCount = this.configurationValueRecordMapper.deleteByExample()
+                .where(configurationId, isEqualTo(value.configId))
+                .and(configurationAttributeId, SqlBuilder.isIn(columnAttributeIds))
+                .build()
+                .execute();
+
+        // then add the new values
+        int columnIndex = 0;
+        int rowIndex = 0;
+        for (final String val : value.values) {
+            final ConfigurationAttributeRecord rec = columnAttributes.get(columnIndex);
+            final AttributeType type = AttributeType.valueOf(rec.getType());
+            final ConfigurationValueRecord valueRecord = new ConfigurationValueRecord(
+                    null,
+                    value.configId,
+                    attribute.getId(),
+                    rowIndex,
+                    (type == AttributeType.FILE_UPLOAD) ? null : val,
+                    (type == AttributeType.FILE_UPLOAD) ? val : null);
+
+            this.configurationValueRecordMapper.insert(valueRecord);
+
+            columnIndex++;
+            if (columnIndex >= columns) {
+                columnIndex = 0;
+                rowIndex++;
+            }
+        }
+    }
+
     private String getAttributeName(final Long attrId) {
         return this.configurationAttributeRecordMapper.selectByPrimaryKey(attrId)
                 .getName();
     }
 
-    private String getAttributeFQName(final Long attrId) {
-        if (!this.attributeIdFQNameMapping.containsKey(attrId)) {
-            final ConfigurationAttributeRecord attribute =
-                    this.configurationAttributeRecordMapper.selectByPrimaryKey(attrId);
-            final String fqName = (attribute.getParentId() == null) ? attribute.getName()
-                    : getAttributeFQName(attribute.getParentId()) + attribute.getName();
-            this.attributeIdFQNameMapping.put(attrId, fqName);
-        }
+    // TODO make this with join and caching
+    private ConfigurationAttributeRecord getAttribute(final String name, final String parentName) {
 
-        return this.attributeIdFQNameMapping.get(attrId);
-    }
+        final Long parentId;
+        if (StringUtils.isNotBlank(parentName)) {
+            final List<ConfigurationAttributeRecord> parents = this.configurationAttributeRecordMapper.selectByExample()
+                    .where(ConfigurationAttributeRecordDynamicSqlSupport.name, isEqualTo(parentName))
+                    .build()
+                    .execute();
 
-    private ConfigurationAttributeRecord attributeByFQName(final String attributeFQName) {
-        if (this.attributeFQNameMapping.containsKey(attributeFQName)) {
-            return this.attributeFQNameMapping.get(attributeFQName);
-        }
-
-        final String[] nameSpace = StringUtils.split(attributeFQName, ".");
-        if (nameSpace.length >= 1) {
-            ConfigurationAttributeRecord attr = getAttribute(nameSpace[0], null);
-            this.attributeFQNameMapping.put(nameSpace[0], attr);
-            this.attributeIdFQNameMapping.put(attr.getId(), nameSpace[0]);
-            String fqName = nameSpace[0];
-            for (int i = 1; i < nameSpace.length; i++) {
-                attr = getAttribute(nameSpace[i], attr.getId());
-                fqName = fqName + "." + nameSpace[i];
-                this.attributeFQNameMapping.put(fqName, attr);
-                this.attributeIdFQNameMapping.put(attr.getId(), fqName);
+            if (parents == null || parents.isEmpty()) {
+                throw new IllegalArgumentException("No Configuration Attribute found for name: " + parentName);
+            } else if (parents.size() > 1) {
+                throw new IllegalArgumentException("To many Configuration Attribute found for name: " + parentName);
             }
+
+            parentId = parents.get(0).getId();
+        } else {
+            parentId = null;
         }
 
-        return this.attributeFQNameMapping.get(attributeFQName);
-    }
+        final List<ConfigurationAttributeRecord> attrs = this.configurationAttributeRecordMapper.selectByExample()
+                .where(ConfigurationAttributeRecordDynamicSqlSupport.name, isEqualTo(name))
+                .and(ConfigurationAttributeRecordDynamicSqlSupport.parentId,
+                        (parentId == null) ? SqlBuilder.isNull() : isEqualTo(parentId))
+                .build()
+                .execute();
 
-    private ConfigurationAttributeRecord getAttribute(final String attributeName, final Long pId) {
-        if (!this.attributeFQNameMapping.containsKey(attributeName)) {
-            final ConfigurationAttributeRecord attr =
-                    SelectDSL.selectWithMapper(this.configurationAttributeRecordMapper::selectOne, id)
-                            .from(configurationAttributeRecord)
-                            .where(name, SqlBuilder.isEqualTo(attributeName))
-                            .and(parentId, (pId == null) ? SqlBuilder.isNull() : SqlBuilder.isEqualTo(pId))
-                            .build()
-                            .execute();
-
-            if (attr != null) {
-                this.attributeFQNameMapping.put(attributeName, attr);
-                this.attributeIdFQNameMapping.put(attr.getId(), attributeName);
-            }
+        if (attrs == null || attrs.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "No Configuration Attribute found for name: " + name + " and parentName: " + parentName);
+        } else if (attrs.size() > 1) {
+            throw new IllegalArgumentException(
+                    "To many Configuration Attribute found for name: " + name + " and parentName: " + parentName);
+        } else {
+            return attrs.get(0);
         }
-
-        return this.attributeFQNameMapping.get(attributeName);
     }
 
 }

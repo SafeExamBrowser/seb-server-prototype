@@ -8,10 +8,13 @@
 
 package org.eth.demo.sebserver.gui.service.sebconfig;
 
+import org.eth.demo.sebserver.gui.domain.sebconfig.GUITableValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 
 public interface ValueChangeListener {
 
     void valueChanged(GUIViewAttribute attribute, String value, int listIndex);
+
+    void tableChanged(GUITableValue tableValue);
 
 }

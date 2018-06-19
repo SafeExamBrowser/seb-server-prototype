@@ -40,7 +40,7 @@ public class SEBConfigView1 implements ViewComposer {
     @Override
     public void composeView(final ViewService viewService, final Composite parent, final TypedMap attributes) {
 
-        final ViewContext viewContext = this.configViewService.createViewContext("view1", 0L, 100, 0, 800, 500, 4, 20);
+        final ViewContext viewContext = this.configViewService.createViewContext("view1", 1L, 100, 0, 800, 500, 4, 20);
 
         final RowLayout parentLayout = new RowLayout();
         parentLayout.wrap = false;
