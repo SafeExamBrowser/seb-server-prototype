@@ -185,12 +185,12 @@ public class ConfigViewDaoImpl {
         int columnIndex = 0;
         int rowIndex = 0;
         for (final String val : value.values) {
-            final ConfigurationAttributeRecord rec = columnAttributes.get(columnIndex);
-            final AttributeType type = AttributeType.valueOf(rec.getType());
+            final ConfigurationAttributeRecord columnAttr = columnAttributes.get(columnIndex);
+            final AttributeType type = AttributeType.valueOf(columnAttr.getType());
             final ConfigurationValueRecord valueRecord = new ConfigurationValueRecord(
                     null,
                     value.configId,
-                    attribute.getId(),
+                    columnAttr.getId(),
                     rowIndex,
                     (type == AttributeType.FILE_UPLOAD) ? null : val,
                     (type == AttributeType.FILE_UPLOAD) ? val : null);

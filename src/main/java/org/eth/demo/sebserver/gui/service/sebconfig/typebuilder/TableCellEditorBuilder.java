@@ -20,6 +20,6 @@ public interface TableCellEditorBuilder {
 
     Control buildEditor(TableField tableField, TableItem item, int columnIndex, final int rowIndex);
 
-    String getValue(GUIViewAttribute attribute, String displayValue);
+    String populateCell(final GUIViewAttribute attr, String value, TableItem item, int columnIndex);
 
 }

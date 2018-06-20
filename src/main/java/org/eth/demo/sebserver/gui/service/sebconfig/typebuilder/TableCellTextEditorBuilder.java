@@ -45,8 +45,14 @@ public class TableCellTextEditorBuilder implements TableCellEditorBuilder {
     }
 
     @Override
-    public String getValue(final GUIViewAttribute attribute, final String displayValue) {
-        return displayValue;
-    }
+    public String populateCell(
+            final GUIViewAttribute attr,
+            final String value,
+            final TableItem item,
+            final int columnIndex) {
 
+        final String val = (value == null) ? attr.getDefaultValue() : value;
+        item.setText(columnIndex, val);
+        return val;
+    }
 }

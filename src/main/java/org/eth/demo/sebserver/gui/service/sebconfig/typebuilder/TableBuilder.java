@@ -41,8 +41,9 @@ import org.springframework.stereotype.Component;
 public class TableBuilder implements InputComponentBuilder {
 
     public static final String LIST_INDEX_REF = "ListIndex";
+    public static final String ROW_RAW_VALUE_PREFIX = "ROW_RAW_VALUE_";
 
-    private Map<FieldType, TableCellEditorBuilder> cellEditorBuilderMap;
+    private final Map<FieldType, TableCellEditorBuilder> cellEditorBuilderMap;
 
     public TableBuilder(final Collection<TableCellEditorBuilder> cellEditorBuilderList) {
         if (cellEditorBuilderList != null) {
@@ -82,7 +83,8 @@ public class TableBuilder implements InputComponentBuilder {
                 attribute,
                 table,
                 columnAttributes,
-                viewContext);
+                viewContext,
+                this.cellEditorBuilderMap);
 
         table.addMenuDetectListener(new TableMenuListener(tableField));
         table.addMouseListener(new TableCellListener(tableField));
@@ -98,16 +100,19 @@ public class TableBuilder implements InputComponentBuilder {
         final List<GUIViewAttribute> columnAttributes;
         final ViewContext viewContext;
         final TableEditor[] editor;
+        final Map<FieldType, TableCellEditorBuilder> cellEditorBuilderMap;
 
         TableField(
                 final GUIViewAttribute attribute,
                 final Table control,
                 final List<GUIViewAttribute> columnAttributes,
-                final ViewContext viewContext) {
+                final ViewContext viewContext,
+                final Map<FieldType, TableCellEditorBuilder> cellEditorBuilderMap) {
 
             super(attribute, control);
             this.columnAttributes = columnAttributes;
             this.viewContext = viewContext;
+            this.cellEditorBuilderMap = cellEditorBuilderMap;
             this.editor = new TableEditor[columnAttributes.size()];
 
             for (int i = 0; i < this.editor.length; i++) {
@@ -139,9 +144,10 @@ public class TableBuilder implements InputComponentBuilder {
                     final TableItem item = new TableItem(this.control, SWT.NONE);
                     int columnIndex = 0;
                     for (final GUIViewAttribute attr : this.columnAttributes) {
-                        final String value = (rowValues.containsKey(attr.name) ? rowValues.get(attr.name).value
-                                : attr.getDefaultValue());
-                        item.setText(columnIndex, value);
+                        final String value = rowValues.containsKey(attr.name) ? rowValues.get(attr.name).value : null;
+                        final TableCellEditorBuilder tableCellEditorBuilder =
+                                this.cellEditorBuilderMap.get(attr.getFieldType());
+                        tableCellEditorBuilder.populateCell(attr, value, item, columnIndex);
                         columnIndex++;
                     }
                     item.setData(LIST_INDEX_REF, listIndex);
@@ -158,9 +164,10 @@ public class TableBuilder implements InputComponentBuilder {
 
             int index = 0;
             for (final GUIViewAttribute attr : this.columnAttributes) {
-                final String defaultValue = attr.getDefaultValue();
-                item.setText(index, defaultValue);
-                valueChanged(index, listIndex, defaultValue);
+                final TableCellEditorBuilder tableCellEditorBuilder =
+                        this.cellEditorBuilderMap.get(attr.getFieldType());
+                final String value = tableCellEditorBuilder.populateCell(attr, null, item, index);
+                valueChanged(index, listIndex, value);
                 index++;
             }
 
@@ -179,7 +186,9 @@ public class TableBuilder implements InputComponentBuilder {
                 }
 
                 for (int i = 0; i < this.columnAttributes.size(); i++) {
-                    values.add(item.getText(i));
+                    final Object data = item.getData(ROW_RAW_VALUE_PREFIX + i);
+                    final String value = (data != null) ? String.valueOf(data) : item.getText(i);
+                    values.add(value);
                 }
             }
 
