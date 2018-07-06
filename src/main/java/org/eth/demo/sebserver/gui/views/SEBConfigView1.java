@@ -8,6 +8,9 @@
 
 package org.eth.demo.sebserver.gui.views;
 
+import java.util.Enumeration;
+
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.RowData;
@@ -39,6 +42,11 @@ public class SEBConfigView1 implements ViewComposer {
 
     @Override
     public void composeView(final ViewService viewService, final Composite parent, final TypedMap attributes) {
+
+        final Enumeration<String> attributeNames = RWT.getRequest().getSession().getAttributeNames();
+        while (attributeNames.hasMoreElements()) {
+            System.out.println("########" + attributeNames.nextElement());
+        }
 
         final ViewContext viewContext = this.configViewService.createViewContext("view1", 1L, 100, 0, 800, 500, 4, 20);
 

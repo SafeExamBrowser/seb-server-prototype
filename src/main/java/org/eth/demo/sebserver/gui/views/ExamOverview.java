@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -61,10 +62,19 @@ public class ExamOverview implements ViewComposer {
     public void composeView(final ViewService viewService, final Composite parent, final TypedMap attributes) {
         final Collection<GUIExam> exams = getExams();
 
+        final RowLayout parentLayout = new RowLayout();
+        parentLayout.wrap = false;
+        parentLayout.pack = false;
+        parentLayout.justify = true;
+        parentLayout.type = SWT.HORIZONTAL;
+        parentLayout.center = true;
+        parent.setLayout(parentLayout);
+
+        parent.setLayoutData(new RowData(800, 500));
         final Group group = new Group(parent, SWT.SHADOW_NONE);
-        group.setText(" Exam Overview ");
-        group.setBounds(20, 20, 500, 100);
         group.setLayout(new RowLayout());
+        group.setBounds(20, 20, 500, 100);
+        group.setText(" Exam Overview ");
 
         final Table table = new Table(group, SWT.NULL);
         final Menu menu = new Menu(table);

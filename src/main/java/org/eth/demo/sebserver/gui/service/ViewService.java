@@ -8,6 +8,7 @@
 
 package org.eth.demo.sebserver.gui.service;
 
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eth.demo.sebserver.util.TypedMap;
@@ -35,6 +36,9 @@ public class ViewService {
             final Composite parent,
             final Class<? extends ViewComposer> composerType,
             final TypedMap attributes) {
+
+        System.out.println(
+                "********************************** sessionId: " + RWT.getUISession().getHttpSession().getId());
 
         final ViewComposer composer = this.applicationContext.getBean(composerType);
 

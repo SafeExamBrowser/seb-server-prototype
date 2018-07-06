@@ -172,7 +172,7 @@ public class WebSocketClientBot {
                 return false;
             }
 
-            log.trace("Trying to post an event to {} using token: {}", "/app/exam.4/event", token);
+            log.debug("Trying to post an event to {} using token: {}", "/app/exam.4/event", token);
 
             final JSONObject json = new JSONObject();
             try {

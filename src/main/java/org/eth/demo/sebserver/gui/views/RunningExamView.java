@@ -80,9 +80,13 @@ public class RunningExamView implements ViewComposer {
         final GUIExam exam = requestExamData(examId);
         final Display display = parent.getDisplay();
 
-        final RowLayout rootlayout = new RowLayout();
-        rootlayout.type = SWT.VERTICAL;
-        parent.setLayout(rootlayout);
+        final RowLayout parentLayout = new RowLayout();
+        parentLayout.wrap = false;
+        parentLayout.pack = false;
+        parentLayout.justify = true;
+        parentLayout.type = SWT.HORIZONTAL;
+        parentLayout.center = true;
+        parent.setLayout(parentLayout);
 
         final Composite root = new Composite(parent, SWT.SHADOW_NONE);
 
@@ -132,7 +136,7 @@ public class RunningExamView implements ViewComposer {
         final ClientTable clientTable = new ClientTable(display, root, exam);
 
         final Button button = new Button(root, SWT.FLAT);
-        button.setText("Back to Home");
+        button.setText("To Exam Overview");
         button.addListener(SWT.Selection, event -> {
             viewService.composeView(parent, ExamOverview.class);
         });
