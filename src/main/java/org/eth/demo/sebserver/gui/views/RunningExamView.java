@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eth.demo.sebserver.gui.GUISpringConfig;
+import org.eth.demo.sebserver.gui.RAPSpringConfig;
 import org.eth.demo.sebserver.gui.domain.exam.GUIExam;
 import org.eth.demo.sebserver.gui.domain.exam.GUIIndicatorDef;
 import org.eth.demo.sebserver.gui.domain.exam.GUIIndicatorValue;
@@ -155,7 +155,7 @@ public class RunningExamView implements ViewComposer {
     private GUIExam requestExamData(final Long examId) {
         final RestTemplate restTemplate = new RestTemplate();
         final UriComponentsBuilder builder = UriComponentsBuilder
-                .fromHttpUrl(GUISpringConfig.ROOT_LOCATION + "exam/" + examId);
+                .fromHttpUrl(RAPSpringConfig.ROOT_LOCATION + "exam/" + examId);
         return restTemplate.getForObject(builder.toUriString(), GUIExam.class);
     }
 
@@ -171,7 +171,7 @@ public class RunningExamView implements ViewComposer {
         }
 
         final UriComponentsBuilder builder = UriComponentsBuilder
-                .fromHttpUrl(GUISpringConfig.ROOT_LOCATION + "exam/indicatorValues/" + clientTable.exam.id);
+                .fromHttpUrl(RAPSpringConfig.ROOT_LOCATION + "exam/indicatorValues/" + clientTable.exam.id);
         final ResponseEntity<List<GUIIndicatorValue>> responseEntity =
                 context.getRestTemplate().exchange(
                         builder.toUriString(),

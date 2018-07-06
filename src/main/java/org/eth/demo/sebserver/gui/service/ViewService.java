@@ -8,13 +8,17 @@
 
 package org.eth.demo.sebserver.gui.service;
 
-import org.eclipse.rap.rwt.RWT;
+import java.util.Collection;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eth.demo.sebserver.util.TypedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,14 +26,22 @@ public class ViewService {
 
     private static final Logger log = LoggerFactory.getLogger(ViewService.class);
 
-    private final ApplicationContext applicationContext;
+    private Map<String, ViewComposer> viewComposer;
 
-    public ViewService(final ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
+    @Autowired
+    public void init(final Collection<ViewComposer> viewComposer) {
+        this.viewComposer = viewComposer.stream()
+                .collect(Collectors.toMap(
+                        composer -> composer.getName(),
+                        Function.identity()));
     }
 
     public void composeView(final Composite parent, final Class<? extends ViewComposer> composerType) {
-        composeView(parent, composerType, TypedMap.EMPTY_MAP);
+        composeView(parent, composerType.getName(), TypedMap.EMPTY_MAP);
+    }
+
+    public void composeView(final Composite parent, final String composerName) {
+        composeView(parent, composerName, TypedMap.EMPTY_MAP);
     }
 
     public void composeView(
@@ -37,10 +49,20 @@ public class ViewService {
             final Class<? extends ViewComposer> composerType,
             final TypedMap attributes) {
 
-        System.out.println(
-                "********************************** sessionId: " + RWT.getUISession().getHttpSession().getId());
+        composeView(parent, composerType.getName(), attributes);
+    }
 
-        final ViewComposer composer = this.applicationContext.getBean(composerType);
+    public void composeView(
+            final Composite parent,
+            final String composerName,
+            final TypedMap attributes) {
+
+        if (!this.viewComposer.containsKey(composerName)) {
+            throw new IllegalArgumentException(
+                    "No ViewComposer with name: " + composerName + " found. Check Spring confiuration and beans");
+        }
+
+        final ViewComposer composer = this.viewComposer.get(composerName);
 
         if (composer.validateAttributes(attributes)) {
             clearView(parent);
@@ -49,7 +71,7 @@ public class ViewService {
         } else {
             log.error(
                     "Invalid or missing mandatory attributes to handle compose request of ViewComposer: {} attributes: ",
-                    composerType.getName(),
+                    composerName,
                     attributes);
         }
     }

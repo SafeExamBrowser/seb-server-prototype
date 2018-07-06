@@ -29,6 +29,7 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
             final HttpStatus status, final WebRequest request) {
 
         // TODO here we can handle exception within the Rest API
+        ex.printStackTrace();
         return super.handleExceptionInternal(ex, body, headers, status, request);
     }
 

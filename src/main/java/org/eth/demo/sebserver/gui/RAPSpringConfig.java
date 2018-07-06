@@ -14,12 +14,9 @@ import javax.servlet.ServletException;
 
 import org.eclipse.rap.rwt.engine.RWTServlet;
 import org.eclipse.rap.rwt.engine.RWTServletContextListener;
-import org.springframework.beans.BeansException;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -27,6 +24,9 @@ import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class RAPSpringConfig {
+
+    // TODO this should go to application.properties
+    public static final String ROOT_LOCATION = "http://localhost:8080/";
 
     @Bean
     public ServletContextInitializer initializer() {
@@ -54,16 +54,18 @@ public class RAPSpringConfig {
         return new ServletRegistrationBean<>(new RWTServlet(), "/examview", "/sebconfig");
     }
 
-    @Bean
-    public RAPSpringContext rapSpringContext() {
-        return new RAPSpringContext();
-    }
-
+    // TODO create intercepter and eventually create different RestTemplates
     @Bean("restTemplate")
     @Profile("dev")
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
+//  @Lazy
+//  @Bean
+//  public ServerPushService serverPushService() {
+//      return new ServerPushService();
+//  }
 
     // NOTE Profiles seems not to work as expected for now. This bean is initialized if the
     //      Profile "secure" is not set and even if the Profile "dev" is set explicitly.
@@ -95,27 +97,5 @@ public class RAPSpringConfig {
 //                .requestFactory(() -> new HttpComponentsClientHttpRequestFactory(client))
 //                .build();
 //    }
-
-    // NOTE: This is not best practice but I have found no other way to get an ApplicationContext
-    //       In a RAP EntryPoint so far. There may be a better way to integrate Spring dependency
-    //       injection into a RAP/SWT context but the information base on the Internet is very rare on
-    //       this suspect.
-    public static class RAPSpringContext implements ApplicationContextAware {
-
-        private static ApplicationContext context;
-
-        RAPSpringContext() {
-        }
-
-        @Override
-        public void setApplicationContext(final ApplicationContext context) throws BeansException {
-            RAPSpringContext.context = context;
-        }
-
-        public static ApplicationContext getApplicationContext() {
-            return context;
-
-        }
-    }
 
 }

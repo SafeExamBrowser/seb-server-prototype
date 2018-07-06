@@ -20,8 +20,7 @@ CREATE TABLE IF NOT EXISTS `exam` (
   `name` VARCHAR(45) NOT NULL,
   `status` INT(1) NOT NULL,
   PRIMARY KEY (`id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -40,8 +39,7 @@ CREATE TABLE IF NOT EXISTS `client_connection` (
     REFERENCES `exam` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -64,8 +62,7 @@ CREATE TABLE IF NOT EXISTS `client_event` (
     REFERENCES `client_connection` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -87,8 +84,7 @@ CREATE TABLE IF NOT EXISTS `indicator` (
     REFERENCES `exam` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -101,8 +97,7 @@ CREATE TABLE IF NOT EXISTS `configuration` (
   `name` VARCHAR(45) NOT NULL,
   `type` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -125,8 +120,7 @@ CREATE TABLE IF NOT EXISTS `configuration_attribute` (
     REFERENCES `configuration_attribute` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -154,8 +148,7 @@ CREATE TABLE IF NOT EXISTS `configuration_value` (
     REFERENCES `configuration_attribute` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -177,8 +170,7 @@ CREATE TABLE IF NOT EXISTS `orientation` (
     REFERENCES `configuration_attribute` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -204,8 +196,43 @@ CREATE TABLE IF NOT EXISTS `exam_configuration_map` (
     REFERENCES `configuration` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `user`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `user` ;
+
+CREATE TABLE IF NOT EXISTS `user` (
+  `id` BIGINT UNSIGNED NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `user_name` VARCHAR(255) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `email` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `userName_UNIQUE` (`user_name` ASC))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `user_role`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `user_role` ;
+
+CREATE TABLE IF NOT EXISTS `user_role` (
+  `id` BIGINT UNSIGNED NOT NULL,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `role_name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `user_ref_idx` (`user_id` ASC),
+  CONSTRAINT `user_ref`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `user` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

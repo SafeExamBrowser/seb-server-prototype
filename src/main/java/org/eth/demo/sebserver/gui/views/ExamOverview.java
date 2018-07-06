@@ -9,9 +9,11 @@
 package org.eth.demo.sebserver.gui.views;
 
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.RowData;
@@ -24,8 +26,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eth.demo.sebserver.gui.GUISpringConfig;
-import org.eth.demo.sebserver.gui.RAPSpringConfig.RAPSpringContext;
+import org.eth.demo.sebserver.gui.RAPSpringConfig;
 import org.eth.demo.sebserver.gui.domain.exam.GUIExam;
 import org.eth.demo.sebserver.gui.service.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
@@ -48,9 +49,11 @@ public class ExamOverview implements ViewComposer {
     private static final String ROOT_COMPOSITE_SUPPLIER = "ROOT_COMPOSITE_SUPPLIER";
 
     private final RestTemplate restTemplate;
+    private final ViewService viewService;
 
-    public ExamOverview(final RestTemplate restTemplate) {
+    public ExamOverview(final RestTemplate restTemplate, final ViewService viewService) {
         this.restTemplate = restTemplate;
+        this.viewService = viewService;
     }
 
     @Override
@@ -84,7 +87,7 @@ public class ExamOverview implements ViewComposer {
         table.setMenu(menu);
         table.addListener(
                 SWT.MenuDetect,
-                ExamOverview::tableRowMenuEvent);
+                this::tableRowMenuEvent);
 
         new TableColumn(table, SWT.LEFT).setText("Identifier");
         new TableColumn(table, SWT.LEFT).setText("Name");
@@ -112,19 +115,26 @@ public class ExamOverview implements ViewComposer {
 
     private Collection<GUIExam> getExams() {
         final UriComponentsBuilder builder = UriComponentsBuilder
-                .fromHttpUrl(GUISpringConfig.ROOT_LOCATION + "exam");
+                .fromHttpUrl(RAPSpringConfig.ROOT_LOCATION + "exam");
+
+        final Enumeration<String> headerNames = RWT.getRequest().getHeaderNames();
+
+        final HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Content-Type", "application/json");
+        httpHeaders.set("authorization", RWT.getRequest().getHeader("authorization"));
+        final HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
 
         final ResponseEntity<List<GUIExam>> request = this.restTemplate.exchange(
                 builder.toUriString(),
                 HttpMethod.GET,
-                null,
+                httpEntity,
                 new ParameterizedTypeReference<List<GUIExam>>() {
                 });
 
         return request.getBody();
     }
 
-    private static final void tableRowMenuEvent(final Event event) {
+    private final void tableRowMenuEvent(final Event event) {
         final Table table = (Table) event.widget;
         final TableItem[] selection = table.getSelection();
         if (selection != null && selection.length > 0) {
@@ -137,7 +147,7 @@ public class ExamOverview implements ViewComposer {
         }
     }
 
-    private static final Rectangle getRealBounds(final TableItem item) {
+    private final Rectangle getRealBounds(final TableItem item) {
         Rectangle result = item.getBounds();
         for (int i = 0; i < item.getParent().getColumnCount(); i++) {
             result = result.union(item.getBounds(i));
@@ -151,7 +161,7 @@ public class ExamOverview implements ViewComposer {
         return result;
     }
 
-    private static final void composeExamMenu(final Menu menu, final TableItem item) {
+    private final void composeExamMenu(final Menu menu, final TableItem item) {
         final GUIExam exam = (GUIExam) item.getData(ITEM_DATA_EXAM);
         if (menu.getItemCount() > 0) {
             for (final MenuItem mItem : menu.getItems()) {
@@ -179,7 +189,7 @@ public class ExamOverview implements ViewComposer {
         }
     }
 
-    private static final void addEditAction(final Menu menu, final Long examId) {
+    private final void addEditAction(final Menu menu, final Long examId) {
         final MenuItem item = new MenuItem(menu, SWT.NULL);
         item.setText("Edit");
         item.addListener(SWT.Selection, event -> {
@@ -187,7 +197,7 @@ public class ExamOverview implements ViewComposer {
         });
     }
 
-    private static final void addStateChangeAction(
+    private final void addStateChangeAction(
             final String name,
             final Menu menu,
             final TableItem tItem,
@@ -198,7 +208,7 @@ public class ExamOverview implements ViewComposer {
         item.setText(name);
         item.addListener(SWT.Selection, event -> {
             final UriComponentsBuilder builder = UriComponentsBuilder
-                    .fromHttpUrl(GUISpringConfig.ROOT_LOCATION + "exam/statechange/" + examId + "/" + toState);
+                    .fromHttpUrl(RAPSpringConfig.ROOT_LOCATION + "exam/statechange/" + examId + "/" + toState);
             final RestTemplate restTemplate = new RestTemplate();
             final HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.set("Content-Type", "application/json");
@@ -209,17 +219,17 @@ public class ExamOverview implements ViewComposer {
         });
     }
 
-    private static final void addViewRunningExamAction(final Menu menu, final Long examId) {
+    private final void addViewRunningExamAction(final Menu menu, final Long examId) {
         final MenuItem item = new MenuItem(menu, SWT.NULL);
         item.setText("View");
         item.addListener(SWT.Selection, event -> {
-            final ViewService viewService = RAPSpringContext.getApplicationContext().getBean(ViewService.class);
+
             final TypedMap attributes = new TypedMap();
             attributes.put(RunningExamView.EXAM_ID, examId);
             @SuppressWarnings("unchecked")
             final Supplier<Composite> rootCompositeSupplier =
                     (Supplier<Composite>) menu.getData(ROOT_COMPOSITE_SUPPLIER);
-            viewService.composeView(
+            this.viewService.composeView(
                     rootCompositeSupplier.get(),
                     RunningExamView.class, attributes);
         });

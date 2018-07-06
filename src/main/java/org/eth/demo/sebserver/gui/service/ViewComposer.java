@@ -13,6 +13,10 @@ import org.eth.demo.sebserver.util.TypedMap;
 
 public interface ViewComposer {
 
+    default String getName() {
+        return this.getClass().getName();
+    }
+
     /** This is used to indicate if a set of attributes are valid to process the specified ViewComposers compose method.
      *
      * @param attributes the given attributes to test

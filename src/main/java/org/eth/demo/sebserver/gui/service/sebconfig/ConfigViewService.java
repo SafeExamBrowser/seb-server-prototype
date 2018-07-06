@@ -25,7 +25,7 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eth.demo.sebserver.gui.GUISpringConfig;
+import org.eth.demo.sebserver.gui.RAPSpringConfig;
 import org.eth.demo.sebserver.gui.domain.sebconfig.Cell;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
@@ -46,7 +46,7 @@ public class ConfigViewService {
 
     private static final Logger log = LoggerFactory.getLogger(ConfigViewService.class);
 
-    public static final String CONFIG_LOCATION = GUISpringConfig.ROOT_LOCATION + "sebconfig/";
+    public static final String CONFIG_LOCATION = RAPSpringConfig.ROOT_LOCATION + "sebconfig/";
     public static final String ATTRIBUTE_LOCATION = CONFIG_LOCATION + "attributes/";
     public static final String VALUE_LOCATION = CONFIG_LOCATION + "values/";
 

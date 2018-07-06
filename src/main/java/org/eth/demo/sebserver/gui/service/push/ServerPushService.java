@@ -13,8 +13,10 @@ import java.util.function.Consumer;
 import org.eclipse.rap.rwt.service.ServerPushSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+@Lazy
 @Service
 public class ServerPushService {
 

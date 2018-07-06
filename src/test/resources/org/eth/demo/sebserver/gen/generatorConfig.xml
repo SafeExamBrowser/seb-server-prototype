@@ -76,6 +76,14 @@
             <property name="virtualKeyColumns" value="id"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
+        <table tableName="user" domainObjectName="UserRecord">
+            <property name="virtualKeyColumns" value="id"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+        <table tableName="user_role" domainObjectName="RoleRecord">
+            <property name="virtualKeyColumns" value="id"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
         
         
         

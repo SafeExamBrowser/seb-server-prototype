@@ -7,21 +7,27 @@
   <name>seb-server-demo</name>
   <description>Demo project for Spring Boot</description>
   
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.0.1.RELEASE</version>
+  </parent>
+  
   <packaging>jar</packaging>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.8</java.version>
-    
   </properties>
+  
+  
 
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.7.0</version>
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
@@ -31,7 +37,6 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>2.0.1.RELEASE</version>
       </plugin>
     </plugins>
   </build>
@@ -40,18 +45,15 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>6.0.6</version>
     </dependency>
     
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <version>4.5.5</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-      <version>2.0.1.RELEASE</version>
       <exclusions>
         <exclusion>
           <groupId>org.hibernate.validator</groupId>
@@ -62,12 +64,10 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-tomcat</artifactId>
-      <version>2.0.1.RELEASE</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-webflux</artifactId>
-      <version>2.0.1.RELEASE</version>
       <exclusions>
         <exclusion>
           <groupId>org.springframework.boot</groupId>
@@ -82,13 +82,27 @@
     <dependency>
        <groupId>org.springframework.boot</groupId>
        <artifactId>spring-boot-starter-websocket</artifactId>
-       <version>2.0.1.RELEASE</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-jdbc</artifactId>
-      <version>2.0.1.RELEASE</version>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>  
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    
+     <!-- NOTE since org.springframework.security.oauth is not fully migrated to spring-boot-starter-security
+          we have to declare a separate version here. This refers to the latest version of spring-security-oauth2
+          and should be compatible with the overall version of spring boot
+          SEE: https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0.0-M5-Release-Notes#oauth-20-support
+          TODO: once spring-security-oauth2 is fully migrated we should be able to remove this dependency
+      --> 
+<!--     <dependency> -->
+<!--       <groupId>org.springframework.security.oauth</groupId> -->
+<!--       <artifactId>spring-security-oauth2</artifactId> -->
+<!--       <version>2.3.3.RELEASE</version> -->
+<!--     </dependency> -->
 
     <dependency>
       <groupId>org.mybatis</groupId>
@@ -109,7 +123,6 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.7</version>
     </dependency>
     
     <dependency>
@@ -133,19 +146,16 @@
     <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.12</version>
         <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
-      <version>2.0.1.RELEASE</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.4.197</version>
       <scope>test</scope>
     </dependency>
     <dependency>
