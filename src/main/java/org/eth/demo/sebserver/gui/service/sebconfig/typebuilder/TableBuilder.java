@@ -206,6 +206,7 @@ public class TableBuilder implements InputComponentBuilder {
 
         public void valueChanged(final int columnIndex, final int rowIndex, final String value) {
             this.viewContext.getValueChangeListener().valueChanged(
+                    this.viewContext.configurationId,
                     this.columnAttributes.get(columnIndex),
                     value,
                     rowIndex);

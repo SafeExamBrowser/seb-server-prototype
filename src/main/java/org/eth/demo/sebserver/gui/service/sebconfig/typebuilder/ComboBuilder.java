@@ -45,6 +45,7 @@ public class ComboBuilder implements InputComponentBuilder {
         combo.addListener(
                 SWT.Selection,
                 event -> viewContext.getValueChangeListener().valueChanged(
+                        viewContext.configurationId,
                         attribute,
                         String.valueOf(combo.getSelectionIndex()),
                         0));

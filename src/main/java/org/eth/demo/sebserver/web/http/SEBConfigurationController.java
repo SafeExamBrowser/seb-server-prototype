@@ -54,13 +54,13 @@ public class SEBConfigurationController {
     }
 
     // TODO here we should add a validation error response
-    @RequestMapping(value = "values/save", method = RequestMethod.POST)
+    @RequestMapping(value = "saveValue", method = RequestMethod.POST)
     final void saveValue(@RequestBody final AttributeValue value) {
         this.configViewDaoImpl.saveValue(value);
     }
 
     // TODO here we should add a validation error response
-    @RequestMapping(value = "values/savetable", method = RequestMethod.POST)
+    @RequestMapping(value = "saveTable", method = RequestMethod.POST)
     final void saveValue(@RequestBody final TableValue value) {
         this.configViewDaoImpl.saveTableValue(value);
     }

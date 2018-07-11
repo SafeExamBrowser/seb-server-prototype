@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class GUIAttributeValue {
 
-    public final Long configId;
+    public final String configId;
     public final String attributeName;
     public final String parentAttributeName;
     public final Integer listIndex;
@@ -21,7 +21,7 @@ public final class GUIAttributeValue {
 
     @JsonCreator
     public GUIAttributeValue(
-            @JsonProperty("configId") final Long configId,
+            @JsonProperty("configId") final String configId,
             @JsonProperty("attributeName") final String attributeName,
             @JsonProperty("parentAttributeName") final String parentAttributeName,
             @JsonProperty("listIndex") final Integer listIndex,
@@ -34,7 +34,7 @@ public final class GUIAttributeValue {
         this.value = value;
     }
 
-    public Long getConfigId() {
+    public String getConfigId() {
         return this.configId;
     }
 

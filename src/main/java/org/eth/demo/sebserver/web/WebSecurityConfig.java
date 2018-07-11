@@ -20,14 +20,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/rwt-resources/*", "/login").permitAll()
+                .antMatchers("/rwt-resources/**", "/login*").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic()
+
+                //                .formLogin()
+                //                .loginPage("/login")
+                //                .loginProcessingUrl("/doLogin")
+                //                .defaultSuccessUrl("/examview")
+                //                .failureUrl("/login?error=true")
+
                 .and()
                 .logout()
                 .permitAll()
                 .and().csrf().disable() // TODO enable for RAP gui?
         ;
     }
+
 }

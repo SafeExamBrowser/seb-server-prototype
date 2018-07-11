@@ -13,7 +13,7 @@ import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 
 public interface ValueChangeListener {
 
-    void valueChanged(GUIViewAttribute attribute, String value, int listIndex);
+    void valueChanged(String configId, GUIViewAttribute attribute, String value, int listIndex);
 
     void tableChanged(GUITableValue tableValue);
 

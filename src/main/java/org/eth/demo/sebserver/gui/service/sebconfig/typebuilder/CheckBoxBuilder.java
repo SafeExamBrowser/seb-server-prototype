@@ -47,6 +47,7 @@ public class CheckBoxBuilder implements InputComponentBuilder {
         checkbox.addListener(
                 SWT.Selection,
                 event -> viewContext.getValueChangeListener().valueChanged(
+                        viewContext.configurationId,
                         attribute,
                         String.valueOf(checkbox.getSelection()),
                         0));

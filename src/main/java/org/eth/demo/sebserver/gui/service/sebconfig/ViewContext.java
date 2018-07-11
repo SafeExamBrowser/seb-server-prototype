@@ -20,12 +20,11 @@ import org.eclipse.swt.layout.FormData;
 import org.eth.demo.sebserver.gui.domain.sebconfig.Cell;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
-import org.springframework.web.client.RestTemplate;
 
 public final class ViewContext {
 
     public final String name;
-    public final Long configurationId;
+    public final String configurationId;
 
     public final int xpos, ypos, width, height;
     public final int columns, rows;
@@ -38,7 +37,7 @@ public final class ViewContext {
 
     ViewContext(
             final String name,
-            final Long configurationId,
+            final String configurationId,
             final int xpos,
             final int ypos,
             final int width,
@@ -46,7 +45,7 @@ public final class ViewContext {
             final int columns,
             final int rows,
             final Map<String, GUIViewAttribute> attributes,
-            final RestTemplate restTemplate) {
+            final ValueChangeListener valueChangeListener) {
 
         this.name = name;
         this.configurationId = configurationId;
@@ -66,14 +65,14 @@ public final class ViewContext {
 
         this.attributes = attributes;
         this.inputFields = new HashMap<>();
-        this.valueChangeListener = new ViewValueChangeListener(restTemplate, this);
+        this.valueChangeListener = valueChangeListener;
     }
 
     public String getName() {
         return this.name;
     }
 
-    public Long getConfigurationId() {
+    public String getConfigurationId() {
         return this.configurationId;
     }
 

@@ -10,13 +10,10 @@ package org.eth.demo.sebserver.gui.service.sebconfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
@@ -25,39 +22,32 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eth.demo.sebserver.gui.RAPSpringConfig;
 import org.eth.demo.sebserver.gui.domain.sebconfig.Cell;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
+import org.eth.demo.sebserver.gui.service.rest.GETConfigAttribute;
+import org.eth.demo.sebserver.gui.service.rest.GETConfigAttributeValues;
+import org.eth.demo.sebserver.gui.service.rest.POSTConfigValue;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class ConfigViewService {
 
-    private static final Logger log = LoggerFactory.getLogger(ConfigViewService.class);
-
-    public static final String CONFIG_LOCATION = RAPSpringConfig.ROOT_LOCATION + "sebconfig/";
-    public static final String ATTRIBUTE_LOCATION = CONFIG_LOCATION + "attributes/";
-    public static final String VALUE_LOCATION = CONFIG_LOCATION + "values/";
-
-    private final RestTemplate restTemplate;
+    private final GETConfigAttribute configAttributeRequest;
+    private final GETConfigAttributeValues configAttributeValuesRequest;
+    private final POSTConfigValue saveConfigAttributeValue;
     private final Map<FieldType, InputComponentBuilder> builderTypeMapping;
 
     public ConfigViewService(
-            final RestTemplate restTemplate,
+            final GETConfigAttribute configAttributeRequest,
+            final GETConfigAttributeValues configAttributeValuesRequest,
+            final POSTConfigValue saveConfigAttributeValue,
             final Collection<InputComponentBuilder> builders) {
 
-        this.restTemplate = restTemplate;
+        this.configAttributeRequest = configAttributeRequest;
+        this.configAttributeValuesRequest = configAttributeValuesRequest;
+        this.saveConfigAttributeValue = saveConfigAttributeValue;
         this.builderTypeMapping = new EnumMap<>(FieldType.class);
         for (final InputComponentBuilder builder : builders) {
             for (final FieldType type : builder.supportedTypes()) {
@@ -68,7 +58,7 @@ public class ConfigViewService {
 
     public ViewContext createViewContext(
             final String name,
-            final Long configurationId,
+            final String configurationId,
             final int xpos,
             final int ypos,
             final int width,
@@ -76,9 +66,19 @@ public class ConfigViewService {
             final int columns,
             final int rows) {
 
-        final Map<String, GUIViewAttribute> attributes = loadConfigAttributes(name);
-        return new ViewContext(name, configurationId, xpos, ypos, width, height, columns, rows,
-                attributes, this.restTemplate);
+        final Map<String, GUIViewAttribute> attributes = this.configAttributeRequest
+                .with()
+                .configViewName(name)
+                .doRequest();
+
+        return new ViewContext(
+                name,
+                configurationId,
+                xpos, ypos,
+                width, height,
+                columns, rows,
+                attributes,
+                new ViewValueChangeListener(this.saveConfigAttributeValue));
     }
 
     public ViewContext createComponents(final Composite parent, final ViewContext viewContext) {
@@ -129,54 +129,15 @@ public class ConfigViewService {
 
     public ViewContext initInputFieldValues(final ViewContext viewContext) {
 
-        final List<String> attributeNames = viewContext.getAttributeNames();
-        final UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(
-                VALUE_LOCATION + viewContext.configurationId);
+        final String attributeNames = StringUtils.join(viewContext.getAttributeNames(), ",");
+        final Collection<GUIAttributeValue> attributeValues = this.configAttributeValuesRequest
+                .with()
+                .config(viewContext.configurationId)
+                .configAttributeNames(attributeNames)
+                .doRequest();
 
-        final HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set("attributeNames", StringUtils.join(attributeNames, ","));
-        final HttpEntity<String> httpEntity = new HttpEntity<>(null, httpHeaders);
-
-        try {
-            final ResponseEntity<Collection<GUIAttributeValue>> request = this.restTemplate.exchange(
-                    builder.toUriString(),
-                    HttpMethod.GET,
-                    httpEntity,
-                    new ParameterizedTypeReference<Collection<GUIAttributeValue>>() {
-                    });
-
-            viewContext.setValuesToInputFields(request.getBody());
-
-        } catch (final Exception e) {
-            log.error("Error while trying to get values: ", e);
-        }
-
+        viewContext.setValuesToInputFields(attributeValues);
         return viewContext;
-    }
-
-    private Map<String, GUIViewAttribute> loadConfigAttributes(final String viewName) {
-        final UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(
-                ATTRIBUTE_LOCATION + viewName);
-
-        try {
-            final ResponseEntity<List<GUIViewAttribute>> request = this.restTemplate.exchange(
-                    builder.toUriString(),
-                    HttpMethod.GET,
-                    null,
-                    new ParameterizedTypeReference<List<GUIViewAttribute>>() {
-                    });
-
-            final Map<String, GUIViewAttribute> result = request.getBody()
-                    .stream()
-                    .collect(Collectors.toMap(
-                            a -> getFQName(a, request.getBody()),
-                            a -> a));
-
-            return result;
-        } catch (final Exception e) {
-            log.error("Error while trying to get attributes of view: {} ", viewName, e);
-            return Collections.emptyMap();
-        }
     }
 
     private void createInputComponentGroup(
@@ -278,22 +239,6 @@ public class ConfigViewService {
         final Label label = new Label(parent, SWT.NONE);
         label.setText(errorText);
         return label;
-    }
-
-    private String getFQName(final GUIViewAttribute a, final Collection<GUIViewAttribute> attrs) {
-        if (a.parentAttributeName == null) {
-            return a.name;
-        }
-
-        final Optional<GUIViewAttribute> parentAttr = attrs.stream()
-                .filter(attr -> attr.name.equals(a.parentAttributeName))
-                .findFirst();
-
-        if (parentAttr.isPresent()) {
-            return parentAttr.get().name + "." + a.name;
-        } else {
-            throw new IllegalArgumentException("No Attribute found with name: " + a.parentAttributeName);
-        }
     }
 
 }

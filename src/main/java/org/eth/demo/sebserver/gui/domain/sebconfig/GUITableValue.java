@@ -13,13 +13,13 @@ import java.util.List;
 
 public class GUITableValue {
 
-    public final Long configId;
+    public final String configId;
     public final String attributeName;
     public final List<String> columns;
     public final List<String> values;
 
     public GUITableValue(
-            final Long configId,
+            final String configId,
             final String attributeName,
             final List<String> columns,
             final List<String> values) {
@@ -30,7 +30,7 @@ public class GUITableValue {
         this.values = Collections.unmodifiableList(values);
     }
 
-    public Long getConfigId() {
+    public String getConfigId() {
         return this.configId;
     }
 

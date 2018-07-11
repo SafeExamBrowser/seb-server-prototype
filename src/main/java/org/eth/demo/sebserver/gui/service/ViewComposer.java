@@ -8,8 +8,9 @@
 
 package org.eth.demo.sebserver.gui.service;
 
+import java.util.Map;
+
 import org.eclipse.swt.widgets.Composite;
-import org.eth.demo.sebserver.util.TypedMap;
 
 public interface ViewComposer {
 
@@ -21,8 +22,8 @@ public interface ViewComposer {
      *
      * @param attributes the given attributes to test
      * @return true if the given attributes has all the information the composer needs to compose the view */
-    boolean validateAttributes(TypedMap attributes);
+    boolean validateAttributes(Map<String, String> attributes);
 
-    void composeView(ViewService viewService, Composite parent, TypedMap attributes);
+    void composeView(ViewService viewService, Composite parent, Map<String, String> attributes);
 
 }

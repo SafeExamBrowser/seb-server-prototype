@@ -51,25 +51,27 @@ public class TextFieldBuilder implements InputComponentBuilder {
             text = new Text(parent, SWT.LEFT | SWT.BORDER);
         }
 
-        addValueChangeListener(text, attribute, viewContext.getValueChangeListener());
+        addValueChangeListener(text, attribute, viewContext);
 
         return new TextInputField(attribute, text);
     }
 
-    public void addValueChangeListener(
+    private void addValueChangeListener(
             final Text control,
             final GUIViewAttribute attribute,
-            final ValueChangeListener valueListener) {
+            final ViewContext viewContext) {
 
+        final ValueChangeListener valueListener = viewContext.getValueChangeListener();
         final FieldType fieldType = attribute.getFieldType();
         if (fieldType == FieldType.INTEGER) {
-            addNumberCheckListener(control, attribute, s -> Integer.parseInt(s), valueListener);
+            addNumberCheckListener(control, attribute, s -> Integer.parseInt(s), viewContext);
         } else if (fieldType == FieldType.DECIMAL) {
-            addNumberCheckListener(control, attribute, s -> Double.parseDouble(s), valueListener);
+            addNumberCheckListener(control, attribute, s -> Double.parseDouble(s), viewContext);
         } else {
             control.addListener(
                     SWT.FocusOut,
                     event -> valueListener.valueChanged(
+                            viewContext.configurationId,
                             attribute,
                             String.valueOf(control.getText()),
                             0));
@@ -80,14 +82,15 @@ public class TextFieldBuilder implements InputComponentBuilder {
             final Text control,
             final GUIViewAttribute attribute,
             final Consumer<String> numberCheck,
-            final ValueChangeListener valueListener) {
+            final ViewContext viewContext) {
 
+        final ValueChangeListener valueListener = viewContext.getValueChangeListener();
         control.addListener(SWT.FocusOut, event -> {
             try {
                 final String text = control.getText();
                 numberCheck.accept(text);
                 control.setBackground(null);
-                valueListener.valueChanged(attribute, text, 0);
+                valueListener.valueChanged(viewContext.configurationId, attribute, text, 0);
             } catch (final NumberFormatException e) {
                 control.setBackground(new Color(control.getDisplay(), 255, 0, 0, 50));
             }

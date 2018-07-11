@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -32,7 +33,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eth.demo.sebserver.gui.RAPSpringConfig;
 import org.eth.demo.sebserver.gui.domain.exam.GUIExam;
 import org.eth.demo.sebserver.gui.domain.exam.GUIIndicatorDef;
 import org.eth.demo.sebserver.gui.domain.exam.GUIIndicatorValue;
@@ -40,53 +40,49 @@ import org.eth.demo.sebserver.gui.service.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
 import org.eth.demo.sebserver.gui.service.push.ServerPushContext;
 import org.eth.demo.sebserver.gui.service.push.ServerPushService;
-import org.eth.demo.sebserver.util.TypedMap;
-import org.eth.demo.sebserver.util.TypedMap.TypedKey;
+import org.eth.demo.sebserver.gui.service.rest.GETExamDetail;
+import org.eth.demo.sebserver.gui.service.rest.GETIndicatorValues;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Lazy
 @Component
 public class RunningExamView implements ViewComposer {
 
-    public static final TypedKey<Long> EXAM_ID = new TypedKey<>("EXAM_ID", Long.class);
-
-    private static final TypedKey<ClientTable> CLIENT_TABLE = new TypedKey<>("CLIENT_TABLE", ClientTable.class);
-
     private final ServerPushService serverPushService;
-    private final RestTemplate restTemplate;
+    private final GETExamDetail examDetailRequest;
+    private final GETIndicatorValues indicatorValuesRequest;
 
     public RunningExamView(
             final ServerPushService serverPushService,
-            final RestTemplate restTemplate) {
+            final GETExamDetail examDetailRequest,
+            final GETIndicatorValues indicatorValuesRequest) {
 
         this.serverPushService = serverPushService;
-        this.restTemplate = restTemplate;
+        this.examDetailRequest = examDetailRequest;
+        this.indicatorValuesRequest = indicatorValuesRequest;
     }
 
     @Override
-    public boolean validateAttributes(final TypedMap attributes) {
-        return attributes.containsKey(EXAM_ID);
+    public boolean validateAttributes(final Map<String, String> attributes) {
+        return attributes.containsKey(AttributeKeys.EXAM_ID);
     }
 
     @Override
-    public void composeView(final ViewService viewService, final Composite parent, final TypedMap attributes) {
-        final Long examId = attributes.get(EXAM_ID);
-        final GUIExam exam = requestExamData(examId);
+    public void composeView(
+            final ViewService viewService,
+            final Composite parent,
+            final Map<String, String> attributes) {
+
+        final String examId = attributes.get(AttributeKeys.EXAM_ID);
+        final GUIExam exam = this.examDetailRequest
+                .with()
+                .exam(examId)
+                .doRequest();
+
         final Display display = parent.getDisplay();
 
-        final RowLayout parentLayout = new RowLayout();
-        parentLayout.wrap = false;
-        parentLayout.pack = false;
-        parentLayout.justify = true;
-        parentLayout.type = SWT.HORIZONTAL;
-        parentLayout.center = true;
-        parent.setLayout(parentLayout);
+        viewService.centringView(parent);
 
         final Composite root = new Composite(parent, SWT.SHADOW_NONE);
 
@@ -141,56 +137,34 @@ public class RunningExamView implements ViewComposer {
             viewService.composeView(parent, ExamOverview.class);
         });
 
-        final ServerPushContext context = new ServerPushContext(
-                root,
-                runAgainContext -> true,
-                this.restTemplate)
-                        .setData(CLIENT_TABLE, clientTable);
         this.serverPushService.runServerPush(
-                context,
-                RunningExamView::pollData,
-                RunningExamView::update);
+                new ServerPushContext(
+                        root,
+                        runAgainContext -> true),
+                dataPoll(this.indicatorValuesRequest, clientTable),
+                context -> {
+                    clientTable.updateGUI();
+                    context.layout();
+                });
     }
 
-    private GUIExam requestExamData(final Long examId) {
-        final RestTemplate restTemplate = new RestTemplate();
-        final UriComponentsBuilder builder = UriComponentsBuilder
-                .fromHttpUrl(RAPSpringConfig.ROOT_LOCATION + "exam/" + examId);
-        return restTemplate.getForObject(builder.toUriString(), GUIExam.class);
-    }
+    private static final Consumer<ServerPushContext> dataPoll(
+            final GETIndicatorValues indicatorValuesRequest,
+            final ClientTable clientTable) {
 
-    private final static void pollData(final ServerPushContext context) {
-        try {
-            Thread.sleep(100);
-        } catch (final Exception e) {
-        }
+        return (context) -> {
+            try {
+                Thread.sleep(100);
+            } catch (final Exception e) {
+            }
 
-        final ClientTable clientTable = context.getData(CLIENT_TABLE);
-        if (clientTable == null) {
-            return;
-        }
+            final List<GUIIndicatorValue> indicatorValues = indicatorValuesRequest
+                    .with()
+                    .exam(String.valueOf(clientTable.exam.id))
+                    .doRequest();
 
-        final UriComponentsBuilder builder = UriComponentsBuilder
-                .fromHttpUrl(RAPSpringConfig.ROOT_LOCATION + "exam/indicatorValues/" + clientTable.exam.id);
-        final ResponseEntity<List<GUIIndicatorValue>> responseEntity =
-                context.getRestTemplate().exchange(
-                        builder.toUriString(),
-                        HttpMethod.GET,
-                        null,
-                        new ParameterizedTypeReference<List<GUIIndicatorValue>>() {
-                        });
-        final List<GUIIndicatorValue> indicatorValues = responseEntity.getBody();
-        clientTable.updateValues(indicatorValues);
-    }
-
-    private final static void update(final ServerPushContext context) {
-        final ClientTable clientTable = context.getData(CLIENT_TABLE);
-        if (clientTable == null) {
-            return;
-        }
-
-        clientTable.updateGUI();
-        context.layout();
+            clientTable.updateValues(indicatorValues);
+        };
     }
 
     private final static class ClientTable {

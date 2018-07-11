@@ -9,14 +9,12 @@
 package org.eth.demo.sebserver.gui.views;
 
 import java.util.Collection;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
-import org.eclipse.rap.rwt.RWT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -26,20 +24,15 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eth.demo.sebserver.gui.RAPSpringConfig;
 import org.eth.demo.sebserver.gui.domain.exam.GUIExam;
 import org.eth.demo.sebserver.gui.service.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
-import org.eth.demo.sebserver.util.TypedMap;
+import org.eth.demo.sebserver.gui.service.rest.POSTExamStateChange;
+import org.eth.demo.sebserver.gui.service.rest.GETExams;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Lazy
 @Component
@@ -48,32 +41,34 @@ public class ExamOverview implements ViewComposer {
     private static final String ITEM_DATA_EXAM = "ITEM_DATA_EXAM";
     private static final String ROOT_COMPOSITE_SUPPLIER = "ROOT_COMPOSITE_SUPPLIER";
 
-    private final RestTemplate restTemplate;
+    private final GETExams examsRequest;
+    private final POSTExamStateChange examStateChange;
     private final ViewService viewService;
 
-    public ExamOverview(final RestTemplate restTemplate, final ViewService viewService) {
-        this.restTemplate = restTemplate;
+    public ExamOverview(
+            final GETExams examsRequest,
+            final POSTExamStateChange examStateChange,
+            final ViewService viewService) {
+
+        this.examsRequest = examsRequest;
+        this.examStateChange = examStateChange;
         this.viewService = viewService;
     }
 
     @Override
-    public boolean validateAttributes(final TypedMap attributes) {
+    public boolean validateAttributes(final Map<String, String> attributes) {
         return true;
     }
 
     @Override
-    public void composeView(final ViewService viewService, final Composite parent, final TypedMap attributes) {
-        final Collection<GUIExam> exams = getExams();
+    public void composeView(final ViewService viewService, final Composite parent,
+            final Map<String, String> attributes) {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        final RowLayout parentLayout = new RowLayout();
-        parentLayout.wrap = false;
-        parentLayout.pack = false;
-        parentLayout.justify = true;
-        parentLayout.type = SWT.HORIZONTAL;
-        parentLayout.center = true;
-        parent.setLayout(parentLayout);
+        final Collection<GUIExam> exams = this.examsRequest.doRequest();
 
-        parent.setLayoutData(new RowData(800, 500));
+        viewService.centringView(parent);
+
         final Group group = new Group(parent, SWT.SHADOW_NONE);
         group.setLayout(new RowLayout());
         group.setBounds(20, 20, 500, 100);
@@ -111,27 +106,6 @@ public class ExamOverview implements ViewComposer {
         }
 
         table.layout();
-    }
-
-    private Collection<GUIExam> getExams() {
-        final UriComponentsBuilder builder = UriComponentsBuilder
-                .fromHttpUrl(RAPSpringConfig.ROOT_LOCATION + "exam");
-
-        final Enumeration<String> headerNames = RWT.getRequest().getHeaderNames();
-
-        final HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set("Content-Type", "application/json");
-        httpHeaders.set("authorization", RWT.getRequest().getHeader("authorization"));
-        final HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
-
-        final ResponseEntity<List<GUIExam>> request = this.restTemplate.exchange(
-                builder.toUriString(),
-                HttpMethod.GET,
-                httpEntity,
-                new ParameterizedTypeReference<List<GUIExam>>() {
-                });
-
-        return request.getBody();
     }
 
     private final void tableRowMenuEvent(final Event event) {
@@ -172,16 +146,16 @@ public class ExamOverview implements ViewComposer {
         switch (exam.status.intValue()) {
             case 0: {
                 addEditAction(menu, exam.id);
-                addStateChangeAction("Set Ready", menu, item, exam.id, 1);
+                addStateChangeAction("Set Ready", menu, item, String.valueOf(exam.id), "1");
                 break;
             }
             case 1: {
-                addStateChangeAction("Back To Edit", menu, item, exam.id, 0);
-                addStateChangeAction("Run", menu, item, exam.id, 2);
+                addStateChangeAction("Back To Edit", menu, item, String.valueOf(exam.id), "0");
+                addStateChangeAction("Run", menu, item, String.valueOf(exam.id), "2");
                 break;
             }
             case 2: {
-                addViewRunningExamAction(menu, exam.id);
+                addViewRunningExamAction(menu, String.valueOf(exam.id));
                 break;
             }
             default: {
@@ -201,31 +175,29 @@ public class ExamOverview implements ViewComposer {
             final String name,
             final Menu menu,
             final TableItem tItem,
-            final Long examId,
-            final int toState) {
+            final String examId,
+            final String toStateId) {
 
         final MenuItem item = new MenuItem(menu, SWT.NULL);
         item.setText(name);
         item.addListener(SWT.Selection, event -> {
-            final UriComponentsBuilder builder = UriComponentsBuilder
-                    .fromHttpUrl(RAPSpringConfig.ROOT_LOCATION + "exam/statechange/" + examId + "/" + toState);
-            final RestTemplate restTemplate = new RestTemplate();
-            final HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.set("Content-Type", "application/json");
-            final HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
-            final GUIExam newExam = restTemplate.postForObject(builder.toUriString(), httpEntity, GUIExam.class);
+            final GUIExam newExam = this.examStateChange
+                    .with()
+                    .exam(examId)
+                    .toState(toStateId)
+                    .doRequest();
             tItem.setText(2, newExam.statusName);
             tItem.setData(ITEM_DATA_EXAM, newExam);
         });
     }
 
-    private final void addViewRunningExamAction(final Menu menu, final Long examId) {
+    private final void addViewRunningExamAction(final Menu menu, final String examId) {
         final MenuItem item = new MenuItem(menu, SWT.NULL);
         item.setText("View");
         item.addListener(SWT.Selection, event -> {
 
-            final TypedMap attributes = new TypedMap();
-            attributes.put(RunningExamView.EXAM_ID, examId);
+            final Map<String, String> attributes = new HashMap<>();
+            attributes.put(AttributeKeys.EXAM_ID, examId);
             @SuppressWarnings("unchecked")
             final Supplier<Composite> rootCompositeSupplier =
                     (Supplier<Composite>) menu.getData(ROOT_COMPOSITE_SUPPLIER);
