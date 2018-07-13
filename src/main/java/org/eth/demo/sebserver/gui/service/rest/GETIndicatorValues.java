@@ -15,14 +15,13 @@ import org.eth.demo.sebserver.gui.domain.exam.GUIIndicatorValue;
 import org.eth.demo.sebserver.gui.views.AttributeKeys;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
-public class GETIndicatorValues implements RestCall<List<GUIIndicatorValue>> {
+public class GETIndicatorValues implements SEBServerAPICall<List<GUIIndicatorValue>> {
 
     private final RestCallBuilder restCallBuilder;
     private final RestTemplate restTemplate;
@@ -41,7 +40,7 @@ public class GETIndicatorValues implements RestCall<List<GUIIndicatorValue>> {
     }
 
     @Override
-    public List<GUIIndicatorValue> doRequest(final Map<String, String> attributes) {
+    public List<GUIIndicatorValue> doAPICall(final Map<String, String> attributes) {
         final String examId = getAttribute(attributes, AttributeKeys.EXAM_ID);
 
         return this.restTemplate.exchange(
@@ -50,7 +49,7 @@ public class GETIndicatorValues implements RestCall<List<GUIIndicatorValue>> {
                 HttpMethod.GET,
                 this.restCallBuilder.httpEntity()
                         .withContentTypeJson()
-                        .withHeaderCopy(HttpHeaders.AUTHORIZATION)
+                        .withAuth(attributes)
                         .build(),
                 new ParameterizedTypeReference<List<GUIIndicatorValue>>() {
                 }).getBody();

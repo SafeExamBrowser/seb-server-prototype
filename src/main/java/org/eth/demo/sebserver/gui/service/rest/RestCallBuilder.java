@@ -8,7 +8,12 @@
 
 package org.eth.demo.sebserver.gui.service.rest;
 
+import java.util.Map;
+
 import org.eclipse.rap.rwt.RWT;
+import org.eth.demo.sebserver.gui.views.AttributeKeys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpEntity;
@@ -19,6 +24,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Lazy
 @Component
 public class RestCallBuilder {
+
+    private static final Logger log = LoggerFactory.getLogger(RestCallBuilder.class);
 
     @Value("${server.address}")
     private String webServerAdress;
@@ -49,17 +56,30 @@ public class RestCallBuilder {
         }
 
         public HttpEntityBuilder<T> withContentTypeJson() {
-            this.httpHeaders.set(HttpHeaders.CONTENT_TYPE, RestCall.CONTENT_TYPE_APPLICATION_JSON);
+            this.httpHeaders.set(HttpHeaders.CONTENT_TYPE, SEBServerAPICall.CONTENT_TYPE_APPLICATION_JSON);
+            return this;
+        }
+
+        public HttpEntityBuilder<T> withAuth(final Map<String, String> attributes) {
+            if (attributes.containsKey(AttributeKeys.AUTHORIZATION_HEADER)) {
+                this.httpHeaders.set(
+                        HttpHeaders.AUTHORIZATION,
+                        attributes.get(AttributeKeys.AUTHORIZATION_HEADER));
+            } else {
+                try {
+                    this.httpHeaders.set(
+                            HttpHeaders.AUTHORIZATION,
+                            RWT.getRequest().getHeader(HttpHeaders.AUTHORIZATION));
+                } catch (final Exception e) {
+                    log.error("Error while trying to get AUTHORIZATION_HEADER from RWT context request: ", e);
+                }
+            }
+
             return this;
         }
 
         public HttpEntityBuilder<T> withHeader(final String name, final String value) {
             this.httpHeaders.set(name, value);
-            return this;
-        }
-
-        public HttpEntityBuilder<T> withHeaderCopy(final String name) {
-            this.httpHeaders.set(name, RWT.getRequest().getHeader(name));
             return this;
         }
 

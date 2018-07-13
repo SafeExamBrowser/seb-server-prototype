@@ -27,10 +27,11 @@ public class ViewValueChangeListener implements ValueChangeListener {
     }
 
     @Override
-    public void valueChanged(final String configId, final GUIViewAttribute attribute, final String value,
+    public void valueChanged(
+            final String configId,
+            final GUIViewAttribute attribute,
+            final String value,
             final int listIndex) {
-        System.out.println("****************** value entered: " + value + " attribute: " + attribute.name
-                + " listIndex: " + listIndex);
 
         final GUIAttributeValue valueObj = new GUIAttributeValue(
                 configId,
@@ -46,7 +47,7 @@ public class ViewValueChangeListener implements ValueChangeListener {
                     .with()
                     .singleAttribute()
                     .attributeValue(jsonValue)
-                    .doRequest();
+                    .doAPICall();
         } catch (final JsonProcessingException e) {
             throw new RuntimeException("Failed to POST attribute value to back-end: ", e);
         }
@@ -62,7 +63,7 @@ public class ViewValueChangeListener implements ValueChangeListener {
                     .with()
                     .tableAttribute()
                     .attributeValue(jsonValue)
-                    .doRequest();
+                    .doAPICall();
         } catch (final JsonProcessingException e) {
             throw new RuntimeException("Failed to POST attribute value to back-end: ", e);
         }

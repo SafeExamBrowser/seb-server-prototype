@@ -15,14 +15,13 @@ import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
 import org.eth.demo.sebserver.gui.views.AttributeKeys;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
-public class GETConfigAttributeValues implements RestCall<Collection<GUIAttributeValue>> {
+public class GETConfigAttributeValues implements SEBServerAPICall<Collection<GUIAttributeValue>> {
 
     private final RestCallBuilder restCallBuilder;
     private final RestTemplate restTemplate;
@@ -33,7 +32,7 @@ public class GETConfigAttributeValues implements RestCall<Collection<GUIAttribut
     }
 
     @Override
-    public Collection<GUIAttributeValue> doRequest(final Map<String, String> attributes) {
+    public Collection<GUIAttributeValue> doAPICall(final Map<String, String> attributes) {
         final String configId = getAttribute(attributes, AttributeKeys.CONFIG_ID);
         final String configAttrs = getAttribute(attributes, AttributeKeys.CONFIG_ATTRIBUTE_NAMES);
 
@@ -45,7 +44,7 @@ public class GETConfigAttributeValues implements RestCall<Collection<GUIAttribut
                         .httpEntity()
                         .withContentTypeJson()
                         .withHeader("attributeNames", configAttrs)
-                        .withHeaderCopy(HttpHeaders.AUTHORIZATION)
+                        .withAuth(attributes)
                         .build(),
                 new ParameterizedTypeReference<Collection<GUIAttributeValue>>() {
                 }).getBody();

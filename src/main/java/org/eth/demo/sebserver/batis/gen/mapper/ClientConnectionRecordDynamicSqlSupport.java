@@ -6,19 +6,19 @@ import org.mybatis.dynamic.sql.SqlColumn;
 import org.mybatis.dynamic.sql.SqlTable;
 
 public final class ClientConnectionRecordDynamicSqlSupport {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-06-08T16:06:32.970+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-13T13:25:25.209+02:00", comments="Source Table: client_connection")
     public static final ClientConnectionRecord clientConnectionRecord = new ClientConnectionRecord();
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-06-08T16:06:32.970+02:00", comments="Source field: client_connection.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-13T13:25:25.210+02:00", comments="Source field: client_connection.id")
     public static final SqlColumn<Long> id = clientConnectionRecord.id;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-06-08T16:06:32.971+02:00", comments="Source field: client_connection.exam_id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-13T13:25:25.210+02:00", comments="Source field: client_connection.exam_id")
     public static final SqlColumn<Long> examId = clientConnectionRecord.examId;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-06-08T16:06:32.971+02:00", comments="Source field: client_connection.token")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-13T13:25:25.210+02:00", comments="Source field: client_connection.token")
     public static final SqlColumn<String> token = clientConnectionRecord.token;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-06-08T16:06:32.970+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-13T13:25:25.210+02:00", comments="Source Table: client_connection")
     public static final class ClientConnectionRecord extends SqlTable {
         public final SqlColumn<Long> id = column("id", JDBCType.BIGINT);
 

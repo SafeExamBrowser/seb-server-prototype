@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -29,7 +28,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
-public class GETConfigAttribute implements RestCall<Map<String, GUIViewAttribute>> {
+public class GETConfigAttribute implements SEBServerAPICall<Map<String, GUIViewAttribute>> {
 
     private static final Logger log = LoggerFactory.getLogger(GETConfigAttribute.class);
 
@@ -42,7 +41,7 @@ public class GETConfigAttribute implements RestCall<Map<String, GUIViewAttribute
     }
 
     @Override
-    public Map<String, GUIViewAttribute> doRequest(final Map<String, String> attributes) {
+    public Map<String, GUIViewAttribute> doAPICall(final Map<String, String> attributes) {
         final String viewName = getAttribute(attributes, AttributeKeys.CONFIG_VIEW_NAME);
 
         try {
@@ -53,7 +52,7 @@ public class GETConfigAttribute implements RestCall<Map<String, GUIViewAttribute
                     this.restCallBuilder
                             .httpEntity()
                             .withContentTypeJson()
-                            .withHeaderCopy(HttpHeaders.AUTHORIZATION)
+                            .withAuth(attributes)
                             .build(),
                     new ParameterizedTypeReference<List<GUIViewAttribute>>() {
                     });

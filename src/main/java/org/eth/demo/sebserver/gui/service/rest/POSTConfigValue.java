@@ -12,13 +12,12 @@ import java.util.Map;
 
 import org.eth.demo.sebserver.gui.views.AttributeKeys;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
-public class POSTConfigValue implements RestCall<String> {
+public class POSTConfigValue implements SEBServerAPICall<String> {
 
     private final RestCallBuilder restCallBuilder;
     private final RestTemplate restTemplate;
@@ -29,7 +28,7 @@ public class POSTConfigValue implements RestCall<String> {
     }
 
     @Override
-    public String doRequest(final Map<String, String> attributes) {
+    public String doAPICall(final Map<String, String> attributes) {
         final String saveType = getAttribute(attributes, AttributeKeys.CONFIG_ATTRIBUTE_SAVE_TYPE);
         final String attributeValue = getAttribute(attributes, AttributeKeys.CONFIG_ATTRIBUTE_VALUE);
 
@@ -40,7 +39,7 @@ public class POSTConfigValue implements RestCall<String> {
                 this.restCallBuilder
                         .httpEntity()
                         .withContentTypeJson()
-                        .withHeaderCopy(HttpHeaders.AUTHORIZATION)
+                        .withAuth(attributes)
                         .withBody(attributeValue)
                         .build(),
                 String.class);

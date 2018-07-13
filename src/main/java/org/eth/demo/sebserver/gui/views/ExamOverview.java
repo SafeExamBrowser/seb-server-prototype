@@ -65,7 +65,7 @@ public class ExamOverview implements ViewComposer {
             final Map<String, String> attributes) {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        final Collection<GUIExam> exams = this.examsRequest.doRequest();
+        final Collection<GUIExam> exams = this.examsRequest.doAPICall();
 
         viewService.centringView(parent);
 
@@ -185,7 +185,7 @@ public class ExamOverview implements ViewComposer {
                     .with()
                     .exam(examId)
                     .toState(toStateId)
-                    .doRequest();
+                    .doAPICall();
             tItem.setText(2, newExam.statusName);
             tItem.setData(ITEM_DATA_EXAM, newExam);
         });

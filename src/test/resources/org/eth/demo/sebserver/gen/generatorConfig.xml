@@ -79,6 +79,7 @@
         <table tableName="user" domainObjectName="UserRecord">
             <property name="virtualKeyColumns" value="id"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <columnOverride column="creation_date" javaType="org.joda.time.DateTime" typeHandler="org.eth.demo.sebserver.batis.JodaTimeTypeResolver"></columnOverride>
         </table>
         <table tableName="user_role" domainObjectName="RoleRecord">
             <property name="virtualKeyColumns" value="id"/>

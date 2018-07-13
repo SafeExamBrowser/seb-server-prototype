@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -43,6 +44,7 @@ import org.eth.demo.sebserver.gui.service.push.ServerPushService;
 import org.eth.demo.sebserver.gui.service.rest.GETExamDetail;
 import org.eth.demo.sebserver.gui.service.rest.GETIndicatorValues;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 @Lazy
@@ -78,7 +80,7 @@ public class RunningExamView implements ViewComposer {
         final GUIExam exam = this.examDetailRequest
                 .with()
                 .exam(examId)
-                .doRequest();
+                .doAPICall();
 
         final Display display = parent.getDisplay();
 
@@ -152,6 +154,7 @@ public class RunningExamView implements ViewComposer {
             final GETIndicatorValues indicatorValuesRequest,
             final ClientTable clientTable) {
 
+        final String authHeader = RWT.getRequest().getHeader(HttpHeaders.AUTHORIZATION);
         return (context) -> {
             try {
                 Thread.sleep(100);
@@ -161,7 +164,8 @@ public class RunningExamView implements ViewComposer {
             final List<GUIIndicatorValue> indicatorValues = indicatorValuesRequest
                     .with()
                     .exam(String.valueOf(clientTable.exam.id))
-                    .doRequest();
+                    .authHeader(authHeader)
+                    .doAPICall();
 
             clientTable.updateValues(indicatorValues);
         };

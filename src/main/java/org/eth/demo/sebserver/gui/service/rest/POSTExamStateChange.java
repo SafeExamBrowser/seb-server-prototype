@@ -13,13 +13,12 @@ import java.util.Map;
 import org.eth.demo.sebserver.gui.domain.exam.GUIExam;
 import org.eth.demo.sebserver.gui.views.AttributeKeys;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
-public final class POSTExamStateChange implements RestCall<GUIExam> {
+public final class POSTExamStateChange implements SEBServerAPICall<GUIExam> {
 
     private final RestCallBuilder restCallBuilder;
     private final RestTemplate restTemplate;
@@ -35,7 +34,7 @@ public final class POSTExamStateChange implements RestCall<GUIExam> {
     }
 
     @Override
-    public GUIExam doRequest(final Map<String, String> attributes) {
+    public GUIExam doAPICall(final Map<String, String> attributes) {
         final String examId = getAttribute(attributes, AttributeKeys.EXAM_ID);
         final String toState = getAttribute(attributes, AttributeKeys.STATE_ID);
 
@@ -45,7 +44,7 @@ public final class POSTExamStateChange implements RestCall<GUIExam> {
                 this.restCallBuilder
                         .httpEntity()
                         .withContentTypeJson()
-                        .withHeaderCopy(HttpHeaders.AUTHORIZATION)
+                        .withAuth(attributes)
                         .build(),
                 GUIExam.class);
     }

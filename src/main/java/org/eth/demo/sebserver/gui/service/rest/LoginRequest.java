@@ -20,7 +20,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
-public class LoginRequest implements RestCall<String> {
+public class LoginRequest implements SEBServerAPICall<String> {
 
     private final RestCallBuilder restCallBuilder;
     private final RestTemplate restTemplate;
@@ -37,7 +37,7 @@ public class LoginRequest implements RestCall<String> {
     }
 
     @Override
-    public String doRequest(final Map<String, String> attributes) {
+    public String doAPICall(final Map<String, String> attributes) {
         final String userName = getAttribute(attributes, AttributeKeys.USER_NAME);
         final String password = getAttribute(attributes, AttributeKeys.PASSWORD);
 

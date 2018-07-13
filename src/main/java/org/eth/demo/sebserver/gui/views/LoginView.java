@@ -72,7 +72,7 @@ public class LoginView implements ViewComposer {
             this.attrs.clear();
             this.attrs.put(AttributeKeys.USER_NAME, loginName.getText());
             this.attrs.put(AttributeKeys.PASSWORD, loginPassword.getText());
-            final String sessionId = this.loginRequest.doRequest(this.attrs);
+            final String sessionId = this.loginRequest.doAPICall(this.attrs);
 
             final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             System.out.println("********************** authentication_: " + authentication);

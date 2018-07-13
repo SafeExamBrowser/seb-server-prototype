@@ -22,7 +22,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
-public final class GETExams implements RestCall<Collection<GUIExam>> {
+public final class GETExams implements SEBServerAPICall<Collection<GUIExam>> {
 
     private final RestCallBuilder restCallBuilder;
     private final RestTemplate restTemplate;
@@ -35,14 +35,14 @@ public final class GETExams implements RestCall<Collection<GUIExam>> {
     }
 
     @Override
-    public Collection<GUIExam> doRequest(final Map<String, String> attributes) {
+    public Collection<GUIExam> doAPICall(final Map<String, String> attributes) {
         return this.restTemplate.exchange(
                 this.uri,
                 HttpMethod.GET,
                 this.restCallBuilder
                         .httpEntity()
                         .withHeader(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_APPLICATION_JSON)
-                        .withHeaderCopy(HttpHeaders.AUTHORIZATION)
+                        .withAuth(attributes)
                         .build(),
                 new ParameterizedTypeReference<List<GUIExam>>() {
                 }).getBody();

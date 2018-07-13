@@ -69,7 +69,7 @@ public class ConfigViewService {
         final Map<String, GUIViewAttribute> attributes = this.configAttributeRequest
                 .with()
                 .configViewName(name)
-                .doRequest();
+                .doAPICall();
 
         return new ViewContext(
                 name,
@@ -134,7 +134,7 @@ public class ConfigViewService {
                 .with()
                 .config(viewContext.configurationId)
                 .configAttributeNames(attributeNames)
-                .doRequest();
+                .doAPICall();
 
         viewContext.setValuesToInputFields(attributeValues);
         return viewContext;

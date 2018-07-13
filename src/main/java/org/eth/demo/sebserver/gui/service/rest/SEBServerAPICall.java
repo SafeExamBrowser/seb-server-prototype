@@ -18,14 +18,14 @@ import org.eclipse.rap.rwt.RWT;
 import org.eth.demo.sebserver.gui.views.AttributeKeys;
 import org.springframework.http.HttpHeaders;
 
-public interface RestCall<T> {
+public interface SEBServerAPICall<T> {
 
     String CONTENT_TYPE_APPLICATION_JSON = "application/json";
 
-    T doRequest(Map<String, String> attributes);
+    T doAPICall(Map<String, String> attributes);
 
-    default T doRequest() {
-        return doRequest(Collections.emptyMap());
+    default T doAPICall() {
+        return doAPICall(Collections.emptyMap());
     }
 
     default String getAttribute(final Map<String, String> attrs, final String name) {
@@ -57,10 +57,10 @@ public interface RestCall<T> {
 
     public class RequestCallBuilder<T> {
 
-        private final RestCall<T> call;
+        private final SEBServerAPICall<T> call;
         protected final Map<String, String> attributes = new HashMap<>();
 
-        RequestCallBuilder(final RestCall<T> call) {
+        RequestCallBuilder(final SEBServerAPICall<T> call) {
             this.call = call;
         }
 
@@ -109,12 +109,17 @@ public interface RestCall<T> {
             return this;
         }
 
+        public RequestCallBuilder<T> authHeader(final String authHeader) {
+            attributes.put(AttributeKeys.AUTHORIZATION_HEADER, authHeader);
+            return this;
+        }
+
         public final void clear() {
             attributes.clear();
         }
 
-        public final T doRequest() {
-            return call.doRequest(attributes);
+        public final T doAPICall() {
+            return call.doAPICall(attributes);
         }
 
     }

@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eth.demo.sebserver.gui.service.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
 import org.eth.demo.sebserver.gui.views.ExamOverview;
-import org.eth.demo.sebserver.gui.views.LoginView;
 import org.eth.demo.sebserver.gui.views.SEBConfigView1;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -27,7 +26,7 @@ public class RAPConfiguration implements ApplicationConfiguration {
 
     @Override
     public void configure(final Application application) {
-        application.addEntryPoint("/login", of(LoginView.class), null);
+        //  application.addEntryPoint("/login", of(LoginView.class), null);
         application.addEntryPoint("/examview", of(ExamOverview.class), null);
         application.addEntryPoint("/sebconfig", of(SEBConfigView1.class), null);
 
