@@ -15,10 +15,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 public class SEBServer {
 
-    public static final String PROPERTY_NAME_INDICATOR_CACHING = "sebserver.indicator.caching";
-    public static final String PROPERTY_NAME_EVENT_CONSUMER_STRATEGY = "sebserver.client.event-handling-strategy";
-    public static final String EVENT_CONSUMER_STRATEGY_SINGLE_EVENT_STORE = "SINGLE_EVENT_STORE_STRATEGY";
-    public static final String EVENT_CONSUMER_STRATEGY_ASYNC_BATCH_STORE = "ASYNC_BATCH_STORE_STRATEGY";
+    public interface Constants {
+        String CONTENT_TYPE_APPLICATION_JSON = "application/json";
+
+        public static final String EVENT_CONSUMER_STRATEGY_SINGLE_EVENT_STORE = "SINGLE_EVENT_STORE_STRATEGY";
+        public static final String EVENT_CONSUMER_STRATEGY_ASYNC_BATCH_STORE = "ASYNC_BATCH_STORE_STRATEGY";
+    }
 
     public static void main(final String[] args) {
         SpringApplication.run(SEBServer.class, args);

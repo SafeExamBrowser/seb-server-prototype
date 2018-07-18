@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.eth.demo.sebserver.SEBServer;
 import org.eth.demo.sebserver.gui.domain.exam.GUIExam;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
@@ -41,7 +42,9 @@ public final class GETExams implements SEBServerAPICall<Collection<GUIExam>> {
                 HttpMethod.GET,
                 this.restCallBuilder
                         .httpEntity()
-                        .withHeader(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_APPLICATION_JSON)
+                        .withHeader(
+                                HttpHeaders.CONTENT_TYPE,
+                                SEBServer.Constants.CONTENT_TYPE_APPLICATION_JSON)
                         .withAuth(attributes)
                         .build(),
                 new ParameterizedTypeReference<List<GUIExam>>() {

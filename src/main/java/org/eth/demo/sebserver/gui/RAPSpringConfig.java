@@ -19,7 +19,6 @@ import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class RAPSpringConfig {
@@ -47,12 +46,7 @@ public class RAPSpringConfig {
 
     @Bean
     public ServletRegistrationBean<RWTServlet> servletRegistrationBean() {
-        return new ServletRegistrationBean<>(new RWTServlet(), "/login", "/examview", "/sebconfig");
-    }
-
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+        return new ServletRegistrationBean<>(new RWTServlet(), "/gui" /* "/examview", "/sebconfig" */);
     }
 
     // NOTE Profiles seems not to work as expected for now. This bean is initialized if the

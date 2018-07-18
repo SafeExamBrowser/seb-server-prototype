@@ -8,38 +8,64 @@
 
 package org.eth.demo.sebserver.web;
 
+import org.eth.demo.sebserver.web.oauth.SEBServerUserDetailService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    public static final RequestMatcher PUBLIC_URLS = new OrRequestMatcher(
+
+            // NOTE: The integrated GUI is not covered within Spring-Security
+            new AntPathRequestMatcher("/gui/**"),
+
+            // RAP/RWT resources has to be accessible
+            new AntPathRequestMatcher("/rwt-resources/**"),
+
+            // TODO this has to be secured as well but have to implement Client-Bot/LMS authentication first
+            new AntPathRequestMatcher("/ws/**"));
+
+    public static final RequestMatcher PROTECTED_URLS =
+            new NegatedRequestMatcher(PUBLIC_URLS);
+
+    @Autowired
+    private SEBServerUserDetailService userDetailsService;
+    @Autowired
+    private PasswordEncoder userPasswordEncoder;
+
     @Override
-    protected void configure(final HttpSecurity http) throws Exception {
-        http
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.NEVER)
-                .and()
-                .authorizeRequests()
-                .antMatchers("/rwt-resources/**", "/login*", "/ws/**").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .httpBasic()
+    public void configure(final WebSecurity web) {
+        web
+                .ignoring()
+                .requestMatchers(PUBLIC_URLS);
+    }
 
-                //                .formLogin()
-                //                .loginPage("/login")
-                //                //                                .loginProcessingUrl("/doLogin")
-                //                .defaultSuccessUrl("/examview")
-                //                .failureUrl("/login?error=true")
+    @Override
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
-                .and()
-                .logout()
-                .permitAll()
-                .and().csrf().disable() // TODO enable for RAP gui?
-        ;
+    @Override
+    protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
+        auth
+                .userDetailsService(this.userDetailsService)
+                .passwordEncoder(this.userPasswordEncoder);
     }
 
 }

@@ -55,7 +55,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  * ability to effectively store and recover message queues but also comes with more complexity on setup and installation
  * side as well as for the whole server system. */
 @Lazy
-@Component(SEBServer.EVENT_CONSUMER_STRATEGY_ASYNC_BATCH_STORE)
+@Component(SEBServer.Constants.EVENT_CONSUMER_STRATEGY_ASYNC_BATCH_STORE)
 public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
 
     private static final Logger log = LoggerFactory.getLogger(AsyncBatchEventSaveStrategy.class);
@@ -71,6 +71,7 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
 
     private final BlockingDeque<ClientEvent> eventQueue = new LinkedBlockingDeque<>();
 
+    private boolean enabled = false;
     private boolean workersRunning = false;
 
     public AsyncBatchEventSaveStrategy(
@@ -87,14 +88,23 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
         this.transactionManager = transactionManager;
     }
 
+    @Override
+    public void enable(final boolean enable) {
+        this.enabled = enable;
+    }
+
     @EventListener(ApplicationReadyEvent.class)
     protected void recover() {
-        runWorkers();
+        if (this.enabled) {
+            runWorkers();
+        }
     }
 
     @EventListener(ExamStartedEvent.class)
     protected void examStarted() {
-        runWorkers();
+        if (this.enabled && !this.workersRunning) {
+            runWorkers();
+        }
     }
 
     @EventListener(ExamFinishedEvent.class)
@@ -104,6 +114,11 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
 
     @Override
     public void accept(final ClientEvent event) {
+        if (!this.enabled) {
+            log.warn("Received ClientEvent on none enabled AsyncBatchEventSaveStrategy. ClientEvent is ignored");
+            return;
+        }
+
         this.eventQueue.add(event);
     }
 

@@ -106,11 +106,16 @@
           SEE: https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0.0-M5-Release-Notes#oauth-20-support
           TODO: once spring-security-oauth2 is fully migrated we should be able to remove this dependency
       --> 
-<!--     <dependency> -->
-<!--       <groupId>org.springframework.security.oauth</groupId> -->
-<!--       <artifactId>spring-security-oauth2</artifactId> -->
-<!--       <version>2.3.3.RELEASE</version> -->
-<!--     </dependency> -->
+    <dependency>
+      <groupId>org.springframework.security.oauth</groupId>
+      <artifactId>spring-security-oauth2</artifactId>
+      <version>2.3.3.RELEASE</version>
+    </dependency>
+    <dependency>
+       <groupId>org.springframework.security</groupId>
+       <artifactId>spring-security-jwt</artifactId>
+       <version>1.0.9.RELEASE</version>
+    </dependency>
 
     <dependency>
       <groupId>org.mybatis</groupId>

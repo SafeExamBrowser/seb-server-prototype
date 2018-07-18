@@ -235,6 +235,39 @@ CREATE TABLE IF NOT EXISTS `user_role` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- Table `oauth_access_token`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `oauth_access_token` ;
+
+CREATE TABLE IF NOT EXISTS `oauth_access_token` (
+  `token_id` VARCHAR(255) NULL,
+  `token` BLOB NULL,
+  `authentication_id` VARCHAR(255) NULL,
+  `user_name` VARCHAR(255) NULL,
+  `client_id` VARCHAR(255) NULL,
+  `authentication` BLOB NULL,
+  `refresh_token` VARCHAR(255) NULL)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `oauth_refresh_token`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `oauth_refresh_token` ;
+
+CREATE TABLE IF NOT EXISTS `oauth_refresh_token` (
+  `token_id` VARCHAR(255) NULL,
+  `token` BLOB NULL,
+  `authentication` BLOB NULL)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

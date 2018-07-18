@@ -10,7 +10,6 @@ package org.eth.demo.sebserver.service;
 
 import java.util.concurrent.Executor;
 
-import org.eth.demo.sebserver.SEBServer;
 import org.eth.demo.sebserver.service.event.EventHandlingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,9 +30,9 @@ public class ServiceSpringConfig implements AsyncConfigurer {
     @Autowired
     private ExamStateService examStateService;
 
-    @Value("${" + SEBServer.PROPERTY_NAME_INDICATOR_CACHING + "}")
+    @Value("${sebserver.indicator.caching}")
     private boolean indicatorValueCachingEnabled;
-    @Value("${" + SEBServer.PROPERTY_NAME_EVENT_CONSUMER_STRATEGY + "}")
+    @Value("${sebserver.client.event-handling-strategy}")
     private String eventHandlingStrategyBeanName;
 
     @Lazy
@@ -42,6 +41,7 @@ public class ServiceSpringConfig implements AsyncConfigurer {
         final EventHandlingStrategy eventHandlingStrategy = applicationContext
                 .getBean(this.eventHandlingStrategyBeanName, EventHandlingStrategy.class);
 
+        eventHandlingStrategy.enable(true);
         return new ExamSessionService(
                 this.examStateService,
                 this.clientConnectionService,

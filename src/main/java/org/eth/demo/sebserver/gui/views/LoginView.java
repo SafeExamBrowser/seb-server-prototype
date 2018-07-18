@@ -8,9 +8,11 @@
 
 package org.eth.demo.sebserver.gui.views;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -19,24 +21,22 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eth.demo.sebserver.gui.RAPConfiguration;
 import org.eth.demo.sebserver.gui.service.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
-import org.eth.demo.sebserver.gui.service.rest.LoginRequest;
+import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
+import org.eth.demo.sebserver.gui.service.rest.auth.SEBServerAuthorizationContext;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Lazy
 @Component
 public class LoginView implements ViewComposer {
 
-    private final LoginRequest loginRequest;
+    private final AuthorizationContextHolder authorizationContextHolder;
 
-    private final Map<String, String> attrs = new HashMap<>();
-
-    public LoginView(final LoginRequest loginRequest) {
-        this.loginRequest = loginRequest;
+    public LoginView(final AuthorizationContextHolder authorizationContextHolder) {
+        this.authorizationContextHolder = authorizationContextHolder;
     }
 
     @Override
@@ -45,8 +45,18 @@ public class LoginView implements ViewComposer {
     }
 
     @Override
-    public void composeView(final ViewService viewService, final Composite parent,
+    public void composeView(
+            final ViewService viewService,
+            final Composite parent,
             final Map<String, String> attributes) {
+
+        // NOTE: if there is already an authenticated user within the current http-session
+        //       we "redirect" the page-compose-call to the main page composer here
+        if (alreadyAuthenticated(parent)) {
+            viewService.composeView(parent, RAPConfiguration.MAIN_PAGE_COMPOSER_CLASS);
+            return;
+        }
+
         viewService.centringView(parent);
 
         final Group group = new Group(parent, SWT.SHADOW_NONE);
@@ -68,29 +78,33 @@ public class LoginView implements ViewComposer {
         final Button button = new Button(group, SWT.FLAT);
         button.setText("Login");
         button.addListener(SWT.Selection, event -> {
-            System.out.println("login name: " + loginName.getText() + " password: " + loginPassword.getText());
-            this.attrs.clear();
-            this.attrs.put(AttributeKeys.USER_NAME, loginName.getText());
-            this.attrs.put(AttributeKeys.PASSWORD, loginPassword.getText());
-            final String sessionId = this.loginRequest.doAPICall(this.attrs);
+            try {
+                final SEBServerAuthorizationContext authorizationContext = this.authorizationContextHolder
+                        .getAuthorizationContext(RWT.getUISession().getHttpSession());
+                final boolean loggedIn = authorizationContext.login(loginName.getText(), loginPassword.getText());
 
-            final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            System.out.println("********************** authentication_: " + authentication);
-
-//            final HttpServletResponse response = RWT.getResponse();
-//            response.setStatus(HttpServletResponse.SC_OK);
-//            try {
-//                response.getWriter()
-//                        .write("{\"head\": {\"redirect\": \"http://localhost:8080/examview\", \"Set-Cookie\": \""
-//                                + sessionId + "\"}}");
-//                response.getWriter().flush();
-//                response.getWriter().close();
-//            } catch (final IOException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            }
-
+//                final String response = this.loginRequest
+//                        .with()
+//                        .username(loginName.getText())
+//                        .password(loginPassword.getText())
+//                        .doAPICall();
+//
+//                System.out.println("*********************** accessToken: " + response);
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
         });
+    }
+
+    private boolean alreadyAuthenticated(final Composite parent) {
+        final HttpSession httpSession = RWT.getUISession(parent.getDisplay()).getHttpSession();
+        final String authentication = (String) httpSession.getAttribute(AttributeKeys.AUTHORIZATION_HEADER);
+        return (authentication != null && validAuthentication(authentication));
+    }
+
+    private boolean validAuthentication(final String authentication) {
+        // TODO later we have also to check the token if it is a valid one and if it is still not expired
+        return true;
     }
 
 }

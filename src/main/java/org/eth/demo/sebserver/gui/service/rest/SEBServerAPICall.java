@@ -20,8 +20,6 @@ import org.springframework.http.HttpHeaders;
 
 public interface SEBServerAPICall<T> {
 
-    String CONTENT_TYPE_APPLICATION_JSON = "application/json";
-
     T doAPICall(Map<String, String> attributes);
 
     default T doAPICall() {
@@ -111,6 +109,16 @@ public interface SEBServerAPICall<T> {
 
         public RequestCallBuilder<T> authHeader(final String authHeader) {
             attributes.put(AttributeKeys.AUTHORIZATION_HEADER, authHeader);
+            return this;
+        }
+
+        public RequestCallBuilder<T> username(final String username) {
+            attributes.put(AttributeKeys.USER_NAME, username);
+            return this;
+        }
+
+        public RequestCallBuilder<T> password(final String password) {
+            attributes.put(AttributeKeys.PASSWORD, password);
             return this;
         }
 

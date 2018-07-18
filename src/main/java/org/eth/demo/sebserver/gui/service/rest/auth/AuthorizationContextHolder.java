@@ -6,12 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.service.event;
+package org.eth.demo.sebserver.gui.service.rest.auth;
 
-import java.util.function.Consumer;
+import javax.servlet.http.HttpSession;
 
-import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
-
-public interface EventHandlingStrategy extends Consumer<ClientEvent> {
-    void enable(boolean enable);
+public interface AuthorizationContextHolder {
+    SEBServerAuthorizationContext getAuthorizationContext(HttpSession session);
 }

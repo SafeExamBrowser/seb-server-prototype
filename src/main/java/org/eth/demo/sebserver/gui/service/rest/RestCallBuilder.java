@@ -11,9 +11,11 @@ package org.eth.demo.sebserver.gui.service.rest;
 import java.util.Map;
 
 import org.eclipse.rap.rwt.RWT;
+import org.eth.demo.sebserver.SEBServer;
 import org.eth.demo.sebserver.gui.views.AttributeKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpEntity;
@@ -27,12 +29,20 @@ public class RestCallBuilder {
 
     private static final Logger log = LoggerFactory.getLogger(RestCallBuilder.class);
 
-    @Value("${server.address}")
-    private String webServerAdress;
-    @Value("${server.port}")
-    private String webServerPort;
-    @Value("${sebserver.webservice.protocol}")
-    private String webProtocol;
+    private final String webServerAdress;
+    private final String webServerPort;
+    private final String webProtocol;
+
+    @Autowired
+    public RestCallBuilder(
+            @Value("${server.address}") final String webServerAdress,
+            @Value("${server.port}") final String webServerPort,
+            @Value("${sebserver.webservice.protocol}") final String webProtocol) {
+
+        this.webServerAdress = webServerAdress;
+        this.webServerPort = webServerPort;
+        this.webProtocol = webProtocol;
+    }
 
     public String withPath(final String path) {
         return UriComponentsBuilder
@@ -56,7 +66,9 @@ public class RestCallBuilder {
         }
 
         public HttpEntityBuilder<T> withContentTypeJson() {
-            this.httpHeaders.set(HttpHeaders.CONTENT_TYPE, SEBServerAPICall.CONTENT_TYPE_APPLICATION_JSON);
+            this.httpHeaders.set(
+                    HttpHeaders.CONTENT_TYPE,
+                    SEBServer.Constants.CONTENT_TYPE_APPLICATION_JSON);
             return this;
         }
 

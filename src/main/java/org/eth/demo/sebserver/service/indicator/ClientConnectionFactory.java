@@ -10,12 +10,13 @@ package org.eth.demo.sebserver.service.indicator;
 
 import java.util.UUID;
 
-import org.eth.demo.sebserver.SEBServer;
 import org.eth.demo.sebserver.domain.ClientConnection;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -27,13 +28,15 @@ public class ClientConnectionFactory {
     private static final Logger log = LoggerFactory.getLogger(ClientConnectionFactory.class);
 
     private final ApplicationContext applicationContext;
-    private final boolean alwaysCompute;
+    private final boolean enableCaching;
 
-    public ClientConnectionFactory(final ApplicationContext applicationContext) {
+    @Autowired
+    public ClientConnectionFactory(
+            final ApplicationContext applicationContext,
+            @Value("${sebserver.indicator.caching}") final boolean enableCaching) {
+
         this.applicationContext = applicationContext;
-        this.alwaysCompute = !applicationContext
-                .getEnvironment()
-                .getProperty(SEBServer.PROPERTY_NAME_INDICATOR_CACHING, Boolean.class);
+        this.enableCaching = enableCaching;
     }
 
     public ClientConnection create(final Long examId, final Long clientId, final UUID uuid, final Exam exam) {
@@ -43,7 +46,7 @@ public class ClientConnectionFactory {
             try {
                 final ClientIndicator indicator =
                         this.applicationContext.getBean(indicatorDef.type, ClientIndicator.class);
-                indicator.init(examId, clientId, uuid, this.alwaysCompute);
+                indicator.init(examId, clientId, uuid, this.enableCaching);
                 result.add(indicatorDef, indicator);
             } catch (final Exception e) {
                 log.warn("No Indicator with type: {} found as registered bean. Ignore this one.", indicatorDef.type, e);

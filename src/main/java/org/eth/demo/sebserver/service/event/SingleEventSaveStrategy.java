@@ -28,13 +28,15 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * An advantage of this approach is minimal data loss on server fail. **/
 @Lazy
-@Component(SEBServer.EVENT_CONSUMER_STRATEGY_SINGLE_EVENT_STORE)
+@Component(SEBServer.Constants.EVENT_CONSUMER_STRATEGY_SINGLE_EVENT_STORE)
 public class SingleEventSaveStrategy implements EventHandlingStrategy {
 
     private static final Logger log = LoggerFactory.getLogger(SingleEventSaveStrategy.class);
 
     private final ClientConnectionService clientConnectionService;
     private final ClientEventRecordMapper clientEventRecordMapper;
+
+    private boolean enabled = false;
 
     public SingleEventSaveStrategy(
             final ClientConnectionService clientConnectionService,
@@ -44,10 +46,20 @@ public class SingleEventSaveStrategy implements EventHandlingStrategy {
         this.clientEventRecordMapper = clientEventRecordMapper;
     }
 
+    @Override
+    public void enable(final boolean enable) {
+        this.enabled = enable;
+    }
+
     @Transactional
     @Async
     @Override
     public void accept(final ClientEvent event) {
+        if (!this.enabled) {
+            log.warn("Received ClientEvent on none enabled SingleEventSaveStrategy. ClientEvent is ignored");
+            return;
+        }
+
         try {
             if (!this.clientConnectionService.checkActiveConnection(event.clientId)) {
                 throw new IllegalStateException("Client with UUID: " + event.clientId + " is not registered");

@@ -16,16 +16,16 @@ public abstract class ClientIndicatorAdapter implements ClientIndicator {
     protected Long examId;
     protected Long clientId;
     protected UUID clientUUID;
-    protected boolean alwaysCompute;
+    protected boolean cachingEnabled;
 
     protected BigDecimal currentValue = null;
 
     @Override
-    public void init(final Long examId, final Long clientId, final UUID clientUUID, final boolean alwaysCompute) {
+    public void init(final Long examId, final Long clientId, final UUID clientUUID, final boolean cachingEnabled) {
         this.examId = examId;
         this.clientId = clientId;
         this.clientUUID = clientUUID;
-        this.alwaysCompute = alwaysCompute;
+        this.cachingEnabled = cachingEnabled;
     }
 
     @Override
@@ -45,7 +45,7 @@ public abstract class ClientIndicatorAdapter implements ClientIndicator {
 
     @Override
     public BigDecimal getCurrentValue() {
-        if (this.currentValue == null || this.alwaysCompute) {
+        if (this.currentValue == null || !this.cachingEnabled) {
             this.currentValue = computeValueAt(System.currentTimeMillis());
         }
 
