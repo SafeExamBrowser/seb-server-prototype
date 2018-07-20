@@ -20,29 +20,34 @@ import org.springframework.web.client.RestTemplate;
 public class POSTConfigValue implements SEBServerAPICall<String> {
 
     private final RestCallBuilder restCallBuilder;
-    private final RestTemplate restTemplate;
 
     public POSTConfigValue(final RestCallBuilder restCallBuilder) {
         this.restCallBuilder = restCallBuilder;
-        this.restTemplate = new RestTemplate();
     }
 
     @Override
-    public String doAPICall(final Map<String, String> attributes) {
+    public Response<String> doAPICall(
+            final RestTemplate restTemplate,
+            final Map<String, String> attributes) {
+
         final String saveType = getAttribute(attributes, AttributeKeys.CONFIG_ATTRIBUTE_SAVE_TYPE);
         final String attributeValue = getAttribute(attributes, AttributeKeys.CONFIG_ATTRIBUTE_VALUE);
 
-        // TODO here we will get a validation error response if the back-end validation failed
-        return this.restTemplate.postForObject(
-                this.restCallBuilder
-                        .withPath("sebconfig/" + saveType),
-                this.restCallBuilder
-                        .httpEntity()
-                        .withContentTypeJson()
-                        .withAuth(attributes)
-                        .withBody(attributeValue)
-                        .build(),
-                String.class);
+        try {
+            // TODO here we want to get a validation error response if the back-end validation failed
+            return new Response<>(
+                    restTemplate.postForObject(
+                            this.restCallBuilder
+                                    .withPath("sebconfig/" + saveType),
+                            this.restCallBuilder
+                                    .httpEntity()
+                                    .withContentTypeJson()
+                                    .withBody(attributeValue)
+                                    .build(),
+                            String.class));
+        } catch (final Throwable t) {
+            return new Response<>(t);
+        }
     }
 
 }

@@ -12,9 +12,9 @@ import org.springframework.web.client.RestTemplate;
 
 public interface SEBServerAuthorizationContext {
 
-    boolean valid();
+    boolean isValid();
 
-    boolean loggedIn();
+    boolean isLoggedIn();
 
     boolean login(String username, String password);
 

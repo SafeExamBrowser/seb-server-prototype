@@ -22,32 +22,37 @@ import org.springframework.web.client.RestTemplate;
 public class GETExamDetail implements SEBServerAPICall<GUIExam> {
 
     private final RestCallBuilder restCallBuilder;
-    private final RestTemplate restTemplate;
 
     public GETExamDetail(final RestCallBuilder restCallBuilder) {
         this.restCallBuilder = restCallBuilder;
-        this.restTemplate = new RestTemplate();
     }
 
     @Override
-    public RequestCallBuilder<GUIExam> with() {
-        return new RequestCallBuilder<>(this);
+    public APICallBuilder<GUIExam> with(final RestTemplate restTemplate) {
+        return new APICallBuilder<>(this, restTemplate);
     }
 
     @Override
-    public GUIExam doAPICall(final Map<String, String> attributes) {
+    public Response<GUIExam> doAPICall(
+            final RestTemplate restTemplate,
+            final Map<String, String> attributes) {
+
         final String examId = getAttribute(attributes, AttributeKeys.EXAM_ID);
 
-        return this.restTemplate.exchange(
-                this.restCallBuilder
-                        .withPath("exam/" + examId),
-                HttpMethod.GET,
-                this.restCallBuilder
-                        .httpEntity()
-                        .withContentTypeJson()
-                        .withAuth(attributes)
-                        .build(),
-                GUIExam.class).getBody();
+        try {
+            return new Response<>(
+                    restTemplate.exchange(
+                            this.restCallBuilder
+                                    .withPath("exam/" + examId),
+                            HttpMethod.GET,
+                            this.restCallBuilder
+                                    .httpEntity()
+                                    .withContentTypeJson()
+                                    .build(),
+                            GUIExam.class)
+                            .getBody());
+        } catch (final Throwable t) {
+            return new Response<>(t);
+        }
     }
-
 }

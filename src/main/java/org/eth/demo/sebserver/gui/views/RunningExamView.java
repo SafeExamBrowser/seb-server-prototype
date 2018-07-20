@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import org.eclipse.rap.rwt.RWT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -43,8 +42,9 @@ import org.eth.demo.sebserver.gui.service.push.ServerPushContext;
 import org.eth.demo.sebserver.gui.service.push.ServerPushService;
 import org.eth.demo.sebserver.gui.service.rest.GETExamDetail;
 import org.eth.demo.sebserver.gui.service.rest.GETIndicatorValues;
+import org.eth.demo.sebserver.gui.service.rest.SEBServerAPICall.APICallBuilder;
+import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 @Lazy
@@ -54,15 +54,18 @@ public class RunningExamView implements ViewComposer {
     private final ServerPushService serverPushService;
     private final GETExamDetail examDetailRequest;
     private final GETIndicatorValues indicatorValuesRequest;
+    private final AuthorizationContextHolder authorizationContextHolder;
 
     public RunningExamView(
             final ServerPushService serverPushService,
             final GETExamDetail examDetailRequest,
-            final GETIndicatorValues indicatorValuesRequest) {
+            final GETIndicatorValues indicatorValuesRequest,
+            final AuthorizationContextHolder authorizationContextHolder) {
 
         this.serverPushService = serverPushService;
         this.examDetailRequest = examDetailRequest;
         this.indicatorValuesRequest = indicatorValuesRequest;
+        this.authorizationContextHolder = authorizationContextHolder;
     }
 
     @Override
@@ -78,9 +81,10 @@ public class RunningExamView implements ViewComposer {
 
         final String examId = attributes.get(AttributeKeys.EXAM_ID);
         final GUIExam exam = this.examDetailRequest
-                .with()
+                .with(this.authorizationContextHolder)
                 .exam(examId)
-                .doAPICall();
+                .doAPICall()
+                .orElse(t -> t.printStackTrace()); // TODO error handling
 
         final Display display = parent.getDisplay();
 
@@ -143,7 +147,9 @@ public class RunningExamView implements ViewComposer {
                 new ServerPushContext(
                         root,
                         runAgainContext -> true),
-                dataPoll(this.indicatorValuesRequest, clientTable),
+                dataPoll(
+                        this.indicatorValuesRequest.with(this.authorizationContextHolder),
+                        clientTable),
                 context -> {
                     clientTable.updateGUI();
                     context.layout();
@@ -151,21 +157,20 @@ public class RunningExamView implements ViewComposer {
     }
 
     private static final Consumer<ServerPushContext> dataPoll(
-            final GETIndicatorValues indicatorValuesRequest,
+            final APICallBuilder<List<GUIIndicatorValue>> restCallBuilder,
             final ClientTable clientTable) {
 
-        final String authHeader = RWT.getRequest().getHeader(HttpHeaders.AUTHORIZATION);
-        return (context) -> {
+        return context -> {
             try {
                 Thread.sleep(100);
             } catch (final Exception e) {
             }
 
-            final List<GUIIndicatorValue> indicatorValues = indicatorValuesRequest
-                    .with()
+            restCallBuilder.clear();
+            final List<GUIIndicatorValue> indicatorValues = restCallBuilder
                     .exam(String.valueOf(clientTable.exam.id))
-                    .authHeader(authHeader)
-                    .doAPICall();
+                    .doAPICall()
+                    .orElse(t -> t.printStackTrace()); // TODO error handling
 
             clientTable.updateValues(indicatorValues);
         };

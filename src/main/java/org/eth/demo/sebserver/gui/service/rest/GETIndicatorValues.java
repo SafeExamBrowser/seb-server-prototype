@@ -24,35 +24,47 @@ import org.springframework.web.client.RestTemplate;
 public class GETIndicatorValues implements SEBServerAPICall<List<GUIIndicatorValue>> {
 
     private final RestCallBuilder restCallBuilder;
-    private final RestTemplate restTemplate;
-    private final RequestCallBuilder<List<GUIIndicatorValue>> builder;
+//    private final RequestCallBuilder<List<GUIIndicatorValue>> builder = null;
 
     public GETIndicatorValues(final RestCallBuilder restCallBuilder) {
         this.restCallBuilder = restCallBuilder;
-        this.restTemplate = new RestTemplate();
-        this.builder = new RequestCallBuilder<>(this);
     }
 
-    @Override
-    public RequestCallBuilder<List<GUIIndicatorValue>> with() {
-        this.builder.clear();
-        return this.builder;
-    }
+//    @Override
+//    public RequestCallBuilder<List<GUIIndicatorValue>> with(final RestTemplate restTemplate) {
+//        // NOTE: to get better performance one instance of RequestCallBuilder is reused
+//        //          here for every poll-request of one client user connection
+//        if (this.builder == null) {
+//            this.builder = new RequestCallBuilder<>(this, restTemplate);
+//        } else {
+//            this.builder.setRestTemplate(restTemplate);
+//        }
+//
+//        this.builder.clear();
+//        return this.builder;
+//    }
 
     @Override
-    public List<GUIIndicatorValue> doAPICall(final Map<String, String> attributes) {
+    public Response<List<GUIIndicatorValue>> doAPICall(
+            final RestTemplate restTemplate,
+            final Map<String, String> attributes) {
+
         final String examId = getAttribute(attributes, AttributeKeys.EXAM_ID);
 
-        return this.restTemplate.exchange(
-                this.restCallBuilder
-                        .withPath("exam/indicatorValues/" + examId),
-                HttpMethod.GET,
-                this.restCallBuilder.httpEntity()
-                        .withContentTypeJson()
-                        .withAuth(attributes)
-                        .build(),
-                new ParameterizedTypeReference<List<GUIIndicatorValue>>() {
-                }).getBody();
+        try {
+            return new Response<>(
+                    restTemplate.exchange(
+                            this.restCallBuilder
+                                    .withPath("exam/indicatorValues/" + examId),
+                            HttpMethod.GET,
+                            this.restCallBuilder.httpEntity()
+                                    .withContentTypeJson()
+                                    .build(),
+                            new ParameterizedTypeReference<List<GUIIndicatorValue>>() {
+                            })
+                            .getBody());
+        } catch (final Throwable t) {
+            return new Response<>(t);
+        }
     }
-
 }

@@ -28,6 +28,7 @@ import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 import org.eth.demo.sebserver.gui.service.rest.GETConfigAttribute;
 import org.eth.demo.sebserver.gui.service.rest.GETConfigAttributeValues;
 import org.eth.demo.sebserver.gui.service.rest.POSTConfigValue;
+import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
 import org.springframework.stereotype.Service;
 
@@ -38,12 +39,14 @@ public class ConfigViewService {
     private final GETConfigAttributeValues configAttributeValuesRequest;
     private final POSTConfigValue saveConfigAttributeValue;
     private final Map<FieldType, InputComponentBuilder> builderTypeMapping;
+    private final AuthorizationContextHolder authorizationContextHolder;
 
     public ConfigViewService(
             final GETConfigAttribute configAttributeRequest,
             final GETConfigAttributeValues configAttributeValuesRequest,
             final POSTConfigValue saveConfigAttributeValue,
-            final Collection<InputComponentBuilder> builders) {
+            final Collection<InputComponentBuilder> builders,
+            final AuthorizationContextHolder authorizationContextHolder) {
 
         this.configAttributeRequest = configAttributeRequest;
         this.configAttributeValuesRequest = configAttributeValuesRequest;
@@ -54,6 +57,7 @@ public class ConfigViewService {
                 this.builderTypeMapping.put(type, builder);
             }
         }
+        this.authorizationContextHolder = authorizationContextHolder;
     }
 
     public ViewContext createViewContext(
@@ -67,9 +71,10 @@ public class ConfigViewService {
             final int rows) {
 
         final Map<String, GUIViewAttribute> attributes = this.configAttributeRequest
-                .with()
+                .with(this.authorizationContextHolder)
                 .configViewName(name)
-                .doAPICall();
+                .doAPICall()
+                .orElse(t -> t.printStackTrace()); // TODO error handling
 
         return new ViewContext(
                 name,
@@ -78,7 +83,11 @@ public class ConfigViewService {
                 width, height,
                 columns, rows,
                 attributes,
-                new ViewValueChangeListener(this.saveConfigAttributeValue));
+                new ViewValueChangeListener(
+                        this.saveConfigAttributeValue,
+                        this.authorizationContextHolder
+                                .getAuthorizationContext()
+                                .getRestTemplate()));
     }
 
     public ViewContext createComponents(final Composite parent, final ViewContext viewContext) {
@@ -131,10 +140,11 @@ public class ConfigViewService {
 
         final String attributeNames = StringUtils.join(viewContext.getAttributeNames(), ",");
         final Collection<GUIAttributeValue> attributeValues = this.configAttributeValuesRequest
-                .with()
+                .with(this.authorizationContextHolder)
                 .config(viewContext.configurationId)
                 .configAttributeNames(attributeNames)
-                .doAPICall();
+                .doAPICall()
+                .orElse(t -> t.printStackTrace()); // TODO error handling;
 
         viewContext.setValuesToInputFields(attributeValues);
         return viewContext;

@@ -12,6 +12,7 @@ import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUITableValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 import org.eth.demo.sebserver.gui.service.rest.POSTConfigValue;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,11 +20,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ViewValueChangeListener implements ValueChangeListener {
 
     private final POSTConfigValue saveConfigAttributeValue;
+    private final RestTemplate restTemplate;
 
     public ViewValueChangeListener(
-            final POSTConfigValue saveConfigAttributeValue) {
+            final POSTConfigValue saveConfigAttributeValue,
+            final RestTemplate restTemplate) {
 
         this.saveConfigAttributeValue = saveConfigAttributeValue;
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -44,7 +48,7 @@ public class ViewValueChangeListener implements ValueChangeListener {
             final ObjectMapper mapper = new ObjectMapper();
             final String jsonValue = mapper.writeValueAsString(valueObj);
             this.saveConfigAttributeValue
-                    .with()
+                    .with(this.restTemplate)
                     .singleAttribute()
                     .attributeValue(jsonValue)
                     .doAPICall();
@@ -60,7 +64,7 @@ public class ViewValueChangeListener implements ValueChangeListener {
             final ObjectMapper mapper = new ObjectMapper();
             final String jsonValue = mapper.writeValueAsString(tableValue);
             this.saveConfigAttributeValue
-                    .with()
+                    .with(this.restTemplate)
                     .tableAttribute()
                     .attributeValue(jsonValue)
                     .doAPICall();

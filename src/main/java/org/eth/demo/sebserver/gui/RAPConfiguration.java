@@ -18,12 +18,9 @@ import org.eclipse.rap.rwt.application.ApplicationConfiguration;
 import org.eclipse.rap.rwt.application.EntryPoint;
 import org.eclipse.rap.rwt.application.EntryPointFactory;
 import org.eclipse.swt.widgets.Composite;
-import org.eth.demo.sebserver.gui.service.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.eth.demo.sebserver.gui.service.rest.auth.SEBServerAuthorizationContext;
-import org.eth.demo.sebserver.gui.views.ExamOverview;
-import org.eth.demo.sebserver.gui.views.LoginView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
@@ -32,10 +29,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class RAPConfiguration implements ApplicationConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(RAPConfiguration.class);
-
-    public static final Class<? extends ViewComposer> LOGIN_COMPOSER_CLASS = LoginView.class;
-    public static final Class<? extends ViewComposer> MAIN_PAGE_COMPOSER_CLASS = ExamOverview.class;
-    //public static final Class<? extends ViewComposer> ERROR_PAGE_COMPOSER_CLASS = TODO.class;
 
     @Override
     public void configure(final Application application) {
@@ -68,9 +61,9 @@ public class RAPConfiguration implements ApplicationConfiguration {
                             .getBean(ViewService.class);
 
                     if (isAuthenticated(httpSession, webApplicationContext)) {
-                        viewService.composeView(parent, MAIN_PAGE_COMPOSER_CLASS);
+                        viewService.composeView(parent, ViewService.MAIN_PAGE);
                     } else {
-                        viewService.composeView(parent, LOGIN_COMPOSER_CLASS);
+                        viewService.composeView(parent, ViewService.LOGIN_PAGE);
                     }
                 }
             };
@@ -84,7 +77,7 @@ public class RAPConfiguration implements ApplicationConfiguration {
                     .getBean(AuthorizationContextHolder.class);
             final SEBServerAuthorizationContext authorizationContext = authorizationContextHolder
                     .getAuthorizationContext(httpSession);
-            return authorizationContext.valid() && authorizationContext.loggedIn();
+            return authorizationContext.isValid() && authorizationContext.isLoggedIn();
         }
 
         private WebApplicationContext getWebApplicationContext(final HttpSession httpSession) {

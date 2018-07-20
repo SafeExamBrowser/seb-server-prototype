@@ -10,6 +10,13 @@ package org.eth.demo.sebserver.gui.service.rest.auth;
 
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.rap.rwt.RWT;
+
 public interface AuthorizationContextHolder {
     SEBServerAuthorizationContext getAuthorizationContext(HttpSession session);
+
+    // TODO error handling!?
+    default SEBServerAuthorizationContext getAuthorizationContext() {
+        return getAuthorizationContext(RWT.getUISession().getHttpSession());
+    }
 }

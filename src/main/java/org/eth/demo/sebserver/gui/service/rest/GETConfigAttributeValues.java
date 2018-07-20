@@ -24,30 +24,36 @@ import org.springframework.web.client.RestTemplate;
 public class GETConfigAttributeValues implements SEBServerAPICall<Collection<GUIAttributeValue>> {
 
     private final RestCallBuilder restCallBuilder;
-    private final RestTemplate restTemplate;
 
     public GETConfigAttributeValues(final RestCallBuilder restCallBuilder) {
         this.restCallBuilder = restCallBuilder;
-        this.restTemplate = new RestTemplate();
     }
 
     @Override
-    public Collection<GUIAttributeValue> doAPICall(final Map<String, String> attributes) {
+    public Response<Collection<GUIAttributeValue>> doAPICall(
+            final RestTemplate restTemplate,
+            final Map<String, String> attributes) {
+
         final String configId = getAttribute(attributes, AttributeKeys.CONFIG_ID);
         final String configAttrs = getAttribute(attributes, AttributeKeys.CONFIG_ATTRIBUTE_NAMES);
 
-        return this.restTemplate.exchange(
-                this.restCallBuilder
-                        .withPath("sebconfig/values/" + configId),
-                HttpMethod.GET,
-                this.restCallBuilder
-                        .httpEntity()
-                        .withContentTypeJson()
-                        .withHeader("attributeNames", configAttrs)
-                        .withAuth(attributes)
-                        .build(),
-                new ParameterizedTypeReference<Collection<GUIAttributeValue>>() {
-                }).getBody();
+        try {
+            return new Response<>(
+                    restTemplate.exchange(
+                            this.restCallBuilder
+                                    .withPath("sebconfig/values/" + configId),
+                            HttpMethod.GET,
+                            this.restCallBuilder
+                                    .httpEntity()
+                                    .withContentTypeJson()
+                                    .withHeader("attributeNames", configAttrs)
+                                    .build(),
+                            new ParameterizedTypeReference<Collection<GUIAttributeValue>>() {
+                            })
+                            .getBody());
+        } catch (final Throwable t) {
+            return new Response<>(t);
+        }
     }
 
 }

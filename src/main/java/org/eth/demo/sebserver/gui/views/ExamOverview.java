@@ -27,11 +27,10 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eth.demo.sebserver.gui.domain.exam.GUIExam;
 import org.eth.demo.sebserver.gui.service.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
-import org.eth.demo.sebserver.gui.service.rest.POSTExamStateChange;
 import org.eth.demo.sebserver.gui.service.rest.GETExams;
+import org.eth.demo.sebserver.gui.service.rest.POSTExamStateChange;
+import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Lazy
@@ -44,15 +43,18 @@ public class ExamOverview implements ViewComposer {
     private final GETExams examsRequest;
     private final POSTExamStateChange examStateChange;
     private final ViewService viewService;
+    private final AuthorizationContextHolder authorizationContextHolder;
 
     public ExamOverview(
             final GETExams examsRequest,
             final POSTExamStateChange examStateChange,
-            final ViewService viewService) {
+            final ViewService viewService,
+            final AuthorizationContextHolder authorizationContextHolder) {
 
         this.examsRequest = examsRequest;
         this.examStateChange = examStateChange;
         this.viewService = viewService;
+        this.authorizationContextHolder = authorizationContextHolder;
     }
 
     @Override
@@ -61,11 +63,15 @@ public class ExamOverview implements ViewComposer {
     }
 
     @Override
-    public void composeView(final ViewService viewService, final Composite parent,
+    public void composeView(
+            final ViewService viewService,
+            final Composite parent,
             final Map<String, String> attributes) {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        final Collection<GUIExam> exams = this.examsRequest.doAPICall();
+        final Collection<GUIExam> exams = this.examsRequest
+                .with(this.authorizationContextHolder)
+                .doAPICall()
+                .orElse(t -> t.printStackTrace()); // TODO error handling
 
         viewService.centringView(parent);
 
@@ -181,11 +187,14 @@ public class ExamOverview implements ViewComposer {
         final MenuItem item = new MenuItem(menu, SWT.NULL);
         item.setText(name);
         item.addListener(SWT.Selection, event -> {
+
             final GUIExam newExam = this.examStateChange
-                    .with()
+                    .with(this.authorizationContextHolder)
                     .exam(examId)
                     .toState(toStateId)
-                    .doAPICall();
+                    .doAPICall()
+                    .orElse(t -> t.printStackTrace()); // TODO error handling
+
             tItem.setText(2, newExam.statusName);
             tItem.setData(ITEM_DATA_EXAM, newExam);
         });

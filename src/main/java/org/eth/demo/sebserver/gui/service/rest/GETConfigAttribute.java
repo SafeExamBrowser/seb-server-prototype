@@ -9,7 +9,6 @@
 package org.eth.demo.sebserver.gui.service.rest;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,8 +16,6 @@ import java.util.stream.Collectors;
 
 import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
 import org.eth.demo.sebserver.gui.views.AttributeKeys;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -30,29 +27,27 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class GETConfigAttribute implements SEBServerAPICall<Map<String, GUIViewAttribute>> {
 
-    private static final Logger log = LoggerFactory.getLogger(GETConfigAttribute.class);
-
     private final RestCallBuilder restCallBuilder;
-    private final RestTemplate restTemplate;
 
     public GETConfigAttribute(final RestCallBuilder restCallBuilder) {
         this.restCallBuilder = restCallBuilder;
-        this.restTemplate = new RestTemplate();
     }
 
     @Override
-    public Map<String, GUIViewAttribute> doAPICall(final Map<String, String> attributes) {
+    public Response<Map<String, GUIViewAttribute>> doAPICall(
+            final RestTemplate restTemplate,
+            final Map<String, String> attributes) {
+
         final String viewName = getAttribute(attributes, AttributeKeys.CONFIG_VIEW_NAME);
 
         try {
-            final ResponseEntity<List<GUIViewAttribute>> request = this.restTemplate.exchange(
+            final ResponseEntity<List<GUIViewAttribute>> request = restTemplate.exchange(
                     this.restCallBuilder
                             .withPath("sebconfig/attributes/" + viewName),
                     HttpMethod.GET,
                     this.restCallBuilder
                             .httpEntity()
                             .withContentTypeJson()
-                            .withAuth(attributes)
                             .build(),
                     new ParameterizedTypeReference<List<GUIViewAttribute>>() {
                     });
@@ -63,10 +58,9 @@ public class GETConfigAttribute implements SEBServerAPICall<Map<String, GUIViewA
                             a -> getFQName(a, request.getBody()),
                             a -> a));
 
-            return result;
+            return new Response<>(result);
         } catch (final Exception e) {
-            log.error("Error while trying to get attributes of view: {} ", viewName, e);
-            return Collections.emptyMap();
+            return new Response<>(e);
         }
     }
 

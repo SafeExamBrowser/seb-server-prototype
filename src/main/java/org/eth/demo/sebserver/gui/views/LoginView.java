@@ -21,17 +21,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eth.demo.sebserver.gui.RAPConfiguration;
 import org.eth.demo.sebserver.gui.service.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.eth.demo.sebserver.gui.service.rest.auth.SEBServerAuthorizationContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Lazy
 @Component
 public class LoginView implements ViewComposer {
+
+    private static final Logger log = LoggerFactory.getLogger(LoginView.class);
 
     private final AuthorizationContextHolder authorizationContextHolder;
 
@@ -53,7 +56,7 @@ public class LoginView implements ViewComposer {
         // NOTE: if there is already an authenticated user within the current http-session
         //       we "redirect" the page-compose-call to the main page composer here
         if (alreadyAuthenticated(parent)) {
-            viewService.composeView(parent, RAPConfiguration.MAIN_PAGE_COMPOSER_CLASS);
+            viewService.composeView(parent, ViewService.MAIN_PAGE);
             return;
         }
 
@@ -81,17 +84,19 @@ public class LoginView implements ViewComposer {
             try {
                 final SEBServerAuthorizationContext authorizationContext = this.authorizationContextHolder
                         .getAuthorizationContext(RWT.getUISession().getHttpSession());
-                final boolean loggedIn = authorizationContext.login(loginName.getText(), loginPassword.getText());
+                final boolean loggedIn = authorizationContext.login(
+                        loginName.getText(),
+                        loginPassword.getText());
 
-//                final String response = this.loginRequest
-//                        .with()
-//                        .username(loginName.getText())
-//                        .password(loginPassword.getText())
-//                        .doAPICall();
-//
-//                System.out.println("*********************** accessToken: " + response);
+                if (loggedIn) {
+                    // view main page (TODO: or users-entry-page?)
+                    viewService.composeView(parent, ViewService.MAIN_PAGE);
+                } else {
+                    // TODO show login view with failed notification
+                }
             } catch (final Exception e) {
-                e.printStackTrace();
+                log.error("Error while trying to login with user: {}", loginName.getText(), e);
+                // TODO: show error on login page?
             }
         });
     }

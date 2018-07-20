@@ -11,19 +11,25 @@ package org.eth.demo.sebserver.gui.service.rest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.rap.rwt.RWT;
+import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
+import org.eth.demo.sebserver.gui.service.rest.auth.SEBServerAuthorizationContext;
 import org.eth.demo.sebserver.gui.views.AttributeKeys;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.client.RestTemplate;
 
 public interface SEBServerAPICall<T> {
 
-    T doAPICall(Map<String, String> attributes);
+    Response<T> doAPICall(
+            RestTemplate restTemplate,
+            Map<String, String> attributes);
 
-    default T doAPICall() {
-        return doAPICall(Collections.emptyMap());
+    default Response<T> doAPICall(final RestTemplate restTemplate) {
+        return doAPICall(restTemplate, Collections.emptyMap());
     }
 
     default String getAttribute(final Map<String, String> attrs, final String name) {
@@ -33,8 +39,18 @@ public interface SEBServerAPICall<T> {
         return attrs.get(name);
     }
 
-    default RequestCallBuilder<T> with() {
-        return new RequestCallBuilder<>(this);
+    default APICallBuilder<T> with(final AuthorizationContextHolder authorizationContextHolder) {
+        return with(authorizationContextHolder.getAuthorizationContext());
+    }
+
+    default APICallBuilder<T> with(final SEBServerAuthorizationContext authorizationContext) {
+        return new APICallBuilder<>(
+                this,
+                authorizationContext.getRestTemplate());
+    }
+
+    default APICallBuilder<T> with(final RestTemplate restTemplate) {
+        return new APICallBuilder<>(this, restTemplate);
     }
 
     default HttpHeaders getHeadersFromCurrentRequest() {
@@ -53,71 +69,108 @@ public interface SEBServerAPICall<T> {
                         });
     }
 
-    public class RequestCallBuilder<T> {
+    public final class Response<T> {
+        public final T t;
+        public final Throwable error;
 
-        private final SEBServerAPICall<T> call;
-        protected final Map<String, String> attributes = new HashMap<>();
-
-        RequestCallBuilder(final SEBServerAPICall<T> call) {
-            this.call = call;
+        public Response(final T t) {
+            this.t = t;
+            error = null;
         }
 
-        public RequestCallBuilder<T> attribute(final String name, final String value) {
+        public Response(final Throwable error) {
+            t = null;
+            this.error = error;
+        }
+
+        public T orElse(final Consumer<Throwable> errorHandler) {
+            if (t != null) {
+                return t;
+            }
+
+            errorHandler.accept(error);
+            return null;
+        }
+    }
+
+    public class APICallBuilder<T> {
+
+        private final SEBServerAPICall<T> call;
+        private RestTemplate restTemplate;
+        protected final Map<String, String> attributes = new HashMap<>();
+
+        APICallBuilder(
+                final SEBServerAPICall<T> call,
+                final RestTemplate restTemplate) {
+
+            this.call = call;
+            this.restTemplate = restTemplate;
+        }
+
+        public RestTemplate getRestTemplate() {
+            return restTemplate;
+        }
+
+        public void setRestTemplate(final RestTemplate restTemplate) {
+            this.restTemplate = restTemplate;
+        }
+
+        public APICallBuilder<T> attribute(final String name, final String value) {
             attributes.put(name, value);
             return this;
         }
 
-        public RequestCallBuilder<T> exam(final String examId) {
+        public APICallBuilder<T> exam(final String examId) {
             attributes.put(AttributeKeys.EXAM_ID, examId);
             return this;
         }
 
-        public RequestCallBuilder<T> toState(final String stateId) {
+        public APICallBuilder<T> toState(final String stateId) {
             attributes.put(AttributeKeys.STATE_ID, stateId);
             return this;
         }
 
-        public RequestCallBuilder<T> config(final String configId) {
+        public APICallBuilder<T> config(final String configId) {
             attributes.put(AttributeKeys.CONFIG_ID, configId);
             return this;
         }
 
-        public RequestCallBuilder<T> configViewName(final String name) {
+        public APICallBuilder<T> configViewName(final String name) {
             attributes.put(AttributeKeys.CONFIG_VIEW_NAME, name);
             return this;
         }
 
-        public RequestCallBuilder<T> configAttributeNames(final String configAttrs) {
+        public APICallBuilder<T> configAttributeNames(final String configAttrs) {
             attributes.put(AttributeKeys.CONFIG_ATTRIBUTE_NAMES, configAttrs);
             return this;
         }
 
-        public RequestCallBuilder<T> singleAttribute() {
+        public APICallBuilder<T> singleAttribute() {
             attributes.put(AttributeKeys.CONFIG_ATTRIBUTE_SAVE_TYPE, "saveValue");
             return this;
         }
 
-        public RequestCallBuilder<T> tableAttribute() {
+        public APICallBuilder<T> tableAttribute() {
             attributes.put(AttributeKeys.CONFIG_ATTRIBUTE_SAVE_TYPE, "saveTable");
             return this;
         }
 
-        public RequestCallBuilder<T> attributeValue(final String value) {
+        public APICallBuilder<T> attributeValue(final String value) {
             attributes.put(AttributeKeys.CONFIG_ATTRIBUTE_VALUE, value);
             return this;
         }
 
-        public RequestCallBuilder<T> authHeader(final String authHeader) {
+        public APICallBuilder<T> authHeader(final String authHeader) {
             attributes.put(AttributeKeys.AUTHORIZATION_HEADER, authHeader);
             return this;
         }
 
-        public RequestCallBuilder<T> username(final String username) {
+        public APICallBuilder<T> username(final String username) {
             attributes.put(AttributeKeys.USER_NAME, username);
             return this;
         }
 
-        public RequestCallBuilder<T> password(final String password) {
+        public APICallBuilder<T> password(final String password) {
             attributes.put(AttributeKeys.PASSWORD, password);
             return this;
         }
@@ -126,10 +179,8 @@ public interface SEBServerAPICall<T> {
             attributes.clear();
         }
 
-        public final T doAPICall() {
-            return call.doAPICall(attributes);
+        public final Response<T> doAPICall() {
+            return call.doAPICall(restTemplate, attributes);
         }
-
     }
-
 }

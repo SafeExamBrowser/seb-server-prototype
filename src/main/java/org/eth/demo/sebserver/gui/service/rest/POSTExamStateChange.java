@@ -21,32 +21,32 @@ import org.springframework.web.client.RestTemplate;
 public final class POSTExamStateChange implements SEBServerAPICall<GUIExam> {
 
     private final RestCallBuilder restCallBuilder;
-    private final RestTemplate restTemplate;
 
     public POSTExamStateChange(final RestCallBuilder restCallBuilder) {
         this.restCallBuilder = restCallBuilder;
-        this.restTemplate = new RestTemplate();
     }
 
     @Override
-    public RequestCallBuilder<GUIExam> with() {
-        return new RequestCallBuilder<>(this);
-    }
+    public Response<GUIExam> doAPICall(
+            final RestTemplate restTemplate,
+            final Map<String, String> attributes) {
 
-    @Override
-    public GUIExam doAPICall(final Map<String, String> attributes) {
         final String examId = getAttribute(attributes, AttributeKeys.EXAM_ID);
         final String toState = getAttribute(attributes, AttributeKeys.STATE_ID);
 
-        return this.restTemplate.postForObject(
-                this.restCallBuilder
-                        .withPath("exam/statechange/" + examId + "/" + toState),
-                this.restCallBuilder
-                        .httpEntity()
-                        .withContentTypeJson()
-                        .withAuth(attributes)
-                        .build(),
-                GUIExam.class);
+        try {
+            return new Response<>(
+                    restTemplate.postForObject(
+                            this.restCallBuilder
+                                    .withPath("exam/statechange/" + examId + "/" + toState),
+                            this.restCallBuilder
+                                    .httpEntity()
+                                    .withContentTypeJson()
+                                    .build(),
+                            GUIExam.class));
+        } catch (final Throwable t) {
+            return new Response<>(t);
+        }
     }
 
 }
