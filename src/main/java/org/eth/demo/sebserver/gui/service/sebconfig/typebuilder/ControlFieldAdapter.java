@@ -9,15 +9,15 @@
 package org.eth.demo.sebserver.gui.service.sebconfig.typebuilder;
 
 import org.eclipse.swt.widgets.Control;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField;
 
 public abstract class ControlFieldAdapter<T extends Control> implements InputField {
 
-    protected final GUIViewAttribute attribute;
+    protected final ConfigViewAttribute attribute;
     protected final T control;
 
-    public ControlFieldAdapter(final GUIViewAttribute attribute, final T control) {
+    public ControlFieldAdapter(final ConfigViewAttribute attribute, final T control) {
         this.attribute = attribute;
         this.control = control;
     }
@@ -28,7 +28,7 @@ public abstract class ControlFieldAdapter<T extends Control> implements InputFie
     }
 
     @Override
-    public final GUIViewAttribute getAttribute() {
+    public final ConfigViewAttribute getAttribute() {
         return this.attribute;
     }
 

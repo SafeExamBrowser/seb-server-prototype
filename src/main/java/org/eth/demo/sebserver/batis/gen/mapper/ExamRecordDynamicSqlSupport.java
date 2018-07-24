@@ -6,25 +6,30 @@ import org.mybatis.dynamic.sql.SqlColumn;
 import org.mybatis.dynamic.sql.SqlTable;
 
 public final class ExamRecordDynamicSqlSupport {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-13T13:25:25.206+02:00", comments="Source Table: exam")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-24T11:31:47.182+02:00", comments="Source Table: exam")
     public static final ExamRecord examRecord = new ExamRecord();
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-13T13:25:25.206+02:00", comments="Source field: exam.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-24T11:31:47.182+02:00", comments="Source field: exam.id")
     public static final SqlColumn<Long> id = examRecord.id;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-13T13:25:25.206+02:00", comments="Source field: exam.name")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-24T11:31:47.183+02:00", comments="Source field: exam.name")
     public static final SqlColumn<String> name = examRecord.name;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-13T13:25:25.207+02:00", comments="Source field: exam.status")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-24T11:31:47.183+02:00", comments="Source field: exam.status")
     public static final SqlColumn<Integer> status = examRecord.status;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-13T13:25:25.206+02:00", comments="Source Table: exam")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-24T11:31:47.183+02:00", comments="Source field: exam.owner_id")
+    public static final SqlColumn<Long> ownerId = examRecord.ownerId;
+
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-24T11:31:47.182+02:00", comments="Source Table: exam")
     public static final class ExamRecord extends SqlTable {
         public final SqlColumn<Long> id = column("id", JDBCType.BIGINT);
 
         public final SqlColumn<String> name = column("name", JDBCType.VARCHAR);
 
         public final SqlColumn<Integer> status = column("status", JDBCType.INTEGER);
+
+        public final SqlColumn<Long> ownerId = column("owner_id", JDBCType.BIGINT);
 
         public ExamRecord() {
             super("exam");

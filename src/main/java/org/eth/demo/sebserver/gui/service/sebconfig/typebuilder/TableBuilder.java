@@ -28,9 +28,9 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUITableValue;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigAttributeValue;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigTableValue;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputComponentBuilder;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
@@ -64,15 +64,15 @@ public class TableBuilder implements InputComponentBuilder {
     @Override
     public InputField createInputComponent(
             final Composite parent,
-            final GUIViewAttribute attribute,
+            final ConfigViewAttribute attribute,
             final ViewContext viewContext) {
 
-        final List<GUIViewAttribute> columnAttributes = viewContext.getChildAttributes(attribute);
+        final List<ConfigViewAttribute> columnAttributes = viewContext.getChildAttributes(attribute);
         final Table table = new Table(parent, SWT.NONE);
         final Menu menu = new Menu(table);
         table.setMenu(menu);
 
-        for (final GUIViewAttribute columnAttr : columnAttributes) {
+        for (final ConfigViewAttribute columnAttr : columnAttributes) {
             final TableColumn column = new TableColumn(table, SWT.NONE);
             column.setText(columnAttr.name);
             // TODO this information should also come within the orientation form back-end
@@ -97,15 +97,15 @@ public class TableBuilder implements InputComponentBuilder {
 
     static final class TableField extends ControlFieldAdapter<Table> {
 
-        final List<GUIViewAttribute> columnAttributes;
+        final List<ConfigViewAttribute> columnAttributes;
         final ViewContext viewContext;
         final TableEditor[] editor;
         final Map<FieldType, TableCellEditorBuilder> cellEditorBuilderMap;
 
         TableField(
-                final GUIViewAttribute attribute,
+                final ConfigViewAttribute attribute,
                 final Table control,
-                final List<GUIViewAttribute> columnAttributes,
+                final List<ConfigViewAttribute> columnAttributes,
                 final ViewContext viewContext,
                 final Map<FieldType, TableCellEditorBuilder> cellEditorBuilderMap) {
 
@@ -128,22 +128,22 @@ public class TableBuilder implements InputComponentBuilder {
         }
 
         @Override
-        public void initValue(final Collection<GUIAttributeValue> values) {
-            final List<GUIAttributeValue> allValues = values.stream()
+        public void initValue(final Collection<ConfigAttributeValue> values) {
+            final List<ConfigAttributeValue> allValues = values.stream()
                     .filter(a -> this.attribute.name.equals(a.parentAttributeName))
                     .collect(Collectors.toList());
 
             int index = 0;
             while (index >= 0) {
                 final int listIndex = index;
-                final Map<String, GUIAttributeValue> rowValues = allValues.stream()
+                final Map<String, ConfigAttributeValue> rowValues = allValues.stream()
                         .filter(a -> a.listIndex == listIndex)
                         .collect(Collectors.toMap(a -> a.attributeName, a -> a));
 
                 if (!rowValues.isEmpty()) {
                     final TableItem item = new TableItem(this.control, SWT.NONE);
                     int columnIndex = 0;
-                    for (final GUIViewAttribute attr : this.columnAttributes) {
+                    for (final ConfigViewAttribute attr : this.columnAttributes) {
                         final String value = rowValues.containsKey(attr.name) ? rowValues.get(attr.name).value : null;
                         final TableCellEditorBuilder tableCellEditorBuilder =
                                 this.cellEditorBuilderMap.get(attr.getFieldType());
@@ -163,7 +163,7 @@ public class TableBuilder implements InputComponentBuilder {
             final TableItem item = new TableItem(this.control, SWT.NONE);
 
             int index = 0;
-            for (final GUIViewAttribute attr : this.columnAttributes) {
+            for (final ConfigViewAttribute attr : this.columnAttributes) {
                 final TableCellEditorBuilder tableCellEditorBuilder =
                         this.cellEditorBuilderMap.get(attr.getFieldType());
                 final String value = tableCellEditorBuilder.populateCell(attr, null, item, index);
@@ -195,7 +195,7 @@ public class TableBuilder implements InputComponentBuilder {
             final List<String> columnNames = this.columnAttributes.stream()
                     .map(a -> a.name)
                     .collect(Collectors.toList());
-            final GUITableValue tableValue = new GUITableValue(
+            final ConfigTableValue tableValue = new ConfigTableValue(
                     this.viewContext.configurationId,
                     this.attribute.name,
                     columnNames,
@@ -279,7 +279,7 @@ public class TableBuilder implements InputComponentBuilder {
             final int listIndex = (Integer) item.getData(LIST_INDEX_REF);
 
             for (int i = 0; i < this.tableField.editor.length; i++) {
-                final GUIViewAttribute guiViewAttribute = this.tableField.columnAttributes.get(i);
+                final ConfigViewAttribute guiViewAttribute = this.tableField.columnAttributes.get(i);
                 final TableCellEditorBuilder tableCellEditorBuilder = TableBuilder.this.cellEditorBuilderMap.get(
                         guiViewAttribute.getFieldType());
                 final Control cellEditor = tableCellEditorBuilder.buildEditor(this.tableField, item, i, listIndex);

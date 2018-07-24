@@ -57,7 +57,7 @@ public class ExamDaoImpl implements ExamDao {
     //      are a lot of rows to fetch we better implement and use a join to perform better.
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eth.demo.sebserver.service.dao.ExamDao#byId(java.lang.Long)
      */
     @Transactional(readOnly = true)
@@ -74,12 +74,12 @@ public class ExamDaoImpl implements ExamDao {
                 .build()
                 .execute();
 
-        return Exam.fromRecord(record, indicators);
+        return Exam.fromRecords(record, indicators);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eth.demo.sebserver.service.dao.ExamDao#getAll()
      */
     @Transactional(readOnly = true)
@@ -90,7 +90,7 @@ public class ExamDaoImpl implements ExamDao {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eth.demo.sebserver.service.dao.ExamDao#getAll(java.util.function.Predicate)
      */
     @Transactional(readOnly = true)
@@ -103,7 +103,7 @@ public class ExamDaoImpl implements ExamDao {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eth.demo.sebserver.service.dao.ExamDao#save(org.eth.demo.sebserver.domain.rest.exam.Exam)
      */
     @Transactional
@@ -111,11 +111,11 @@ public class ExamDaoImpl implements ExamDao {
     public Exam save(final Exam model) {
         Long id;
         if (model.getId() == null) {
-            final ExamRecord record = model.toRecord();
+            final ExamRecord record = model.toExamRecord();
             this.examMapper.insert(record);
             id = record.getId();
         } else {
-            this.examMapper.updateByPrimaryKeySelective(model.toRecord());
+            this.examMapper.updateByPrimaryKeySelective(model.toExamRecord());
 
             // NOTE: delete all existing indicators for this exam. The new ones form request gets inserted after
             this.indicatorMapper.deleteByExample()
@@ -136,7 +136,7 @@ public class ExamDaoImpl implements ExamDao {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eth.demo.sebserver.service.dao.ExamDao#delete(java.lang.Long)
      */
     @Transactional

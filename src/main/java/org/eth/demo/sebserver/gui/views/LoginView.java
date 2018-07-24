@@ -10,17 +10,18 @@ package org.eth.demo.sebserver.gui.views;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.eth.demo.sebserver.gui.service.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
@@ -54,7 +55,7 @@ public class LoginView implements ViewComposer {
             final Map<String, String> attributes) {
 
         // NOTE: if there is already an authenticated user within the current http-session
-        //       we "redirect" the page-compose-call to the main page composer here
+        //       we "redirect" the page-compose-call to the main page composer
         if (alreadyAuthenticated(parent)) {
             viewService.composeView(parent, ViewService.MAIN_PAGE);
             return;
@@ -62,54 +63,106 @@ public class LoginView implements ViewComposer {
 
         viewService.centringView(parent);
 
-        final Group group = new Group(parent, SWT.SHADOW_NONE);
-        group.setBounds(20, 20, 500, 100);
+        final Group group = new Group(parent, SWT.NONE);
+        group.setLayout(new RowLayout(SWT.VERTICAL | SWT.CENTER));
+        group.setLayoutData(new RowData(400, 200));
         group.setText(" Login");
+
+        final Composite messageGroup = new Composite(group, SWT.BORDER);
+        messageGroup.setLayoutData(new RowData(390, 50));
+        messageGroup.setLayout(new RowLayout(SWT.VERTICAL));
+
+        if (attributes.containsKey(AttributeKeys.AUTHORIZATION_FAILURE)) {
+            final String message = attributes.get(AttributeKeys.AUTHORIZATION_FAILURE);
+            final Label loginFailed1 = new Label(messageGroup, SWT.BOLD);
+            loginFailed1.setText("Login Failed");
+            final Label messageLabel = new Label(messageGroup, SWT.BOLD);
+            messageLabel.setText(message);
+            messageGroup.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
+            messageGroup.setBackgroundMode(SWT.INHERIT_FORCE);
+        } else if (attributes.containsKey(AttributeKeys.LGOUT_SUCCESS)) {
+            final Label logoutSuccess = new Label(messageGroup, SWT.BOLD);
+            logoutSuccess.setText("You have been successfully logged out.");
+            messageGroup.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
+            messageGroup.setBackgroundMode(SWT.INHERIT_FORCE);
+        } else {
+            messageGroup.setVisible(false);
+        }
+
+        final Composite space = new Composite(group, SWT.NONE);
+        space.setLayoutData(new RowData(390, 10));
+
+        final Composite form = new Composite(group, SWT.NONE);
         final GridLayout gridLayout = new GridLayout();
         gridLayout.numColumns = 2;
-        group.setLayout(gridLayout);
+        form.setLayout(gridLayout);
+        form.setLayoutData(new RowData(400, -1));
 
-        final Label name = new Label(group, SWT.NONE);
+        final GridData formCellText = new GridData(100, 20);
+        final GridData formCellData = new GridData(200, 20);
+        final Label name = new Label(form, SWT.NONE);
         name.setText("Name: ");
-        final Text loginName = new Text(group, SWT.LEFT | SWT.BORDER);
-        loginName.setLayoutData(new GridData(100, 10));
-        final Label pwd = new Label(group, SWT.NONE);
+        name.setLayoutData(formCellText);
+        final Text loginName = new Text(form, SWT.LEFT | SWT.BORDER);
+        loginName.setLayoutData(formCellData);
+        final Label pwd = new Label(form, SWT.NONE);
         pwd.setText("Password: ");
-        final Text loginPassword = new Text(group, SWT.LEFT | SWT.PASSWORD | SWT.BORDER);
-        loginPassword.setLayoutData(new GridData(200, 10));
+        pwd.setLayoutData(formCellText);
+        final Text loginPassword = new Text(form, SWT.LEFT | SWT.PASSWORD | SWT.BORDER);
+        loginPassword.setLayoutData(formCellData);
 
-        final Button button = new Button(group, SWT.FLAT);
+        final Button button = new Button(form, SWT.FLAT);
         button.setText("Login");
+        final GridData gridData = new GridData();
+        gridData.horizontalSpan = 2;
+        gridData.horizontalIndent = 125;
+        gridData.widthHint = 150;
+        gridData.verticalIndent = 10;
+        button.setLayoutData(gridData);
+
+        final SEBServerAuthorizationContext authorizationContext = this.authorizationContextHolder
+                .getAuthorizationContext(RWT.getUISession().getHttpSession());
+
         button.addListener(SWT.Selection, event -> {
+            final String username = loginName.getText();
             try {
-                final SEBServerAuthorizationContext authorizationContext = this.authorizationContextHolder
-                        .getAuthorizationContext(RWT.getUISession().getHttpSession());
+
                 final boolean loggedIn = authorizationContext.login(
-                        loginName.getText(),
+                        username,
                         loginPassword.getText());
 
                 if (loggedIn) {
                     // view main page (TODO: or users-entry-page?)
                     viewService.composeView(parent, ViewService.MAIN_PAGE);
                 } else {
-                    // TODO show login view with failed notification
+                    loginError(viewService, parent, "Access Denied");
                 }
             } catch (final Exception e) {
-                log.error("Error while trying to login with user: {}", loginName.getText(), e);
-                // TODO: show error on login page?
+                log.error("Unexpected error while trying to login with user: {}", username, e);
+
+                // just to be sure we leave a clean and proper authorizationContext
+                authorizationContext.logout();
+
+                loginError(viewService, parent, "Unexpected Error. Please call an Administrator");
             }
         });
     }
 
-    private boolean alreadyAuthenticated(final Composite parent) {
-        final HttpSession httpSession = RWT.getUISession(parent.getDisplay()).getHttpSession();
-        final String authentication = (String) httpSession.getAttribute(AttributeKeys.AUTHORIZATION_HEADER);
-        return (authentication != null && validAuthentication(authentication));
+    private void loginError(
+            final ViewService viewService,
+            final Composite parent,
+            final String message) {
+
+        viewService
+                .createViewOn(parent)
+                .attribute(AttributeKeys.AUTHORIZATION_FAILURE, message)
+                .compose(ViewService.LOGIN_PAGE);
     }
 
-    private boolean validAuthentication(final String authentication) {
-        // TODO later we have also to check the token if it is a valid one and if it is still not expired
-        return true;
+    private boolean alreadyAuthenticated(final Composite parent) {
+        final SEBServerAuthorizationContext authorizationContext = this.authorizationContextHolder
+                .getAuthorizationContext();
+        return authorizationContext.isValid() && authorizationContext.isLoggedIn();
     }
 
 }

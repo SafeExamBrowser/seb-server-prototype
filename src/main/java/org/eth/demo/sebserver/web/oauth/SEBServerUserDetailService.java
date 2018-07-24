@@ -8,27 +8,30 @@
 
 package org.eth.demo.sebserver.web.oauth;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import org.eth.demo.sebserver.service.dao.UserDao;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+@Lazy
 @Component
 public class SEBServerUserDetailService implements UserDetailsService {
 
-    @Autowired
-    private UserPasswordEncoder userPasswordEncoder;
+    private final UserDao userDao;
+
+    public SEBServerUserDetailService(final UserDao userDao) {
+        this.userDao = userDao;
+    }
 
     @Override
     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
-        return User
-                .withUsername("username")
-                .passwordEncoder(pw -> this.userPasswordEncoder.encode(pw))
-                .password("password")
-                .authorities("Admin")
-                .build();
+        final org.eth.demo.sebserver.domain.rest.admin.User byUserName = this.userDao.byUserName(username);
+        if (byUserName == null) {
+            throw new UsernameNotFoundException("No User with name: " + username + " found");
+        }
+        return byUserName;
     }
 
 }

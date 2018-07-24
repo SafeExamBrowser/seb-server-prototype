@@ -12,7 +12,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
 import org.eth.demo.sebserver.gui.service.sebconfig.typebuilder.TableBuilder.TableField;
 import org.springframework.stereotype.Component;
@@ -46,7 +46,7 @@ public class TableCellTextEditorBuilder implements TableCellEditorBuilder {
 
     @Override
     public String populateCell(
-            final GUIViewAttribute attr,
+            final ConfigViewAttribute attr,
             final String value,
             final TableItem item,
             final int columnIndex) {

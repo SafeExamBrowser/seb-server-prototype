@@ -13,5 +13,9 @@ import java.util.function.Consumer;
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 
 public interface EventHandlingStrategy extends Consumer<ClientEvent> {
+
+    String EVENT_CONSUMER_STRATEGY_SINGLE_EVENT_STORE = "SINGLE_EVENT_STORE_STRATEGY";
+    String EVENT_CONSUMER_STRATEGY_ASYNC_BATCH_STORE = "ASYNC_BATCH_STORE_STRATEGY";
+
     void enable(boolean enable);
 }

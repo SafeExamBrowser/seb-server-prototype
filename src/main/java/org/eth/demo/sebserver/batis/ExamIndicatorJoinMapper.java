@@ -42,6 +42,7 @@ public interface ExamIndicatorJoinMapper {
             @Arg(column = "id", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "status", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Arg(column = "owner_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
             @Arg(column = "indicatorId", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "threshold1", javaType = BigDecimal.class, jdbcType = JdbcType.DECIMAL),
@@ -63,6 +64,7 @@ public interface ExamIndicatorJoinMapper {
                 examRecord.id,
                 examRecord.name,
                 examRecord.status,
+                examRecord.ownerId.as("owner_id"),
                 indicatorRecord.id.as("indicatorId"),
                 indicatorRecord.type,
                 indicatorRecord.threshold1,
@@ -89,20 +91,23 @@ public interface ExamIndicatorJoinMapper {
         @Override
         public void handleResult(final ResultContext<? extends JoinRecord> resultContext) {
             final JoinRecord rec = resultContext.getResultObject();
-            resultMap.computeIfAbsent(rec.id, id -> Exam.create(id, rec.name, rec.status))
+            resultMap.computeIfAbsent(rec.id, id -> Exam.create(rec))
                     .addIndicator(rec.indicator);
         }
     }
 
-    static final class JoinRecord {
+    public static final class JoinRecord {
         public final Long id;
         public final String name;
         public final Integer status;
+        public final Long ownerId;
         public final IndicatorDefinition indicator;
 
-        private JoinRecord(final Long id,
+        private JoinRecord(
+                final Long id,
                 final String name,
                 final Integer status,
+                final Long ownerId,
                 final Long indicatorId,
                 final String type,
                 final BigDecimal threshold1,
@@ -112,6 +117,7 @@ public interface ExamIndicatorJoinMapper {
             this.id = id;
             this.name = name;
             this.status = status;
+            this.ownerId = ownerId;
             indicator = (indicatorId != null)
                     ? new IndicatorDefinition(type, threshold1, threshold2, threshold3) : null;
         }

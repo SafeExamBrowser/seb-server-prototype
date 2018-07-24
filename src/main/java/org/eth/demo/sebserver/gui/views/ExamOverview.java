@@ -9,27 +9,31 @@
 package org.eth.demo.sebserver.gui.views;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eth.demo.sebserver.gui.domain.exam.GUIExam;
+import org.eth.demo.sebserver.gui.domain.exam.RunningExam;
+import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.eth.demo.sebserver.gui.service.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
 import org.eth.demo.sebserver.gui.service.rest.GETExams;
 import org.eth.demo.sebserver.gui.service.rest.POSTExamStateChange;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
+import org.eth.demo.sebserver.gui.service.rest.auth.SEBServerAuthorizationContext;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -68,17 +72,60 @@ public class ExamOverview implements ViewComposer {
             final Composite parent,
             final Map<String, String> attributes) {
 
-        final Collection<GUIExam> exams = this.examsRequest
-                .with(this.authorizationContextHolder)
-                .doAPICall()
-                .orElse(t -> t.printStackTrace()); // TODO error handling
+        final SEBServerAuthorizationContext authorizationContext = this.authorizationContextHolder
+                .getAuthorizationContext();
 
         viewService.centringView(parent);
 
         final Group group = new Group(parent, SWT.SHADOW_NONE);
-        group.setLayout(new RowLayout());
-        group.setBounds(20, 20, 500, 100);
-        group.setText(" Exam Overview ");
+        group.setLayout(new RowLayout(SWT.VERTICAL));
+        group.setLayoutData(new RowData(800, 500));
+        group.setText(" Dashboard ");
+
+        final Composite titleGroup = new Composite(group, SWT.SHADOW_NONE);
+        titleGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+        titleGroup.setLayoutData(new RowData(800, 50));
+
+        final Label wellcome = new Label(titleGroup, SWT.NULL);
+        wellcome.setText("Wellcome: " + authorizationContext.getLoggedInUser().getName());
+        wellcome.setLayoutData(new RowData(550, 50));
+
+        final Button admin = new Button(titleGroup, SWT.NONE);
+        admin.setText("Administration");
+        admin.addListener(SWT.Selection, event -> {
+            System.out.println("***** TODO Admin Section");
+        });
+        admin.setVisible(authorizationContext.hasRole("ADMIN_USER"));
+
+        final Button logout = new Button(titleGroup, SWT.NONE);
+        logout.setText("Logout");
+        logout.addListener(SWT.Selection, event -> {
+            final boolean logoutSuccessful = this.authorizationContextHolder
+                    .getAuthorizationContext()
+                    .logout();
+
+            if (!logoutSuccessful) {
+                // TODO error handling
+            }
+
+            viewService
+                    .createViewOn(parent)
+                    .attribute(AttributeKeys.LGOUT_SUCCESS, "true")
+                    .compose(ViewService.LOGIN_PAGE);
+        });
+
+        final Label examTableTitle = new Label(group, SWT.NULL);
+        examTableTitle.setText("Exams: ");
+
+        createExamsTable(parent, group);
+    }
+
+    private void createExamsTable(final Composite parent, final Group group) {
+        // get all exams for the current logged in user from the SEBServer Web-Service API
+        final Collection<RunningExam> exams = this.examsRequest
+                .with(this.authorizationContextHolder)
+                .doAPICall()
+                .orElse(t -> t.printStackTrace()); // TODO error handling
 
         final Table table = new Table(group, SWT.NULL);
         final Menu menu = new Menu(table);
@@ -94,13 +141,13 @@ public class ExamOverview implements ViewComposer {
         new TableColumn(table, SWT.LEFT).setText("Name");
         new TableColumn(table, SWT.LEFT).setText("Status");
         table.getColumn(0).setWidth(100);
-        table.getColumn(1).setWidth(200);
-        table.getColumn(2).setWidth(200);
+        table.getColumn(1).setWidth(500);
+        table.getColumn(2).setWidth(180);
 
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
 
-        for (final GUIExam exam : exams) {
+        for (final RunningExam exam : exams) {
             final TableItem item = new TableItem(table, SWT.RIGHT);
             item.setText(0, String.valueOf(exam.id));
             item.setText(1, exam.name);
@@ -142,7 +189,7 @@ public class ExamOverview implements ViewComposer {
     }
 
     private final void composeExamMenu(final Menu menu, final TableItem item) {
-        final GUIExam exam = (GUIExam) item.getData(ITEM_DATA_EXAM);
+        final RunningExam exam = (RunningExam) item.getData(ITEM_DATA_EXAM);
         if (menu.getItemCount() > 0) {
             for (final MenuItem mItem : menu.getItems()) {
                 mItem.dispose();
@@ -188,7 +235,7 @@ public class ExamOverview implements ViewComposer {
         item.setText(name);
         item.addListener(SWT.Selection, event -> {
 
-            final GUIExam newExam = this.examStateChange
+            final RunningExam newExam = this.examStateChange
                     .with(this.authorizationContextHolder)
                     .exam(examId)
                     .toState(toStateId)
@@ -205,14 +252,13 @@ public class ExamOverview implements ViewComposer {
         item.setText("View");
         item.addListener(SWT.Selection, event -> {
 
-            final Map<String, String> attributes = new HashMap<>();
-            attributes.put(AttributeKeys.EXAM_ID, examId);
             @SuppressWarnings("unchecked")
             final Supplier<Composite> rootCompositeSupplier =
                     (Supplier<Composite>) menu.getData(ROOT_COMPOSITE_SUPPLIER);
-            this.viewService.composeView(
-                    rootCompositeSupplier.get(),
-                    RunningExamView.class, attributes);
+            this.viewService
+                    .createViewOn(rootCompositeSupplier.get())
+                    .exam(examId)
+                    .compose(RunningExamView.class);
         });
     }
 

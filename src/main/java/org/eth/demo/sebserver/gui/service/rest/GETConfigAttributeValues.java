@@ -11,8 +11,8 @@ package org.eth.demo.sebserver.gui.service.rest;
 import java.util.Collection;
 import java.util.Map;
 
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
-import org.eth.demo.sebserver.gui.views.AttributeKeys;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigAttributeValue;
+import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -21,7 +21,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
-public class GETConfigAttributeValues implements SEBServerAPICall<Collection<GUIAttributeValue>> {
+public class GETConfigAttributeValues implements SEBServerAPICall<Collection<ConfigAttributeValue>> {
 
     private final RestCallBuilder restCallBuilder;
 
@@ -30,7 +30,7 @@ public class GETConfigAttributeValues implements SEBServerAPICall<Collection<GUI
     }
 
     @Override
-    public Response<Collection<GUIAttributeValue>> doAPICall(
+    public Response<Collection<ConfigAttributeValue>> doAPICall(
             final RestTemplate restTemplate,
             final Map<String, String> attributes) {
 
@@ -48,7 +48,7 @@ public class GETConfigAttributeValues implements SEBServerAPICall<Collection<GUI
                                     .withContentTypeJson()
                                     .withHeader("attributeNames", configAttrs)
                                     .build(),
-                            new ParameterizedTypeReference<Collection<GUIAttributeValue>>() {
+                            new ParameterizedTypeReference<Collection<ConfigAttributeValue>>() {
                             })
                             .getBody());
         } catch (final Throwable t) {

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eth.demo.sebserver.gui.domain.admin.UserInfo;
 import org.eth.demo.sebserver.gui.service.rest.RestCallBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.DefaultAccessTokenRequest;
 import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails;
@@ -40,6 +43,9 @@ public class OAuth2AuthorizationContextHolder implements AuthorizationContextHol
     private static final Logger log = LoggerFactory.getLogger(OAuth2AuthorizationContextHolder.class);
 
     private static final String CONTEXT_HOLDER_ATTRIBUTE = "CONTEXT_HOLDER_ATTRIBUTE";
+    private static final String OAUTH_TOKEN_URI_PATH = "oauth/token"; // TODO to config properties?
+    private static final String OAUTH_REVOKE_TOKEN_URI_PATH = "/oauth/revoke-token"; // TODO to config properties?
+    private static final String CURRENT_USER_URI_PATH = "/user/me"; // TODO to config properties?
 
     private final String guiClientId;
     private final String guiClientSecret;
@@ -73,7 +79,7 @@ public class OAuth2AuthorizationContextHolder implements AuthorizationContextHol
             context = new OAuth2AuthorizationContext(
                     this.guiClientId,
                     this.guiClientSecret,
-                    this.restCallBuilder.withPath("oauth/token"));
+                    this.restCallBuilder);
             session.setAttribute(CONTEXT_HOLDER_ATTRIBUTE, context);
         }
 
@@ -107,18 +113,21 @@ public class OAuth2AuthorizationContextHolder implements AuthorizationContextHol
     private static final class OAuth2AuthorizationContext implements SEBServerAuthorizationContext {
 
         private boolean valid = true;
-        //private boolean loggedIn = false;
 
         private final ResourceOwnerPasswordResourceDetails resource;
         private final DisposableOAuth2RestTemplate restTemplate;
+        private final String revokeTokenURI;
+        private final String currentUserURI;
+
+        private UserInfo loggedInUser = null;
 
         OAuth2AuthorizationContext(
                 final String guiClientId,
                 final String guiClientSecret,
-                final String uri) {
+                final RestCallBuilder restCallBuilder) {
 
             this.resource = new ResourceOwnerPasswordResourceDetails();
-            this.resource.setAccessTokenUri(uri);
+            this.resource.setAccessTokenUri(restCallBuilder.withPath(OAUTH_TOKEN_URI_PATH));
             this.resource.setClientId(guiClientId);
             this.resource.setClientSecret(guiClientSecret);
             this.resource.setGrantType("password");
@@ -128,6 +137,9 @@ public class OAuth2AuthorizationContextHolder implements AuthorizationContextHol
             this.resource.setScope(scopes);
 
             this.restTemplate = new DisposableOAuth2RestTemplate(this.resource);
+
+            this.revokeTokenURI = restCallBuilder.withPath(OAUTH_REVOKE_TOKEN_URI_PATH);
+            this.currentUserURI = restCallBuilder.withPath(CURRENT_USER_URI_PATH);
         }
 
         @Override
@@ -155,27 +167,64 @@ public class OAuth2AuthorizationContextHolder implements AuthorizationContextHol
             try {
                 final OAuth2AccessToken accessToken = this.restTemplate.getAccessToken();
                 log.debug("Got token for user: {} : {}", username, accessToken);
+                this.loggedInUser = getLoggedInUser();
                 return true;
-            } catch (final Exception e) {
-                // TODO
-                e.printStackTrace();
+            } catch (final OAuth2AccessDeniedException e) {
+                log.info("Access Denied for user: {}", username);
                 return false;
             }
         }
 
         @Override
         public boolean logout() {
+            // set this context invalid to force creation of a new context on next request
             this.valid = false;
-
-            // TODO: http://www.baeldung.com/logout-spring-security-oauth
+            this.loggedInUser = null;
+            // delete the access-token (and refresh-token) on authentication server side
+            this.restTemplate.delete(this.revokeTokenURI);
+            // delete the access-token within the RestTemplate
             this.restTemplate.getOAuth2ClientContext().setAccessToken(null);
+            // mark the RestTemplate as disposed
             this.restTemplate.enabled = false;
+
             return true;
         }
 
         @Override
         public RestTemplate getRestTemplate() {
             return this.restTemplate;
+        }
+
+        @Override
+        public UserInfo getLoggedInUser() {
+            if (this.loggedInUser != null) {
+                return this.loggedInUser;
+            }
+
+            log.debug("Request logged in User from SEBserver web-service API");
+
+            try {
+                if (isValid() && isLoggedIn()) {
+                    final ResponseEntity<UserInfo> response =
+                            this.restTemplate.getForEntity(this.currentUserURI, UserInfo.class);
+                    this.loggedInUser = response.getBody();
+                    return this.loggedInUser;
+                } else {
+                    throw new IllegalStateException("Logged in User requested on invalid or not logged in ");
+                }
+            } catch (final Exception e) {
+                log.error("Unexpected error while trying to request logged in User from API", e);
+                throw new RuntimeException("Unexpected error while trying to request logged in User from API", e);
+            }
+        }
+
+        @Override
+        public boolean hasRole(final String role) {
+            if (!isValid() || !isLoggedIn()) {
+                return false;
+            }
+
+            return getLoggedInUser().hasRole(role);
         }
     }
 }

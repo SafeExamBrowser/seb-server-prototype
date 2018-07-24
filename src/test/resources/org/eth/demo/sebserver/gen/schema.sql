@@ -1,5 +1,38 @@
 
 -- -----------------------------------------------------
+-- Table `user`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `user` ;
+
+CREATE TABLE IF NOT EXISTS `user` (
+  `id` BIGINT UNSIGNED NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `user_name` VARCHAR(255) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `email` VARCHAR(255) NOT NULL,
+  `creation_date` DATETIME NOT NULL,
+  `active` BIT(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `userName_UNIQUE` (`user_name` ASC));
+
+-- -----------------------------------------------------
+-- Table `user_role`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `user_role` ;
+
+CREATE TABLE IF NOT EXISTS `user_role` (
+  `id` BIGINT UNSIGNED NOT NULL,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `role_name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `user_ref_idx` (`user_id` ASC),
+  CONSTRAINT `user_ref`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `user` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+-- -----------------------------------------------------
 -- Table `exam`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `exam` ;
@@ -8,7 +41,14 @@ CREATE TABLE IF NOT EXISTS `exam` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
   `status` INT(1) NOT NULL,
-  PRIMARY KEY (`id`));
+  `owner_id` BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `examOwnerRef_idx` (`owner_id` ASC),
+  CONSTRAINT `examOwnerRef`
+    FOREIGN KEY (`owner_id`)
+    REFERENCES `user` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -81,7 +121,14 @@ CREATE TABLE IF NOT EXISTS `configuration` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
   `type` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`id`));
+  `owner_id` BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `configOwnerRef_idx` (`owner_id` ASC),
+  CONSTRAINT `configOwnerRef`
+    FOREIGN KEY (`owner_id`)
+    REFERENCES `user` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -175,39 +222,6 @@ CREATE TABLE IF NOT EXISTS `exam_configuration_map` (
   CONSTRAINT `configuration_map_ref`
     FOREIGN KEY (`configuration_id`)
     REFERENCES `configuration` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
-
--- -----------------------------------------------------
--- Table `user`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `user` ;
-
-CREATE TABLE IF NOT EXISTS `user` (
-  `id` BIGINT UNSIGNED NOT NULL,
-  `name` VARCHAR(255) NOT NULL,
-  `user_name` VARCHAR(255) NOT NULL,
-  `password` VARCHAR(60) NOT NULL,
-  `email` VARCHAR(255) NOT NULL,
-  `creation_date` DATETIME NOT NULL,
-  `active` BIT(1) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE INDEX `userName_UNIQUE` (`user_name` ASC));
-
--- -----------------------------------------------------
--- Table `user_role`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `user_role` ;
-
-CREATE TABLE IF NOT EXISTS `user_role` (
-  `id` BIGINT UNSIGNED NOT NULL,
-  `user_id` BIGINT UNSIGNED NOT NULL,
-  `role_name` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `user_ref_idx` (`user_id` ASC),
-  CONSTRAINT `user_ref`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `user` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 

@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.views;
+package org.eth.demo.sebserver.gui.service;
 
 public interface AttributeKeys {
 
@@ -24,5 +24,7 @@ public interface AttributeKeys {
 
     public static final String AUTHORIZATION_CONTEXT = "AUTHORIZATION_CONTEXT";
     public static final String AUTHORIZATION_HEADER = "AUTHORIZATION_HEADER";
+    public static final String AUTHORIZATION_FAILURE = "AUTHORIZATION_FAILURE";
+    public static final String LGOUT_SUCCESS = "LGOUT_SUCCESS";
 
 }

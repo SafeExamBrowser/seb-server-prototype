@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import org.eth.demo.sebserver.batis.ExamIndicatorJoinMapper;
 import org.eth.demo.sebserver.batis.gen.model.ExamRecord;
 import org.eth.demo.sebserver.batis.gen.model.IndicatorRecord;
 
@@ -20,49 +21,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class Exam {
 
-    public static enum Status {
-        NONE(-1, "NO STATUS"), IN_PROGRESS(0, "In Progress"), READY(1, "Ready To Run"), RUNNING(2,
-                "Running"), FINISHED(3, "Finished");
-
-        public final int id;
-        public final String displayName;
-
-        private Status(final int id, final String displayName) {
-            this.id = id;
-            this.displayName = displayName;
-        }
-
-        public static Status byId(final int id) {
-            for (final Status status : Status.values()) {
-                if (status.id == id) {
-                    return status;
-                }
-            }
-
-            return NONE;
-        }
-
-        public static String getDisplayName(final int id) {
-            return byId(id).displayName;
-        }
-    }
-
     public final Long id;
     public final String name;
     public final Integer status;
     public final String statusName;
+    public final Long ownerId;
     private final Collection<IndicatorDefinition> indicators;
 
     @JsonCreator
     Exam(@JsonProperty("id") final Long id,
             @JsonProperty("name") final String name,
             @JsonProperty("status") final Integer status,
+            @JsonProperty("ownerId") final Long ownerId,
             @JsonProperty("indicators") final Collection<IndicatorDefinition> indicators) {
 
         this.id = id;
         this.name = name;
         this.status = status;
-        this.statusName = Status.getDisplayName(status);
+        this.ownerId = ownerId;
+        this.statusName = ExamStatus.getDisplayName(status);
         this.indicators = (indicators != null) ? new ArrayList<>(indicators) : new ArrayList<>();
     }
 
@@ -82,6 +59,10 @@ public final class Exam {
         return this.statusName;
     }
 
+    public Long getOwnerId() {
+        return this.ownerId;
+    }
+
     public Collection<IndicatorDefinition> getIndicators() {
         return this.indicators;
     }
@@ -93,36 +74,40 @@ public final class Exam {
         this.indicators.add(indicator);
     }
 
-    public final ExamRecord toRecord() {
-        return new ExamRecord(this.id, this.name, this.status);
+    public static final Exam create(final ExamIndicatorJoinMapper.JoinRecord record) {
+
+        return new Exam(
+                record.id,
+                record.name,
+                record.status,
+                record.ownerId,
+                new ArrayList<>());
     }
 
-    public final Exam withId(final Long id) {
-        return new Exam(id, this.name, this.status, this.indicators);
+    public static final Exam create(
+            final Long id,
+            final String name,
+            final Integer status,
+            final Long ownerId) {
+
+        return new Exam(id, name, status, ownerId, new ArrayList<>());
     }
 
-    public static final Exam fromRecord(
+    public final ExamRecord toExamRecord() {
+        return new ExamRecord(this.id, this.name, this.status, this.ownerId);
+    }
+
+    public static final Exam fromRecords(
             final ExamRecord record,
-
             final Collection<IndicatorRecord> indicators) {
+
         return new Exam(
                 record.getId(),
                 record.getName(),
                 record.getStatus(),
+                record.getId(),
                 indicators.stream()
                         .map(IndicatorDefinition::fromRecord)
                         .collect(Collectors.toList()));
     }
-
-    public static final Exam fromRecord(final ExamRecord record) {
-        return new Exam(record.getId(), record.getName(), record.getStatus(), null);
-    }
-
-    public static final Exam create(final Long id,
-            final String name,
-            final Integer status) {
-
-        return new Exam(id, name, status, null);
-    }
-
 }

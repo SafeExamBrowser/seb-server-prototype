@@ -13,7 +13,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.TableItem;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
 import org.eth.demo.sebserver.gui.service.sebconfig.typebuilder.TableBuilder.TableField;
 import org.springframework.stereotype.Component;
@@ -34,7 +34,7 @@ public class TableCellComboEditorBuilder implements TableCellEditorBuilder {
             final int rowIndex) {
 
         final String rawDataKey = TableBuilder.ROW_RAW_VALUE_PREFIX + columnIndex;
-        final GUIViewAttribute columnAttribute = tableField.columnAttributes.get(columnIndex);
+        final ConfigViewAttribute columnAttribute = tableField.columnAttributes.get(columnIndex);
         final Combo cellEditor = new Combo(tableField.control, SWT.READ_ONLY);
         cellEditor.setItems(StringUtils.split(columnAttribute.resources, ","));
         final String rawData = (String) item.getData(rawDataKey);
@@ -57,7 +57,7 @@ public class TableCellComboEditorBuilder implements TableCellEditorBuilder {
 
     @Override
     public String populateCell(
-            final GUIViewAttribute attr,
+            final ConfigViewAttribute attr,
             final String value,
             final TableItem item,
             final int columnIndex) {

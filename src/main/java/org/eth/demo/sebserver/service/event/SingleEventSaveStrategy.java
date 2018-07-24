@@ -8,7 +8,6 @@
 
 package org.eth.demo.sebserver.service.event;
 
-import org.eth.demo.sebserver.SEBServer;
 import org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordMapper;
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 import org.eth.demo.sebserver.service.ClientConnectionService;
@@ -28,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * An advantage of this approach is minimal data loss on server fail. **/
 @Lazy
-@Component(SEBServer.Constants.EVENT_CONSUMER_STRATEGY_SINGLE_EVENT_STORE)
+@Component(EventHandlingStrategy.EVENT_CONSUMER_STRATEGY_SINGLE_EVENT_STORE)
 public class SingleEventSaveStrategy implements EventHandlingStrategy {
 
     private static final Logger log = LoggerFactory.getLogger(SingleEventSaveStrategy.class);

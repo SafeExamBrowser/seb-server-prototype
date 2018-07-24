@@ -9,7 +9,7 @@
 package org.eth.demo.sebserver.gui.service.sebconfig;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
 
 public interface InputComponentBuilder {
@@ -18,7 +18,7 @@ public interface InputComponentBuilder {
 
     InputField createInputComponent(
             final Composite parent,
-            final GUIViewAttribute attribute,
+            final ConfigViewAttribute attribute,
             final ViewContext viewContext);
 
 }

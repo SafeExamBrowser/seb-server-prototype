@@ -84,6 +84,10 @@ public class ViewService {
         }
     }
 
+    public ViewRequestBuilder createViewOn(final Composite parent) {
+        return new ViewRequestBuilder(this, parent);
+    }
+
     public void centringView(final Composite parent) {
         final RowLayout parentLayout = new RowLayout();
         parentLayout.wrap = false;
@@ -97,6 +101,25 @@ public class ViewService {
     private void clearView(final Composite parent) {
         for (final Control control : parent.getChildren()) {
             control.dispose();
+        }
+    }
+
+    public final static class ViewRequestBuilder extends AttributeMapBuilder<ViewRequestBuilder> {
+
+        private final ViewService viewService;
+        private final Composite parent;
+
+        public ViewRequestBuilder(final ViewService viewService, final Composite parent) {
+            this.viewService = viewService;
+            this.parent = parent;
+        }
+
+        public void compose(final String composerName) {
+            this.viewService.composeView(this.parent, composerName, this.attributes);
+        }
+
+        public void compose(final Class<? extends ViewComposer> composerType) {
+            this.viewService.composeView(this.parent, composerType, this.attributes);
         }
     }
 

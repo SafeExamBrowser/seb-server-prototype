@@ -22,35 +22,42 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class User implements UserDetails {
+public final class User implements UserDetails {
 
     private static final long serialVersionUID = -2490638288935417827L;
 
+    private final Long id;
     private final String name;
     private final String username;
     private final String password;
     private final String email;
     private final DateTime creationDate;
     private final Boolean active;
-    private final Collection<Grant> grants;
+    private final Collection<Role> roles;
 
     @JsonCreator
     public User(
+            @JsonProperty("id") final Long id,
             @JsonProperty("name") final String name,
             @JsonProperty("username") final String username,
             @JsonProperty("password") final String password,
             @JsonProperty("email") final String email,
             @JsonProperty("creationDate") final DateTime creationDate,
             @JsonProperty("active") final Boolean active,
-            @JsonProperty("grants") final Collection<Grant> grants) {
+            @JsonProperty("roles") final Collection<Role> roles) {
 
+        this.id = id;
         this.name = name;
         this.username = username;
         this.password = password;
         this.email = email;
         this.creationDate = creationDate;
         this.active = active;
-        this.grants = grants;
+        this.roles = roles;
+    }
+
+    public Long getId() {
+        return this.id;
     }
 
     public String getName() {
@@ -69,13 +76,14 @@ public class User implements UserDetails {
         return this.active;
     }
 
-    public Collection<Grant> getGrants() {
-        return this.grants;
+    public Collection<Role> getRoles() {
+        return this.roles;
     }
 
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.grants;
+        return this.roles;
     }
 
     @JsonIgnore
@@ -115,6 +123,7 @@ public class User implements UserDetails {
 
     public static User fromRecord(final UserRecord record, final List<RoleRecord> roles) {
         return new User(
+                record.getId(),
                 record.getName(),
                 record.getUserName(),
                 record.getPassword(),
@@ -122,7 +131,7 @@ public class User implements UserDetails {
                 record.getCreationDate(),
                 record.getActive(),
                 roles.stream()
-                        .map(Grant::fromRecord)
+                        .map(Role::fromRecord)
                         .collect(Collectors.toList()));
     }
 

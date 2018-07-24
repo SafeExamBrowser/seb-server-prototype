@@ -10,7 +10,7 @@ package org.eth.demo.sebserver.gui.service.sebconfig.typebuilder;
 
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.TableItem;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
 import org.eth.demo.sebserver.gui.service.sebconfig.typebuilder.TableBuilder.TableField;
 
@@ -20,6 +20,6 @@ public interface TableCellEditorBuilder {
 
     Control buildEditor(TableField tableField, TableItem item, int columnIndex, final int rowIndex);
 
-    String populateCell(final GUIViewAttribute attr, String value, TableItem item, int columnIndex);
+    String populateCell(final ConfigViewAttribute attr, String value, TableItem item, int columnIndex);
 
 }

@@ -14,28 +14,28 @@ import org.springframework.security.core.GrantedAuthority;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public final class Grant implements GrantedAuthority {
+public final class Role implements GrantedAuthority {
 
     private static final long serialVersionUID = -5304544591727115010L;
 
-    private final String grantName;
+    public final String roleName;
 
     @JsonCreator
-    public Grant(@JsonProperty("grant") final String grantName) {
-        this.grantName = grantName;
+    public Role(@JsonProperty("role") final String roleName) {
+        this.roleName = roleName;
     }
 
-    public String getGrantName() {
-        return this.grantName;
+    public String getRoleName() {
+        return this.roleName;
     }
 
     @Override
     public String getAuthority() {
-        return this.grantName;
+        return this.roleName;
     }
 
-    public static Grant fromRecord(final RoleRecord record) {
-        return new Grant(record.getRoleName());
+    public static Role fromRecord(final RoleRecord record) {
+        return new Role(record.getRoleName());
     }
 
 }

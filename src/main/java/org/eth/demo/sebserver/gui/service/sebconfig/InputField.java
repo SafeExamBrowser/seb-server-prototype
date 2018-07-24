@@ -13,8 +13,8 @@ import static org.eth.demo.sebserver.gui.service.sebconfig.InputField.TitleOrien
 import java.util.Collection;
 
 import org.eclipse.swt.widgets.Control;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigAttributeValue;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
 
 public interface InputField {
 
@@ -54,10 +54,10 @@ public interface InputField {
 
     String getName();
 
-    void initValue(Collection<GUIAttributeValue> values);
+    void initValue(Collection<ConfigAttributeValue> values);
 
     Control getControl();
 
-    GUIViewAttribute getAttribute();
+    ConfigViewAttribute getAttribute();
 
 }

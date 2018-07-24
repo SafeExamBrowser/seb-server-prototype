@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.eth.demo.sebserver.gui.domain.exam.GUIExam;
+import org.eth.demo.sebserver.gui.domain.exam.RunningExam;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -21,7 +21,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
-public final class GETExams implements SEBServerAPICall<Collection<GUIExam>> {
+public final class GETExams implements SEBServerAPICall<Collection<RunningExam>> {
 
     private final RestCallBuilder restCallBuilder;
     private final String uri;
@@ -32,7 +32,7 @@ public final class GETExams implements SEBServerAPICall<Collection<GUIExam>> {
     }
 
     @Override
-    public Response<Collection<GUIExam>> doAPICall(
+    public Response<Collection<RunningExam>> doAPICall(
             final RestTemplate restTemplate,
             final Map<String, String> attributes) {
 
@@ -45,7 +45,7 @@ public final class GETExams implements SEBServerAPICall<Collection<GUIExam>> {
                                     .httpEntity()
                                     .withContentTypeJson()
                                     .build(),
-                            new ParameterizedTypeReference<List<GUIExam>>() {
+                            new ParameterizedTypeReference<List<RunningExam>>() {
                             })
                             .getBody());
         } catch (final Throwable t) {

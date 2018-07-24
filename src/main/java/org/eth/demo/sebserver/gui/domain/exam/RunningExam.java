@@ -17,22 +17,23 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class GUIExam {
+public class RunningExam {
 
     public final Long id;
     public final String name;
     public final Integer status;
     public final String statusName;
     private final List<String> indicatorTypeList;
-    private final List<GUIIndicatorDef> indicatorList;
-    private final Map<String, GUIIndicatorDef> indicators;
+    private final List<Indicator> indicatorList;
+    private final Map<String, Indicator> indicators;
 
     @JsonCreator
-    public GUIExam(@JsonProperty("id") final Long id,
+    public RunningExam(
+            @JsonProperty("id") final Long id,
             @JsonProperty("name") final String name,
             @JsonProperty("status") final Integer status,
             @JsonProperty("statusName") final String statusName,
-            @JsonProperty("indicators") final Collection<GUIIndicatorDef> indicatorList) {
+            @JsonProperty("indicators") final Collection<Indicator> indicatorList) {
 
         this.id = id;
         this.name = name;
@@ -68,11 +69,11 @@ public class GUIExam {
         return this.statusName;
     }
 
-    public Collection<GUIIndicatorDef> getIndicators() {
+    public Collection<Indicator> getIndicators() {
         return this.indicatorList;
     }
 
-    public GUIIndicatorDef getIndicator(final String type) {
+    public Indicator getIndicator(final String type) {
         return this.indicators.get(type);
     }
 
@@ -80,7 +81,7 @@ public class GUIExam {
         return this.indicatorTypeList.indexOf(indicatorType);
     }
 
-    public GUIIndicatorDef getIndicator(final int indicatorIndex) {
+    public Indicator getIndicator(final int indicatorIndex) {
         return this.indicatorList.get(indicatorIndex);
     }
 
@@ -104,7 +105,7 @@ public class GUIExam {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final GUIExam other = (GUIExam) obj;
+        final RunningExam other = (RunningExam) obj;
         if (this.id == null) {
             if (other.id != null)
                 return false;
@@ -115,7 +116,7 @@ public class GUIExam {
 
     @Override
     public String toString() {
-        return "GUIExam [id=" + this.id
+        return "ExamInfo [id=" + this.id
                 + ", name=" + this.name
                 + ", status=" + this.status
                 + ", statusName=" + this.statusName

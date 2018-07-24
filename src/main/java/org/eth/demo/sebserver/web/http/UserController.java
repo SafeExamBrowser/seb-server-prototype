@@ -8,22 +8,36 @@
 
 package org.eth.demo.sebserver.web.http;
 
-import org.springframework.ui.Model;
+import java.security.Principal;
+
+import org.eth.demo.sebserver.domain.rest.admin.User;
+import org.eth.demo.sebserver.service.dao.UserDao;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-//@RestController
+@RestController
+@RequestMapping("/user")
 public class UserController {
 
-    @RequestMapping(value = "/doLogin", method = RequestMethod.GET)
-    public String login(final Model model, final String error, final String logout) {
-        if (error != null)
-            model.addAttribute("error", "Your username and password is invalid.");
+    private final UserDao userDao;
 
-        if (logout != null)
-            model.addAttribute("message", "You have been logged out successfully.");
+    public UserController(final UserDao userDao) {
+        this.userDao = userDao;
+    }
 
-        return "login";
+    @RequestMapping(value = "/me", method = RequestMethod.GET)
+    @PreAuthorize("hasAuthority('ADMIN_USER') or hasAuthority('STANDARD_USER')")
+    public User loggedInUser(final Principal principal) {
+        return this.userDao.byUserName(principal.getName());
+    }
+
+    @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    public User user(@PathVariable final Long userId) {
+        return this.userDao.byId(userId);
     }
 
 }

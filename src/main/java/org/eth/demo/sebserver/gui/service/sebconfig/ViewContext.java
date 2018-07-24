@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormData;
-import org.eth.demo.sebserver.gui.domain.sebconfig.Cell;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewGridCell;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigAttributeValue;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
 
 public final class ViewContext {
 
@@ -28,9 +28,9 @@ public final class ViewContext {
 
     public final int xpos, ypos, width, height;
     public final int columns, rows;
-    private final Cell protoCell;
+    private final ConfigViewGridCell protoCell;
 
-    private final Map<String, GUIViewAttribute> attributes;
+    private final Map<String, ConfigViewAttribute> attributes;
     private final Map<String, InputField> inputFields;
 
     private final ValueChangeListener valueChangeListener;
@@ -44,7 +44,7 @@ public final class ViewContext {
             final int height,
             final int columns,
             final int rows,
-            final Map<String, GUIViewAttribute> attributes,
+            final Map<String, ConfigViewAttribute> attributes,
             final ValueChangeListener valueChangeListener) {
 
         this.name = name;
@@ -56,7 +56,7 @@ public final class ViewContext {
         this.columns = columns;
         this.rows = rows;
 
-        this.protoCell = new Cell(
+        this.protoCell = new ConfigViewGridCell(
                 0, 0,
                 100 / columns,
                 100 / rows,
@@ -120,15 +120,15 @@ public final class ViewContext {
         return new Rectangle(this.xpos, this.ypos, this.width, this.height);
     }
 
-    public Cell getCell(final int column, final int row) {
+    public ConfigViewGridCell getCell(final int column, final int row) {
         return this.protoCell.copyOf(column, row);
     }
 
     public FormData getFormData(final int column, final int row) {
-        return Cell.createFormData(getCell(column, row));
+        return ConfigViewGridCell.createFormData(getCell(column, row));
     }
 
-    public List<GUIViewAttribute> getAttributes() {
+    public List<ConfigViewAttribute> getAttributes() {
         return new ArrayList<>(this.attributes.values());
     }
 
@@ -136,7 +136,7 @@ public final class ViewContext {
         return new ArrayList<>(this.attributes.keySet());
     }
 
-    public List<GUIViewAttribute> getChildAttributes(final GUIViewAttribute attribute) {
+    public List<ConfigViewAttribute> getChildAttributes(final ConfigViewAttribute attribute) {
         return this.attributes.values().stream()
                 .filter(a -> attribute.name.equals(a.parentAttributeName))
                 .sorted((a1, a2) -> Integer.valueOf(a1.xpos).compareTo(a2.xpos))
@@ -151,7 +151,7 @@ public final class ViewContext {
         this.inputFields.put(inputField.getName(), inputField);
     }
 
-    void setValuesToInputFields(final Collection<GUIAttributeValue> values) {
+    void setValuesToInputFields(final Collection<ConfigAttributeValue> values) {
         this.inputFields.values().stream()
                 .forEach(field -> field.initValue(values));
     }

@@ -11,18 +11,18 @@ package org.eth.demo.sebserver;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
+
 @SpringBootApplication
 
 public class SEBServer {
 
-    public interface Constants {
-        String CONTENT_TYPE_APPLICATION_JSON = "application/json";
-
-        public static final String EVENT_CONSUMER_STRATEGY_SINGLE_EVENT_STORE = "SINGLE_EVENT_STORE_STRATEGY";
-        public static final String EVENT_CONSUMER_STRATEGY_ASYNC_BATCH_STORE = "ASYNC_BATCH_STORE_STRATEGY";
-    }
-
     public static void main(final String[] args) {
+        // first of all register the JodaModule to Jackson
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JodaModule());
+
         SpringApplication.run(SEBServer.class, args);
     }
 

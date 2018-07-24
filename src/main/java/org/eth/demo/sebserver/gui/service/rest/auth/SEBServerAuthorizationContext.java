@@ -8,6 +8,7 @@
 
 package org.eth.demo.sebserver.gui.service.rest.auth;
 
+import org.eth.demo.sebserver.gui.domain.admin.UserInfo;
 import org.springframework.web.client.RestTemplate;
 
 public interface SEBServerAuthorizationContext {
@@ -19,6 +20,10 @@ public interface SEBServerAuthorizationContext {
     boolean login(String username, String password);
 
     boolean logout();
+
+    UserInfo getLoggedInUser();
+
+    public boolean hasRole(String role);
 
     RestTemplate getRestTemplate();
 

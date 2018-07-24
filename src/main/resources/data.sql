@@ -1,4 +1,14 @@
-INSERT INTO `configuration_attribute` VALUES
+INSERT INTO user VALUES 
+    (1, "Admin1", "admin", "$2a$08$c2GKYEYoUVXH1Yb8GXVXVu66ltPvbZgLMcVSXRH.LgZNF/YeaYB8m", "admin@nomail.nomail", '2018-01-01 00:00:00', 1),
+    (2, "User1", "user1", "$2a$08$XkDcqOPfp6L6CkRlYUZ61e1pT.ut8NblPE4IujHIiOzxQkVwo2O8q", "user1@nomail.nomail", '2018-01-01 00:00:00', 1)
+    ;
+    
+INSERT INTO user_role VALUES
+    (1, 1, "ADMIN_USER"),
+    (2, 2, "STANDARD_USER")
+    ;
+
+INSERT INTO configuration_attribute VALUES
     (1, "table1", "TABLE", null, "", "", ""),
     (2, "param1", "TEXT_FIELD", 1, "", "", ""),
     (3, "param2", "SINGLE_SELECTION", 1, "One,Two,Three", "", ""),
@@ -22,7 +32,7 @@ INSERT INTO `configuration_attribute` VALUES
     (17, "selection1", "SINGLE_SELECTION", null, "One,Two,Three", "", "")
     ;
     
-INSERT INTO `orientation` VALUES 
+INSERT INTO orientation VALUES 
     (1, 1, "view1", null, 0, 13),
     (2, 2, "view1", null, 0, 0),
     (3, 3, "view1", null, 1, 0),
@@ -46,16 +56,16 @@ INSERT INTO `orientation` VALUES
     (17, 17, "view1", null, 1, 10)
     ;
     
-INSERT INTO `configuration` VALUES
-    (1, "Demo Config", "CLIENT");
+INSERT INTO configuration VALUES
+    (1, "Demo Config", "CLIENT", 2);
 
 INSERT INTO `exam` VALUES 
-    (1,'Demo Exam 1',0),
-    (2,'Demo Exam 2',0),
-    (3,'Demo Exam 3',1),
-    (4,'Demo Exam 4',2);
+    (1,'Demo Exam 1',0, 2),
+    (2,'Demo Exam 2',0, 2),
+    (3,'Demo Exam 3',1, 2),
+    (4,'Demo Exam 4',2, 2);
     
-INSERT INTO `indicator` VALUES 
+INSERT INTO indicator VALUES 
     (NULL,1,"DemoIndicator1",20.0000,40.0000,60.0000),
     (NULL,1,"errorCountIndicator",1.0000,2.0000,3.0000),
     (NULL,3,"errorCountIndicator",1.0000,2.0000,3.0000),

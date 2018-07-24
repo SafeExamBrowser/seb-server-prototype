@@ -11,14 +11,14 @@ package org.eth.demo.sebserver.gui.domain.sebconfig;
 import java.util.Collections;
 import java.util.List;
 
-public class GUITableValue {
+public class ConfigTableValue {
 
     public final String configId;
     public final String attributeName;
     public final List<String> columns;
     public final List<String> values;
 
-    public GUITableValue(
+    public ConfigTableValue(
             final String configId,
             final String attributeName,
             final List<String> columns,
@@ -48,7 +48,7 @@ public class GUITableValue {
 
     @Override
     public String toString() {
-        return "GUITableValue [configId=" + this.configId + ", attributeName=" + this.attributeName + ", columns="
+        return "ConfigTableValue [configId=" + this.configId + ", attributeName=" + this.attributeName + ", columns="
                 + this.columns
                 + ", values=" + this.values + "]";
     }

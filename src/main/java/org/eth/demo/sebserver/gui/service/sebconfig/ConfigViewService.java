@@ -22,9 +22,9 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eth.demo.sebserver.gui.domain.sebconfig.Cell;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewGridCell;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigAttributeValue;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
 import org.eth.demo.sebserver.gui.service.rest.GETConfigAttribute;
 import org.eth.demo.sebserver.gui.service.rest.GETConfigAttributeValues;
 import org.eth.demo.sebserver.gui.service.rest.POSTConfigValue;
@@ -70,7 +70,8 @@ public class ConfigViewService {
             final int columns,
             final int rows) {
 
-        final Map<String, GUIViewAttribute> attributes = this.configAttributeRequest
+        // request the configuration attributes for the view/page from the SEBServer Web-Service API
+        final Map<String, ConfigViewAttribute> attributes = this.configAttributeRequest
                 .with(this.authorizationContextHolder)
                 .configViewName(name)
                 .doAPICall()
@@ -91,8 +92,8 @@ public class ConfigViewService {
     }
 
     public ViewContext createComponents(final Composite parent, final ViewContext viewContext) {
-        final Map<String, List<GUIViewAttribute>> groups = new LinkedHashMap<>();
-        for (final GUIViewAttribute attribute : viewContext.getAttributes()) {
+        final Map<String, List<ConfigViewAttribute>> groups = new LinkedHashMap<>();
+        for (final ConfigViewAttribute attribute : viewContext.getAttributes()) {
 
             // ignore nested attributes
             if (StringUtils.isNotBlank(attribute.parentAttributeName)) {
@@ -102,7 +103,7 @@ public class ConfigViewService {
             // check and handle builder availability for specified type
             if (!this.builderTypeMapping.containsKey(attribute.getFieldType())) {
                 final Label errorLabel = getErrorLabel(parent, "No Builder for type: " + attribute.type);
-                errorLabel.setLayoutData(Cell.createFormData(viewContext.getCell(attribute.xpos, attribute.ypos)));
+                errorLabel.setLayoutData(ConfigViewGridCell.createFormData(viewContext.getCell(attribute.xpos, attribute.ypos)));
                 continue;
             }
 
@@ -115,20 +116,20 @@ public class ConfigViewService {
             }
 
             // TODO the span information should also come within the orientation form back-end
-            Cell cell = viewContext.getCell(attribute.xpos, attribute.ypos);
+            ConfigViewGridCell configViewGridCell = viewContext.getCell(attribute.xpos, attribute.ypos);
             if (FieldType.TABLE == attribute.getFieldType()) {
-                cell = cell.span(3, 6);
+                configViewGridCell = configViewGridCell.span(3, 6);
             }
 
             createSingleInputComponent(
                     parent,
                     attribute,
                     viewContext,
-                    cell);
+                    configViewGridCell);
         }
 
         if (!groups.isEmpty()) {
-            for (final List<GUIViewAttribute> group : groups.values()) {
+            for (final List<ConfigViewAttribute> group : groups.values()) {
                 createInputComponentGroup(parent, group, viewContext);
             }
         }
@@ -139,7 +140,7 @@ public class ConfigViewService {
     public ViewContext initInputFieldValues(final ViewContext viewContext) {
 
         final String attributeNames = StringUtils.join(viewContext.getAttributeNames(), ",");
-        final Collection<GUIAttributeValue> attributeValues = this.configAttributeValuesRequest
+        final Collection<ConfigAttributeValue> attributeValues = this.configAttributeValuesRequest
                 .with(this.authorizationContextHolder)
                 .config(viewContext.configurationId)
                 .configAttributeNames(attributeNames)
@@ -152,14 +153,14 @@ public class ConfigViewService {
 
     private void createInputComponentGroup(
             final Composite parent,
-            final List<GUIViewAttribute> groupAttrs,
+            final List<ConfigViewAttribute> groupAttrs,
             final ViewContext viewContext) {
 
         if (groupAttrs == null || groupAttrs.isEmpty()) {
             return;
         }
 
-        final GUIViewAttribute firstAttr = groupAttrs.get(0);
+        final ConfigViewAttribute firstAttr = groupAttrs.get(0);
         final Rectangle groupBounds = groupAttrs.stream()
                 .map(a -> new Rectangle(a.xpos, a.ypos, 1, 1))
                 .reduce(new Rectangle(firstAttr.xpos, firstAttr.ypos, 0, 0), Rectangle::union);
@@ -170,23 +171,23 @@ public class ConfigViewService {
         final FormLayout layout = new FormLayout();
         group.setLayout(layout);
         group.setText(firstAttr.group);
-        group.setLayoutData(Cell.createFormData(new Cell(
+        group.setLayoutData(ConfigViewGridCell.createFormData(new ConfigViewGridCell(
                 groupBounds.x,
                 groupBounds.y,
                 viewContext.getCellRelativeWidth() * groupBounds.width,
-                viewContext.getCellRelativeHeight() * (groupBounds.height + Cell.GROUP_CELL_HEIGHT_ADJUSTMENT),
+                viewContext.getCellRelativeHeight() * (groupBounds.height + ConfigViewGridCell.GROUP_CELL_HEIGHT_ADJUSTMENT),
                 viewContext.getCellPixelWidth() * groupBounds.width,
-                viewContext.getCellPixelHeight() * (groupBounds.height + Cell.GROUP_CELL_HEIGHT_ADJUSTMENT))));
+                viewContext.getCellPixelHeight() * (groupBounds.height + ConfigViewGridCell.GROUP_CELL_HEIGHT_ADJUSTMENT))));
 
         final int cellWidth = 100 / groupBounds.width;
         final int cellHeight = 100 / groupBounds.height;
 
-        for (final GUIViewAttribute attr : groupAttrs) {
+        for (final ConfigViewAttribute attr : groupAttrs) {
             createSingleInputComponent(
                     group,
                     attr,
                     viewContext,
-                    new Cell(
+                    new ConfigViewGridCell(
                             attr.xpos - groupBounds.x,
                             attr.ypos - groupBounds.y,
                             cellWidth,
@@ -198,15 +199,15 @@ public class ConfigViewService {
 
     private void createSingleInputComponent(
             final Composite parent,
-            final GUIViewAttribute attribute,
+            final ConfigViewAttribute attribute,
             final ViewContext viewContext,
-            final Cell cell) {
+            final ConfigViewGridCell configViewGridCell) {
 
         final InputComponentBuilder inputComponentBuilder = this.builderTypeMapping.get(attribute.getFieldType());
         final InputField inputField = inputComponentBuilder.createInputComponent(parent, attribute, viewContext);
 
-        createTitleLabel(parent, inputField, cell, attribute.name);
-        inputField.getControl().setLayoutData(Cell.createFormData(cell));
+        createTitleLabel(parent, inputField, configViewGridCell, attribute.name);
+        inputField.getControl().setLayoutData(ConfigViewGridCell.createFormData(configViewGridCell));
         inputField.getControl().setToolTipText(attribute.name);
         viewContext.registerInputField(inputField);
     }
@@ -214,7 +215,7 @@ public class ConfigViewService {
     private void createTitleLabel(
             final Composite parent,
             final InputField inputField,
-            final Cell cell,
+            final ConfigViewGridCell configViewGridCell,
             final String title) {
 
         final FieldType fieldType = inputField.getType();
@@ -222,22 +223,22 @@ public class ConfigViewService {
         label.setText(" " + title + "   ");
         switch (fieldType.titleOrientation) {
             case LEFT: {
-                if (cell.column > 0) {
+                if (configViewGridCell.column > 0) {
                     label.setAlignment(SWT.RIGHT);
-                    label.setLayoutData(Cell.createFormData(cell.copyOf(cell.column - 1, cell.row)));
+                    label.setLayoutData(ConfigViewGridCell.createFormData(configViewGridCell.copyOf(configViewGridCell.column - 1, configViewGridCell.row)));
                 }
                 break;
             }
             case TOP: {
-                if (cell.row > 0) {
+                if (configViewGridCell.row > 0) {
                     label.setAlignment(SWT.BOTTOM);
-                    label.setLayoutData(Cell.createFormData(cell.copyOf(cell.column, cell.row - 1)));
+                    label.setLayoutData(ConfigViewGridCell.createFormData(configViewGridCell.copyOf(configViewGridCell.column, configViewGridCell.row - 1)));
                 }
                 break;
             }
             case RIGHT: {
                 label.setAlignment(SWT.LEFT);
-                label.setLayoutData(Cell.createFormData(cell.copyOf(cell.column + 1, cell.row)));
+                label.setLayoutData(ConfigViewGridCell.createFormData(configViewGridCell.copyOf(configViewGridCell.column + 1, configViewGridCell.row)));
             }
             default: {
                 label.dispose();

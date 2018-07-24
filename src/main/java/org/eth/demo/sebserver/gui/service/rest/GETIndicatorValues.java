@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eth.demo.sebserver.gui.domain.exam.GUIIndicatorValue;
-import org.eth.demo.sebserver.gui.views.AttributeKeys;
+import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;

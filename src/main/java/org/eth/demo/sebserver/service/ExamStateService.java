@@ -19,7 +19,7 @@ import org.eth.demo.sebserver.appevents.ExamStartedEvent;
 import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ExamRecord;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
-import org.eth.demo.sebserver.domain.rest.exam.Exam.Status;
+import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
 import org.eth.demo.sebserver.service.dao.ExamDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,13 +51,13 @@ public class ExamStateService {
     }
 
     @Transactional
-    public Exam processStateChange(final Long examId, final Exam.Status toState) {
+    public Exam processStateChange(final Long examId, final ExamStatus toState) {
         final ExamRecord examRecord = this.examRecordMapper.selectByPrimaryKey(examId);
-        final Status currentStatus = Exam.Status.byId(examRecord.getStatus());
+        final ExamStatus currentStatus = ExamStatus.byId(examRecord.getStatus());
 
         switch (toState) {
             case IN_PROGRESS: {
-                if (currentStatus != Status.READY) {
+                if (currentStatus != ExamStatus.READY) {
                     invalidStateException(toState, currentStatus);
                 }
 
@@ -66,7 +66,7 @@ public class ExamStateService {
                 return this.examDao.byId(examId);
             }
             case READY: {
-                if (currentStatus != Status.IN_PROGRESS) {
+                if (currentStatus != ExamStatus.IN_PROGRESS) {
                     invalidStateException(toState, currentStatus);
                 }
                 save(examId, toState);
@@ -74,7 +74,7 @@ public class ExamStateService {
                 return this.examDao.byId(examId);
             }
             case RUNNING: {
-                if (currentStatus != Status.READY) {
+                if (currentStatus != ExamStatus.READY) {
                     invalidStateException(toState, currentStatus);
                 }
                 save(examId, toState);
@@ -87,7 +87,7 @@ public class ExamStateService {
                 return exam;
             }
             case FINISHED: {
-                if (currentStatus != Status.RUNNING) {
+                if (currentStatus != ExamStatus.RUNNING) {
                     invalidStateException(toState, currentStatus);
                 }
                 save(examId, toState);
@@ -126,7 +126,7 @@ public class ExamStateService {
     private boolean cacheRunningExam(final Long id) {
         final Long count = this.examRecordMapper.countByExample()
                 .where(examRecord.id, isEqualTo(id))
-                .and(examRecord.status, isEqualTo(Exam.Status.RUNNING.id))
+                .and(examRecord.status, isEqualTo(ExamStatus.RUNNING.id))
                 .build()
                 .execute();
 
@@ -138,11 +138,12 @@ public class ExamStateService {
         return true;
     }
 
-    private void save(final Long examId, final Exam.Status toState) {
-        this.examRecordMapper.updateByPrimaryKeySelective(new ExamRecord(examId, null, toState.id));
+    private void save(final Long examId, final ExamStatus toState) {
+        final ExamRecord recordWithIdAndChanges = new ExamRecord(examId, null, toState.id, null);
+        this.examRecordMapper.updateByPrimaryKeySelective(recordWithIdAndChanges);
     }
 
-    private void invalidStateException(final Exam.Status toState, final Status currentStatus) {
+    private void invalidStateException(final ExamStatus toState, final ExamStatus currentStatus) {
         throw new RuntimeException("Invalid state change request form: " + currentStatus.displayName
                 + " to: " + toState.displayName);
     }

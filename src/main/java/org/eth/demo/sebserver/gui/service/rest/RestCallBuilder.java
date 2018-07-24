@@ -8,7 +8,6 @@
 
 package org.eth.demo.sebserver.gui.service.rest;
 
-import org.eth.demo.sebserver.SEBServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -20,6 +19,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Lazy
 @Component
 public class RestCallBuilder {
+
+    public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
 
     private final String webServerAdress;
     private final String webServerPort;
@@ -60,7 +61,7 @@ public class RestCallBuilder {
         public HttpEntityBuilder<T> withContentTypeJson() {
             this.httpHeaders.set(
                     HttpHeaders.CONTENT_TYPE,
-                    SEBServer.Constants.CONTENT_TYPE_APPLICATION_JSON);
+                    CONTENT_TYPE_APPLICATION_JSON);
             return this;
         }
 

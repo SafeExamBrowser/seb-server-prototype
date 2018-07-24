@@ -13,7 +13,7 @@ import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class GUIIndicatorDef {
+public class Indicator {
 
     public final String type;
     public final Float threshold1;
@@ -21,7 +21,8 @@ public class GUIIndicatorDef {
     public final Float threshold3;
 
     @JsonCreator
-    public GUIIndicatorDef(@JsonProperty("type") final String type,
+    public Indicator(
+            @JsonProperty("type") final String type,
             @JsonProperty("threshold1") final Float threshold1,
             @JsonProperty("threshold2") final Float threshold2,
             @JsonProperty("threshold3") final Float threshold3) {

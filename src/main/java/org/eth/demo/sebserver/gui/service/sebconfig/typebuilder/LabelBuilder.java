@@ -13,8 +13,8 @@ import java.util.Collection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigAttributeValue;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputComponentBuilder;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
@@ -32,7 +32,7 @@ public class LabelBuilder implements InputComponentBuilder {
     @Override
     public InputField createInputComponent(
             final Composite parent,
-            final GUIViewAttribute attribute,
+            final ConfigViewAttribute attribute,
             final ViewContext viewContext) {
 
         final Label label = new Label(parent, SWT.NONE);
@@ -43,12 +43,12 @@ public class LabelBuilder implements InputComponentBuilder {
 
     static final class LabelField extends ControlFieldAdapter<Label> {
 
-        LabelField(final GUIViewAttribute attribute, final Label control) {
+        LabelField(final ConfigViewAttribute attribute, final Label control) {
             super(attribute, control);
         }
 
         @Override
-        public void initValue(final Collection<GUIAttributeValue> values) {
+        public void initValue(final Collection<ConfigAttributeValue> values) {
             // Does Nothing
         }
     };

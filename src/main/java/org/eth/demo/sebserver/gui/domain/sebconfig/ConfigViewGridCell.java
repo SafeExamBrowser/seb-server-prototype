@@ -12,14 +12,14 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eth.demo.sebserver.gui.service.sebconfig.ViewContext;
 
-public class Cell {
+public class ConfigViewGridCell {
 
     public static final int GROUP_CELL_HEIGHT_ADJUSTMENT = 2;
 
     public final int column, row, columnSpan, rowSpan;
     public final int relWidth, relHeight, pixelWidth, pixelHeight;
 
-    public Cell(
+    public ConfigViewGridCell(
             final int column,
             final int row,
             final int relWidth,
@@ -30,7 +30,7 @@ public class Cell {
         this(column, row, 1, 1, relWidth, relHeight, pixelWidth, pixelHeight);
     }
 
-    public Cell(
+    public ConfigViewGridCell(
             final int column,
             final int row,
             final int columnSpan,
@@ -50,8 +50,8 @@ public class Cell {
         this.pixelHeight = pixelHeight;
     }
 
-    public Cell span(final int columnSpan, final int rowSpan) {
-        return new Cell(
+    public ConfigViewGridCell span(final int columnSpan, final int rowSpan) {
+        return new ConfigViewGridCell(
                 this.column,
                 this.row,
                 columnSpan,
@@ -64,14 +64,15 @@ public class Cell {
 
     @Override
     public String toString() {
-        return "Cell [column=" + this.column + ", row=" + this.row + ", columnSpan=" + this.columnSpan + ", rowSpan="
+        return "ConfigViewGridCell [column=" + this.column + ", row=" + this.row + ", columnSpan=" + this.columnSpan
+                + ", rowSpan="
                 + this.rowSpan
                 + ", relWidth=" + this.relWidth + ", relHeight=" + this.relHeight + ", pixelWidth=" + this.pixelWidth
                 + ", pixelHeight=" + this.pixelHeight + "]";
     }
 
-    public Cell copyOf(final int column, final int row) {
-        return new Cell(
+    public ConfigViewGridCell copyOf(final int column, final int row) {
+        return new ConfigViewGridCell(
                 column,
                 row,
                 this.relWidth,
@@ -84,13 +85,15 @@ public class Cell {
         return createFormData(view.getCell(column, row));
     }
 
-    public static FormData createFormData(final Cell cell) {
+    public static FormData createFormData(final ConfigViewGridCell configViewGridCell) {
 
         final FormData result = new FormData();
-        result.left = new FormAttachment(cell.column * cell.relWidth);
-        result.top = new FormAttachment(cell.row * cell.relHeight);
-        result.right = new FormAttachment((cell.column + cell.columnSpan) * cell.relWidth);
-        result.bottom = new FormAttachment((cell.row + cell.rowSpan) * cell.relHeight, -5);
+        result.left = new FormAttachment(configViewGridCell.column * configViewGridCell.relWidth);
+        result.top = new FormAttachment(configViewGridCell.row * configViewGridCell.relHeight);
+        result.right = new FormAttachment(
+                (configViewGridCell.column + configViewGridCell.columnSpan) * configViewGridCell.relWidth);
+        result.bottom = new FormAttachment(
+                (configViewGridCell.row + configViewGridCell.rowSpan) * configViewGridCell.relHeight, -5);
 
         return result;
     }

@@ -40,7 +40,9 @@ public class SEBConfigView1 implements ViewComposer {
     }
 
     @Override
-    public void composeView(final ViewService viewService, final Composite parent,
+    public void composeView(
+            final ViewService viewService,
+            final Composite parent,
             final Map<String, String> attributes) {
 
         final Enumeration<String> attributeNames = RWT.getRequest().getSession().getAttributeNames();

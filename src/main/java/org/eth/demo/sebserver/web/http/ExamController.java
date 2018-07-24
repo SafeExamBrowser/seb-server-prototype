@@ -11,6 +11,7 @@ package org.eth.demo.sebserver.web.http;
 import java.util.Collection;
 
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
+import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
 import org.eth.demo.sebserver.service.ExamStateService;
 import org.eth.demo.sebserver.service.dao.ExamDao;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,7 +42,7 @@ public class ExamController {
         return this.examDao.byId(examId);
     }
 
-    @RequestMapping(value = "/delete/{examId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/delete/{examId}", method = RequestMethod.DELETE)
     final void deleteExam(@PathVariable final Long examId) {
         this.examDao.delete(examId);
     }
@@ -52,8 +53,8 @@ public class ExamController {
     }
 
     @RequestMapping(value = "/statechange/{examId}/{stateId}", method = RequestMethod.POST)
-    final Exam saveExam(@PathVariable final Long examId, @PathVariable final Integer stateId) {
-        return this.examStateService.processStateChange(examId, Exam.Status.byId(stateId));
+    final Exam processStateChange(@PathVariable final Long examId, @PathVariable final Integer stateId) {
+        return this.examStateService.processStateChange(examId, ExamStatus.byId(stateId));
     }
 
 }

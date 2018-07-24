@@ -33,9 +33,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eth.demo.sebserver.gui.domain.exam.GUIExam;
-import org.eth.demo.sebserver.gui.domain.exam.GUIIndicatorDef;
+import org.eth.demo.sebserver.gui.domain.exam.RunningExam;
+import org.eth.demo.sebserver.gui.domain.exam.Indicator;
 import org.eth.demo.sebserver.gui.domain.exam.GUIIndicatorValue;
+import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.eth.demo.sebserver.gui.service.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
 import org.eth.demo.sebserver.gui.service.push.ServerPushContext;
@@ -80,7 +81,7 @@ public class RunningExamView implements ViewComposer {
             final Map<String, String> attributes) {
 
         final String examId = attributes.get(AttributeKeys.EXAM_ID);
-        final GUIExam exam = this.examDetailRequest
+        final RunningExam exam = this.examDetailRequest
                 .with(this.authorizationContextHolder)
                 .exam(examId)
                 .doAPICall()
@@ -117,7 +118,7 @@ public class RunningExamView implements ViewComposer {
         gridData.horizontalSpan = 3;
         name.setLayoutData(gridData);
 
-        for (final GUIIndicatorDef indDef : exam.getIndicators()) {
+        for (final Indicator indDef : exam.getIndicators()) {
             final Label indName = new Label(group, SWT.NULL);
             indName.setText(indDef.type);
             final Label indT1 = new Label(group, SWT.NULL);
@@ -178,7 +179,7 @@ public class RunningExamView implements ViewComposer {
 
     private final static class ClientTable {
 
-        final GUIExam exam;
+        final RunningExam exam;
         Table table;
 
         final Color color1;
@@ -189,7 +190,7 @@ public class RunningExamView implements ViewComposer {
         final Map<UUID, float[]> indicatorValues;
         final Map<UUID, UpdatableTableItem> tableMapping;
 
-        ClientTable(final Display display, final Composite tableRoot, final GUIExam exam) {
+        ClientTable(final Display display, final Composite tableRoot, final RunningExam exam) {
             this.exam = exam;
             this.toRemove = new HashSet<>();
             this.indicatorValues = new HashMap<>();
@@ -198,7 +199,7 @@ public class RunningExamView implements ViewComposer {
             final TableColumn t1c = new TableColumn(this.table, SWT.NONE);
             t1c.setText("UUID");
             t1c.setWidth(300);
-            for (final GUIIndicatorDef indDef : exam.getIndicators()) {
+            for (final Indicator indDef : exam.getIndicators()) {
                 final TableColumn tc = new TableColumn(this.table, SWT.NONE);
                 tc.setText(indDef.type);
                 tc.setWidth(200);
@@ -264,7 +265,7 @@ public class RunningExamView implements ViewComposer {
         }
 
         private Color getColorForValue(final int indicatorIndex, final float value) {
-            final GUIIndicatorDef indicator = this.exam.getIndicator(indicatorIndex);
+            final Indicator indicator = this.exam.getIndicator(indicatorIndex);
             if (value >= indicator.threshold3) {
                 return this.color3;
             } else if (value >= indicator.threshold2) {

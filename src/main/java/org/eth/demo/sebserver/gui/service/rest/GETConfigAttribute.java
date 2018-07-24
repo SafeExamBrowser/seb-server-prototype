@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
-import org.eth.demo.sebserver.gui.views.AttributeKeys;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
+import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -25,7 +25,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
-public class GETConfigAttribute implements SEBServerAPICall<Map<String, GUIViewAttribute>> {
+public class GETConfigAttribute implements SEBServerAPICall<Map<String, ConfigViewAttribute>> {
 
     private final RestCallBuilder restCallBuilder;
 
@@ -34,14 +34,14 @@ public class GETConfigAttribute implements SEBServerAPICall<Map<String, GUIViewA
     }
 
     @Override
-    public Response<Map<String, GUIViewAttribute>> doAPICall(
+    public Response<Map<String, ConfigViewAttribute>> doAPICall(
             final RestTemplate restTemplate,
             final Map<String, String> attributes) {
 
         final String viewName = getAttribute(attributes, AttributeKeys.CONFIG_VIEW_NAME);
 
         try {
-            final ResponseEntity<List<GUIViewAttribute>> request = restTemplate.exchange(
+            final ResponseEntity<List<ConfigViewAttribute>> request = restTemplate.exchange(
                     this.restCallBuilder
                             .withPath("sebconfig/attributes/" + viewName),
                     HttpMethod.GET,
@@ -49,10 +49,10 @@ public class GETConfigAttribute implements SEBServerAPICall<Map<String, GUIViewA
                             .httpEntity()
                             .withContentTypeJson()
                             .build(),
-                    new ParameterizedTypeReference<List<GUIViewAttribute>>() {
+                    new ParameterizedTypeReference<List<ConfigViewAttribute>>() {
                     });
 
-            final Map<String, GUIViewAttribute> result = request.getBody()
+            final Map<String, ConfigViewAttribute> result = request.getBody()
                     .stream()
                     .collect(Collectors.toMap(
                             a -> getFQName(a, request.getBody()),
@@ -64,12 +64,12 @@ public class GETConfigAttribute implements SEBServerAPICall<Map<String, GUIViewA
         }
     }
 
-    private String getFQName(final GUIViewAttribute a, final Collection<GUIViewAttribute> attrs) {
+    private String getFQName(final ConfigViewAttribute a, final Collection<ConfigViewAttribute> attrs) {
         if (a.parentAttributeName == null) {
             return a.name;
         }
 
-        final Optional<GUIViewAttribute> parentAttr = attrs.stream()
+        final Optional<ConfigViewAttribute> parentAttr = attrs.stream()
                 .filter(attr -> attr.name.equals(a.parentAttributeName))
                 .findFirst();
 

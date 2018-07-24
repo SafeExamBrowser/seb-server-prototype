@@ -16,8 +16,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigAttributeValue;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputComponentBuilder;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
@@ -40,7 +40,7 @@ public class TextFieldBuilder implements InputComponentBuilder {
     @Override
     public InputField createInputComponent(
             final Composite parent,
-            final GUIViewAttribute attribute,
+            final ConfigViewAttribute attribute,
             final ViewContext viewContext) {
 
         final FieldType fieldType = attribute.getFieldType();
@@ -58,7 +58,7 @@ public class TextFieldBuilder implements InputComponentBuilder {
 
     private void addValueChangeListener(
             final Text control,
-            final GUIViewAttribute attribute,
+            final ConfigViewAttribute attribute,
             final ViewContext viewContext) {
 
         final ValueChangeListener valueListener = viewContext.getValueChangeListener();
@@ -80,7 +80,7 @@ public class TextFieldBuilder implements InputComponentBuilder {
 
     private void addNumberCheckListener(
             final Text control,
-            final GUIViewAttribute attribute,
+            final ConfigViewAttribute attribute,
             final Consumer<String> numberCheck,
             final ViewContext viewContext) {
 
@@ -99,13 +99,13 @@ public class TextFieldBuilder implements InputComponentBuilder {
 
     static final class TextInputField extends ControlFieldAdapter<Text> {
 
-        TextInputField(final GUIViewAttribute attribute, final Text control) {
+        TextInputField(final ConfigViewAttribute attribute, final Text control) {
             super(attribute, control);
         }
 
         @Override
-        public void initValue(final Collection<GUIAttributeValue> values) {
-            final Optional<GUIAttributeValue> value = values.stream()
+        public void initValue(final Collection<ConfigAttributeValue> values) {
+            final Optional<ConfigAttributeValue> value = values.stream()
                     .filter(a -> this.attribute.name.equals(a.attributeName))
                     .findFirst();
 

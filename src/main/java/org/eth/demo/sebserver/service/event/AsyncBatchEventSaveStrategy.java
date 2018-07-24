@@ -20,13 +20,12 @@ import java.util.stream.Collectors;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.eth.demo.sebserver.SEBServer;
 import org.eth.demo.sebserver.appevents.ExamFinishedEvent;
 import org.eth.demo.sebserver.appevents.ExamStartedEvent;
 import org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ClientEventRecord;
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
-import org.eth.demo.sebserver.domain.rest.exam.Exam.Status;
+import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
 import org.eth.demo.sebserver.service.ClientConnectionService;
 import org.eth.demo.sebserver.service.dao.ExamDao;
 import org.slf4j.Logger;
@@ -55,7 +54,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  * ability to effectively store and recover message queues but also comes with more complexity on setup and installation
  * side as well as for the whole server system. */
 @Lazy
-@Component(SEBServer.Constants.EVENT_CONSUMER_STRATEGY_ASYNC_BATCH_STORE)
+@Component(EventHandlingStrategy.EVENT_CONSUMER_STRATEGY_ASYNC_BATCH_STORE)
 public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
 
     private static final Logger log = LoggerFactory.getLogger(AsyncBatchEventSaveStrategy.class);
@@ -109,7 +108,7 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
 
     @EventListener(ExamFinishedEvent.class)
     protected void examFinished() {
-        this.workersRunning = !this.examDao.getAll(exam -> exam.status == Status.RUNNING.id).isEmpty();
+        this.workersRunning = !this.examDao.getAll(exam -> exam.status == ExamStatus.RUNNING.id).isEmpty();
     }
 
     @Override
@@ -128,7 +127,7 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
             return;
         }
 
-        if (this.examDao.getAll(exam -> exam.status == Status.RUNNING.id).isEmpty()) {
+        if (this.examDao.getAll(exam -> exam.status == ExamStatus.RUNNING.id).isEmpty()) {
             log.info("runWorkers called but no exam is running");
             return;
         }

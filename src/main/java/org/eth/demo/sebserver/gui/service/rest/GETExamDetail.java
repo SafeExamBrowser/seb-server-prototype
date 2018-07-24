@@ -10,8 +10,8 @@ package org.eth.demo.sebserver.gui.service.rest;
 
 import java.util.Map;
 
-import org.eth.demo.sebserver.gui.domain.exam.GUIExam;
-import org.eth.demo.sebserver.gui.views.AttributeKeys;
+import org.eth.demo.sebserver.gui.domain.exam.RunningExam;
+import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
-public class GETExamDetail implements SEBServerAPICall<GUIExam> {
+public class GETExamDetail implements SEBServerAPICall<RunningExam> {
 
     private final RestCallBuilder restCallBuilder;
 
@@ -28,12 +28,12 @@ public class GETExamDetail implements SEBServerAPICall<GUIExam> {
     }
 
     @Override
-    public APICallBuilder<GUIExam> with(final RestTemplate restTemplate) {
+    public APICallBuilder<RunningExam> with(final RestTemplate restTemplate) {
         return new APICallBuilder<>(this, restTemplate);
     }
 
     @Override
-    public Response<GUIExam> doAPICall(
+    public Response<RunningExam> doAPICall(
             final RestTemplate restTemplate,
             final Map<String, String> attributes) {
 
@@ -49,7 +49,7 @@ public class GETExamDetail implements SEBServerAPICall<GUIExam> {
                                     .httpEntity()
                                     .withContentTypeJson()
                                     .build(),
-                            GUIExam.class)
+                            RunningExam.class)
                             .getBody());
         } catch (final Throwable t) {
             return new Response<>(t);

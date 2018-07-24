@@ -8,9 +8,9 @@
 
 package org.eth.demo.sebserver.gui.service.sebconfig;
 
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIAttributeValue;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUITableValue;
-import org.eth.demo.sebserver.gui.domain.sebconfig.GUIViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigAttributeValue;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigTableValue;
+import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
 import org.eth.demo.sebserver.gui.service.rest.POSTConfigValue;
 import org.springframework.web.client.RestTemplate;
 
@@ -33,11 +33,11 @@ public class ViewValueChangeListener implements ValueChangeListener {
     @Override
     public void valueChanged(
             final String configId,
-            final GUIViewAttribute attribute,
+            final ConfigViewAttribute attribute,
             final String value,
             final int listIndex) {
 
-        final GUIAttributeValue valueObj = new GUIAttributeValue(
+        final ConfigAttributeValue valueObj = new ConfigAttributeValue(
                 configId,
                 attribute.name,
                 attribute.parentAttributeName,
@@ -59,7 +59,7 @@ public class ViewValueChangeListener implements ValueChangeListener {
     }
 
     @Override
-    public void tableChanged(final GUITableValue tableValue) {
+    public void tableChanged(final ConfigTableValue tableValue) {
         try {
             final ObjectMapper mapper = new ObjectMapper();
             final String jsonValue = mapper.writeValueAsString(tableValue);

@@ -10,7 +10,7 @@ package org.eth.demo.sebserver.gui.service.rest;
 
 import java.util.Map;
 
-import org.eth.demo.sebserver.gui.views.AttributeKeys;
+import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
