@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eth.demo.sebserver.web.WebSecurityConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +27,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
+import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -47,6 +52,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     private String guiClientId;
     @Value("${sebserver.oauth.clients.guiClient.secret}")
     private String guiClientSecret;
+    @Autowired
+    private InternalUserDetailsService userDetailsService;
 
     @Primary
     @Bean
@@ -60,11 +67,26 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                         .toUriString());
         tokenService.setClientId(this.guiClientId);
         tokenService.setClientSecret(this.guiClientSecret);
+        tokenService.setAccessTokenConverter(accessTokenConverter());
         return tokenService;
     }
 
-    @Override
+    @Bean
+    public AccessTokenConverter accessTokenConverter() {
+        final DefaultAccessTokenConverter accessTokenConverter = new DefaultAccessTokenConverter();
+        accessTokenConverter.setUserTokenConverter(userAuthenticationConverter());
+        return accessTokenConverter;
+    }
 
+    @Bean
+    public UserAuthenticationConverter userAuthenticationConverter() {
+        final DefaultUserAuthenticationConverter userAuthenticationConverter =
+                new DefaultUserAuthenticationConverter();
+        userAuthenticationConverter.setUserDetailsService(this.userDetailsService);
+        return userAuthenticationConverter;
+    }
+
+    @Override
     public void configure(final ResourceServerSecurityConfigurer resources) {
         resources.resourceId(AuthorizationServerConfig.SEB_SERVER_API_RESOURCE_ID);
     }

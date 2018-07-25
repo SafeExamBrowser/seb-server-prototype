@@ -6,13 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.service.indicator;
+package org.eth.demo.sebserver.service.exam.run;
 
 import java.util.UUID;
 
 import org.eth.demo.sebserver.domain.ClientConnection;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
+import org.eth.demo.sebserver.service.exam.indicator.ClientIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

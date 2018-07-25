@@ -10,7 +10,7 @@ package org.eth.demo.sebserver.web.socket;
 
 import java.util.UUID;
 
-import org.eth.demo.sebserver.service.ExamSessionService;
+import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;

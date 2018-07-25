@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.service.dao;
+package org.eth.demo.sebserver.service.exam;
 
 import java.util.Collection;
 import java.util.function.Predicate;
@@ -15,11 +15,6 @@ import org.eth.demo.sebserver.domain.rest.exam.Exam;
 
 public interface ExamDao {
 
-    // TODO It should also be possible to use a Join here...
-    // NOTE Joins are a bit more complicated to implement and cannot be generated directly.
-    //      A join example is implements within getAll using ExamIndicatorJoinMapper
-    //      We should decide in case if it makes sense to use join. usually if a there
-    //      are a lot of rows to fetch we better implement and use a join to perform better.
     Exam byId(Long id);
 
     Collection<Exam> getAll();

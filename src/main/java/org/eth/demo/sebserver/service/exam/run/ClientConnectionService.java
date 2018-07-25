@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.service;
+package org.eth.demo.sebserver.service.exam.run;
 
 import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 
@@ -25,7 +25,7 @@ import org.eth.demo.sebserver.batis.gen.model.ClientConnectionRecord;
 import org.eth.demo.sebserver.domain.ClientConnection;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorValue;
-import org.eth.demo.sebserver.service.indicator.ClientConnectionFactory;
+import org.eth.demo.sebserver.service.exam.ExamStateService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

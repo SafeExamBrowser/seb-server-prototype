@@ -10,7 +10,10 @@ package org.eth.demo.sebserver.service;
 
 import java.util.concurrent.Executor;
 
-import org.eth.demo.sebserver.service.event.EventHandlingStrategy;
+import org.eth.demo.sebserver.service.exam.ExamStateService;
+import org.eth.demo.sebserver.service.exam.run.ClientConnectionService;
+import org.eth.demo.sebserver.service.exam.run.EventHandlingStrategy;
+import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;

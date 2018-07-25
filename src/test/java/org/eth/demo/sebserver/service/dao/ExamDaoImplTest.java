@@ -15,10 +15,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.eth.demo.sebserver.batis.ExamIndicatorJoinMapper;
+import org.eth.demo.sebserver.batis.ExamJoinMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.IndicatorRecordMapper;
 import org.eth.demo.sebserver.service.ResourceNotFoundException;
+import org.eth.demo.sebserver.service.exam.ExamDaoImpl;
 import org.eth.demo.sebserver.testing.TestWithLogging;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -64,7 +65,7 @@ public class ExamDaoImplTest extends TestWithLogging {
 
         final ExamRecordMapper examMapperMock = mock(ExamRecordMapper.class);
         final IndicatorRecordMapper indicatorMapperMock = mock(IndicatorRecordMapper.class);
-        final ExamIndicatorJoinMapper examIndicatorJoinMapperMock = mock(ExamIndicatorJoinMapper.class);
+        final ExamJoinMapper examIndicatorJoinMapperMock = mock(ExamJoinMapper.class);
 
         final ExamDaoImpl candidate;
 

@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorValue;
-import org.eth.demo.sebserver.service.ExamSessionService;
+import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;

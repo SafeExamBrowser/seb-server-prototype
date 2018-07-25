@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
@@ -169,7 +170,7 @@ public class OAuth2AuthorizationContextHolder implements AuthorizationContextHol
                 log.debug("Got token for user: {} : {}", username, accessToken);
                 this.loggedInUser = getLoggedInUser();
                 return true;
-            } catch (final OAuth2AccessDeniedException e) {
+            } catch (final OAuth2AccessDeniedException | AccessDeniedException e) {
                 log.info("Access Denied for user: {}", username);
                 return false;
             }
@@ -212,6 +213,9 @@ public class OAuth2AuthorizationContextHolder implements AuthorizationContextHol
                 } else {
                     throw new IllegalStateException("Logged in User requested on invalid or not logged in ");
                 }
+            } catch (final AccessDeniedException | OAuth2AccessDeniedException ade) {
+                log.error("Acccess denied while trying to request logged in User from API", ade);
+                throw ade;
             } catch (final Exception e) {
                 log.error("Unexpected error while trying to request logged in User from API", e);
                 throw new RuntimeException("Unexpected error while trying to request logged in User from API", e);

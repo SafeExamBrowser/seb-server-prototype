@@ -8,7 +8,7 @@
 
 package org.eth.demo.sebserver.web;
 
-import org.eth.demo.sebserver.web.oauth.SEBServerUserDetailService;
+import org.eth.demo.sebserver.web.oauth.InternalUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,7 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             new NegatedRequestMatcher(PUBLIC_URLS);
 
     @Autowired
-    private SEBServerUserDetailService userDetailsService;
+    private InternalUserDetailsService userDetailsService;
     @Autowired
     private PasswordEncoder userPasswordEncoder;
 

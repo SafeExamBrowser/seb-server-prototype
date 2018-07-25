@@ -139,10 +139,6 @@ public class LoginView implements ViewComposer {
                 }
             } catch (final Exception e) {
                 log.error("Unexpected error while trying to login with user: {}", username, e);
-
-                // just to be sure we leave a clean and proper authorizationContext
-                authorizationContext.logout();
-
                 loginError(viewService, parent, "Unexpected Error. Please call an Administrator");
             }
         });
@@ -153,6 +149,10 @@ public class LoginView implements ViewComposer {
             final Composite parent,
             final String message) {
 
+        // just to be sure we leave a clean and proper authorizationContext
+        this.authorizationContextHolder
+                .getAuthorizationContext()
+                .logout();
         viewService
                 .createViewOn(parent)
                 .attribute(AttributeKeys.AUTHORIZATION_FAILURE, message)

@@ -8,12 +8,14 @@
 
 package org.eth.demo.sebserver.web.http;
 
+import java.security.Principal;
 import java.util.Collection;
 
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
-import org.eth.demo.sebserver.service.ExamStateService;
-import org.eth.demo.sebserver.service.dao.ExamDao;
+import org.eth.demo.sebserver.service.exam.ExamDao;
+import org.eth.demo.sebserver.service.exam.ExamStateService;
+import org.eth.demo.sebserver.service.exam.UserPrivilegeExamFilter;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,8 +35,9 @@ public class ExamController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    final Collection<Exam> exams() {
-        return this.examDao.getAll();
+
+    final Collection<Exam> exams(final Principal principal) {
+        return this.examDao.getAll(UserPrivilegeExamFilter.of(principal));
     }
 
     @RequestMapping(value = "/{examId}", method = RequestMethod.GET)

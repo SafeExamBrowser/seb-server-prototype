@@ -11,7 +11,7 @@ package org.eth.demo.sebserver.web.http;
 import java.security.Principal;
 
 import org.eth.demo.sebserver.domain.rest.admin.User;
-import org.eth.demo.sebserver.service.dao.UserDao;
+import org.eth.demo.sebserver.service.admin.UserDao;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +29,6 @@ public class UserController {
     }
 
     @RequestMapping(value = "/me", method = RequestMethod.GET)
-    @PreAuthorize("hasAuthority('ADMIN_USER') or hasAuthority('STANDARD_USER')")
     public User loggedInUser(final Principal principal) {
         return this.userDao.byUserName(principal.getName());
     }

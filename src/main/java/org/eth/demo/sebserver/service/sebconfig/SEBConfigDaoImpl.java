@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.service.dao;
+package org.eth.demo.sebserver.service.sebconfig;
 
 import static org.eth.demo.sebserver.batis.gen.mapper.ConfigurationAttributeRecordDynamicSqlSupport.name;
 import static org.eth.demo.sebserver.batis.gen.mapper.ConfigurationValueRecordDynamicSqlSupport.*;
@@ -37,13 +37,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Lazy
 @Component
-public class ConfigViewDaoImpl {
+public class SEBConfigDaoImpl implements SEBConfigDao {
 
     private final AttributeOrientationJoinMapper attributeOrientationJoinMapper;
     private final ConfigurationAttributeRecordMapper configurationAttributeRecordMapper;
     private final ConfigurationValueRecordMapper configurationValueRecordMapper;
 
-    public ConfigViewDaoImpl(
+    public SEBConfigDaoImpl(
             final AttributeOrientationJoinMapper attributeOrientationJoinMapper,
             final ConfigurationAttributeRecordMapper configurationAttributeRecordMapper,
             final ConfigurationValueRecordMapper configurationValueRecordMapper) {
@@ -53,6 +53,10 @@ public class ConfigViewDaoImpl {
         this.configurationValueRecordMapper = configurationValueRecordMapper;
     }
 
+    /* (non-Javadoc)
+     * @see org.eth.demo.sebserver.service.dao.SEBConfigDao#getAttributes(java.lang.String)
+     */
+    @Override
     @Transactional(readOnly = true)
     public Collection<ViewAttribute> getAttributes(final String viewName) {
         final Collection<JoinRecord> allOfView = this.attributeOrientationJoinMapper.selectOfView(viewName);
@@ -75,6 +79,10 @@ public class ConfigViewDaoImpl {
                 .collect(Collectors.toList());
     }
 
+    /* (non-Javadoc)
+     * @see org.eth.demo.sebserver.service.dao.SEBConfigDao#getValues(java.lang.Long, java.util.List)
+     */
+    @Override
     @Transactional(readOnly = true)
     public Collection<AttributeValue> getValues(final Long configId, final List<String> attributeNames) {
 
@@ -113,6 +121,10 @@ public class ConfigViewDaoImpl {
 
     }
 
+    /* (non-Javadoc)
+     * @see org.eth.demo.sebserver.service.dao.SEBConfigDao#attributeValueFromRecord(org.eth.demo.sebserver.batis.gen.model.ConfigurationValueRecord)
+     */
+    @Override
     public AttributeValue attributeValueFromRecord(final ConfigurationValueRecord record) {
         final ConfigurationAttributeRecord attribute = this.configurationAttributeRecordMapper
                 .selectByPrimaryKey(record.getConfigurationAttributeId());
@@ -127,6 +139,10 @@ public class ConfigViewDaoImpl {
                 record.getValue());
     }
 
+    /* (non-Javadoc)
+     * @see org.eth.demo.sebserver.service.dao.SEBConfigDao#saveValue(org.eth.demo.sebserver.domain.rest.sebconfig.AttributeValue)
+     */
+    @Override
     @Transactional
     public Long saveValue(final AttributeValue value) {
         final ConfigurationAttributeRecord attribute = getAttribute(value.attributeName, value.parentAttributeName);
@@ -160,6 +176,10 @@ public class ConfigViewDaoImpl {
         return valueRecord.getId();
     }
 
+    /* (non-Javadoc)
+     * @see org.eth.demo.sebserver.service.dao.SEBConfigDao#saveTableValue(org.eth.demo.sebserver.domain.rest.sebconfig.TableValue)
+     */
+    @Override
     @Transactional
     public void saveTableValue(final TableValue value) {
         final ConfigurationAttributeRecord attribute = getAttribute(value.attributeName, null);
@@ -175,7 +195,7 @@ public class ConfigViewDaoImpl {
         final int columns = columnAttributeIds.size();
 
         // first delete all old values of this table
-        final Integer deleteCount = this.configurationValueRecordMapper.deleteByExample()
+        this.configurationValueRecordMapper.deleteByExample()
                 .where(configurationId, isEqualTo(value.configId))
                 .and(configurationAttributeId, SqlBuilder.isIn(columnAttributeIds))
                 .build()

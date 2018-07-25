@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.service.indicator;
+package org.eth.demo.sebserver.service.exam.indicator;
 
 import java.math.BigDecimal;
 import java.util.UUID;

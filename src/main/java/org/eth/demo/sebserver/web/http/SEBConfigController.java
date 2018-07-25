@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eth.demo.sebserver.domain.rest.sebconfig.AttributeValue;
 import org.eth.demo.sebserver.domain.rest.sebconfig.TableValue;
 import org.eth.demo.sebserver.domain.rest.sebconfig.ViewAttribute;
-import org.eth.demo.sebserver.service.dao.ConfigViewDaoImpl;
+import org.eth.demo.sebserver.service.sebconfig.SEBConfigDao;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -27,17 +27,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/sebconfig")
-public class SEBConfigurationController {
+public class SEBConfigController {
 
-    private final ConfigViewDaoImpl configViewDaoImpl;
+    private final SEBConfigDao sebConfigDao;
 
-    public SEBConfigurationController(final ConfigViewDaoImpl configViewDaoImpl) {
-        this.configViewDaoImpl = configViewDaoImpl;
+    public SEBConfigController(final SEBConfigDao sebConfigDao) {
+        this.sebConfigDao = sebConfigDao;
     }
 
     @RequestMapping(value = "attributes/{viewName}", method = RequestMethod.GET)
     final Collection<ViewAttribute> getAttributesOfView(@PathVariable final String viewName) {
-        return this.configViewDaoImpl.getAttributes(viewName);
+        return this.sebConfigDao.getAttributes(viewName);
     }
 
     @RequestMapping(value = "values/{configId}", method = RequestMethod.GET)
@@ -50,19 +50,19 @@ public class SEBConfigurationController {
             return Collections.emptyList();
         }
 
-        return this.configViewDaoImpl.getValues(configId, attrNames);
+        return this.sebConfigDao.getValues(configId, attrNames);
     }
 
     // TODO here we should add a validation error response
     @RequestMapping(value = "saveValue", method = RequestMethod.POST)
     final void saveValue(@RequestBody final AttributeValue value) {
-        this.configViewDaoImpl.saveValue(value);
+        this.sebConfigDao.saveValue(value);
     }
 
     // TODO here we should add a validation error response
     @RequestMapping(value = "saveTable", method = RequestMethod.POST)
     final void saveValue(@RequestBody final TableValue value) {
-        this.configViewDaoImpl.saveTableValue(value);
+        this.sebConfigDao.saveTableValue(value);
     }
 
 }

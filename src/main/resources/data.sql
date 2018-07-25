@@ -1,11 +1,13 @@
 INSERT INTO user VALUES 
     (1, "Admin1", "admin", "$2a$08$c2GKYEYoUVXH1Yb8GXVXVu66ltPvbZgLMcVSXRH.LgZNF/YeaYB8m", "admin@nomail.nomail", '2018-01-01 00:00:00', 1),
-    (2, "User1", "user1", "$2a$08$XkDcqOPfp6L6CkRlYUZ61e1pT.ut8NblPE4IujHIiOzxQkVwo2O8q", "user1@nomail.nomail", '2018-01-01 00:00:00', 1)
+    (2, "User1", "user1", "$2a$08$0mBB2.NPUsg0afMhYq5NE.Te.g.QnzIH8ncKs65zYtoyV/NV2X8ne", "user1@nomail.nomail", '2018-01-01 00:00:00', 1),
+    (3, "User2", "user2", "$2a$08$VSQl35ERwunAEKMGt7XhkuqkDD4ze4I8j/RDdRw8jzqhjwzuqiGQi", "user2@nomail.nomail", '2018-01-01 00:00:00', 1)
     ;
     
 INSERT INTO user_role VALUES
     (1, 1, "ADMIN_USER"),
-    (2, 2, "STANDARD_USER")
+    (2, 2, "STANDARD_USER"),
+    (3, 3, "STANDARD_USER")
     ;
 
 INSERT INTO configuration_attribute VALUES
@@ -57,19 +59,22 @@ INSERT INTO orientation VALUES
     ;
     
 INSERT INTO configuration VALUES
-    (1, "Demo Config", "CLIENT", 2);
+    (1, "Demo Config", "CLIENT", 2)
+    ;
 
 INSERT INTO `exam` VALUES 
     (1,'Demo Exam 1',0, 2),
     (2,'Demo Exam 2',0, 2),
-    (3,'Demo Exam 3',1, 2),
-    (4,'Demo Exam 4',2, 2);
-    
+    (3,'Demo Exam 3',1, 3),
+    (4,'Demo Exam 4',2, 3)
+    ;
+
 INSERT INTO indicator VALUES 
     (NULL,1,"DemoIndicator1",20.0000,40.0000,60.0000),
     (NULL,1,"errorCountIndicator",1.0000,2.0000,3.0000),
     (NULL,3,"errorCountIndicator",1.0000,2.0000,3.0000),
     (NULL,4,"errorCountIndicator",1.0000,2.0000,3.0000),
     (NULL,3,"pingIntervalIndicator",1000,2000,5000),
-    (NULL,4,"pingIntervalIndicator",1000,2000,5000);
+    (NULL,4,"pingIntervalIndicator",1000,2000,5000)
+    ;
 

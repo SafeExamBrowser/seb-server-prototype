@@ -6,23 +6,21 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.service.dao;
+package org.eth.demo.sebserver.service.exam;
 
 import static org.eth.demo.sebserver.batis.gen.mapper.IndicatorRecordDynamicSqlSupport.examId;
 import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.eth.demo.sebserver.batis.ExamIndicatorJoinMapper;
+import org.eth.demo.sebserver.batis.ExamJoinMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.IndicatorRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ExamRecord;
-import org.eth.demo.sebserver.batis.gen.model.IndicatorRecord;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
-import org.eth.demo.sebserver.service.ResourceNotFoundException;
+import org.mybatis.dynamic.sql.select.MyBatis3SelectModelAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -37,17 +35,17 @@ public class ExamDaoImpl implements ExamDao {
 
     private final ExamRecordMapper examMapper;
     private final IndicatorRecordMapper indicatorMapper;
-    private final ExamIndicatorJoinMapper examIndicatorJoinMapper;
+    private final ExamJoinMapper examJoinMapper;
 
     public ExamDaoImpl(
             final ExamRecordMapper examMapper,
             final IndicatorRecordMapper indicatorMapper,
-            final ExamIndicatorJoinMapper examIndicatorJoinMapper) {
+            final ExamJoinMapper examJoinMapper) {
 
         super();
         this.examMapper = examMapper;
         this.indicatorMapper = indicatorMapper;
-        this.examIndicatorJoinMapper = examIndicatorJoinMapper;
+        this.examJoinMapper = examJoinMapper;
     }
 
     // TODO It should also be possible to use a Join here...
@@ -63,18 +61,12 @@ public class ExamDaoImpl implements ExamDao {
     @Transactional(readOnly = true)
     @Override
     public Exam byId(final Long id) {
-        final ExamRecord record = this.examMapper.selectByPrimaryKey(id);
-        if (record == null) {
-            log.info("Exam with id {} requested but not exists", id);
-            throw new ResourceNotFoundException("Exam", String.valueOf(id));
-        }
-
-        final List<IndicatorRecord> indicators = this.indicatorMapper.selectByExample()
+        final MyBatis3SelectModelAdapter<Exam> select = this.examJoinMapper
+                .selectOneByExample()
                 .where(examId, isEqualTo(id))
-                .build()
-                .execute();
+                .build();
 
-        return Exam.fromRecords(record, indicators);
+        return select.execute();
     }
 
     /*
@@ -85,7 +77,11 @@ public class ExamDaoImpl implements ExamDao {
     @Transactional(readOnly = true)
     @Override
     public Collection<Exam> getAll() {
-        return this.examIndicatorJoinMapper.selectAll();
+        final MyBatis3SelectModelAdapter<Collection<Exam>> select = this.examJoinMapper
+                .selectManyByExample()
+                .build();
+
+        return select.execute();
     }
 
     /*

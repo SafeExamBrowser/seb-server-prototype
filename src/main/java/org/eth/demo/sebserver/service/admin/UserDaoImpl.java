@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.service.dao;
+package org.eth.demo.sebserver.service.admin;
 
 import static org.eth.demo.sebserver.batis.gen.mapper.RoleRecordDynamicSqlSupport.userId;
 import static org.eth.demo.sebserver.batis.gen.mapper.UserRecordDynamicSqlSupport.active;

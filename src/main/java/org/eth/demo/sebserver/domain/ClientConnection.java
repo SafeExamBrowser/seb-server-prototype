@@ -14,7 +14,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
-import org.eth.demo.sebserver.service.indicator.ClientIndicator;
+import org.eth.demo.sebserver.service.exam.indicator.ClientIndicator;
 
 public class ClientConnection {
 

@@ -45,7 +45,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Autowired
     private DataSource dataSource;
     @Autowired
-    private SEBServerUserDetailService userDetailService;
+    private InternalUserDetailsService userDetailsService;
     @Autowired
     private ClientPasswordEncoder clientPasswordEncoder;
 
@@ -86,7 +86,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         endpoints
                 .tokenStore(tokenStore())
                 .authenticationManager(this.authenticationManager)
-                .userDetailsService(this.userDetailService)
+                .userDetailsService(this.userDetailsService)
                 .accessTokenConverter(new JwtAccessTokenConverter());
     }
 
