@@ -68,6 +68,10 @@ public class UserInfo {
         return this.roles;
     }
 
+    public boolean hasRole(final UserRole role) {
+        return hasRole(role.name());
+    }
+
     public boolean hasRole(final String role) {
         for (final Role r : this.roles) {
             if (r.roleName.equals(role)) {

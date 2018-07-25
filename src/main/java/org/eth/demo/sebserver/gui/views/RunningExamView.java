@@ -41,7 +41,7 @@ import org.eth.demo.sebserver.gui.service.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
 import org.eth.demo.sebserver.gui.service.push.ServerPushContext;
 import org.eth.demo.sebserver.gui.service.push.ServerPushService;
-import org.eth.demo.sebserver.gui.service.rest.GETExamDetail;
+import org.eth.demo.sebserver.gui.service.rest.GETRunningExamDetails;
 import org.eth.demo.sebserver.gui.service.rest.GETIndicatorValues;
 import org.eth.demo.sebserver.gui.service.rest.SEBServerAPICall.APICallBuilder;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
@@ -53,13 +53,13 @@ import org.springframework.stereotype.Component;
 public class RunningExamView implements ViewComposer {
 
     private final ServerPushService serverPushService;
-    private final GETExamDetail examDetailRequest;
+    private final GETRunningExamDetails examDetailRequest;
     private final GETIndicatorValues indicatorValuesRequest;
     private final AuthorizationContextHolder authorizationContextHolder;
 
     public RunningExamView(
             final ServerPushService serverPushService,
-            final GETExamDetail examDetailRequest,
+            final GETRunningExamDetails examDetailRequest,
             final GETIndicatorValues indicatorValuesRequest,
             final AuthorizationContextHolder authorizationContextHolder) {
 

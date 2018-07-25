@@ -19,11 +19,11 @@ import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
-public class GETExamDetail implements SEBServerAPICall<RunningExam> {
+public class GETRunningExamDetails implements SEBServerAPICall<RunningExam> {
 
     private final RestCallBuilder restCallBuilder;
 
-    public GETExamDetail(final RestCallBuilder restCallBuilder) {
+    public GETRunningExamDetails(final RestCallBuilder restCallBuilder) {
         this.restCallBuilder = restCallBuilder;
     }
 

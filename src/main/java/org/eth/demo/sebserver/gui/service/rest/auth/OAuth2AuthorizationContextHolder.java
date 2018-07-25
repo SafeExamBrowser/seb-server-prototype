@@ -15,6 +15,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eth.demo.sebserver.gui.domain.admin.UserInfo;
+import org.eth.demo.sebserver.gui.domain.admin.UserRole;
 import org.eth.demo.sebserver.gui.service.rest.RestCallBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -223,7 +224,7 @@ public class OAuth2AuthorizationContextHolder implements AuthorizationContextHol
         }
 
         @Override
-        public boolean hasRole(final String role) {
+        public boolean hasRole(final UserRole role) {
             if (!isValid() || !isLoggedIn()) {
                 return false;
             }

@@ -10,7 +10,7 @@ package org.eth.demo.sebserver.gui.service.rest;
 
 import java.util.Map;
 
-import org.eth.demo.sebserver.gui.domain.exam.RunningExam;
+import org.eth.demo.sebserver.gui.domain.exam.ExamTableRow;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -18,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
-public final class POSTExamStateChange implements SEBServerAPICall<RunningExam> {
+public final class POSTExamStateChange implements SEBServerAPICall<ExamTableRow> {
 
     private final RestCallBuilder restCallBuilder;
 
@@ -27,7 +27,7 @@ public final class POSTExamStateChange implements SEBServerAPICall<RunningExam> 
     }
 
     @Override
-    public Response<RunningExam> doAPICall(
+    public Response<ExamTableRow> doAPICall(
             final RestTemplate restTemplate,
             final Map<String, String> attributes) {
 
@@ -43,7 +43,7 @@ public final class POSTExamStateChange implements SEBServerAPICall<RunningExam> 
                                     .httpEntity()
                                     .withContentTypeJson()
                                     .build(),
-                            RunningExam.class));
+                            ExamTableRow.class));
         } catch (final Throwable t) {
             return new Response<>(t);
         }

@@ -26,8 +26,9 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eth.demo.sebserver.gui.domain.admin.UserRole;
 import org.eth.demo.sebserver.gui.domain.exam.ExamStatus;
-import org.eth.demo.sebserver.gui.domain.exam.RunningExam;
+import org.eth.demo.sebserver.gui.domain.exam.ExamTableRow;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.eth.demo.sebserver.gui.service.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
@@ -96,7 +97,7 @@ public class ExamOverview implements ViewComposer {
         admin.addListener(SWT.Selection, event -> {
             System.out.println("***** TODO Admin Section");
         });
-        admin.setVisible(authorizationContext.hasRole("ADMIN_USER"));
+        admin.setVisible(authorizationContext.hasRole(UserRole.ADMIN_USER));
 
         final Button logout = new Button(titleGroup, SWT.NONE);
         logout.setText("Logout");
@@ -123,7 +124,7 @@ public class ExamOverview implements ViewComposer {
 
     private void createExamsTable(final Composite parent, final Group group) {
         // get all exams for the current logged in user from the SEBServer Web-Service API
-        final Collection<RunningExam> exams = this.examsRequest
+        final Collection<ExamTableRow> exams = this.examsRequest
                 .with(this.authorizationContextHolder)
                 .doAPICall()
                 .orElse(t -> t.printStackTrace()); // TODO error handling
@@ -148,11 +149,11 @@ public class ExamOverview implements ViewComposer {
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
 
-        for (final RunningExam exam : exams) {
+        for (final ExamTableRow exam : exams) {
             final TableItem item = new TableItem(table, SWT.RIGHT);
             item.setText(0, String.valueOf(exam.id));
             item.setText(1, exam.name);
-            item.setText(2, exam.status.name());
+            item.setText(2, exam.status);
             item.setData(ITEM_DATA_EXAM, exam);
             item.addListener(SWT.Selection, event -> {
                 System.out.println("table item selection: ");
@@ -190,26 +191,32 @@ public class ExamOverview implements ViewComposer {
     }
 
     private final void composeExamMenu(final Menu menu, final TableItem item) {
-        final RunningExam exam = (RunningExam) item.getData(ITEM_DATA_EXAM);
+        final ExamTableRow exam = (ExamTableRow) item.getData(ITEM_DATA_EXAM);
         if (menu.getItemCount() > 0) {
             for (final MenuItem mItem : menu.getItems()) {
                 mItem.dispose();
             }
         }
 
-        switch (exam.status) {
+        switch (exam.getExamStatus()) {
             case IN_PROGRESS: {
-                addEditAction(menu, exam.id);
-                addStateChangeAction("Set Ready", menu, item, String.valueOf(exam.id), ExamStatus.READY);
+                addViewExamAction(menu, exam.id);
+                if (exam.isOwner(this.authorizationContextHolder)) {
+                    addEditAction(menu, exam.id);
+                    addStateChangeAction("Set Ready", menu, item, exam.id, ExamStatus.READY);
+                }
                 break;
             }
             case READY: {
-                addStateChangeAction("Back To Edit", menu, item, String.valueOf(exam.id), ExamStatus.IN_PROGRESS);
-                addStateChangeAction("Run", menu, item, String.valueOf(exam.id), ExamStatus.RUNNING);
+                addViewExamAction(menu, exam.id);
+                if (exam.isOwner(this.authorizationContextHolder)) {
+                    addStateChangeAction("Back To Edit", menu, item, exam.id, ExamStatus.IN_PROGRESS);
+                    addStateChangeAction("Run", menu, item, exam.id, ExamStatus.RUNNING);
+                }
                 break;
             }
             case RUNNING: {
-                addViewRunningExamAction(menu, String.valueOf(exam.id));
+                addViewRunningExamAction(menu, exam.id);
                 break;
             }
             default: {
@@ -217,11 +224,19 @@ public class ExamOverview implements ViewComposer {
         }
     }
 
-    private final void addEditAction(final Menu menu, final Long examId) {
+    private final void addViewExamAction(final Menu menu, final String examId) {
+        final MenuItem item = new MenuItem(menu, SWT.NULL);
+        item.setText("View");
+        item.addListener(SWT.Selection, event -> {
+            System.out.println("**************** TODO goto exam info page");
+        });
+    }
+
+    private final void addEditAction(final Menu menu, final String examId) {
         final MenuItem item = new MenuItem(menu, SWT.NULL);
         item.setText("Edit");
         item.addListener(SWT.Selection, event -> {
-            System.out.println("******************* edit " + examId);
+            System.out.println("**************** TODO goto exam edit page");
         });
     }
 
@@ -236,14 +251,14 @@ public class ExamOverview implements ViewComposer {
         item.setText(name);
         item.addListener(SWT.Selection, event -> {
 
-            final RunningExam newExam = this.examStateChange
+            final ExamTableRow newExam = this.examStateChange
                     .with(this.authorizationContextHolder)
                     .exam(examId)
                     .toState(toState.name())
                     .doAPICall()
                     .orElse(t -> t.printStackTrace()); // TODO error handling
 
-            tItem.setText(2, newExam.status.name());
+            tItem.setText(2, newExam.status);
             tItem.setData(ITEM_DATA_EXAM, newExam);
         });
     }
