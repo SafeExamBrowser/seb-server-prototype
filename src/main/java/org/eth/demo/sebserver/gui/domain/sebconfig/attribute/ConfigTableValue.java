@@ -6,27 +6,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.domain.rest.sebconfig;
+package org.eth.demo.sebserver.gui.domain.sebconfig.attribute;
 
 import java.util.Collections;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+public class ConfigTableValue {
 
-public class TableValue {
-
-    public final Long configId;
+    public final String configId;
     public final String attributeName;
     public final List<String> columns;
     public final List<String> values;
 
-    @JsonCreator
-    public TableValue(
-            @JsonProperty("configId") final Long configId,
-            @JsonProperty("attributeName") final String attributeName,
-            @JsonProperty("columns") final List<String> columns,
-            @JsonProperty("values") final List<String> values) {
+    public ConfigTableValue(
+            final String configId,
+            final String attributeName,
+            final List<String> columns,
+            final List<String> values) {
 
         this.configId = configId;
         this.attributeName = attributeName;
@@ -34,7 +30,7 @@ public class TableValue {
         this.values = Collections.unmodifiableList(values);
     }
 
-    public Long getConfigId() {
+    public String getConfigId() {
         return this.configId;
     }
 
@@ -52,7 +48,7 @@ public class TableValue {
 
     @Override
     public String toString() {
-        return "GUITableValue [configId=" + this.configId + ", attributeName=" + this.attributeName + ", columns="
+        return "ConfigTableValue [configId=" + this.configId + ", attributeName=" + this.attributeName + ", columns="
                 + this.columns
                 + ", values=" + this.values + "]";
     }

@@ -9,7 +9,7 @@
 package org.eth.demo.sebserver.gui.service.sebconfig;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
 
 public interface InputComponentBuilder {

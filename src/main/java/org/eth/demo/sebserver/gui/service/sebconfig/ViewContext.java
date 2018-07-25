@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormData;
-import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewGridCell;
-import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigAttributeValue;
-import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigAttributeValue;
+import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigViewGridCell;
 
 public final class ViewContext {
 

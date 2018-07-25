@@ -21,8 +21,7 @@ public class RunningExam {
 
     public final Long id;
     public final String name;
-    public final Integer status;
-    public final String statusName;
+    public final ExamStatus status;
     private final List<String> indicatorTypeList;
     private final List<Indicator> indicatorList;
     private final Map<String, Indicator> indicators;
@@ -31,14 +30,12 @@ public class RunningExam {
     public RunningExam(
             @JsonProperty("id") final Long id,
             @JsonProperty("name") final String name,
-            @JsonProperty("status") final Integer status,
-            @JsonProperty("statusName") final String statusName,
+            @JsonProperty("status") final String status,
             @JsonProperty("indicators") final Collection<Indicator> indicatorList) {
 
         this.id = id;
         this.name = name;
-        this.status = status;
-        this.statusName = statusName;
+        this.status = ExamStatus.valueOf(status);
 
         this.indicatorTypeList = new ArrayList<>();
         this.indicatorList = new ArrayList<>();
@@ -61,12 +58,8 @@ public class RunningExam {
         return this.name;
     }
 
-    public Integer getStatus() {
+    public ExamStatus getStatus() {
         return this.status;
-    }
-
-    public String getStatusName() {
-        return this.statusName;
     }
 
     public Collection<Indicator> getIndicators() {
@@ -119,7 +112,7 @@ public class RunningExam {
         return "ExamInfo [id=" + this.id
                 + ", name=" + this.name
                 + ", status=" + this.status
-                + ", statusName=" + this.statusName
+                + ", status=" + this.status
                 + ", indicators=" + this.indicators + "]";
     }
 

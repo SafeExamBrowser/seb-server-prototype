@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.domain.sebconfig;
+package org.eth.demo.sebserver.gui.domain.sebconfig.attribute;
 
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
 import org.slf4j.Logger;

@@ -26,8 +26,8 @@ public class AttributeMapBuilder<T extends AttributeMapBuilder<T>> {
         return (T) this;
     }
 
-    public T toState(final String stateId) {
-        this.attributes.put(AttributeKeys.STATE_ID, stateId);
+    public T toState(final String stateName) {
+        this.attributes.put(AttributeKeys.STATE_NAME, stateName);
         return (T) this;
     }
 

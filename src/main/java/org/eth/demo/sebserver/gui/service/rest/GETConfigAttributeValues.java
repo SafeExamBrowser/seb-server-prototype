@@ -11,7 +11,7 @@ package org.eth.demo.sebserver.gui.service.rest;
 import java.util.Collection;
 import java.util.Map;
 
-import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigAttributeValue;
+import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigAttributeValue;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;

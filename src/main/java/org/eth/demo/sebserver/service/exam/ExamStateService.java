@@ -52,7 +52,7 @@ public class ExamStateService {
     @Transactional
     public Exam processStateChange(final Long examId, final ExamStatus toState) {
         final ExamRecord examRecord = this.examRecordMapper.selectByPrimaryKey(examId);
-        final ExamStatus currentStatus = ExamStatus.byId(examRecord.getStatus());
+        final ExamStatus currentStatus = ExamStatus.valueOf(examRecord.getStatus());
 
         switch (toState) {
             case IN_PROGRESS: {
@@ -98,8 +98,8 @@ public class ExamStateService {
                 return this.examDao.byId(examId);
             }
             default: {
-                throw new RuntimeException("Invalid state change request form: " + currentStatus.displayName
-                        + " to: " + toState.displayName);
+                throw new RuntimeException("Invalid state change request form: " + currentStatus
+                        + " to: " + toState);
             }
         }
 
@@ -125,7 +125,7 @@ public class ExamStateService {
     private boolean cacheRunningExam(final Long id) {
         final Long count = this.examRecordMapper.countByExample()
                 .where(examRecord.id, isEqualTo(id))
-                .and(examRecord.status, isEqualTo(ExamStatus.RUNNING.id))
+                .and(examRecord.status, isEqualTo(ExamStatus.RUNNING.name()))
                 .build()
                 .execute();
 
@@ -138,13 +138,13 @@ public class ExamStateService {
     }
 
     private void save(final Long examId, final ExamStatus toState) {
-        final ExamRecord recordWithIdAndChanges = new ExamRecord(examId, null, toState.id, null);
+        final ExamRecord recordWithIdAndChanges = new ExamRecord(examId, null, toState.name(), null);
         this.examRecordMapper.updateByPrimaryKeySelective(recordWithIdAndChanges);
     }
 
     private void invalidStateException(final ExamStatus toState, final ExamStatus currentStatus) {
-        throw new RuntimeException("Invalid state change request form: " + currentStatus.displayName
-                + " to: " + toState.displayName);
+        throw new RuntimeException("Invalid state change request form: " + currentStatus
+                + " to: " + toState);
     }
 
 }

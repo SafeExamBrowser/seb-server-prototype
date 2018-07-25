@@ -33,6 +33,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.eth.demo.sebserver.Utils;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.ExamSEBConfigMapping;
+import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
 import org.mybatis.dynamic.sql.select.MyBatis3SelectModelAdapter;
 import org.mybatis.dynamic.sql.select.QueryExpressionDSL;
@@ -48,7 +49,7 @@ public interface ExamJoinMapper {
     @ConstructorArgs({
             @Arg(column = "id", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Arg(column = "status", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Arg(column = "status", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "owner_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
 
             @Arg(column = "indicatorId", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
@@ -58,8 +59,8 @@ public interface ExamJoinMapper {
             @Arg(column = "threshold3", javaType = BigDecimal.class, jdbcType = JdbcType.DECIMAL),
 
             @Arg(column = "configMappingId", javaType = Long.class, jdbcType = JdbcType.BIGINT),
-            @Arg(column = "configurationId", javaType = Long.class, jdbcType = JdbcType.BIGINT),
-            @Arg(column = "clientInfo", javaType = String.class, jdbcType = JdbcType.VARCHAR)
+            @Arg(column = "configuration_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
+            @Arg(column = "client_info", javaType = String.class, jdbcType = JdbcType.VARCHAR)
     })
     void selectMany(
             SelectStatementProvider select,
@@ -96,7 +97,7 @@ public interface ExamJoinMapper {
                 examRecord.id,
                 examRecord.name,
                 examRecord.status,
-                examRecord.ownerId.as("owner_id"),
+                examRecord.ownerId,
                 indicatorRecord.id.as("indicatorId"),
                 indicatorRecord.type,
                 indicatorRecord.threshold1,
@@ -153,7 +154,7 @@ public interface ExamJoinMapper {
     public static final class JoinRecord {
         public final Long id;
         public final String name;
-        public final Integer status;
+        public final String status;
         public final Long ownerId;
         public final IndicatorDefinition indicator;
         public final ExamSEBConfigMapping configMapping;
@@ -161,7 +162,7 @@ public interface ExamJoinMapper {
         private JoinRecord(
                 final Long id,
                 final String name,
-                final Integer status,
+                final String status,
                 final Long ownerId,
                 final Long indicatorId,
                 final String type,
@@ -185,7 +186,7 @@ public interface ExamJoinMapper {
         }
 
         Exam createPrototype() {
-            return new Exam(id, name, status, ownerId, null, null);
+            return new Exam(id, name, ExamStatus.valueOf(status), ownerId, null, null);
         }
     }
 

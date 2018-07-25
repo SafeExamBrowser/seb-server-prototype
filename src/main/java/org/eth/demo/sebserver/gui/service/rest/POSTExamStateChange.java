@@ -32,7 +32,7 @@ public final class POSTExamStateChange implements SEBServerAPICall<RunningExam> 
             final Map<String, String> attributes) {
 
         final String examId = getAttribute(attributes, AttributeKeys.EXAM_ID);
-        final String toState = getAttribute(attributes, AttributeKeys.STATE_ID);
+        final String toState = getAttribute(attributes, AttributeKeys.STATE_NAME);
 
         try {
             return new Response<>(

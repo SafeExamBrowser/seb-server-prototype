@@ -9,7 +9,7 @@
 package org.eth.demo.sebserver.gui.service.sebconfig.typebuilder;
 
 import org.eclipse.swt.widgets.Control;
-import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigViewAttribute;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField;
 
 public abstract class ControlFieldAdapter<T extends Control> implements InputField {

@@ -56,7 +56,7 @@ DROP TABLE IF EXISTS `exam` ;
 CREATE TABLE IF NOT EXISTS `exam` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
-  `status` INT(1) NOT NULL,
+  `status` VARCHAR(45) NOT NULL,
   `owner_id` BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `examOwnerRef_idx` (`owner_id` ASC),

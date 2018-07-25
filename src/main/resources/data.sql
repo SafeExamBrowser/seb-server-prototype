@@ -63,10 +63,10 @@ INSERT INTO configuration VALUES
     ;
 
 INSERT INTO `exam` VALUES 
-    (1,'Demo Exam 1',0, 2),
-    (2,'Demo Exam 2',0, 2),
-    (3,'Demo Exam 3',1, 3),
-    (4,'Demo Exam 4',2, 3)
+    (1,'Demo Exam 1','IN_PROGRESS', 2),
+    (2,'Demo Exam 2','IN_PROGRESS', 2),
+    (3,'Demo Exam 3','READY', 3),
+    (4,'Demo Exam 4','RUNNING', 3)
     ;
 
 INSERT INTO indicator VALUES 

@@ -8,8 +8,8 @@
 
 package org.eth.demo.sebserver.gui.service.sebconfig;
 
-import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigTableValue;
-import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigViewAttribute;
+import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigTableValue;
+import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigViewAttribute;
 
 public interface ValueChangeListener {
 

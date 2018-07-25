@@ -6,9 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.domain.rest.sebconfig;
+package org.eth.demo.sebserver.domain.rest.sebconfig.attribute;
 
-import static org.eth.demo.sebserver.domain.rest.sebconfig.ConfigurationValueType.*;
+import static org.eth.demo.sebserver.domain.rest.sebconfig.attribute.AttributeValueType.*;
 
 //@formatter:off
 public enum AttributeType {
@@ -27,10 +27,10 @@ public enum AttributeType {
     TABLE(COMPOSITE_LIST),
     ;
 
-    public final ConfigurationValueType configurationValueType;
+    public final AttributeValueType attributeValueType;
 
-    private AttributeType(final ConfigurationValueType configurationValueType) {
-        this.configurationValueType = configurationValueType;
+    private AttributeType(final AttributeValueType attributeValueType) {
+        this.attributeValueType = attributeValueType;
     }
 }
 //@formatter:on

@@ -20,8 +20,7 @@ public final class Exam {
 
     public final Long id;
     public final String name;
-    public final Integer status;
-    public final String statusName;
+    public final ExamStatus status;
     public final Long ownerId;
     public final Collection<IndicatorDefinition> indicators;
     public final Collection<ExamSEBConfigMapping> sebConfigMapping;
@@ -30,7 +29,7 @@ public final class Exam {
     public Exam(
             @JsonProperty("id") final Long id,
             @JsonProperty("name") final String name,
-            @JsonProperty("status") final Integer status,
+            @JsonProperty("status") final ExamStatus status,
             @JsonProperty("ownerId") final Long ownerId,
             @JsonProperty("indicators") final Collection<IndicatorDefinition> indicators,
             @JsonProperty("sebConfigMapping") final Collection<ExamSEBConfigMapping> sebConfigMapping) {
@@ -39,7 +38,6 @@ public final class Exam {
         this.name = name;
         this.status = status;
         this.ownerId = ownerId;
-        this.statusName = ExamStatus.getDisplayName(status);
         this.indicators = (indicators != null)
                 ? Collections.unmodifiableCollection(indicators)
                 : Collections.emptyList();
@@ -56,12 +54,8 @@ public final class Exam {
         return this.name;
     }
 
-    public Integer getStatus() {
+    public ExamStatus getStatus() {
         return this.status;
-    }
-
-    public String getStatusName() {
-        return this.statusName;
     }
 
     public Long getOwnerId() {
@@ -111,7 +105,7 @@ public final class Exam {
 //    }
 
     public final ExamRecord toExamRecord() {
-        return new ExamRecord(this.id, this.name, this.status, this.ownerId);
+        return new ExamRecord(this.id, this.name, this.status.name(), this.ownerId);
     }
 
     public static final Exam of(

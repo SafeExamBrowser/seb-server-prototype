@@ -6,9 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.domain.rest.sebconfig;
+package org.eth.demo.sebserver.domain.rest.sebconfig.attribute;
 
-public final class ViewAttribute {
+public final class Attribute {
 
     public final String name;
     public final AttributeType type;
@@ -21,7 +21,7 @@ public final class ViewAttribute {
     public final int xpos;
     public final int ypos;
 
-    public ViewAttribute(final String name,
+    public Attribute(final String name,
             final AttributeType type,
             final String parentAttributeName,
             final String resources,
@@ -82,7 +82,7 @@ public final class ViewAttribute {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final ViewAttribute other = (ViewAttribute) obj;
+        final Attribute other = (Attribute) obj;
         if (this.name == null) {
             if (other.name != null)
                 return false;

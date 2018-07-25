@@ -14,10 +14,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eth.demo.sebserver.domain.rest.sebconfig.AttributeValue;
-import org.eth.demo.sebserver.domain.rest.sebconfig.TableValue;
-import org.eth.demo.sebserver.domain.rest.sebconfig.ViewAttribute;
-import org.eth.demo.sebserver.service.sebconfig.SEBConfigDao;
+import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.Attribute;
+import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.AttributeValue;
+import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.TableAttributeValue;
+import org.eth.demo.sebserver.service.sebconfig.ConfigAttributeDao;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -27,17 +27,30 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/sebconfig")
-public class SEBConfigController {
+public class SEBConfigAttributeController {
 
-    private final SEBConfigDao sebConfigDao;
+    private final ConfigAttributeDao sebConfigDao;
 
-    public SEBConfigController(final SEBConfigDao sebConfigDao) {
+    public SEBConfigAttributeController(final ConfigAttributeDao sebConfigDao) {
         this.sebConfigDao = sebConfigDao;
     }
 
     @RequestMapping(value = "attributes/{viewName}", method = RequestMethod.GET)
-    final Collection<ViewAttribute> getAttributesOfView(@PathVariable final String viewName) {
+    final Collection<Attribute> getAttributesOfView(@PathVariable final String viewName) {
         return this.sebConfigDao.getAttributes(viewName);
+    }
+
+    @RequestMapping(value = "values/{viewName}/{configId}", method = RequestMethod.GET)
+    final Collection<AttributeValue> getValuesOfView(
+            @RequestHeader(value = "attributeNames") final String attributeNames,
+            @PathVariable final Long configId) {
+
+        final List<String> attrNames = Arrays.asList(StringUtils.split(attributeNames, ","));
+        if (attrNames == null || attrNames.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return this.sebConfigDao.getValues(configId, attrNames);
     }
 
     @RequestMapping(value = "values/{configId}", method = RequestMethod.GET)
@@ -53,15 +66,15 @@ public class SEBConfigController {
         return this.sebConfigDao.getValues(configId, attrNames);
     }
 
-    // TODO here we should add a validation error response
+    // TODO add validation error response
     @RequestMapping(value = "saveValue", method = RequestMethod.POST)
     final void saveValue(@RequestBody final AttributeValue value) {
         this.sebConfigDao.saveValue(value);
     }
 
-    // TODO here we should add a validation error response
+    // TODO add validation error response
     @RequestMapping(value = "saveTable", method = RequestMethod.POST)
-    final void saveValue(@RequestBody final TableValue value) {
+    final void saveValue(@RequestBody final TableAttributeValue value) {
         this.sebConfigDao.saveTableValue(value);
     }
 

@@ -55,9 +55,9 @@ public class ExamController {
         return this.examDao.save(exam);
     }
 
-    @RequestMapping(value = "/statechange/{examId}/{stateId}", method = RequestMethod.POST)
-    final Exam processStateChange(@PathVariable final Long examId, @PathVariable final Integer stateId) {
-        return this.examStateService.processStateChange(examId, ExamStatus.byId(stateId));
+    @RequestMapping(value = "/statechange/{examId}/{stateName}", method = RequestMethod.POST)
+    final Exam processStateChange(@PathVariable final Long examId, @PathVariable final String stateName) {
+        return this.examStateService.processStateChange(examId, ExamStatus.valueOf(stateName));
     }
 
 }

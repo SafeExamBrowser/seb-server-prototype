@@ -6,8 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.domain.rest.sebconfig;
+package org.eth.demo.sebserver.gui.domain.exam;
 
-public enum ConfigurationValueType {
-    NONE, TEXT, LARGE_TEXT, BASE64_BINARY, LIST, COMPOSITE, COMPOSITE_LIST
+//@formatter:off
+public enum ExamStatus {
+  IN_PROGRESS,
+  READY,
+  RUNNING,
+  FINISHED
 }
+//@formatter:on

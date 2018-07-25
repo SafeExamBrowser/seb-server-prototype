@@ -107,7 +107,7 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
 
     @EventListener(ExamFinishedEvent.class)
     protected void examFinished() {
-        this.workersRunning = !this.examDao.getAll(exam -> exam.status == ExamStatus.RUNNING.id).isEmpty();
+        this.workersRunning = !this.examDao.getAll(exam -> exam.status == ExamStatus.RUNNING).isEmpty();
     }
 
     @Override
@@ -126,7 +126,7 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
             return;
         }
 
-        if (this.examDao.getAll(exam -> exam.status == ExamStatus.RUNNING.id).isEmpty()) {
+        if (this.examDao.getAll(exam -> exam.status == ExamStatus.RUNNING).isEmpty()) {
             log.info("runWorkers called but no exam is running");
             return;
         }

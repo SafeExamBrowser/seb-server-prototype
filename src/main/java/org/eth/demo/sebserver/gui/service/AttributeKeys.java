@@ -20,7 +20,7 @@ public interface AttributeKeys {
     public static final String CONFIG_ATTRIBUTE_VALUE = "CONFIG_ATTRIBUTE_VALUE";
 
     public static final String EXAM_ID = "EXAM_ID";
-    public static final String STATE_ID = "STATE_ID";
+    public static final String STATE_NAME = "STATE_NAME";
 
     public static final String AUTHORIZATION_CONTEXT = "AUTHORIZATION_CONTEXT";
     public static final String AUTHORIZATION_HEADER = "AUTHORIZATION_HEADER";

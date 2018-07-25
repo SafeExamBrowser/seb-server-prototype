@@ -12,20 +12,25 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eth.demo.sebserver.batis.gen.model.ConfigurationValueRecord;
-import org.eth.demo.sebserver.domain.rest.sebconfig.AttributeValue;
-import org.eth.demo.sebserver.domain.rest.sebconfig.TableValue;
-import org.eth.demo.sebserver.domain.rest.sebconfig.ViewAttribute;
+import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.Attribute;
+import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.AttributeValue;
+import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.TableAttributeValue;
 
-public interface SEBConfigDao {
+public interface ConfigAttributeDao {
 
-    Collection<ViewAttribute> getAttributes(String viewName);
+    Collection<Attribute> getAttributes(String viewName);
 
+    Collection<AttributeValue> getValuesOfView(Long configId, String viewName);
+
+    Collection<AttributeValue> getValuesOfConfig(Long configId);
+
+    @Deprecated
     Collection<AttributeValue> getValues(Long configId, List<String> attributeNames);
 
     AttributeValue attributeValueFromRecord(ConfigurationValueRecord record);
 
     Long saveValue(AttributeValue value);
 
-    void saveTableValue(TableValue value);
+    void saveTableValue(TableAttributeValue value);
 
 }

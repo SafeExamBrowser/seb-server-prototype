@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.domain.sebconfig;
+package org.eth.demo.sebserver.gui.domain.sebconfig.attribute;
 
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;

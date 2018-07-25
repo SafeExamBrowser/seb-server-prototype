@@ -11,6 +11,8 @@ package org.eth.demo.sebserver.domain.rest.sebconfig;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.AttributeValue;
+
 public final class SEBConfiguration {
 
     public final Long id;
