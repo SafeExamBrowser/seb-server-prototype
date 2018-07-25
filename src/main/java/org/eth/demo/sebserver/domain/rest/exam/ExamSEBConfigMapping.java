@@ -13,21 +13,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public final class ExamSEBConfigMapping {
 
     public final Long id;
+    public final Long examId;
     public final Long configurationId;
     public final String clientInfo;
 
     public ExamSEBConfigMapping(
             @JsonProperty("id") final Long id,
+            @JsonProperty("id") final Long examId,
             @JsonProperty("configurationId") final Long configurationId,
             @JsonProperty("clientInfo") final String clientInfo) {
 
         this.id = id;
+        this.examId = examId;
         this.configurationId = configurationId;
         this.clientInfo = clientInfo;
     }
 
     public Long getId() {
         return this.id;
+    }
+
+    public Long getExamId() {
+        return this.examId;
     }
 
     public Long getConfigurationId() {
@@ -65,9 +72,9 @@ public final class ExamSEBConfigMapping {
 
     @Override
     public String toString() {
-        return "ExamSEBConfigMapping [id=" + this.id + ", configurationId=" + this.configurationId + ", clientInfo="
-                + this.clientInfo
-                + "]";
+        return "ExamSEBConfigMapping [id=" + this.id + ", examId=" + this.examId + ", configurationId="
+                + this.configurationId
+                + ", clientInfo=" + this.clientInfo + "]";
     }
 
 }

@@ -8,41 +8,74 @@
 
 package org.eth.demo.sebserver.domain.rest.sebconfig;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 
-import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.AttributeValue;
+import org.eth.demo.sebserver.domain.rest.exam.ExamSEBConfigMapping;
 
 public final class SEBConfiguration {
 
     public final Long id;
-    public final Long examId;
     public final String name;
+    public final Long ownerId;
+    public final Collection<ExamSEBConfigMapping> examMappings;
 
-    private final List<AttributeValue> values;
-
-    public SEBConfiguration(final Long id, final Long examId, final String name) {
+    public SEBConfiguration(final Long id, final String name, final Long ownerId,
+            final Collection<ExamSEBConfigMapping> examMappings) {
         this.id = id;
-        this.examId = examId;
         this.name = name;
-        this.values = new ArrayList<>();
+        this.ownerId = ownerId;
+        this.examMappings = (examMappings != null)
+                ? Collections.unmodifiableCollection(examMappings)
+                : Collections.emptyList();
     }
 
-    public void addValue(final AttributeValue value) {
-        this.values.add(value);
+    public Long getId() {
+        return this.id;
     }
 
-//    public void fromXMLConfig(final InputStream in) throws ParserConfigurationException, SAXException, IOException {
-//        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//        final DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-//        final org.w3c.dom.Document w3cDocument = documentBuilder.parse(in);
-//
-//        // TODO
-//    }
-//
-//    public String toXMLConfig() {
-//        // TODO
-//        return "";
-//    }
+    public String getName() {
+        return this.name;
+    }
+
+    public Long getOwnerId() {
+        return this.ownerId;
+    }
+
+    public Collection<ExamSEBConfigMapping> getExamMappings() {
+        return this.examMappings;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final SEBConfiguration other = (SEBConfiguration) obj;
+        if (this.id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!this.id.equals(other.id))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "SEBConfiguration [id=" + this.id + ", name=" + this.name + ", ownerId=" + this.ownerId
+                + ", examMappings="
+                + this.examMappings + "]";
+    }
 
 }

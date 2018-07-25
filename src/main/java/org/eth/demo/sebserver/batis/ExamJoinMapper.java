@@ -30,7 +30,6 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.session.ResultContext;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.type.JdbcType;
-import org.eth.demo.sebserver.Utils;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.ExamSEBConfigMapping;
 import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
@@ -78,7 +77,13 @@ public interface ExamJoinMapper {
 
     default Exam selectOne(final SelectStatementProvider select) {
         final Collection<Exam> selectMany = selectMany(select);
-        return Utils.Collections.getSingle(selectMany);
+        if (selectMany == null) {
+            return null;
+        }
+
+        return selectMany.stream()
+                .findFirst()
+                .orElse(null);
     }
 
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<Collection<Exam>>>.JoinSpecificationFinisher selectManyByExample() {
@@ -108,8 +113,10 @@ public interface ExamJoinMapper {
                 examConfigurationMapRecord.clientInfo)
 
                 .from(examRecord)
+
                 .leftJoin(indicatorRecord)
                 .on(examRecord.id, equalTo(indicatorRecord.examId))
+
                 .leftJoin(examConfigurationMapRecord)
                 .on(examRecord.id, equalTo(examConfigurationMapRecord.examId));
     }
@@ -181,7 +188,7 @@ public interface ExamJoinMapper {
                     ? new IndicatorDefinition(type, threshold1, threshold2, threshold3)
                     : null;
             configMapping = (configMappingId != null)
-                    ? new ExamSEBConfigMapping(configMappingId, configurationId, clientInfo)
+                    ? new ExamSEBConfigMapping(configMappingId, id, configurationId, clientInfo)
                     : null;
         }
 

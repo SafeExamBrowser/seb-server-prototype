@@ -48,11 +48,6 @@ public class ExamDaoImpl implements ExamDao {
         this.examJoinMapper = examJoinMapper;
     }
 
-    // TODO It should also be possible to use a Join here...
-    // NOTE Joins are a bit more complicated to implement and cannot be generated directly.
-    //      A join example is implements within getAll using ExamIndicatorJoinMapper
-    //      We should decide in case if it makes sense to use join. usually if a there
-    //      are a lot of rows to fetch we better implement and use a join to perform better.
     /*
      * (non-Javadoc)
      *

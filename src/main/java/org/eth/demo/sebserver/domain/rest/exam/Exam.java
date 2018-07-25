@@ -95,15 +95,6 @@ public final class Exam {
         return true;
     }
 
-//    public static final Exam create(
-//            final Long id,
-//            final String name,
-//            final Integer status,
-//            final Long ownerId) {
-//
-//        return new Exam(id, name, status, ownerId, new ArrayList<>());
-//    }
-
     public final ExamRecord toExamRecord() {
         return new ExamRecord(this.id, this.name, this.status.name(), this.ownerId);
     }
@@ -122,18 +113,4 @@ public final class Exam {
                 sebConfigMapping);
 
     }
-
-//    public static final Exam fromRecords(
-//            final ExamRecord record,
-//            final Collection<IndicatorRecord> indicators) {
-//
-//        return new Exam(
-//                record.getId(),
-//                record.getName(),
-//                record.getStatus(),
-//                record.getId(),
-//                indicators.stream()
-//                        .map(IndicatorDefinition::fromRecord)
-//                        .collect(Collectors.toList()));
-//    }
 }

@@ -10,6 +10,7 @@ package org.eth.demo.sebserver.service.sebconfig;
 
 import static org.eth.demo.sebserver.batis.gen.mapper.ConfigurationAttributeRecordDynamicSqlSupport.name;
 import static org.eth.demo.sebserver.batis.gen.mapper.ConfigurationValueRecordDynamicSqlSupport.*;
+import static org.mybatis.dynamic.sql.SqlBuilder.equalTo;
 import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 
 import java.util.ArrayList;
@@ -23,7 +24,9 @@ import org.eth.demo.sebserver.batis.AttributeOrientationJoinMapper;
 import org.eth.demo.sebserver.batis.AttributeOrientationJoinMapper.JoinRecord;
 import org.eth.demo.sebserver.batis.gen.mapper.ConfigurationAttributeRecordDynamicSqlSupport;
 import org.eth.demo.sebserver.batis.gen.mapper.ConfigurationAttributeRecordMapper;
+import org.eth.demo.sebserver.batis.gen.mapper.ConfigurationValueRecordDynamicSqlSupport;
 import org.eth.demo.sebserver.batis.gen.mapper.ConfigurationValueRecordMapper;
+import org.eth.demo.sebserver.batis.gen.mapper.OrientationRecordDynamicSqlSupport;
 import org.eth.demo.sebserver.batis.gen.model.ConfigurationAttributeRecord;
 import org.eth.demo.sebserver.batis.gen.model.ConfigurationValueRecord;
 import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.Attribute;
@@ -55,7 +58,7 @@ public class ConfigAttributeDaoImpl implements ConfigAttributeDao {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eth.demo.sebserver.service.dao.SEBConfigDao#getAttributes(java.lang.String)
      */
     @Override
@@ -81,11 +84,45 @@ public class ConfigAttributeDaoImpl implements ConfigAttributeDao {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Collection<AttributeValue> getValuesOfView(final Long configId, final String viewName) {
+        return this.configurationValueRecordMapper.selectByExample()
+
+                .leftJoin(ConfigurationAttributeRecordDynamicSqlSupport.configurationAttributeRecord)
+                .on(ConfigurationValueRecordDynamicSqlSupport.configurationAttributeId,
+                        equalTo(ConfigurationAttributeRecordDynamicSqlSupport.id))
+
+                .leftJoin(OrientationRecordDynamicSqlSupport.orientationRecord)
+                .on(ConfigurationAttributeRecordDynamicSqlSupport.id,
+                        equalTo(OrientationRecordDynamicSqlSupport.configAttributeId))
+
+                .where(configurationId, SqlBuilder.isEqualTo(configId))
+                .and(OrientationRecordDynamicSqlSupport.view, isEqualTo(viewName))
+
+                .build()
+                .execute()
+                .stream()
+                .map(this::attributeValueFromRecord)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<AttributeValue> getValuesOfConfig(final Long configId) {
+        return this.configurationValueRecordMapper.selectByExample()
+                .where(configurationId, SqlBuilder.isEqualTo(configId))
+                .build()
+                .execute()
+                .stream()
+                .map(this::attributeValueFromRecord)
+                .collect(Collectors.toList());
+    }
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eth.demo.sebserver.service.dao.SEBConfigDao#getValues(java.lang.Long, java.util.List)
      */
+    @Deprecated
     @Override
     @Transactional(readOnly = true)
     public Collection<AttributeValue> getValues(final Long configId, final List<String> attributeNames) {
@@ -125,14 +162,6 @@ public class ConfigAttributeDaoImpl implements ConfigAttributeDao {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.eth.demo.sebserver.service.dao.SEBConfigDao#attributeValueFromRecord(org.eth.demo.sebserver.batis.gen.model.
-     * ConfigurationValueRecord)
-     */
-    @Override
     public AttributeValue attributeValueFromRecord(final ConfigurationValueRecord record) {
         final ConfigurationAttributeRecord attribute = this.configurationAttributeRecordMapper
                 .selectByPrimaryKey(record.getConfigurationAttributeId());
@@ -147,21 +176,9 @@ public class ConfigAttributeDaoImpl implements ConfigAttributeDao {
                 record.getValue());
     }
 
-    @Override
-    public Collection<AttributeValue> getValuesOfView(final Long configId, final String viewName) {
-
-        return null;
-    }
-
-    @Override
-    public Collection<AttributeValue> getValuesOfConfig(final Long configId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eth.demo.sebserver.service.dao.SEBConfigDao#saveValue(org.eth.demo.sebserver.domain.rest.sebconfig.
      * AttributeValue)
      */
@@ -201,7 +218,7 @@ public class ConfigAttributeDaoImpl implements ConfigAttributeDao {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eth.demo.sebserver.service.dao.SEBConfigDao#saveTableValue(org.eth.demo.sebserver.domain.rest.sebconfig.
      * TableValue)
      */
