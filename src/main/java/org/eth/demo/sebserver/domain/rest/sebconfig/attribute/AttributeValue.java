@@ -15,6 +15,7 @@ public final class AttributeValue {
 
     public final Long configId;
     public final String attributeName;
+    // TODO use parentId instead of name and remove the name resolving code in ConfigAttributeDaoImpl (adapt GUI)
     public final String parentAttributeName;
     public final Integer listIndex;
     public final String value;

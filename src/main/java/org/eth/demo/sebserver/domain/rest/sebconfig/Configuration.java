@@ -6,45 +6,54 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.domain.rest.exam;
+package org.eth.demo.sebserver.domain.rest.sebconfig;
+
+import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public final class ExamSEBConfigMapping {
+public class Configuration {
 
     public final Long id;
-    public final Long examId;
-    public final Long configurationNodeId;
-    public final String clientInfo;
+    public final Long nodeId;
+    public final String version;
+    public final DateTime versionDate;
+    public final Boolean followup;
 
     @JsonCreator
-    public ExamSEBConfigMapping(
+    public Configuration(
             @JsonProperty("id") final Long id,
-            @JsonProperty("id") final Long examId,
-            @JsonProperty("configurationNodeId") final Long configurationNodeId,
-            @JsonProperty("clientInfo") final String clientInfo) {
+            @JsonProperty("nodeId") final Long nodeId,
+            @JsonProperty("version") final String version,
+            @JsonProperty("versionDate") final DateTime versionDate,
+            @JsonProperty("followup") final Boolean followup) {
 
         this.id = id;
-        this.examId = examId;
-        this.configurationNodeId = configurationNodeId;
-        this.clientInfo = clientInfo;
+        this.nodeId = nodeId;
+        this.version = version;
+        this.versionDate = versionDate;
+        this.followup = followup;
     }
 
     public Long getId() {
         return this.id;
     }
 
-    public Long getExamId() {
-        return this.examId;
+    public Long getNodeId() {
+        return this.nodeId;
     }
 
-    public Long getConfigurationNodeId() {
-        return this.configurationNodeId;
+    public String getVersion() {
+        return this.version;
     }
 
-    public String getClientInfo() {
-        return this.clientInfo;
+    public DateTime getVersionDate() {
+        return this.versionDate;
+    }
+
+    public Boolean getFollowup() {
+        return this.followup;
     }
 
     @Override
@@ -63,7 +72,7 @@ public final class ExamSEBConfigMapping {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final ExamSEBConfigMapping other = (ExamSEBConfigMapping) obj;
+        final Configuration other = (Configuration) obj;
         if (this.id == null) {
             if (other.id != null)
                 return false;
@@ -74,9 +83,9 @@ public final class ExamSEBConfigMapping {
 
     @Override
     public String toString() {
-        return "ExamSEBConfigMapping [id=" + this.id + ", examId=" + this.examId + ", configurationNodeId="
-                + this.configurationNodeId
-                + ", clientInfo=" + this.clientInfo + "]";
+        return "Configuration [id=" + this.id + ", nodeId=" + this.nodeId + ", version=" + this.version
+                + ", versionDate="
+                + this.versionDate + ", followup=" + this.followup + "]";
     }
 
 }

@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.Attribute;
+import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.AttributeOfView;
 import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.AttributeValue;
 import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.TableAttributeValue;
 import org.eth.demo.sebserver.service.sebconfig.ConfigAttributeDao;
@@ -36,8 +36,8 @@ public class SEBConfigAttributeController {
     }
 
     @RequestMapping(value = "attributes/{viewName}", method = RequestMethod.GET)
-    final Collection<Attribute> getAttributesOfView(@PathVariable final String viewName) {
-        return this.sebConfigDao.getAttributes(viewName);
+    final Collection<AttributeOfView> getAttributesOfView(@PathVariable final String viewName) {
+        return this.sebConfigDao.getAttributesOfView(viewName);
     }
 
     @RequestMapping(value = "values/{viewName}/{configId}", method = RequestMethod.GET)

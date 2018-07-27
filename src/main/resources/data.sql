@@ -11,27 +11,27 @@ INSERT INTO user_role VALUES
     ;
 
 INSERT INTO configuration_attribute VALUES
-    (1, "table1", "TABLE", null, "", "", ""),
-    (2, "param1", "TEXT_FIELD", 1, "", "", ""),
-    (3, "param2", "SINGLE_SELECTION", 1, "One,Two,Three", "", ""),
-    (4, "param3", "TEXT_FIELD", 1, "", "", ""),
+    (1, "table1", "TABLE", null, "", "", "", ""),
+    (2, "param1", "TEXT_FIELD", 1, "", "", "", ""),
+    (3, "param2", "SINGLE_SELECTION", 1, "One,Two,Three", "", "", ""),
+    (4, "param3", "TEXT_FIELD", 1, "", "", "", ""),
     
-    (5, "check1", "CHECKBOX", null, "", "", ""),
-    (6, "check2", "CHECKBOX", null, "", "", ""),
+    (5, "check1", "CHECKBOX", null, "", "", "", ""),
+    (6, "check2", "CHECKBOX", null, "", "", "", ""),
     
-    (7, "Label1:", "LABEL", null, "", "", ""),
-    (8, "check11", "CHECKBOX", null, "", "", ""),
-    (9, "check12", "CHECKBOX", null, "", "", ""),
+    (7, "Label1:", "LABEL", null, "", "", "", ""),
+    (8, "check11", "CHECKBOX", null, "", "", "", ""),
+    (9, "check12", "CHECKBOX", null, "", "", "", ""),
     
-    (10, "check21", "CHECKBOX", null, "", "", ""),
-    (11, "check22", "CHECKBOX", null, "", "", ""),
-    (12, "check23", "CHECKBOX", null, "", "", ""),
+    (10, "check21", "CHECKBOX", null, "", "", "", ""),
+    (11, "check22", "CHECKBOX", null, "", "", "", ""),
+    (12, "check23", "CHECKBOX", null, "", "", "", ""),
     
-    (13, "text1", "TEXT_FIELD", null, "", "", ""),
-    (14, "number1", "INTEGER", null, "", "", ""),
-    (15, "checkField1", "CHECK_FIELD", null, "", "", ""),
-    (16, "checkField2", "CHECK_FIELD", null, "", "", ""),
-    (17, "selection1", "SINGLE_SELECTION", null, "One,Two,Three", "", "")
+    (13, "text1", "TEXT_FIELD", null, "", "", "", ""),
+    (14, "number1", "INTEGER", null, "", "", "", ""),
+    (15, "checkField1", "CHECK_FIELD", null, "", "", "", ""),
+    (16, "checkField2", "CHECK_FIELD", null, "", "", "", ""),
+    (17, "selection1", "SINGLE_SELECTION", null, "One,Two,Three", "", "", "")
     ;
     
 INSERT INTO orientation VALUES 
@@ -58,10 +58,14 @@ INSERT INTO orientation VALUES
     (17, 17, "view1", null, 1, 10)
     ;
     
-INSERT INTO configuration VALUES
-    (1, "Demo Config", "CLIENT", 2)
+INSERT INTO configuration_node VALUES
+    (1, 2, "Demo Config", "CLIENT")
     ;
-
+    
+INSERT INTO configuration VALUES
+    (1, 1, "V1.0", '2018-01-01 00:00:00', 1)
+    ;
+    
 INSERT INTO `exam` VALUES 
     (1,'Demo Exam 1','IN_PROGRESS', 2),
     (2,'Demo Exam 2','IN_PROGRESS', 2),

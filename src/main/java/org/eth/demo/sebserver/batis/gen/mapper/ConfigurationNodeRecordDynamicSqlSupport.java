@@ -1,0 +1,38 @@
+package org.eth.demo.sebserver.batis.gen.mapper;
+
+import java.sql.JDBCType;
+import javax.annotation.Generated;
+import org.mybatis.dynamic.sql.SqlColumn;
+import org.mybatis.dynamic.sql.SqlTable;
+
+public final class ConfigurationNodeRecordDynamicSqlSupport {
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-27T12:52:33.539+02:00", comments="Source Table: configuration_node")
+    public static final ConfigurationNodeRecord configurationNodeRecord = new ConfigurationNodeRecord();
+
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-27T12:52:33.539+02:00", comments="Source field: configuration_node.id")
+    public static final SqlColumn<Long> id = configurationNodeRecord.id;
+
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-27T12:52:33.539+02:00", comments="Source field: configuration_node.owner_id")
+    public static final SqlColumn<Long> ownerId = configurationNodeRecord.ownerId;
+
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-27T12:52:33.540+02:00", comments="Source field: configuration_node.name")
+    public static final SqlColumn<String> name = configurationNodeRecord.name;
+
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-27T12:52:33.540+02:00", comments="Source field: configuration_node.type")
+    public static final SqlColumn<String> type = configurationNodeRecord.type;
+
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-07-27T12:52:33.539+02:00", comments="Source Table: configuration_node")
+    public static final class ConfigurationNodeRecord extends SqlTable {
+        public final SqlColumn<Long> id = column("id", JDBCType.BIGINT);
+
+        public final SqlColumn<Long> ownerId = column("owner_id", JDBCType.BIGINT);
+
+        public final SqlColumn<String> name = column("name", JDBCType.VARCHAR);
+
+        public final SqlColumn<String> type = column("type", JDBCType.VARCHAR);
+
+        public ConfigurationNodeRecord() {
+            super("configuration_node");
+        }
+    }
+}

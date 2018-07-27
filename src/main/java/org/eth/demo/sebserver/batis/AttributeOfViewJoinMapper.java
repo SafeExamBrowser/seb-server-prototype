@@ -17,6 +17,7 @@ import java.util.Collection;
 
 import org.apache.ibatis.annotations.Arg;
 import org.apache.ibatis.annotations.ConstructorArgs;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.ResultType;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
@@ -25,10 +26,11 @@ import org.mybatis.dynamic.sql.select.SelectDSL;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 import org.mybatis.dynamic.sql.util.SqlProviderAdapter;
 
-public interface AttributeOrientationJoinMapper {
+@Mapper
+public interface AttributeOfViewJoinMapper {
 
     @SelectProvider(type = SqlProviderAdapter.class, method = "select")
-    @ResultType(AttributeOrientationJoinMapper.JoinRecord.class)
+    @ResultType(AttributeOfViewJoinMapper.AttributeOfViewRecord.class)
     @ConstructorArgs({
             @Arg(column = "id", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -42,9 +44,9 @@ public interface AttributeOrientationJoinMapper {
             @Arg(column = "x_position", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Arg(column = "y_position", javaType = Integer.class, jdbcType = JdbcType.INTEGER)
     })
-    Collection<AttributeOrientationJoinMapper.JoinRecord> selectMany(SelectStatementProvider select);
+    Collection<AttributeOfViewJoinMapper.AttributeOfViewRecord> selectMany(SelectStatementProvider select);
 
-    default Collection<AttributeOrientationJoinMapper.JoinRecord> selectOfView(final String viewName) {
+    default Collection<AttributeOfViewJoinMapper.AttributeOfViewRecord> selectOfView(final String viewName) {
         return SelectDSL.selectWithMapper(
                 this::selectMany,
                 configurationAttributeRecord.id,
@@ -66,7 +68,7 @@ public interface AttributeOrientationJoinMapper {
                 .execute();
     }
 
-    public static final class JoinRecord {
+    public static final class AttributeOfViewRecord {
         public final Long id;
         public final String name;
         public final String type;
@@ -79,7 +81,7 @@ public interface AttributeOrientationJoinMapper {
         public final Integer xPosition;
         public final Integer yPosition;
 
-        public JoinRecord(final Long id, final String name, final String type, final Long parentId,
+        public AttributeOfViewRecord(final Long id, final String name, final String type, final Long parentId,
                 final String resources, final String dependencies,
                 final Long orientationId, final String view, final String group, final Integer xPosition,
                 final Integer yPosition) {

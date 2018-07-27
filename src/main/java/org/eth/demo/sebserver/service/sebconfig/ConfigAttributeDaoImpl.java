@@ -15,13 +15,15 @@ import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eth.demo.sebserver.batis.AttributeOrientationJoinMapper;
-import org.eth.demo.sebserver.batis.AttributeOrientationJoinMapper.JoinRecord;
+import org.eth.demo.sebserver.batis.AttributeOfViewJoinMapper;
+import org.eth.demo.sebserver.batis.AttributeOfViewJoinMapper.AttributeOfViewRecord;
+import org.eth.demo.sebserver.batis.BulkSaveAttributeValuesMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.ConfigurationAttributeRecordDynamicSqlSupport;
 import org.eth.demo.sebserver.batis.gen.mapper.ConfigurationAttributeRecordMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.ConfigurationValueRecordDynamicSqlSupport;
@@ -30,6 +32,7 @@ import org.eth.demo.sebserver.batis.gen.mapper.OrientationRecordDynamicSqlSuppor
 import org.eth.demo.sebserver.batis.gen.model.ConfigurationAttributeRecord;
 import org.eth.demo.sebserver.batis.gen.model.ConfigurationValueRecord;
 import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.Attribute;
+import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.AttributeOfView;
 import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.AttributeType;
 import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.AttributeValue;
 import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.TableAttributeValue;
@@ -42,18 +45,49 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class ConfigAttributeDaoImpl implements ConfigAttributeDao {
 
-    private final AttributeOrientationJoinMapper attributeOrientationJoinMapper;
+    private final AttributeOfViewJoinMapper attributeOfViewJoinMapper;
     private final ConfigurationAttributeRecordMapper configurationAttributeRecordMapper;
     private final ConfigurationValueRecordMapper configurationValueRecordMapper;
+    private final BulkSaveAttributeValuesMapper bulkSaveAttributeValuesMapper;
 
     public ConfigAttributeDaoImpl(
-            final AttributeOrientationJoinMapper attributeOrientationJoinMapper,
+            final AttributeOfViewJoinMapper attributeOfViewJoinMapper,
             final ConfigurationAttributeRecordMapper configurationAttributeRecordMapper,
-            final ConfigurationValueRecordMapper configurationValueRecordMapper) {
+            final ConfigurationValueRecordMapper configurationValueRecordMapper,
+            final BulkSaveAttributeValuesMapper bulkSaveAttributeValuesMapper) {
 
-        this.attributeOrientationJoinMapper = attributeOrientationJoinMapper;
+        this.attributeOfViewJoinMapper = attributeOfViewJoinMapper;
         this.configurationAttributeRecordMapper = configurationAttributeRecordMapper;
         this.configurationValueRecordMapper = configurationValueRecordMapper;
+        this.bulkSaveAttributeValuesMapper = bulkSaveAttributeValuesMapper;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Attribute byId(final Long id) {
+        final ConfigurationAttributeRecord record = this.configurationAttributeRecordMapper.selectByPrimaryKey(id);
+        if (record == null) {
+            return null;
+        }
+
+        return fromRecord(record);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Collection<Attribute> getAll() {
+        final List<ConfigurationAttributeRecord> records = this.configurationAttributeRecordMapper
+                .selectByExample()
+                .build()
+                .execute();
+
+        if (records == null) {
+            return Collections.emptyList();
+        }
+
+        return records.stream()
+                .map(ConfigAttributeDaoImpl::fromRecord)
+                .collect(Collectors.toList());
     }
 
     /*
@@ -63,15 +97,15 @@ public class ConfigAttributeDaoImpl implements ConfigAttributeDao {
      */
     @Override
     @Transactional(readOnly = true)
-    public Collection<Attribute> getAttributes(final String viewName) {
-        final Collection<JoinRecord> allOfView = this.attributeOrientationJoinMapper.selectOfView(viewName);
+    public Collection<AttributeOfView> getAttributesOfView(final String viewName) {
+        final Collection<AttributeOfViewRecord> allOfView = this.attributeOfViewJoinMapper.selectOfView(viewName);
         final Map<Long, String> mapping = allOfView
                 .stream()
                 .collect(Collectors.toMap(r -> r.id, r -> r.name));
 
         return allOfView
                 .stream()
-                .map(r -> new Attribute(
+                .map(r -> new AttributeOfView(
                         r.name,
                         AttributeType.valueOf(r.type),
                         mapping.get(r.parentId),
@@ -85,6 +119,7 @@ public class ConfigAttributeDaoImpl implements ConfigAttributeDao {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Collection<AttributeValue> getValuesOfView(final Long configId, final String viewName) {
         return this.configurationValueRecordMapper.selectByExample()
 
@@ -107,6 +142,7 @@ public class ConfigAttributeDaoImpl implements ConfigAttributeDao {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Collection<AttributeValue> getValuesOfConfig(final Long configId) {
         return this.configurationValueRecordMapper.selectByExample()
                 .where(configurationId, SqlBuilder.isEqualTo(configId))
@@ -115,6 +151,15 @@ public class ConfigAttributeDaoImpl implements ConfigAttributeDao {
                 .stream()
                 .map(this::attributeValueFromRecord)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Collection<ConfigurationValueRecord> getValueRecordsOfConfig(final Long configId) {
+        return this.configurationValueRecordMapper.selectByExample()
+                .where(configurationId, SqlBuilder.isEqualTo(configId))
+                .build()
+                .execute();
     }
 
     /*
@@ -162,18 +207,20 @@ public class ConfigAttributeDaoImpl implements ConfigAttributeDao {
 
     }
 
-    public AttributeValue attributeValueFromRecord(final ConfigurationValueRecord record) {
-        final ConfigurationAttributeRecord attribute = this.configurationAttributeRecordMapper
-                .selectByPrimaryKey(record.getConfigurationAttributeId());
-        final Long parentId = attribute.getParentId();
-        final String parentName = (parentId != null) ? getAttributeName(parentId) : null;
+    @Override
+    @Transactional
+    public Collection<ConfigurationValueRecord> saveValues(final Collection<ConfigurationValueRecord> records) {
+        for (final ConfigurationValueRecord record : records) {
+            if (record.getId() == null) {
+                this.bulkSaveAttributeValuesMapper.insert(record);
+            } else {
+                this.bulkSaveAttributeValuesMapper.updateByPrimaryKey(record);
+            }
+        }
 
-        return new AttributeValue(
-                record.getConfigurationId(),
-                attribute.getName(),
-                parentName,
-                record.getListIndex(),
-                record.getValue());
+        // TODO test this and check what exactly flush is returning
+        final List flush = this.bulkSaveAttributeValuesMapper.flush();
+        return flush;
     }
 
     /*
@@ -310,6 +357,31 @@ public class ConfigAttributeDaoImpl implements ConfigAttributeDao {
         } else {
             return attrs.get(0);
         }
+    }
+
+    private static final Attribute fromRecord(final ConfigurationAttributeRecord r) {
+        return new Attribute(
+                r.getId(),
+                r.getParentId(),
+                r.getName(),
+                AttributeType.valueOf(r.getType()),
+                r.getResources(),
+                r.getDependencies(),
+                r.getDefaultValue());
+    }
+
+    private AttributeValue attributeValueFromRecord(final ConfigurationValueRecord record) {
+        final ConfigurationAttributeRecord attribute = this.configurationAttributeRecordMapper
+                .selectByPrimaryKey(record.getConfigurationAttributeId());
+        final Long parentId = attribute.getParentId();
+        final String parentName = (parentId != null) ? getAttributeName(parentId) : null;
+
+        return new AttributeValue(
+                record.getConfigurationId(),
+                attribute.getName(),
+                parentName,
+                record.getListIndex(),
+                record.getValue());
     }
 
 }

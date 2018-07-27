@@ -35,10 +35,7 @@
             <property name="enableSubPackages" value="false"/>
         </javaClientGenerator>
         
-        <table tableName="configuration" domainObjectName="ConfigurationRecord">
-            <property name="immutable" value="true"/>
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
+        
         <table tableName="configuration_attribute" domainObjectName="ConfigurationAttributeRecord">
             <property name="immutable" value="true"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
@@ -48,6 +45,15 @@
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
         <table tableName="orientation" domainObjectName="OrientationRecord">
+            <property name="immutable" value="true"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+        <table tableName="configuration" domainObjectName="ConfigurationRecord">
+            <property name="immutable" value="true"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <columnOverride column="version_date" javaType="org.joda.time.DateTime" typeHandler="org.eth.demo.sebserver.batis.JodaTimeTypeResolver"></columnOverride>
+        </table>
+        <table tableName="configuration_node" domainObjectName="ConfigurationNodeRecord">
             <property name="immutable" value="true"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>

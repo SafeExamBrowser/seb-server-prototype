@@ -58,7 +58,7 @@ public interface ExamJoinMapper {
             @Arg(column = "threshold3", javaType = BigDecimal.class, jdbcType = JdbcType.DECIMAL),
 
             @Arg(column = "configMappingId", javaType = Long.class, jdbcType = JdbcType.BIGINT),
-            @Arg(column = "configuration_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
+            @Arg(column = "configuration_node_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
             @Arg(column = "client_info", javaType = String.class, jdbcType = JdbcType.VARCHAR)
     })
     void selectMany(
@@ -103,13 +103,15 @@ public interface ExamJoinMapper {
                 examRecord.name,
                 examRecord.status,
                 examRecord.ownerId,
+
                 indicatorRecord.id.as("indicatorId"),
                 indicatorRecord.type,
                 indicatorRecord.threshold1,
                 indicatorRecord.threshold2,
                 indicatorRecord.threshold3,
+
                 examConfigurationMapRecord.id.as("configMappingId"),
-                examConfigurationMapRecord.configurationId,
+                examConfigurationMapRecord.configurationNodeId,
                 examConfigurationMapRecord.clientInfo)
 
                 .from(examRecord)

@@ -15,6 +15,8 @@ import org.eth.demo.sebserver.domain.rest.exam.Exam;
 
 public interface ExamDao {
 
+    Exam createNew(Exam exam);
+
     Exam byId(Long id);
 
     Collection<Exam> getAll();

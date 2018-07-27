@@ -8,17 +8,14 @@
 
 package org.eth.demo.sebserver.service.dao;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import org.eth.demo.sebserver.batis.ExamJoinMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.IndicatorRecordMapper;
 import org.eth.demo.sebserver.service.ResourceNotFoundException;
+import org.eth.demo.sebserver.service.admin.UserFacade;
 import org.eth.demo.sebserver.service.exam.ExamDaoImpl;
 import org.eth.demo.sebserver.testing.TestWithLogging;
 import org.junit.Test;
@@ -66,6 +63,7 @@ public class ExamDaoImplTest extends TestWithLogging {
         final ExamRecordMapper examMapperMock = mock(ExamRecordMapper.class);
         final IndicatorRecordMapper indicatorMapperMock = mock(IndicatorRecordMapper.class);
         final ExamJoinMapper examIndicatorJoinMapperMock = mock(ExamJoinMapper.class);
+        final UserFacade userFacadeMock = mock(UserFacade.class);
 
         final ExamDaoImpl candidate;
 
@@ -74,7 +72,8 @@ public class ExamDaoImplTest extends TestWithLogging {
             this.candidate = new ExamDaoImpl(
                     this.examMapperMock,
                     this.indicatorMapperMock,
-                    this.examIndicatorJoinMapperMock);
+                    this.examIndicatorJoinMapperMock,
+                    this.userFacadeMock);
         }
     }
 

@@ -10,23 +10,40 @@ package org.eth.demo.sebserver.domain.rest.sebconfig;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.eth.demo.sebserver.domain.rest.exam.ExamSEBConfigMapping;
 
-public final class SEBConfiguration {
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public final class ConfigurationNode {
 
     public final Long id;
-    public final String name;
     public final Long ownerId;
+    public final String name;
+    public final ConfigurationType type;
     public final Collection<ExamSEBConfigMapping> examMappings;
+    public final List<Configuration> configurationHistory;
 
-    public SEBConfiguration(final Long id, final String name, final Long ownerId,
-            final Collection<ExamSEBConfigMapping> examMappings) {
+    @JsonCreator
+    public ConfigurationNode(
+            @JsonProperty("id") final Long id,
+            @JsonProperty("ownerId") final Long ownerId,
+            @JsonProperty("name") final String name,
+            @JsonProperty("type") final ConfigurationType type,
+            @JsonProperty("examMappings") final Collection<ExamSEBConfigMapping> examMappings,
+            @JsonProperty("configurationHistory") final List<Configuration> configurationHistory) {
+
         this.id = id;
-        this.name = name;
         this.ownerId = ownerId;
+        this.name = name;
+        this.type = type;
         this.examMappings = (examMappings != null)
                 ? Collections.unmodifiableCollection(examMappings)
+                : Collections.emptyList();
+        this.configurationHistory = (configurationHistory != null)
+                ? Collections.unmodifiableList(configurationHistory)
                 : Collections.emptyList();
     }
 
@@ -42,8 +59,16 @@ public final class SEBConfiguration {
         return this.ownerId;
     }
 
+    public ConfigurationType getType() {
+        return this.type;
+    }
+
     public Collection<ExamSEBConfigMapping> getExamMappings() {
         return this.examMappings;
+    }
+
+    public List<Configuration> getConfigurationHistory() {
+        return this.configurationHistory;
     }
 
     @Override
@@ -62,7 +87,7 @@ public final class SEBConfiguration {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final SEBConfiguration other = (SEBConfiguration) obj;
+        final ConfigurationNode other = (ConfigurationNode) obj;
         if (this.id == null) {
             if (other.id != null)
                 return false;
@@ -73,9 +98,9 @@ public final class SEBConfiguration {
 
     @Override
     public String toString() {
-        return "SEBConfiguration [id=" + this.id + ", name=" + this.name + ", ownerId=" + this.ownerId
-                + ", examMappings="
-                + this.examMappings + "]";
+        return "ConfigurationNode [id=" + this.id + ", ownerId=" + this.ownerId + ", name=" + this.name + ", type="
+                + this.type
+                + ", examMappings=" + this.examMappings + ", configurationHistory=" + this.configurationHistory + "]";
     }
 
 }
