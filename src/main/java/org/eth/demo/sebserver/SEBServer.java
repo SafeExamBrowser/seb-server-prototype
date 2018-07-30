@@ -19,6 +19,7 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 public class SEBServer {
 
     public static void main(final String[] args) {
+        org.apache.ibatis.logging.LogFactory.useSlf4jLogging();
         // first of all register the JodaModule to Jackson
         final ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JodaModule());

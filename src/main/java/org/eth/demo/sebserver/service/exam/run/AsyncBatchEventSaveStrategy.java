@@ -27,6 +27,7 @@ import org.eth.demo.sebserver.batis.gen.model.ClientEventRecord;
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
 import org.eth.demo.sebserver.service.exam.ExamDao;
+import org.eth.demo.util.TransactionalBounds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -146,7 +147,7 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
 
             final Collection<ClientEvent> events = new ArrayList<>();
             final SqlSession batchedSession = this.sqlSessionFactory.openSession(ExecutorType.BATCH, false);
-            final Consumer<Runnable> transactionBounds = transactionBounds(this.transactionManager);
+            //final Consumer<Runnable> transactionBounds = transactionBounds(this.transactionManager);
             final Runnable batchStore = batchStore(this.clientConnectionService, events, batchedSession);
 
             try {
@@ -154,7 +155,13 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
                     events.clear();
                     this.eventQueue.drainTo(events, BATCH_SIZE);
 
-                    transactionBounds.accept(batchStore);
+                    //transactionBounds.accept(batchStore);
+                    // TODO test this...
+                    new TransactionalBounds<Void>(this.transactionManager)
+                            .runInTransaction(batchStore)
+                            .onError(t -> {
+                                throw new RuntimeException(t);
+                            }); // TODO error handling
 
                     try {
                         Thread.sleep(20);
@@ -204,7 +211,8 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
                     } catch (final Exception e) {
                         log.error(
                                 "Error while trying to store event batch. TODO handle transaction rollback correctly");
-                        //TODO handle transaction rollback correctly
+                        transactionManager.rollback(status);
+                        //TODO handle transaction rollback correctly?
                     }
                 }
             });

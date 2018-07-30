@@ -75,7 +75,9 @@ public class ConfigViewService {
                 .with(this.authorizationContextHolder)
                 .configViewName(name)
                 .doAPICall()
-                .orElse(t -> t.printStackTrace()); // TODO error handling
+                .onError(t -> {
+                    throw new RuntimeException(t);
+                }); // TODO error handling
 
         return new ViewContext(
                 name,
@@ -103,7 +105,8 @@ public class ConfigViewService {
             // check and handle builder availability for specified type
             if (!this.builderTypeMapping.containsKey(attribute.getFieldType())) {
                 final Label errorLabel = getErrorLabel(parent, "No Builder for type: " + attribute.type);
-                errorLabel.setLayoutData(ConfigViewGridCell.createFormData(viewContext.getCell(attribute.xpos, attribute.ypos)));
+                errorLabel.setLayoutData(
+                        ConfigViewGridCell.createFormData(viewContext.getCell(attribute.xpos, attribute.ypos)));
                 continue;
             }
 
@@ -145,7 +148,9 @@ public class ConfigViewService {
                 .config(viewContext.configurationId)
                 .configAttributeNames(attributeNames)
                 .doAPICall()
-                .orElse(t -> t.printStackTrace()); // TODO error handling;
+                .onError(t -> {
+                    throw new RuntimeException(t);
+                }); // TODO error handling
 
         viewContext.setValuesToInputFields(attributeValues);
         return viewContext;
@@ -175,9 +180,11 @@ public class ConfigViewService {
                 groupBounds.x,
                 groupBounds.y,
                 viewContext.getCellRelativeWidth() * groupBounds.width,
-                viewContext.getCellRelativeHeight() * (groupBounds.height + ConfigViewGridCell.GROUP_CELL_HEIGHT_ADJUSTMENT),
+                viewContext.getCellRelativeHeight()
+                        * (groupBounds.height + ConfigViewGridCell.GROUP_CELL_HEIGHT_ADJUSTMENT),
                 viewContext.getCellPixelWidth() * groupBounds.width,
-                viewContext.getCellPixelHeight() * (groupBounds.height + ConfigViewGridCell.GROUP_CELL_HEIGHT_ADJUSTMENT))));
+                viewContext.getCellPixelHeight()
+                        * (groupBounds.height + ConfigViewGridCell.GROUP_CELL_HEIGHT_ADJUSTMENT))));
 
         final int cellWidth = 100 / groupBounds.width;
         final int cellHeight = 100 / groupBounds.height;
@@ -225,20 +232,23 @@ public class ConfigViewService {
             case LEFT: {
                 if (configViewGridCell.column > 0) {
                     label.setAlignment(SWT.RIGHT);
-                    label.setLayoutData(ConfigViewGridCell.createFormData(configViewGridCell.copyOf(configViewGridCell.column - 1, configViewGridCell.row)));
+                    label.setLayoutData(ConfigViewGridCell.createFormData(
+                            configViewGridCell.copyOf(configViewGridCell.column - 1, configViewGridCell.row)));
                 }
                 break;
             }
             case TOP: {
                 if (configViewGridCell.row > 0) {
                     label.setAlignment(SWT.BOTTOM);
-                    label.setLayoutData(ConfigViewGridCell.createFormData(configViewGridCell.copyOf(configViewGridCell.column, configViewGridCell.row - 1)));
+                    label.setLayoutData(ConfigViewGridCell.createFormData(
+                            configViewGridCell.copyOf(configViewGridCell.column, configViewGridCell.row - 1)));
                 }
                 break;
             }
             case RIGHT: {
                 label.setAlignment(SWT.LEFT);
-                label.setLayoutData(ConfigViewGridCell.createFormData(configViewGridCell.copyOf(configViewGridCell.column + 1, configViewGridCell.row)));
+                label.setLayoutData(ConfigViewGridCell.createFormData(
+                        configViewGridCell.copyOf(configViewGridCell.column + 1, configViewGridCell.row)));
             }
             default: {
                 label.dispose();

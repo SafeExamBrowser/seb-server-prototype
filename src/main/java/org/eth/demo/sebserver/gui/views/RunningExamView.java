@@ -33,16 +33,16 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eth.demo.sebserver.gui.domain.exam.RunningExam;
-import org.eth.demo.sebserver.gui.domain.exam.Indicator;
 import org.eth.demo.sebserver.gui.domain.exam.GUIIndicatorValue;
+import org.eth.demo.sebserver.gui.domain.exam.Indicator;
+import org.eth.demo.sebserver.gui.domain.exam.RunningExam;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.eth.demo.sebserver.gui.service.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
 import org.eth.demo.sebserver.gui.service.push.ServerPushContext;
 import org.eth.demo.sebserver.gui.service.push.ServerPushService;
-import org.eth.demo.sebserver.gui.service.rest.GETRunningExamDetails;
 import org.eth.demo.sebserver.gui.service.rest.GETIndicatorValues;
+import org.eth.demo.sebserver.gui.service.rest.GETRunningExamDetails;
 import org.eth.demo.sebserver.gui.service.rest.SEBServerAPICall.APICallBuilder;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.springframework.context.annotation.Lazy;
@@ -85,7 +85,9 @@ public class RunningExamView implements ViewComposer {
                 .with(this.authorizationContextHolder)
                 .exam(examId)
                 .doAPICall()
-                .orElse(t -> t.printStackTrace()); // TODO error handling
+                .onError(t -> {
+                    throw new RuntimeException(t);
+                }); // TODO error handling
 
         final Display display = parent.getDisplay();
 
@@ -171,7 +173,7 @@ public class RunningExamView implements ViewComposer {
             final List<GUIIndicatorValue> indicatorValues = restCallBuilder
                     .exam(String.valueOf(clientTable.exam.id))
                     .doAPICall()
-                    .orElse(t -> t.printStackTrace()); // TODO error handling
+                    .onError(t -> {throw new RuntimeException(t);}); // TODO error handling
 
             clientTable.updateValues(indicatorValues);
         };

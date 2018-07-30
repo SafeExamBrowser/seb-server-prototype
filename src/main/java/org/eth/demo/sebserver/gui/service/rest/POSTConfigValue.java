@@ -11,6 +11,7 @@ package org.eth.demo.sebserver.gui.service.rest;
 import java.util.Map;
 
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
+import org.eth.demo.util.Result;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -26,7 +27,7 @@ public class POSTConfigValue implements SEBServerAPICall<String> {
     }
 
     @Override
-    public Response<String> doAPICall(
+    public Result<String> doAPICall(
             final RestTemplate restTemplate,
             final Map<String, String> attributes) {
 
@@ -35,7 +36,7 @@ public class POSTConfigValue implements SEBServerAPICall<String> {
 
         try {
             // TODO here we want to get a validation error response if the back-end validation failed
-            return new Response<>(
+            return Result.of(
                     restTemplate.postForObject(
                             this.restCallBuilder
                                     .withPath("sebconfig/" + saveType),
@@ -46,7 +47,7 @@ public class POSTConfigValue implements SEBServerAPICall<String> {
                                     .build(),
                             String.class));
         } catch (final Throwable t) {
-            return new Response<>(t);
+            return Result.ofError(t);
         }
     }
 

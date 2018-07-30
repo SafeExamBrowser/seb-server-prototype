@@ -10,7 +10,6 @@ package org.eth.demo.sebserver.gui.service.rest;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,16 +17,17 @@ import org.eclipse.rap.rwt.RWT;
 import org.eth.demo.sebserver.gui.service.AttributeMapBuilder;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.eth.demo.sebserver.gui.service.rest.auth.SEBServerAuthorizationContext;
+import org.eth.demo.util.Result;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestTemplate;
 
 public interface SEBServerAPICall<T> {
 
-    Response<T> doAPICall(
+    Result<T> doAPICall(
             RestTemplate restTemplate,
             Map<String, String> attributes);
 
-    default Response<T> doAPICall(final RestTemplate restTemplate) {
+    default Result<T> doAPICall(final RestTemplate restTemplate) {
         return doAPICall(restTemplate, Collections.emptyMap());
     }
 
@@ -68,30 +68,6 @@ public interface SEBServerAPICall<T> {
                         });
     }
 
-    public final class Response<T> {
-        public final T t;
-        public final Throwable error;
-
-        public Response(final T t) {
-            this.t = t;
-            error = null;
-        }
-
-        public Response(final Throwable error) {
-            t = null;
-            this.error = error;
-        }
-
-        public T orElse(final Consumer<Throwable> errorHandler) {
-            if (t != null) {
-                return t;
-            }
-
-            errorHandler.accept(error);
-            return null;
-        }
-    }
-
     public class APICallBuilder<T> extends AttributeMapBuilder<APICallBuilder<T>> {
 
         private final SEBServerAPICall<T> call;
@@ -113,7 +89,7 @@ public interface SEBServerAPICall<T> {
             this.restTemplate = restTemplate;
         }
 
-        public final Response<T> doAPICall() {
+        public final Result<T> doAPICall() {
             return call.doAPICall(restTemplate, attributes);
         }
     }

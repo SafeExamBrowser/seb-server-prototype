@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.eth.demo.sebserver.gui.domain.exam.GUIIndicatorValue;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
+import org.eth.demo.util.Result;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -30,14 +31,14 @@ public class GETIndicatorValues implements SEBServerAPICall<List<GUIIndicatorVal
     }
 
     @Override
-    public Response<List<GUIIndicatorValue>> doAPICall(
+    public Result<List<GUIIndicatorValue>> doAPICall(
             final RestTemplate restTemplate,
             final Map<String, String> attributes) {
 
         final String examId = getAttribute(attributes, AttributeKeys.EXAM_ID);
 
         try {
-            return new Response<>(
+            return Result.of(
                     restTemplate.exchange(
                             this.restCallBuilder
                                     .withPath("exam/indicatorValues/" + examId),
@@ -49,7 +50,7 @@ public class GETIndicatorValues implements SEBServerAPICall<List<GUIIndicatorVal
                             })
                             .getBody());
         } catch (final Throwable t) {
-            return new Response<>(t);
+            return Result.ofError(t);
         }
     }
 }

@@ -131,7 +131,9 @@ public class ExamOverview implements ViewComposer {
         final Collection<ExamTableRow> exams = this.examsRequest
                 .with(this.authorizationContextHolder)
                 .doAPICall()
-                .orElse(t -> t.printStackTrace()); // TODO error handling
+                .onError(t -> {
+                    throw new RuntimeException(t);
+                }); // TODO error handling
 
         final Table table = new Table(group, SWT.NULL);
         final Menu menu = new Menu(table);
@@ -260,7 +262,9 @@ public class ExamOverview implements ViewComposer {
                     .exam(examId)
                     .toState(toState.name())
                     .doAPICall()
-                    .orElse(t -> t.printStackTrace()); // TODO error handling
+                    .onError(t -> {
+                        throw new RuntimeException(t);
+                    }); // TODO error handling
 
             tItem.setText(2, newExam.status);
             tItem.setData(ITEM_DATA_EXAM, newExam);

@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigAttributeValue;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
+import org.eth.demo.util.Result;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -30,7 +31,7 @@ public class GETConfigAttributeValues implements SEBServerAPICall<Collection<Con
     }
 
     @Override
-    public Response<Collection<ConfigAttributeValue>> doAPICall(
+    public Result<Collection<ConfigAttributeValue>> doAPICall(
             final RestTemplate restTemplate,
             final Map<String, String> attributes) {
 
@@ -38,7 +39,7 @@ public class GETConfigAttributeValues implements SEBServerAPICall<Collection<Con
         final String configAttrs = getAttribute(attributes, AttributeKeys.CONFIG_ATTRIBUTE_NAMES);
 
         try {
-            return new Response<>(
+            return Result.of(
                     restTemplate.exchange(
                             this.restCallBuilder
                                     .withPath("sebconfig/values/" + configId),
@@ -52,7 +53,7 @@ public class GETConfigAttributeValues implements SEBServerAPICall<Collection<Con
                             })
                             .getBody());
         } catch (final Throwable t) {
-            return new Response<>(t);
+            return Result.ofError(t);
         }
     }
 

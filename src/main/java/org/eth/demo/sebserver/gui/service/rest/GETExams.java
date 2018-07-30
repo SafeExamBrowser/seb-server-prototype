@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eth.demo.sebserver.gui.domain.exam.ExamTableRow;
+import org.eth.demo.util.Result;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -32,12 +33,12 @@ public final class GETExams implements SEBServerAPICall<Collection<ExamTableRow>
     }
 
     @Override
-    public Response<Collection<ExamTableRow>> doAPICall(
+    public Result<Collection<ExamTableRow>> doAPICall(
             final RestTemplate restTemplate,
             final Map<String, String> attributes) {
 
         try {
-            return new Response<>(
+            return Result.of(
                     restTemplate.exchange(
                             this.uri,
                             HttpMethod.GET,
@@ -49,7 +50,7 @@ public final class GETExams implements SEBServerAPICall<Collection<ExamTableRow>
                             })
                             .getBody());
         } catch (final Throwable t) {
-            return new Response<>(t);
+            return Result.ofError(t);
         }
     }
 }

@@ -9,10 +9,10 @@
 package org.eth.demo.sebserver.batis;
 
 import java.sql.CallableStatement;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
@@ -36,7 +36,7 @@ public class JodaTimeTypeResolver extends BaseTypeHandler<DateTime> {
             final DateTime parameter,
             final JdbcType jdbcType) throws SQLException {
 
-        ps.setDate(i, new Date(parameter.getMillis()));
+        ps.setTimestamp(i, new Timestamp(parameter.getMillis()));
     }
 
     @Override

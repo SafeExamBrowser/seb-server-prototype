@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.eth.demo.sebserver.gui.domain.exam.RunningExam;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
+import org.eth.demo.util.Result;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -33,14 +34,14 @@ public class GETRunningExamDetails implements SEBServerAPICall<RunningExam> {
     }
 
     @Override
-    public Response<RunningExam> doAPICall(
+    public Result<RunningExam> doAPICall(
             final RestTemplate restTemplate,
             final Map<String, String> attributes) {
 
         final String examId = getAttribute(attributes, AttributeKeys.EXAM_ID);
 
         try {
-            return new Response<>(
+            return Result.of(
                     restTemplate.exchange(
                             this.restCallBuilder
                                     .withPath("exam/" + examId),
@@ -52,7 +53,7 @@ public class GETRunningExamDetails implements SEBServerAPICall<RunningExam> {
                             RunningExam.class)
                             .getBody());
         } catch (final Throwable t) {
-            return new Response<>(t);
+            return Result.ofError(t);
         }
     }
 }

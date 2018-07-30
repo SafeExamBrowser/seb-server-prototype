@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigViewAttribute;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
+import org.eth.demo.util.Result;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -34,7 +35,7 @@ public class GETConfigAttribute implements SEBServerAPICall<Map<String, ConfigVi
     }
 
     @Override
-    public Response<Map<String, ConfigViewAttribute>> doAPICall(
+    public Result<Map<String, ConfigViewAttribute>> doAPICall(
             final RestTemplate restTemplate,
             final Map<String, String> attributes) {
 
@@ -58,9 +59,9 @@ public class GETConfigAttribute implements SEBServerAPICall<Map<String, ConfigVi
                             a -> getFQName(a, request.getBody()),
                             a -> a));
 
-            return new Response<>(result);
+            return Result.of(result);
         } catch (final Exception e) {
-            return new Response<>(e);
+            return Result.ofError(e);
         }
     }
 
