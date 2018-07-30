@@ -11,18 +11,26 @@ package org.eth.demo.sebserver.service.exam;
 import static org.eth.demo.sebserver.batis.gen.mapper.IndicatorRecordDynamicSqlSupport.examId;
 import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.eth.demo.sebserver.batis.ExamJoinMapper;
+import org.eth.demo.sebserver.batis.ExamJoinMapper.ExamJoinRecord;
 import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.IndicatorRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ExamRecord;
 import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
+import org.eth.demo.sebserver.domain.rest.exam.ExamSEBConfigMapping;
+import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
+import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
 import org.eth.demo.sebserver.service.admin.UserFacade;
 import org.mybatis.dynamic.sql.select.MyBatis3SelectModelAdapter;
+import org.mybatis.dynamic.sql.select.QueryExpressionDSL;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +42,7 @@ public class ExamDaoImpl implements ExamDao {
     private final ExamRecordMapper examMapper;
     private final IndicatorRecordMapper indicatorMapper;
     private final ExamJoinMapper examJoinMapper;
+    //private final ExamJoinMapper_OLD examJoinMapper_OLD;
     private final UserFacade userFacade;
 
     public ExamDaoImpl(
@@ -63,15 +72,16 @@ public class ExamDaoImpl implements ExamDao {
     @Transactional(readOnly = true)
     @Override
     public Exam byId(final Long id) {
-        final MyBatis3SelectModelAdapter<Exam> select = this.examJoinMapper
-                .selectOneByExample()
+        final QueryExpressionDSL<MyBatis3SelectModelAdapter<Collection<ExamJoinRecord>>>.JoinSpecificationFinisher selectByExample =
+                this.examJoinMapper.selectByExample();
+        final Exam exam = getOneFromJoinRecords(selectByExample
                 .where(examId, isEqualTo(id))
-                .build();
-
-        final Exam exam = select.execute();
+                .build()
+                .execute());
         if (exam != null) {
             // TODO if there should be institutions (tenants), get current User and check institution
             final User currentUser = this.userFacade.getCurrentUser();
+            // currentUser.institution == exam.owner.institution
         }
 
         return exam;
@@ -90,11 +100,10 @@ public class ExamDaoImpl implements ExamDao {
         //      institution filter to select query
         final User currentUser = this.userFacade.getCurrentUser();
 
-        final MyBatis3SelectModelAdapter<Collection<Exam>> select = this.examJoinMapper
-                .selectManyByExample()
-                .build();
-
-        return select.execute();
+        return getManyFromJoinRecords(this.examJoinMapper
+                .selectByExample()
+                .build()
+                .execute());
     }
 
     /*
@@ -160,4 +169,63 @@ public class ExamDaoImpl implements ExamDao {
         return del > 0;
     }
 
+    private static final Collection<Exam> getManyFromJoinRecords(final Collection<ExamJoinRecord> joinRecords) {
+        return joinRecords.stream()
+                .reduce(
+                        new HashMap<Long, Collection<ExamJoinRecord>>(),
+                        ExamDaoImpl::accToMap,
+                        (m1, m2) -> m1) // TODO if we allow parallelization we need a proper combiner here
+                .values()
+                .stream()
+                .map(ExamDaoImpl::createExam)
+                .collect(Collectors.toList());
+    }
+
+    private static final Map<Long, Collection<ExamJoinRecord>> accToMap(
+            final Map<Long, Collection<ExamJoinRecord>> map,
+            final ExamJoinRecord rec) {
+
+        map.computeIfAbsent(rec.id, id -> new ArrayList<>())
+                .add(rec);
+        return map;
+    }
+
+    private static final Exam getOneFromJoinRecords(final Collection<ExamJoinRecord> joinRecords) {
+        return getManyFromJoinRecords(joinRecords)
+                .stream()
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static final Exam createExam(final Collection<ExamJoinRecord> records) {
+        assert records != null && !records.isEmpty() : "Expecting none-empty ExamJoinRecord Collection";
+
+        Exam prototype = null;
+        final ArrayList<IndicatorDefinition> indicator = new ArrayList<>();
+        final ArrayList<ExamSEBConfigMapping> configMappings = new ArrayList<>();
+
+        for (final ExamJoinRecord record : records) {
+            if (prototype == null) {
+                prototype = Exam.of(
+                        record.id,
+                        record.ownerId,
+                        record.name,
+                        ExamStatus.valueOf(record.status),
+                        record.startTime,
+                        record.endTime,
+                        record.lmsLoginURL);
+            }
+            if (record.indicator != null) {
+                indicator.add(record.indicator);
+            }
+            if (record.configMapping != null) {
+                configMappings.add(record.configMapping);
+            }
+        }
+
+        return Exam.of(
+                prototype,
+                indicator,
+                configMappings);
+    }
 }

@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eth.demo.sebserver.gui.I18nSupport;
 import org.eth.demo.sebserver.gui.domain.admin.UserRole;
 import org.eth.demo.sebserver.gui.domain.exam.ExamStatus;
 import org.eth.demo.sebserver.gui.domain.exam.ExamTableRow;
@@ -50,17 +51,20 @@ public class ExamOverview implements ViewComposer {
     private final POSTExamStateChange examStateChange;
     private final ViewService viewService;
     private final AuthorizationContextHolder authorizationContextHolder;
+    private final I18nSupport i18nSupport;
 
     public ExamOverview(
             final GETExams examsRequest,
             final POSTExamStateChange examStateChange,
             final ViewService viewService,
-            final AuthorizationContextHolder authorizationContextHolder) {
+            final AuthorizationContextHolder authorizationContextHolder,
+            final I18nSupport i18nSupport) {
 
         this.examsRequest = examsRequest;
         this.examStateChange = examStateChange;
         this.viewService = viewService;
         this.authorizationContextHolder = authorizationContextHolder;
+        this.i18nSupport = i18nSupport;
     }
 
     @Override
@@ -139,21 +143,21 @@ public class ExamOverview implements ViewComposer {
                 SWT.MenuDetect,
                 this::tableRowMenuEvent);
 
-        new TableColumn(table, SWT.LEFT).setText("Identifier");
         new TableColumn(table, SWT.LEFT).setText("Name");
         new TableColumn(table, SWT.LEFT).setText("Status");
-        table.getColumn(0).setWidth(100);
-        table.getColumn(1).setWidth(500);
-        table.getColumn(2).setWidth(180);
+        new TableColumn(table, SWT.LEFT).setText("Start Time");
+        table.getColumn(0).setWidth(300);
+        table.getColumn(1).setWidth(200);
+        table.getColumn(2).setWidth(280);
 
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
 
         for (final ExamTableRow exam : exams) {
             final TableItem item = new TableItem(table, SWT.RIGHT);
-            item.setText(0, String.valueOf(exam.id));
-            item.setText(1, exam.name);
-            item.setText(2, exam.status);
+            item.setText(0, exam.name);
+            item.setText(1, exam.status);
+            item.setText(2, this.i18nSupport.formatDisplayDate(exam.startTime));
             item.setData(ITEM_DATA_EXAM, exam);
             item.addListener(SWT.Selection, event -> {
                 System.out.println("table item selection: ");

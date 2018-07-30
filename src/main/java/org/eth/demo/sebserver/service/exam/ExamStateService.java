@@ -138,7 +138,7 @@ public class ExamStateService {
     }
 
     private void save(final Long examId, final ExamStatus toState) {
-        final ExamRecord recordWithIdAndChanges = new ExamRecord(examId, null, toState.name(), null);
+        final ExamRecord recordWithIdAndChanges = new ExamRecord(examId, null, null, toState.name(), null, null, null);
         this.examRecordMapper.updateByPrimaryKeySelective(recordWithIdAndChanges);
     }
 

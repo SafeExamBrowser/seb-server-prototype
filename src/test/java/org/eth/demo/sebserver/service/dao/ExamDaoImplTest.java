@@ -62,7 +62,7 @@ public class ExamDaoImplTest extends TestWithLogging {
 
         final ExamRecordMapper examMapperMock = mock(ExamRecordMapper.class);
         final IndicatorRecordMapper indicatorMapperMock = mock(IndicatorRecordMapper.class);
-        final ExamJoinMapper examIndicatorJoinMapperMock = mock(ExamJoinMapper.class);
+        final ExamJoinMapper examJoinMapperMock = mock(ExamJoinMapper.class);
         final UserFacade userFacadeMock = mock(UserFacade.class);
 
         final ExamDaoImpl candidate;
@@ -72,7 +72,7 @@ public class ExamDaoImplTest extends TestWithLogging {
             this.candidate = new ExamDaoImpl(
                     this.examMapperMock,
                     this.indicatorMapperMock,
-                    this.examIndicatorJoinMapperMock,
+                    this.examJoinMapperMock,
                     this.userFacadeMock);
         }
     }

@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.eth.demo.sebserver.batis.gen.model.ExamRecord;
+import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,25 +20,36 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public final class Exam {
 
     public final Long id;
+    public final Long ownerId;
     public final String name;
     public final ExamStatus status;
-    public final Long ownerId;
+    public final DateTime startTime;
+    public final DateTime endTime;
+    public final String lmsLoginURL;
+
     public final Collection<IndicatorDefinition> indicators;
     public final Collection<ExamSEBConfigMapping> sebConfigMapping;
 
     @JsonCreator
     public Exam(
             @JsonProperty("id") final Long id,
+            @JsonProperty("ownerId") final Long ownerId,
             @JsonProperty("name") final String name,
             @JsonProperty("status") final ExamStatus status,
-            @JsonProperty("ownerId") final Long ownerId,
+            @JsonProperty("startTime") final DateTime startTime,
+            @JsonProperty("endTime") final DateTime endTime,
+            @JsonProperty("lmsLoginURI") final String lmsLoginURL,
             @JsonProperty("indicators") final Collection<IndicatorDefinition> indicators,
             @JsonProperty("sebConfigMapping") final Collection<ExamSEBConfigMapping> sebConfigMapping) {
 
         this.id = id;
+        this.ownerId = ownerId;
         this.name = name;
         this.status = status;
-        this.ownerId = ownerId;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.lmsLoginURL = lmsLoginURL;
+
         this.indicators = (indicators != null)
                 ? Collections.unmodifiableCollection(indicators)
                 : Collections.emptyList();
@@ -50,6 +62,10 @@ public final class Exam {
         return this.id;
     }
 
+    public Long getOwnerId() {
+        return this.ownerId;
+    }
+
     public String getName() {
         return this.name;
     }
@@ -58,8 +74,16 @@ public final class Exam {
         return this.status;
     }
 
-    public Long getOwnerId() {
-        return this.ownerId;
+    public DateTime getStartTime() {
+        return this.startTime;
+    }
+
+    public DateTime getEndTime() {
+        return this.endTime;
+    }
+
+    public String getLmsLoginURL() {
+        return this.lmsLoginURL;
     }
 
     public Collection<IndicatorDefinition> getIndicators() {
@@ -96,7 +120,26 @@ public final class Exam {
     }
 
     public final ExamRecord toExamRecord() {
-        return new ExamRecord(this.id, this.name, this.status.name(), this.ownerId);
+        return new ExamRecord(
+                this.id,
+                this.ownerId,
+                this.name,
+                this.status.name(),
+                this.startTime,
+                this.endTime,
+                this.lmsLoginURL);
+    }
+
+    public static final Exam of(
+            final Long id,
+            final Long ownerId,
+            final String name,
+            final ExamStatus status,
+            final DateTime startTime,
+            final DateTime endTime,
+            final String lmsLoginURL) {
+
+        return new Exam(id, ownerId, name, status, startTime, endTime, lmsLoginURL, null, null);
     }
 
     public static final Exam of(
@@ -106,11 +149,22 @@ public final class Exam {
 
         return new Exam(
                 prototype.id,
+                prototype.ownerId,
                 prototype.name,
                 prototype.status,
-                prototype.ownerId,
+                prototype.startTime,
+                prototype.endTime,
+                prototype.lmsLoginURL,
                 indicators,
                 sebConfigMapping);
+    }
 
+    @Override
+    public String toString() {
+        return "Exam [id=" + this.id + ", ownerId=" + this.ownerId + ", name=" + this.name + ", status=" + this.status
+                + ", startTime="
+                + this.startTime + ", endTime=" + this.endTime + ", lmsLoginURL=" + this.lmsLoginURL + ", indicators="
+                + this.indicators
+                + ", sebConfigMapping=" + this.sebConfigMapping + "]";
     }
 }

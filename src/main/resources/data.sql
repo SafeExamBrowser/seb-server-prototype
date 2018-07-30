@@ -67,10 +67,10 @@ INSERT INTO configuration VALUES
     ;
     
 INSERT INTO `exam` VALUES 
-    (1,'Demo Exam 1','IN_PROGRESS', 2),
-    (2,'Demo Exam 2','IN_PROGRESS', 2),
-    (3,'Demo Exam 3','READY', 3),
-    (4,'Demo Exam 4','RUNNING', 3)
+    (1, 2,'Demo Exam 1','IN_PROGRESS', null, null, null),
+    (2, 2,'Demo Exam 2','IN_PROGRESS', null, null, null),
+    (3, 3,'Demo Exam 3','READY', '2018-07-30 09:00:00' ,'2018-08-01 00:00:00', 'https://localhost:8090/exams/exam3'),
+    (4, 3,'Demo Exam 4','RUNNING', '2018-01-01 00:00:00', '2019-01-01 00:00:00', 'https://localhost:8090/exams/exam4')
     ;
 
 INSERT INTO indicator VALUES 

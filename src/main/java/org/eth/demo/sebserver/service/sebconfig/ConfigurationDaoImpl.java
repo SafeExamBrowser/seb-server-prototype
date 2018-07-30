@@ -215,7 +215,7 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
         return null;
     }
 
-    public static final Collection<ConfigurationNode> fromJoinRecords(
+    private static final Collection<ConfigurationNode> fromJoinRecords(
             final Collection<ConfigNodeJoinRecord> records) {
 
         return records.stream()

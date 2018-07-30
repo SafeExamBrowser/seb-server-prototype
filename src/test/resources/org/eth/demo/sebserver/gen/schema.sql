@@ -27,9 +27,12 @@ DROP TABLE IF EXISTS `exam` ;
 
 CREATE TABLE IF NOT EXISTS `exam` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `owner_id` BIGINT UNSIGNED NOT NULL,
   `name` VARCHAR(45) NOT NULL,
   `status` VARCHAR(45) NOT NULL,
-  `owner_id` BIGINT UNSIGNED NOT NULL,
+  `start_time` DATETIME NOT NULL,
+  `end_time` DATETIME NOT NULL,
+  `lms_login_url` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `examOwnerRef_idx` (`owner_id` ASC),
   CONSTRAINT `examOwnerRef`

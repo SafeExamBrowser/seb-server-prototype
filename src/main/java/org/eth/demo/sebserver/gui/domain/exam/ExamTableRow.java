@@ -9,6 +9,7 @@
 package org.eth.demo.sebserver.gui.domain.exam;
 
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
+import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,25 +17,32 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ExamTableRow {
 
     public final String id;
+    public final Long ownerId;
     public final String name;
     public final String status;
-    public final Long ownerId;
+    public final DateTime startTime;
 
     @JsonCreator
     public ExamTableRow(
             @JsonProperty("id") final String id,
+            @JsonProperty("ownerId") final Long ownerId,
             @JsonProperty("name") final String name,
             @JsonProperty("status") final String status,
-            @JsonProperty("ownerId") final Long ownerId) {
+            @JsonProperty("startTime") final DateTime startTime) {
 
         this.id = id;
+        this.ownerId = ownerId;
         this.name = name;
         this.status = status;
-        this.ownerId = ownerId;
+        this.startTime = startTime;
     }
 
     public String getId() {
         return this.id;
+    }
+
+    public Long getOwnerId() {
+        return this.ownerId;
     }
 
     public String getName() {
@@ -49,8 +57,8 @@ public class ExamTableRow {
         return ExamStatus.valueOf(this.status);
     }
 
-    public Long getOwnerId() {
-        return this.ownerId;
+    public DateTime getStartTime() {
+        return this.startTime;
     }
 
     /** Use this to check if the current logged in user is the owner of the Exam represented by this ExamTableRow. NOTE:
@@ -91,7 +99,9 @@ public class ExamTableRow {
 
     @Override
     public String toString() {
-        return "ExamTableRow [id=" + this.id + ", name=" + this.name + ", status=" + this.status + "]";
+        return "ExamTableRow [id=" + this.id + ", ownerId=" + this.ownerId + ", name=" + this.name + ", status="
+                + this.status
+                + ", startTime=" + this.startTime + "]";
     }
 
 }

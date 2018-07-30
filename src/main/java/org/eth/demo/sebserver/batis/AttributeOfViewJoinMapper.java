@@ -44,9 +44,9 @@ public interface AttributeOfViewJoinMapper {
             @Arg(column = "x_position", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Arg(column = "y_position", javaType = Integer.class, jdbcType = JdbcType.INTEGER)
     })
-    Collection<AttributeOfViewJoinMapper.AttributeOfViewRecord> selectMany(SelectStatementProvider select);
+    Collection<AttributeOfViewRecord> selectMany(SelectStatementProvider select);
 
-    default Collection<AttributeOfViewJoinMapper.AttributeOfViewRecord> selectOfView(final String viewName) {
+    default Collection<AttributeOfViewRecord> selectOfView(final String viewName) {
         return SelectDSL.selectWithMapper(
                 this::selectMany,
                 configurationAttributeRecord.id,

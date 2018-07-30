@@ -24,25 +24,10 @@ import org.springframework.web.client.RestTemplate;
 public class GETIndicatorValues implements SEBServerAPICall<List<GUIIndicatorValue>> {
 
     private final RestCallBuilder restCallBuilder;
-//    private final RequestCallBuilder<List<GUIIndicatorValue>> builder = null;
 
     public GETIndicatorValues(final RestCallBuilder restCallBuilder) {
         this.restCallBuilder = restCallBuilder;
     }
-
-//    @Override
-//    public RequestCallBuilder<List<GUIIndicatorValue>> with(final RestTemplate restTemplate) {
-//        // NOTE: to get better performance one instance of RequestCallBuilder is reused
-//        //          here for every poll-request of one client user connection
-//        if (this.builder == null) {
-//            this.builder = new RequestCallBuilder<>(this, restTemplate);
-//        } else {
-//            this.builder.setRestTemplate(restTemplate);
-//        }
-//
-//        this.builder.clear();
-//        return this.builder;
-//    }
 
     @Override
     public Response<List<GUIIndicatorValue>> doAPICall(
