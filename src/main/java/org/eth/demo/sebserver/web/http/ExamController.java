@@ -37,13 +37,12 @@ public class ExamController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-
-    final Collection<Exam> exams(final Principal principal) {
+    public final Collection<Exam> exams(final Principal principal) {
         return this.examDao.getAll(UserPrivilegeExamFilter.of(principal));
     }
 
     @RequestMapping(value = "/{examId}", method = RequestMethod.GET)
-    final Exam exam(final Principal principal, @PathVariable final Long examId) {
+    public final Exam exam(final Principal principal, @PathVariable final Long examId) {
         final Exam exam = this.examDao.byId(examId);
         if (exam != null) {
             // TODO if there should be institutions (tenants), get current User and check institution
@@ -54,12 +53,12 @@ public class ExamController {
     }
 
     @RequestMapping(value = "/delete/{examId}", method = RequestMethod.DELETE)
-    final void deleteExam(@PathVariable final Long examId) {
+    public final void deleteExam(@PathVariable final Long examId) {
         this.examDao.delete(examId);
     }
 
     @RequestMapping(value = "/save", method = RequestMethod.POST)
-    final Exam saveExam(@RequestBody final Exam exam) {
+    public final Exam saveExam(@RequestBody final Exam exam) {
         return this.examDao.save(exam);
     }
 

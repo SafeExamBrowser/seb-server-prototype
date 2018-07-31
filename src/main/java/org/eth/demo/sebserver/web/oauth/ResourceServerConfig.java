@@ -103,8 +103,6 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                         restAPIAuthenticationEntryPoint(),
                         WebSecurityConfig.PROTECTED_URLS)
             .and()
-                //.authenticationProvider(this.restAPIAuthenticationProvider)
-                //.addFilterBefore(restAuthenticationFilter(), AnonymousAuthenticationFilter.class)
                 .authorizeRequests()
                 .anyRequest().authenticated()
             .and()

@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 @SpringBootApplication
-
 public class SEBServer {
 
     public static void main(final String[] args) {

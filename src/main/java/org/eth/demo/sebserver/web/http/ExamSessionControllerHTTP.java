@@ -35,20 +35,20 @@ public class ExamSessionControllerHTTP {
     }
 
     @RequestMapping(value = "/connect/{examId}", method = RequestMethod.GET)
-    final Mono<String> connect(@PathVariable final Long examId) {
+    public final Mono<String> connect(@PathVariable final Long examId) {
         return Mono.fromCallable(() -> this.examSessionService
                 .connectClient(examId)
                 .toString());
     }
 
     @RequestMapping(value = "/disconnect", method = RequestMethod.POST)
-    final Mono<Void> disconnect(@RequestHeader(value = REQUEST_HEADER_KEY_TOKEN) final String clientUUID) {
+    public final Mono<Void> disconnect(@RequestHeader(value = REQUEST_HEADER_KEY_TOKEN) final String clientUUID) {
         return Mono.fromRunnable(() -> this.examSessionService
                 .disconnectClient(UUID.fromString(clientUUID)));
     }
 
     @RequestMapping(value = "/event/{examId}", method = RequestMethod.POST)
-    final Mono<Void> clientEvent(
+    public final Mono<Void> clientEvent(
             @RequestHeader(value = REQUEST_HEADER_KEY_TOKEN) final String clientUUID,
             @RequestBody final ClientEvent clientEvent) {
 

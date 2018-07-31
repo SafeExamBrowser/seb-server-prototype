@@ -36,12 +36,12 @@ public class SEBConfigAttributeController {
     }
 
     @RequestMapping(value = "attributes/{viewName}", method = RequestMethod.GET)
-    final Collection<AttributeOfView> getAttributesOfView(@PathVariable final String viewName) {
+    public final Collection<AttributeOfView> getAttributesOfView(@PathVariable final String viewName) {
         return this.sebConfigDao.getAttributesOfView(viewName);
     }
 
     @RequestMapping(value = "values/{viewName}/{configId}", method = RequestMethod.GET)
-    final Collection<AttributeValue> getValuesOfView(
+    public final Collection<AttributeValue> getValuesOfView(
             @RequestHeader(value = "attributeNames") final String attributeNames,
             @PathVariable final Long configId) {
 
@@ -54,7 +54,7 @@ public class SEBConfigAttributeController {
     }
 
     @RequestMapping(value = "values/{configId}", method = RequestMethod.GET)
-    final Collection<AttributeValue> getValues(
+    public final Collection<AttributeValue> getValues(
             @RequestHeader(value = "attributeNames") final String attributeNames,
             @PathVariable final Long configId) {
 
@@ -68,13 +68,13 @@ public class SEBConfigAttributeController {
 
     // TODO add validation error response
     @RequestMapping(value = "saveValue", method = RequestMethod.POST)
-    final void saveValue(@RequestBody final AttributeValue value) {
+    public final void saveValue(@RequestBody final AttributeValue value) {
         this.sebConfigDao.saveValue(value);
     }
 
     // TODO add validation error response
     @RequestMapping(value = "saveTable", method = RequestMethod.POST)
-    final void saveValue(@RequestBody final TableAttributeValue value) {
+    public final void saveValue(@RequestBody final TableAttributeValue value) {
         this.sebConfigDao.saveTableValue(value);
     }
 
