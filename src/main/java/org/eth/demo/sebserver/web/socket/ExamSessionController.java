@@ -34,7 +34,8 @@ public class ExamSessionController {
     }
 
     @SubscribeMapping("/exam.{examId}/session.{sessionId}")
-    public String subscribe(@DestinationVariable final long examId,
+    public String subscribe(
+            @DestinationVariable final long examId,
             @DestinationVariable final String sessionId) {
 
         try {

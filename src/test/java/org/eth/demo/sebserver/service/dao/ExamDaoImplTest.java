@@ -15,7 +15,6 @@ import org.eth.demo.sebserver.batis.ExamJoinMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.IndicatorRecordMapper;
 import org.eth.demo.sebserver.service.ResourceNotFoundException;
-import org.eth.demo.sebserver.service.admin.UserFacade;
 import org.eth.demo.sebserver.service.exam.ExamDaoImpl;
 import org.eth.demo.sebserver.testing.TestWithLogging;
 import org.junit.Test;
@@ -63,7 +62,6 @@ public class ExamDaoImplTest extends TestWithLogging {
         final ExamRecordMapper examMapperMock = mock(ExamRecordMapper.class);
         final IndicatorRecordMapper indicatorMapperMock = mock(IndicatorRecordMapper.class);
         final ExamJoinMapper examJoinMapperMock = mock(ExamJoinMapper.class);
-        final UserFacade userFacadeMock = mock(UserFacade.class);
 
         final ExamDaoImpl candidate;
 
@@ -72,8 +70,7 @@ public class ExamDaoImplTest extends TestWithLogging {
             this.candidate = new ExamDaoImpl(
                     this.examMapperMock,
                     this.indicatorMapperMock,
-                    this.examJoinMapperMock,
-                    this.userFacadeMock);
+                    this.examJoinMapperMock);
         }
     }
 

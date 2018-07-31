@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.domain.rest.admin.UserRole;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
-import org.eth.demo.sebserver.service.admin.UserFacadeImpl;
+import org.eth.demo.sebserver.service.admin.UserFacade;
 
 public final class UserPrivilegeExamFilter implements Predicate<Exam> {
 
@@ -39,6 +39,6 @@ public final class UserPrivilegeExamFilter implements Predicate<Exam> {
     }
 
     public static final UserPrivilegeExamFilter of(final Principal principal) {
-        return new UserPrivilegeExamFilter(UserFacadeImpl.fromPrincipal(principal));
+        return new UserPrivilegeExamFilter(UserFacade.extractFromPrincipal(principal));
     }
 }

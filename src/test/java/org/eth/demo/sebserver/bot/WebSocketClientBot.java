@@ -57,7 +57,12 @@ public class WebSocketClientBot {
             final long runtime) {
 
         final SEBServerConnection connection = new SEBServerConnection(examId);
-        final String token = connection.connect(rootURL);
+        final String token = connection.connect(rootURL, connectAttempts);
+
+        if (token == null) {
+            log.error("Failed to connecto the SEBServer. Give up after {} attempts", connectAttempts);
+            return;
+        }
 
         log.info("Successfully connected to SEBServer. Token: {}", token);
 
@@ -113,8 +118,6 @@ public class WebSocketClientBot {
         private final long examId;
         private ConnectionReference connRef;
 
-        private int connectionAttempt = 0;
-
         SEBServerConnection(final long examId) {
             this.examId = examId;
 
@@ -133,14 +136,14 @@ public class WebSocketClientBot {
             });
         }
 
-        String connect(final String url) {
+        String connect(final String url, int connectAttempts) {
             try {
-                this.connectionAttempt++;
-                if (this.connectionAttempt > 3) {
+                connectAttempts--;
+                if (connectAttempts < 0) {
                     return null;
                 }
 
-                log.info("Trying to connect to SEBServer on URL: {}, attempt: {}", url, this.connectionAttempt);
+                log.info("Trying to connect to SEBServer on URL: {}, attempt: {}", url, connectAttempts);
 
                 this.connRef = new ConnectionReference(this.examId);
                 return this.connRef.connect(this.client, url);
@@ -156,7 +159,7 @@ public class WebSocketClientBot {
                     disconnect();
                 }
 
-                return connect(url);
+                return connect(url, connectAttempts);
             }
         }
 
@@ -300,7 +303,8 @@ public class WebSocketClientBot {
                         break;
                     }
                     case ERROR: {
-                        // TODO: handle error message
+                        this.connectioToken.completeExceptionally(
+                                new RuntimeException("SEBServer sent connection error: " + message.content));
                         break;
                     }
                     case UPDATE_CONFIG: {

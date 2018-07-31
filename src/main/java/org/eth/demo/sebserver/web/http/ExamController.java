@@ -11,8 +11,10 @@ package org.eth.demo.sebserver.web.http;
 import java.security.Principal;
 import java.util.Collection;
 
+import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
+import org.eth.demo.sebserver.service.admin.UserFacade;
 import org.eth.demo.sebserver.service.exam.ExamDao;
 import org.eth.demo.sebserver.service.exam.ExamStateService;
 import org.eth.demo.sebserver.service.exam.UserPrivilegeExamFilter;
@@ -41,8 +43,14 @@ public class ExamController {
     }
 
     @RequestMapping(value = "/{examId}", method = RequestMethod.GET)
-    final Exam exam(@PathVariable final Long examId) {
-        return this.examDao.byId(examId);
+    final Exam exam(final Principal principal, @PathVariable final Long examId) {
+        final Exam exam = this.examDao.byId(examId);
+        if (exam != null) {
+            // TODO if there should be institutions (tenants), get current User and check institution
+            final User currentUser = UserFacade.extractFromPrincipal(principal);
+            // currentUser.institution == exam.owner.institution
+        }
+        return exam;
     }
 
     @RequestMapping(value = "/delete/{examId}", method = RequestMethod.DELETE)

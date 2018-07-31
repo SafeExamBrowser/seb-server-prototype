@@ -37,6 +37,7 @@ public class ExamStateService {
     private final ExamDao examDao;
     private final ApplicationEventPublisher publisher;
 
+    // TODO use EhCache or something similar here!!
     private final Map<Long, Exam> runningExamsCache = new HashMap<>();
 
     public ExamStateService(

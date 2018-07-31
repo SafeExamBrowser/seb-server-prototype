@@ -8,26 +8,28 @@
 
 package org.eth.demo.sebserver.service.exam.run;
 
+import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.ibatis.session.ExecutorType;
-import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.eth.demo.sebserver.appevents.ExamFinishedEvent;
 import org.eth.demo.sebserver.appevents.ExamStartedEvent;
 import org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordMapper;
+import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordDynamicSqlSupport;
+import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ClientEventRecord;
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
-import org.eth.demo.sebserver.service.exam.ExamDao;
-import org.eth.demo.util.TransactionalBounds;
+import org.eth.demo.util.Result;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -36,8 +38,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /** Approach 2 to handle/save client events internally
@@ -64,9 +66,9 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
 
     private final ClientConnectionService clientConnectionService;
     private final SqlSessionFactory sqlSessionFactory;
-    private final ExamDao examDao;
+    private final ExamRecordMapper examRecordMapper;
     private final Executor executor;
-    private final PlatformTransactionManager transactionManager;
+    private final TransactionTemplate transactionTemplate;
 
     private final BlockingDeque<ClientEvent> eventQueue = new LinkedBlockingDeque<>();
 
@@ -76,15 +78,17 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
     public AsyncBatchEventSaveStrategy(
             final ClientConnectionService clientConnectionService,
             final SqlSessionFactory sqlSessionFactory,
-            final ExamDao examDao,
+            final ExamRecordMapper examRecordMapper,
             final AsyncConfigurer asyncConfigurer,
             final PlatformTransactionManager transactionManager) {
 
         this.clientConnectionService = clientConnectionService;
         this.sqlSessionFactory = sqlSessionFactory;
-        this.examDao = examDao;
+        this.examRecordMapper = examRecordMapper;
         this.executor = asyncConfigurer.getAsyncExecutor();
-        this.transactionManager = transactionManager;
+
+        this.transactionTemplate = new TransactionTemplate(transactionManager);
+        this.transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
 
     @Override
@@ -108,7 +112,7 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
 
     @EventListener(ExamFinishedEvent.class)
     protected void examFinished() {
-        this.workersRunning = !this.examDao.getAll(exam -> exam.status == ExamStatus.RUNNING).isEmpty();
+        this.workersRunning = hasRunningExams();
     }
 
     @Override
@@ -127,7 +131,7 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
             return;
         }
 
-        if (this.examDao.getAll(exam -> exam.status == ExamStatus.RUNNING).isEmpty()) {
+        if (!hasRunningExams()) {
             log.info("runWorkers called but no exam is running");
             return;
         }
@@ -146,22 +150,29 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
             log.debug("Worker Thread {} running", Thread.currentThread());
 
             final Collection<ClientEvent> events = new ArrayList<>();
-            final SqlSession batchedSession = this.sqlSessionFactory.openSession(ExecutorType.BATCH, false);
-            //final Consumer<Runnable> transactionBounds = transactionBounds(this.transactionManager);
-            final Runnable batchStore = batchStore(this.clientConnectionService, events, batchedSession);
+            final SqlSessionTemplate sqlSessionTemplate = new SqlSessionTemplate(
+                    this.sqlSessionFactory,
+                    ExecutorType.BATCH);
+            final ClientEventRecordMapper clientEventMapper = sqlSessionTemplate.getMapper(
+                    ClientEventRecordMapper.class);
+            final TransactionCallback<Result<Void>> batchStore = batchStore(
+                    this.clientConnectionService,
+                    events,
+                    clientEventMapper);
 
             try {
                 while (this.workersRunning) {
                     events.clear();
                     this.eventQueue.drainTo(events, BATCH_SIZE);
 
-                    //transactionBounds.accept(batchStore);
-                    // TODO test this...
-                    new TransactionalBounds<Void>(this.transactionManager)
-                            .runInTransaction(batchStore)
-                            .onError(t -> {
-                                throw new RuntimeException(t);
-                            }); // TODO error handling
+                    if (!events.isEmpty()) {
+                        this.transactionTemplate
+                                .execute(batchStore)
+                                .onError(t -> {
+                                    log.error("Failed to batch store client events: {}", events);
+                                    return null;
+                                });
+                    }
 
                     try {
                         Thread.sleep(20);
@@ -170,53 +181,46 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
                     }
                 }
             } finally {
-                batchedSession.close();
+                sqlSessionTemplate.close();
                 log.debug("Worker Thread {} stopped", Thread.currentThread());
             }
         };
     }
 
-    private static final Runnable batchStore(
+    private static final TransactionCallback<Result<Void>> batchStore(
             final ClientConnectionService clientConnectionService,
             final Collection<ClientEvent> events,
-            final SqlSession batchedSession) {
+            final ClientEventRecordMapper clientEventMapper) {
 
-        return () -> {
-            final ClientEventRecordMapper mapper = batchedSession.getMapper(ClientEventRecordMapper.class);
-            final List<ClientEventRecord> records = events.stream()
-                    .map(event -> clientConnectionService.getClientConnection(event.clientId)
-                            .map(cc -> event.toRecord(
-                                    cc.examId,
-                                    cc.clientId))
-                            .orElse(null))
-                    .filter(cer -> cer != null)
-                    .collect(Collectors.toList());
+        return status -> {
+            try {
+                final List<ClientEventRecord> records = events.stream()
+                        .map(event -> clientConnectionService.getClientConnection(event.clientId)
+                                .map(cc -> event.toRecord(
+                                        cc.examId,
+                                        cc.clientId))
+                                .orElse(null))
+                        .filter(cer -> cer != null)
+                        .collect(Collectors.toList());
 
-            for (final ClientEventRecord record : records) {
-                mapper.insert(record);
+                for (final ClientEventRecord record : records) {
+                    clientEventMapper.insert(record);
+                }
+
+                return Result.of(null);
+            } catch (final Exception e) {
+                log.error("Error while trying to batch store client-events: ", e);
+                status.setRollbackOnly();
+                return Result.ofError(e);
             }
-
-            batchedSession.commit();
         };
     }
 
-    private static final Consumer<Runnable> transactionBounds(final PlatformTransactionManager transactionManager) {
-        return runnable -> {
-            final TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-            transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-                @Override
-                protected void doInTransactionWithoutResult(final TransactionStatus status) {
-                    try {
-                        runnable.run();
-                    } catch (final Exception e) {
-                        log.error(
-                                "Error while trying to store event batch. TODO handle transaction rollback correctly");
-                        transactionManager.rollback(status);
-                        //TODO handle transaction rollback correctly?
-                    }
-                }
-            });
-        };
+    private boolean hasRunningExams() {
+        return this.examRecordMapper.countByExample()
+                .where(ExamRecordDynamicSqlSupport.status, isEqualTo(ExamStatus.RUNNING.name()))
+                .build()
+                .execute() > 0;
     }
 
 }

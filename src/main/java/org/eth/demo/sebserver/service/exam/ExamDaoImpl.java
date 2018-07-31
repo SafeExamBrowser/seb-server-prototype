@@ -23,12 +23,10 @@ import org.eth.demo.sebserver.batis.ExamJoinMapper.ExamJoinRecord;
 import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.IndicatorRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ExamRecord;
-import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.ExamSEBConfigMapping;
 import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
-import org.eth.demo.sebserver.service.admin.UserFacade;
 import org.mybatis.dynamic.sql.select.MyBatis3SelectModelAdapter;
 import org.mybatis.dynamic.sql.select.QueryExpressionDSL;
 import org.springframework.context.annotation.Lazy;
@@ -42,20 +40,16 @@ public class ExamDaoImpl implements ExamDao {
     private final ExamRecordMapper examMapper;
     private final IndicatorRecordMapper indicatorMapper;
     private final ExamJoinMapper examJoinMapper;
-    //private final ExamJoinMapper_OLD examJoinMapper_OLD;
-    private final UserFacade userFacade;
 
     public ExamDaoImpl(
             final ExamRecordMapper examMapper,
             final IndicatorRecordMapper indicatorMapper,
-            final ExamJoinMapper examJoinMapper,
-            final UserFacade userFacade) {
+            final ExamJoinMapper examJoinMapper) {
 
         super();
         this.examMapper = examMapper;
         this.indicatorMapper = indicatorMapper;
         this.examJoinMapper = examJoinMapper;
-        this.userFacade = userFacade;
     }
 
     @Override
@@ -74,15 +68,11 @@ public class ExamDaoImpl implements ExamDao {
     public Exam byId(final Long id) {
         final QueryExpressionDSL<MyBatis3SelectModelAdapter<Collection<ExamJoinRecord>>>.JoinSpecificationFinisher selectByExample =
                 this.examJoinMapper.selectByExample();
+
         final Exam exam = getOneFromJoinRecords(selectByExample
                 .where(examId, isEqualTo(id))
                 .build()
                 .execute());
-        if (exam != null) {
-            // TODO if there should be institutions (tenants), get current User and check institution
-            final User currentUser = this.userFacade.getCurrentUser();
-            // currentUser.institution == exam.owner.institution
-        }
 
         return exam;
     }
@@ -95,11 +85,6 @@ public class ExamDaoImpl implements ExamDao {
     @Transactional(readOnly = true)
     @Override
     public Collection<Exam> getAll() {
-
-        // TODO if there should be institutions (tenants), get current User and add
-        //      institution filter to select query
-        final User currentUser = this.userFacade.getCurrentUser();
-
         return getManyFromJoinRecords(this.examJoinMapper
                 .selectByExample()
                 .build()
