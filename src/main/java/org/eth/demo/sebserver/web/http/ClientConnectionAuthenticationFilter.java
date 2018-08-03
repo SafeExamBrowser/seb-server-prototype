@@ -77,7 +77,7 @@ public final class ClientConnectionAuthenticationFilter extends GenericFilterBea
             try {
                 final HttpHeaders httpHeaders = new HttpHeaders();
                 httpHeaders.set("SEB_CLIENT_TOKEN", clientToken);
-                httpHeaders.set(HttpHeaders.AUTHORIZATION, "TODO: seb-servers ceredentials to access LMS API");
+                httpHeaders.set(HttpHeaders.AUTHORIZATION, "TODO: seb-servers credentials to access LMS API");
 
                 final ResponseEntity<String> authorizationResponse = this.restTemplate.exchange(
                         UriComponentsBuilder.fromHttpUrl(lmsAuthUrl).toUriString(),
@@ -98,7 +98,8 @@ public final class ClientConnectionAuthenticationFilter extends GenericFilterBea
             log.debug("Case 2: No SEB_CLIENT_TOKEN sent but client-user credentials send");
 
             final HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.set(HttpHeaders.AUTHORIZATION, "TODO: clients credentials");
+            httpHeaders.set(HttpHeaders.AUTHORIZATION, "TODO: seb-servers credentials to access LMS API");
+            httpHeaders.set("SEB_CLIENT_AUTHORIZATION", "TODO: seb-client credentials to login within the LMS");
 
             final ResponseEntity<String> loginResponse = this.restTemplate.exchange(
                     UriComponentsBuilder.fromHttpUrl(lmsAuthUrl).toUriString(),
