@@ -10,10 +10,10 @@ package org.eth.demo.sebserver.web.oauth;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eth.demo.sebserver.web.CustomAuthenticationEntryPoint;
 import org.eth.demo.sebserver.web.WebSecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
@@ -32,9 +31,9 @@ import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConv
 import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Configuration
@@ -54,6 +53,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     private String guiClientSecret;
     @Autowired
     private InternalUserDetailsService userDetailsService;
+    @Autowired
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Primary
     @Bean
@@ -96,36 +97,28 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
         //@formatter:off
         http
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.NEVER)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+                .authorizeRequests()
+                .requestMatchers(new OrRequestMatcher(WebSecurityConfig.SEB_SERVER_API_IGNORE_URL))
+                .permitAll()
             .and()
                 .exceptionHandling()
                 .defaultAuthenticationEntryPointFor(
-                        restAPIAuthenticationEntryPoint(),
-                        WebSecurityConfig.PROTECTED_URLS)
+                        this.customAuthenticationEntryPoint,
+                        new OrRequestMatcher(WebSecurityConfig.SEB_SERVER_API_PROTECTED_URLS))
             .and()
                 .authorizeRequests()
-                .anyRequest().authenticated()
+                .anyRequest()
+                .authenticated()
             .and()
                 .formLogin().disable()
                 .httpBasic().disable()
                 .logout().disable()
+                .headers().frameOptions().disable()
+            .and()
                 .csrf().disable(); // TODO enable for RAP gui?
       //@formatter:on
-    }
-
-    @Bean
-    public AuthenticationEntryPoint restAPIAuthenticationEntryPoint() {
-        return new AuthenticationEntryPoint() {
-            @Override
-            public void commence(final HttpServletRequest request, final HttpServletResponse response,
-                    final AuthenticationException authenticationException) throws IOException, ServletException {
-
-                response.setContentType("application/json");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getOutputStream().println("{ \"error\": \"" + authenticationException.getMessage() + "\" }");
-
-            }
-        };
     }
 
     @Bean

@@ -43,7 +43,7 @@ public interface ExamJoinMapper {
             @Arg(column = "status", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "start_time", javaType = DateTime.class, typeHandler = JodaTimeTypeResolver.class, jdbcType = JdbcType.TIMESTAMP),
             @Arg(column = "end_time", javaType = DateTime.class, typeHandler = JodaTimeTypeResolver.class, jdbcType = JdbcType.TIMESTAMP),
-            @Arg(column = "lms_login_url", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Arg(column = "lms_exam_url", javaType = String.class, jdbcType = JdbcType.VARCHAR),
 
             @Arg(column = "indicatorId", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -66,7 +66,7 @@ public interface ExamJoinMapper {
                 examRecord.status,
                 examRecord.startTime,
                 examRecord.endTime,
-                examRecord.lmsLoginUrl,
+                examRecord.lmsExamUrl,
 
                 indicatorRecord.id.as("indicatorId"),
                 indicatorRecord.type,
@@ -94,7 +94,7 @@ public interface ExamJoinMapper {
         public final String status;
         public final DateTime startTime;
         public final DateTime endTime;
-        public final String lmsLoginURL;
+        public final String lmsExamURL;
 
         public final IndicatorDefinition indicator;
         public final ExamSEBConfigMapping configMapping;
@@ -106,7 +106,7 @@ public interface ExamJoinMapper {
                 final String status,
                 final DateTime startTime,
                 final DateTime endTime,
-                final String lmsLoginURL,
+                final String lmsExamURL,
 
                 final Long indicatorId,
                 final String type,
@@ -123,7 +123,7 @@ public interface ExamJoinMapper {
             this.status = status;
             this.startTime = startTime;
             this.endTime = endTime;
-            this.lmsLoginURL = lmsLoginURL;
+            this.lmsExamURL = lmsExamURL;
 
             indicator = (indicatorId != null)
                     ? new IndicatorDefinition(type, threshold1, threshold2, threshold3)

@@ -182,10 +182,12 @@ public class OAuth2AuthorizationContextHolder implements AuthorizationContextHol
             // set this context invalid to force creation of a new context on next request
             this.valid = false;
             this.loggedInUser = null;
-            // delete the access-token (and refresh-token) on authentication server side
-            this.restTemplate.delete(this.revokeTokenURI);
-            // delete the access-token within the RestTemplate
-            this.restTemplate.getOAuth2ClientContext().setAccessToken(null);
+            if (this.restTemplate.getAccessToken() != null) {
+                // delete the access-token (and refresh-token) on authentication server side
+                this.restTemplate.delete(this.revokeTokenURI);
+                // delete the access-token within the RestTemplate
+                this.restTemplate.getOAuth2ClientContext().setAccessToken(null);
+            }
             // mark the RestTemplate as disposed
             this.restTemplate.enabled = false;
 

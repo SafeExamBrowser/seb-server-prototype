@@ -39,9 +39,9 @@ CREATE TABLE IF NOT EXISTS `exam` (
   `owner_id` BIGINT UNSIGNED NOT NULL,
   `name` VARCHAR(45) NOT NULL,
   `status` VARCHAR(45) NOT NULL,
-  `start_time` DATETIME,
-  `end_time` DATETIME,
-  `lms_login_url` VARCHAR(255),
+  `start_time` DATETIME NULL,
+  `end_time` DATETIME NULL,
+  `lms_exam_url` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
   INDEX `examOwnerRef_idx` (`owner_id` ASC),
   CONSTRAINT `examOwnerRef`
@@ -60,7 +60,9 @@ DROP TABLE IF EXISTS `client_connection` ;
 CREATE TABLE IF NOT EXISTS `client_connection` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `exam_id` BIGINT UNSIGNED NOT NULL,
-  `token` VARCHAR(255) NOT NULL,
+  `status` VARCHAR(45) NOT NULL,
+  `token` VARCHAR(255) NULL,
+  `lms_auth_url` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
   INDEX `connection_exam_ref_idx` (`exam_id` ASC),
   CONSTRAINT `client_connection_exam_ref`

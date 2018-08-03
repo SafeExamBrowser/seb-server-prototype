@@ -150,9 +150,13 @@ public class LoginView implements ViewComposer {
             final String message) {
 
         // just to be sure we leave a clean and proper authorizationContext
-        this.authorizationContextHolder
-                .getAuthorizationContext()
-                .logout();
+        try {
+            this.authorizationContextHolder
+                    .getAuthorizationContext()
+                    .logout();
+        } catch (final Exception e) {
+            log.info("Cleanup logout failed: ", e);
+        }
         viewService
                 .createViewOn(parent)
                 .attribute(AttributeKeys.AUTHORIZATION_FAILURE, message)

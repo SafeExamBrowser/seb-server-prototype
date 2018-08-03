@@ -23,6 +23,7 @@ import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordDynamicSqlS
 import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ClientConnectionRecord;
 import org.eth.demo.sebserver.domain.ClientConnection;
+import org.eth.demo.sebserver.domain.rest.exam.ClientConnectionStatus;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorValue;
 import org.eth.demo.sebserver.service.exam.ExamStateService;
@@ -54,7 +55,12 @@ public class ClientConnectionService {
     public UUID establishConnection(final Exam runningExam) {
 
         final UUID clientUUID = UUID.randomUUID();
-        final ClientConnectionRecord ccRecord = new ClientConnectionRecord(null, runningExam.id, clientUUID.toString());
+        final ClientConnectionRecord ccRecord = new ClientConnectionRecord(
+                null,
+                runningExam.id,
+                ClientConnectionStatus.CONNECTED_TO_RUNNING_EXAM.name(),
+                clientUUID.toString(),
+                null);
         this.clientConnectionRecordMapper.insert(ccRecord);
 
         final ClientConnection clientConnection = createClientConnection(clientUUID);
@@ -72,7 +78,12 @@ public class ClientConnectionService {
         final ClientConnection clientConnection = this.connectionCache.get(clientUUID);
 
         this.clientConnectionRecordMapper.updateByPrimaryKey(
-                new ClientConnectionRecord(clientConnection.clientId, clientConnection.examId, ""));
+                new ClientConnectionRecord(
+                        clientConnection.clientId,
+                        clientConnection.examId,
+                        ClientConnectionStatus.FINISHED.name(),
+                        "",
+                        null));
 
         this.connectionCache.remove(clientUUID);
     }

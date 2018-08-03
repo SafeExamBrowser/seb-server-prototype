@@ -25,7 +25,7 @@ public final class Exam {
     public final ExamStatus status;
     public final DateTime startTime;
     public final DateTime endTime;
-    public final String lmsLoginURL;
+    public final String lmsExamURL;
 
     public final Collection<IndicatorDefinition> indicators;
     public final Collection<ExamSEBConfigMapping> sebConfigMapping;
@@ -38,7 +38,7 @@ public final class Exam {
             @JsonProperty("status") final ExamStatus status,
             @JsonProperty("startTime") final DateTime startTime,
             @JsonProperty("endTime") final DateTime endTime,
-            @JsonProperty("lmsLoginURI") final String lmsLoginURL,
+            @JsonProperty("lmsExamURL") final String lmsExamURL,
             @JsonProperty("indicators") final Collection<IndicatorDefinition> indicators,
             @JsonProperty("sebConfigMapping") final Collection<ExamSEBConfigMapping> sebConfigMapping) {
 
@@ -48,7 +48,7 @@ public final class Exam {
         this.status = status;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.lmsLoginURL = lmsLoginURL;
+        this.lmsExamURL = lmsExamURL;
 
         this.indicators = (indicators != null)
                 ? Collections.unmodifiableCollection(indicators)
@@ -82,8 +82,8 @@ public final class Exam {
         return this.endTime;
     }
 
-    public String getLmsLoginURL() {
-        return this.lmsLoginURL;
+    public String getLmsExamURL() {
+        return this.lmsExamURL;
     }
 
     public Collection<IndicatorDefinition> getIndicators() {
@@ -127,7 +127,7 @@ public final class Exam {
                 this.status.name(),
                 this.startTime,
                 this.endTime,
-                this.lmsLoginURL);
+                this.lmsExamURL);
     }
 
     public static final Exam of(
@@ -154,7 +154,7 @@ public final class Exam {
                 prototype.status,
                 prototype.startTime,
                 prototype.endTime,
-                prototype.lmsLoginURL,
+                prototype.lmsExamURL,
                 indicators,
                 sebConfigMapping);
     }
@@ -163,7 +163,7 @@ public final class Exam {
     public String toString() {
         return "Exam [id=" + this.id + ", ownerId=" + this.ownerId + ", name=" + this.name + ", status=" + this.status
                 + ", startTime="
-                + this.startTime + ", endTime=" + this.endTime + ", lmsLoginURL=" + this.lmsLoginURL + ", indicators="
+                + this.startTime + ", endTime=" + this.endTime + ", lmsExamURL=" + this.lmsExamURL + ", indicators="
                 + this.indicators
                 + ", sebConfigMapping=" + this.sebConfigMapping + "]";
     }

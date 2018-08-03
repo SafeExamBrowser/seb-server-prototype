@@ -198,7 +198,7 @@ public class ExamDaoImpl implements ExamDao {
                         ExamStatus.valueOf(record.status),
                         record.startTime,
                         record.endTime,
-                        record.lmsLoginURL);
+                        record.lmsExamURL);
             }
             if (record.indicator != null) {
                 indicator.add(record.indicator);
