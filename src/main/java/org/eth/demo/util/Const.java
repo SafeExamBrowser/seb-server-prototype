@@ -10,6 +10,6 @@ package org.eth.demo.util;
 
 public interface Const {
 
-    String CONTENT_TYPE_APPLICATION_JSON = "application/json;charset=UTF-8";
+    String CONTENT_TYPE_APPLICATION_JSON = "application/json; charset=UTF-8";
 
 }

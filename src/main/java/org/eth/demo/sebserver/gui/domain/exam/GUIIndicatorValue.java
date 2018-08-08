@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GUIIndicatorValue {
 
+    // TODO clarify which id to use here the record id (Long) or new connectionId
     public final UUID clientUUID;
     public final String type;
     public final Float value;

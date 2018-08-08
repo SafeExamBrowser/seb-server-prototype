@@ -24,7 +24,7 @@ public class Message {
             @JsonProperty("type") final Type type,
             @JsonProperty("timestamp") final long timestamp,
             @JsonProperty("content") final String content) {
-        super();
+
         this.type = type;
         this.timestamp = timestamp;
         this.content = content;

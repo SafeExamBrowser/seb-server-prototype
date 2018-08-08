@@ -39,6 +39,7 @@ public class ExamController {
     @RequestMapping(method = RequestMethod.GET)
     public final Collection<Exam> exams(final Principal principal) {
         return this.examDao.getAll(UserPrivilegeExamFilter.of(principal));
+
     }
 
     @RequestMapping(value = "/{examId}", method = RequestMethod.GET)
@@ -46,6 +47,7 @@ public class ExamController {
         final Exam exam = this.examDao.byId(examId);
         if (exam != null) {
             // TODO if there should be institutions (tenants), get current User and check institution
+            @SuppressWarnings("unused")
             final User currentUser = UserFacade.extractFromPrincipal(principal);
             // currentUser.institution == exam.owner.institution
         }

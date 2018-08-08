@@ -49,10 +49,11 @@ DROP TABLE IF EXISTS `client_connection` ;
 
 CREATE TABLE IF NOT EXISTS `client_connection` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `exam_id` BIGINT UNSIGNED NOT NULL,
+  `exam_id` BIGINT UNSIGNED NULL,
   `status` VARCHAR(45) NOT NULL,
+  `username` VARCHAR(255) NOT NULL,
+  `client_address` VARCHAR(45) NOT NULL,
   `token` VARCHAR(255) NULL,
-  `lms_auth_url` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
   INDEX `connection_exam_ref_idx` (`exam_id` ASC),
   CONSTRAINT `client_connection_exam_ref`

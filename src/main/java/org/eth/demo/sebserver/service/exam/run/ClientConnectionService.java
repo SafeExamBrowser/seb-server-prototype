@@ -31,6 +31,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Deprecated // NOTE: This was used within the demo SEB-client-bots where a self-generated UUID-token was used
+            //       Use NewExamSessionService for real world SEB-Clients that uses LMS authentication
 @Lazy
 @Service
 public class ClientConnectionService {
@@ -59,8 +61,9 @@ public class ClientConnectionService {
                 null,
                 runningExam.id,
                 ClientConnectionStatus.CONNECTED_TO_RUNNING_EXAM.name(),
-                clientUUID.toString(),
-                null);
+                "[TEST_CLIENT_BOT]",
+                "localhost",
+                clientUUID.toString());
         this.clientConnectionRecordMapper.insert(ccRecord);
 
         final ClientConnection clientConnection = createClientConnection(clientUUID);
@@ -77,13 +80,12 @@ public class ClientConnectionService {
 
         final ClientConnection clientConnection = this.connectionCache.get(clientUUID);
 
-        this.clientConnectionRecordMapper.updateByPrimaryKey(
+        this.clientConnectionRecordMapper.updateByPrimaryKeySelective(
                 new ClientConnectionRecord(
                         clientConnection.clientId,
                         clientConnection.examId,
                         ClientConnectionStatus.FINISHED.name(),
-                        "",
-                        null));
+                        null, null, ""));
 
         this.connectionCache.remove(clientUUID);
     }

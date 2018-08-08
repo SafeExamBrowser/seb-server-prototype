@@ -19,6 +19,8 @@ import org.eth.demo.sebserver.domain.rest.exam.IndicatorValue;
 import org.eth.demo.sebserver.service.exam.ExamStateService;
 import org.springframework.stereotype.Service;
 
+@Deprecated // NOTE: This was used within the demo SEB-client-bots where a self-generated UUID-token was used
+            //       Use NewExamSessionService for real world SEB-Clients that uses LMS authentication
 @Service
 public class ExamSessionService {
 

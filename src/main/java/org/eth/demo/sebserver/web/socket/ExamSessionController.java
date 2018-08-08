@@ -51,7 +51,8 @@ public class ExamSessionController {
     }
 
     @MessageMapping("/exam.{examId}/event")
-    public void event(@DestinationVariable final long examId,
+    public void event(
+            @DestinationVariable final long examId,
             @Payload final ClientEvent clientEvent,
             final SimpMessageHeaderAccessor accessor) {
 

@@ -66,14 +66,16 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
+      //@formatter:off
         clients.inMemory()
                 .withClient(this.guiClientId)
-                .secret(this.clientPasswordEncoder.encode(this.guiClientSecret))
-                .authorizedGrantTypes(GUI_CLIENT_GRANT_TYPES)
-                .scopes(GUI_CLIENT_SCOPES)
-                .resourceIds(SEB_SERVER_API_RESOURCE_ID)
-                .accessTokenValiditySeconds(this.guiClientAccessTokenValiditySeconds)
-                .refreshTokenValiditySeconds(this.guiClientRefreshTokenValiditySeconds);
+                    .secret(this.clientPasswordEncoder.encode(this.guiClientSecret))
+                    .authorizedGrantTypes(GUI_CLIENT_GRANT_TYPES)
+                    .scopes(GUI_CLIENT_SCOPES)
+                    .resourceIds(SEB_SERVER_API_RESOURCE_ID)
+                    .accessTokenValiditySeconds(this.guiClientAccessTokenValiditySeconds)
+                    .refreshTokenValiditySeconds(this.guiClientRefreshTokenValiditySeconds);
+      //@formatter:on
     }
 
     @Bean

@@ -11,8 +11,8 @@ package org.eth.demo.sebserver.service.exam;
 import java.security.Principal;
 import java.util.function.Predicate;
 
+import org.eth.demo.sebserver.domain.rest.admin.Role;
 import org.eth.demo.sebserver.domain.rest.admin.User;
-import org.eth.demo.sebserver.domain.rest.admin.UserRole;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.service.admin.UserFacade;
 
@@ -26,7 +26,7 @@ public final class UserPrivilegeExamFilter implements Predicate<Exam> {
         this.isAdmin = this.user
                 .getAuthorities()
                 .stream()
-                .anyMatch(ga -> UserRole.ADMIN_USER.name().equals(ga.getAuthority()));
+                .anyMatch(ga -> Role.UserRole.ADMIN_USER.name().equals(ga.getAuthority()));
     }
 
     @Override

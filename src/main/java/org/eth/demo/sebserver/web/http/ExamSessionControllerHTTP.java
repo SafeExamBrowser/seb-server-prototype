@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Deprecated // NOTE: As we decided to use WebSocket protocol for SEB-Client connection, this has been deprecated
 @RestController
 @RequestMapping("/exam")
 public class ExamSessionControllerHTTP {

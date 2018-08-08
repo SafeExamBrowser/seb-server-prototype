@@ -18,6 +18,32 @@ public final class Role implements GrantedAuthority {
 
     private static final long serialVersionUID = -5304544591727115010L;
 
+    //@formatter:off
+    public enum UserRole {
+        ADMIN_USER(new Role("ADMIN_USER")),
+        STANDARD_USER(new Role("STANDARD_USER")),
+        SEB_CLIENT(new Role("SEB_CLIENT"))
+
+        ;
+
+        public final Role role;
+
+        private UserRole(final Role role) {
+            this.role = role;
+        }
+
+        public static final UserRole byName(final String name) {
+            for (final UserRole userRole : UserRole.values()) {
+                if (userRole.role.roleName.equals(name)) {
+                    return userRole;
+                }
+            }
+
+            throw new IllegalArgumentException("No UserRole with name: " + name + " found");
+        }
+    }
+    //@formatter:on
+
     public final String roleName;
 
     @JsonCreator
