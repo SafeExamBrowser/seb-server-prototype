@@ -18,6 +18,10 @@ import org.eth.demo.sebserver.service.exam.indicator.ClientIndicator;
 
 public class ClientConnection {
 
+    public enum ConnectionStatus {
+        CONNECTION_REQUESTED, AUTHENTICATED, WEB_SOCKET_ESTABLISHED, ABORTED, FINISHED
+    }
+
     public final Long examId;
     public final Long clientId;
     public final UUID clientUUID;

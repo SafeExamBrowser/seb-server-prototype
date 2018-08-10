@@ -148,8 +148,10 @@ public class ExamRunner implements DisposableBean {
 
         void updateExam(final Long examId, final ExamStatus status) {
             final ExamRecord stateChange = new ExamRecord(
-                    examId, null, null,
-                    status.name(), null, null, null);
+                    examId,
+                    null, null, null,
+                    status.name(),
+                    null, null, null);
 
             this.examMapper.updateByPrimaryKeySelective(stateChange);
         }

@@ -40,6 +40,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@Deprecated // NOTE: as we decided to skip SEB-Server proxy authentication there must be
+            // two authentication filter, one for SEBClient connection attempt and one for LMS confirmation
 public final class ClientConnectionAuthenticationFilter extends GenericFilterBean {
 
     private static final Logger log = LoggerFactory.getLogger(ClientConnectionAuthenticationFilter.class);
@@ -82,7 +84,6 @@ public final class ClientConnectionAuthenticationFilter extends GenericFilterBea
             SecurityContextHolder
                     .getContext()
                     .setAuthentication(new SEBClientAuthentication(new SEBClientAuth(
-                            "[SEB_CLIENT_BOT]",
                             "[NO_TOKEN_YET]",
                             httpRequest.getRemoteAddr())));
         } else if (clientToken != null) {
@@ -197,7 +198,6 @@ public final class ClientConnectionAuthenticationFilter extends GenericFilterBea
             final JsonNode node = mapper.readTree(bodyContent);
 
             return new SEBClientAuth(
-                    node.get("username").asText(),
                     token,
                     clientAddress);
 
@@ -224,7 +224,8 @@ public final class ClientConnectionAuthenticationFilter extends GenericFilterBea
 
         @Override
         public String getName() {
-            return this.user.username;
+            //return this.user.username;
+            return null;
         }
 
         @Override

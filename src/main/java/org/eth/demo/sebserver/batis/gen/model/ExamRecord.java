@@ -4,30 +4,34 @@ import javax.annotation.Generated;
 import org.joda.time.DateTime;
 
 public class ExamRecord {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.050+02:00", comments="Source field: exam.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.859+02:00", comments="Source field: exam.id")
     private Long id;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.050+02:00", comments="Source field: exam.owner_id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.859+02:00", comments="Source field: exam.institution_id")
+    private Long institutionId;
+
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.859+02:00", comments="Source field: exam.owner_id")
     private Long ownerId;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.050+02:00", comments="Source field: exam.name")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.859+02:00", comments="Source field: exam.name")
     private String name;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.051+02:00", comments="Source field: exam.status")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.859+02:00", comments="Source field: exam.status")
     private String status;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.051+02:00", comments="Source field: exam.start_time")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.859+02:00", comments="Source field: exam.start_time")
     private DateTime startTime;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.051+02:00", comments="Source field: exam.end_time")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.859+02:00", comments="Source field: exam.end_time")
     private DateTime endTime;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.051+02:00", comments="Source field: exam.lms_exam_url")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.860+02:00", comments="Source field: exam.lms_exam_url")
     private String lmsExamUrl;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.050+02:00", comments="Source Table: exam")
-    public ExamRecord(Long id, Long ownerId, String name, String status, DateTime startTime, DateTime endTime, String lmsExamUrl) {
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.859+02:00", comments="Source Table: exam")
+    public ExamRecord(Long id, Long institutionId, Long ownerId, String name, String status, DateTime startTime, DateTime endTime, String lmsExamUrl) {
         this.id = id;
+        this.institutionId = institutionId;
         this.ownerId = ownerId;
         this.name = name;
         this.status = status;
@@ -36,37 +40,42 @@ public class ExamRecord {
         this.lmsExamUrl = lmsExamUrl;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.050+02:00", comments="Source field: exam.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.859+02:00", comments="Source field: exam.id")
     public Long getId() {
         return id;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.050+02:00", comments="Source field: exam.owner_id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.859+02:00", comments="Source field: exam.institution_id")
+    public Long getInstitutionId() {
+        return institutionId;
+    }
+
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.859+02:00", comments="Source field: exam.owner_id")
     public Long getOwnerId() {
         return ownerId;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.050+02:00", comments="Source field: exam.name")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.859+02:00", comments="Source field: exam.name")
     public String getName() {
         return name;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.051+02:00", comments="Source field: exam.status")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.859+02:00", comments="Source field: exam.status")
     public String getStatus() {
         return status;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.051+02:00", comments="Source field: exam.start_time")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.859+02:00", comments="Source field: exam.start_time")
     public DateTime getStartTime() {
         return startTime;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.051+02:00", comments="Source field: exam.end_time")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.859+02:00", comments="Source field: exam.end_time")
     public DateTime getEndTime() {
         return endTime;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.051+02:00", comments="Source field: exam.lms_exam_url")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.860+02:00", comments="Source field: exam.lms_exam_url")
     public String getLmsExamUrl() {
         return lmsExamUrl;
     }
@@ -75,7 +84,7 @@ public class ExamRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table exam
      *
-     * @mbg.generated Mon Aug 06 14:02:57 CEST 2018
+     * @mbg.generated Fri Aug 10 09:36:55 CEST 2018
      */
     @Override
     public String toString() {
@@ -84,6 +93,7 @@ public class ExamRecord {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
+        sb.append(", institutionId=").append(institutionId);
         sb.append(", ownerId=").append(ownerId);
         sb.append(", name=").append(name);
         sb.append(", status=").append(status);
@@ -98,7 +108,7 @@ public class ExamRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table exam
      *
-     * @mbg.generated Mon Aug 06 14:02:57 CEST 2018
+     * @mbg.generated Fri Aug 10 09:36:55 CEST 2018
      */
     @Override
     public boolean equals(Object that) {
@@ -113,6 +123,7 @@ public class ExamRecord {
         }
         ExamRecord other = (ExamRecord) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
+            && (this.getInstitutionId() == null ? other.getInstitutionId() == null : this.getInstitutionId().equals(other.getInstitutionId()))
             && (this.getOwnerId() == null ? other.getOwnerId() == null : this.getOwnerId().equals(other.getOwnerId()))
             && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()))
             && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
@@ -125,13 +136,14 @@ public class ExamRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table exam
      *
-     * @mbg.generated Mon Aug 06 14:02:57 CEST 2018
+     * @mbg.generated Fri Aug 10 09:36:55 CEST 2018
      */
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        result = prime * result + ((getInstitutionId() == null) ? 0 : getInstitutionId().hashCode());
         result = prime * result + ((getOwnerId() == null) ? 0 : getOwnerId().hashCode());
         result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
         result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());

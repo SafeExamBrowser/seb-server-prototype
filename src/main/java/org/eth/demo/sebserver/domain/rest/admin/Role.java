@@ -20,8 +20,12 @@ public final class Role implements GrantedAuthority {
 
     //@formatter:off
     public enum UserRole {
-        ADMIN_USER(new Role("ADMIN_USER")),
-        STANDARD_USER(new Role("STANDARD_USER")),
+        SEB_SERVER_ADMIN(new Role("SEB_SERVER_ADMIN")),
+        INSTITUTIONAL_ADMIN(new Role("INSTITUTIONAL_ADMIN")),
+        EXAM_ADMIN(new Role("EXAM_ADMIN")),
+        EXAM_SUPPORTER(new Role("EXAM_SUPPORTER")),
+
+        LMS_CLIENT(new Role("LMS_CLIENT")),
         SEB_CLIENT(new Role("SEB_CLIENT"))
 
         ;

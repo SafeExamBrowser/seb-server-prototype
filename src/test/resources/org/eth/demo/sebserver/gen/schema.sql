@@ -4,12 +4,25 @@
 -- -----------------------------------------------------
 
 -- -----------------------------------------------------
+-- Table `institution`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `institution` ;
+
+CREATE TABLE IF NOT EXISTS `institution` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC));
+
+
+-- -----------------------------------------------------
 -- Table `user`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `user` ;
 
 CREATE TABLE IF NOT EXISTS `user` (
-  `id` BIGINT UNSIGNED NOT NULL,
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `institution_id` BIGINT UNSIGNED NULL,
   `name` VARCHAR(255) NOT NULL,
   `user_name` VARCHAR(255) NOT NULL,
   `password` VARCHAR(255) NOT NULL,
@@ -17,7 +30,12 @@ CREATE TABLE IF NOT EXISTS `user` (
   `creation_date` DATETIME NOT NULL,
   `active` BIT(1) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `userName_UNIQUE` (`user_name` ASC));
+  INDEX `institutionRef_idx` (`institution_id` ASC),
+  CONSTRAINT `institutionRef`
+    FOREIGN KEY (`institution_id`)
+    REFERENCES `institution` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -27,6 +45,7 @@ DROP TABLE IF EXISTS `exam` ;
 
 CREATE TABLE IF NOT EXISTS `exam` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `institution_id` BIGINT UNSIGNED NOT NULL,
   `owner_id` BIGINT UNSIGNED NOT NULL,
   `name` VARCHAR(45) NOT NULL,
   `status` VARCHAR(45) NOT NULL,
@@ -35,9 +54,15 @@ CREATE TABLE IF NOT EXISTS `exam` (
   `lms_exam_url` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
   INDEX `examOwnerRef_idx` (`owner_id` ASC),
+  INDEX `examinstitutionRef_idx` (`institution_id` ASC),
   CONSTRAINT `examOwnerRef`
     FOREIGN KEY (`owner_id`)
     REFERENCES `user` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `examinstitutionRef`
+    FOREIGN KEY (`institution_id`)
+    REFERENCES `institution` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
@@ -51,9 +76,9 @@ CREATE TABLE IF NOT EXISTS `client_connection` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `exam_id` BIGINT UNSIGNED NULL,
   `status` VARCHAR(45) NOT NULL,
-  `username` VARCHAR(255) NOT NULL,
+  `connection_token` VARCHAR(255) NOT NULL,
+  `client_identifier` VARCHAR(255) NOT NULL,
   `client_address` VARCHAR(45) NOT NULL,
-  `token` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
   INDEX `connection_exam_ref_idx` (`exam_id` ASC),
   CONSTRAINT `client_connection_exam_ref`
@@ -113,10 +138,17 @@ DROP TABLE IF EXISTS `configuration_node` ;
 
 CREATE TABLE IF NOT EXISTS `configuration_node` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `institution_id` BIGINT UNSIGNED NOT NULL,
   `owner_id` BIGINT UNSIGNED NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `type` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`));
+  PRIMARY KEY (`id`),
+  INDEX `configurationInstitutionRef_idx` (`institution_id` ASC),
+  CONSTRAINT `configurationInstitutionRef`
+    FOREIGN KEY (`institution_id`)
+    REFERENCES `institution` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -241,7 +273,7 @@ CREATE TABLE IF NOT EXISTS `exam_configuration_map` (
 DROP TABLE IF EXISTS `user_role` ;
 
 CREATE TABLE IF NOT EXISTS `user_role` (
-  `id` BIGINT UNSIGNED NOT NULL,
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` BIGINT UNSIGNED NOT NULL,
   `role_name` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`),
@@ -277,4 +309,3 @@ CREATE TABLE IF NOT EXISTS `oauth_refresh_token` (
   `token_id` VARCHAR(255) NULL,
   `token` BLOB NULL,
   `authentication` BLOB NULL);
-

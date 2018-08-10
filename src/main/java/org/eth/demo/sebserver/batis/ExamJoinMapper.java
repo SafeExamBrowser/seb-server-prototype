@@ -38,11 +38,14 @@ public interface ExamJoinMapper {
     @ResultType(ExamJoinMapper.ExamJoinRecord.class)
     @ConstructorArgs({
             @Arg(column = "id", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
+            @Arg(column = "institution_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
             @Arg(column = "owner_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
             @Arg(column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "status", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Arg(column = "start_time", javaType = DateTime.class, typeHandler = JodaTimeTypeResolver.class, jdbcType = JdbcType.TIMESTAMP),
-            @Arg(column = "end_time", javaType = DateTime.class, typeHandler = JodaTimeTypeResolver.class, jdbcType = JdbcType.TIMESTAMP),
+            @Arg(column = "start_time", javaType = DateTime.class, typeHandler = JodaTimeTypeResolver.class,
+                    jdbcType = JdbcType.TIMESTAMP),
+            @Arg(column = "end_time", javaType = DateTime.class, typeHandler = JodaTimeTypeResolver.class,
+                    jdbcType = JdbcType.TIMESTAMP),
             @Arg(column = "lms_exam_url", javaType = String.class, jdbcType = JdbcType.VARCHAR),
 
             @Arg(column = "indicatorId", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
@@ -61,6 +64,7 @@ public interface ExamJoinMapper {
         return SelectDSL.selectWithMapper(
                 this::selectMany,
                 examRecord.id,
+                examRecord.institutionId,
                 examRecord.ownerId,
                 examRecord.name,
                 examRecord.status,
@@ -89,6 +93,7 @@ public interface ExamJoinMapper {
 
     public static final class ExamJoinRecord {
         public final Long id;
+        public final Long institutionId;
         public final Long ownerId;
         public final String name;
         public final String status;
@@ -101,6 +106,7 @@ public interface ExamJoinMapper {
 
         private ExamJoinRecord(
                 final Long id,
+                final Long institutionId,
                 final Long ownerId,
                 final String name,
                 final String status,
@@ -118,6 +124,7 @@ public interface ExamJoinMapper {
                 final String clientInfo) {
 
             this.id = id;
+            this.institutionId = institutionId;
             this.ownerId = ownerId;
             this.name = name;
             this.status = status;

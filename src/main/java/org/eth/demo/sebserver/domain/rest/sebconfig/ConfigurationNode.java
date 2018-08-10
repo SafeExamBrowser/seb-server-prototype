@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public final class ConfigurationNode {
 
     public final Long id;
+    public final Long institutionId;
     public final Long ownerId;
     public final String name;
     public final ConfigurationType type;
@@ -29,6 +30,7 @@ public final class ConfigurationNode {
     @JsonCreator
     public ConfigurationNode(
             @JsonProperty("id") final Long id,
+            @JsonProperty("ownerId") final Long institutionId,
             @JsonProperty("ownerId") final Long ownerId,
             @JsonProperty("name") final String name,
             @JsonProperty("type") final ConfigurationType type,
@@ -36,6 +38,7 @@ public final class ConfigurationNode {
             @JsonProperty("configurationHistory") final List<Configuration> configurationHistory) {
 
         this.id = id;
+        this.institutionId = institutionId;
         this.ownerId = ownerId;
         this.name = name;
         this.type = type;
@@ -51,12 +54,16 @@ public final class ConfigurationNode {
         return this.id;
     }
 
-    public String getName() {
-        return this.name;
+    public Long getInstitutionId() {
+        return this.institutionId;
     }
 
     public Long getOwnerId() {
         return this.ownerId;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public ConfigurationType getType() {
@@ -98,9 +105,10 @@ public final class ConfigurationNode {
 
     @Override
     public String toString() {
-        return "ConfigurationNode [id=" + this.id + ", ownerId=" + this.ownerId + ", name=" + this.name + ", type="
-                + this.type
-                + ", examMappings=" + this.examMappings + ", configurationHistory=" + this.configurationHistory + "]";
+        return "ConfigurationNode [id=" + this.id + ", institutionId=" + this.institutionId + ", ownerId="
+                + this.ownerId + ", name="
+                + this.name + ", type=" + this.type + ", examMappings=" + this.examMappings + ", configurationHistory="
+                + this.configurationHistory + "]";
     }
 
 }

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public final class Exam {
 
     public final Long id;
+    public final Long institutionId;
     public final Long ownerId;
     public final String name;
     public final ExamStatus status;
@@ -33,6 +34,7 @@ public final class Exam {
     @JsonCreator
     public Exam(
             @JsonProperty("id") final Long id,
+            @JsonProperty("institutionId") final Long institutionId,
             @JsonProperty("ownerId") final Long ownerId,
             @JsonProperty("name") final String name,
             @JsonProperty("status") final ExamStatus status,
@@ -43,6 +45,7 @@ public final class Exam {
             @JsonProperty("sebConfigMapping") final Collection<ExamSEBConfigMapping> sebConfigMapping) {
 
         this.id = id;
+        this.institutionId = institutionId;
         this.ownerId = ownerId;
         this.name = name;
         this.status = status;
@@ -60,6 +63,10 @@ public final class Exam {
 
     public Long getId() {
         return this.id;
+    }
+
+    public Long getInstitutionId() {
+        return this.institutionId;
     }
 
     public Long getOwnerId() {
@@ -122,6 +129,7 @@ public final class Exam {
     public final ExamRecord toExamRecord() {
         return new ExamRecord(
                 this.id,
+                this.institutionId,
                 this.ownerId,
                 this.name,
                 this.status.name(),
@@ -132,6 +140,7 @@ public final class Exam {
 
     public static final Exam of(
             final Long id,
+            final Long institutionId,
             final Long ownerId,
             final String name,
             final ExamStatus status,
@@ -139,7 +148,7 @@ public final class Exam {
             final DateTime endTime,
             final String lmsLoginURL) {
 
-        return new Exam(id, ownerId, name, status, startTime, endTime, lmsLoginURL, null, null);
+        return new Exam(id, institutionId, ownerId, name, status, startTime, endTime, lmsLoginURL, null, null);
     }
 
     public static final Exam of(
@@ -149,6 +158,7 @@ public final class Exam {
 
         return new Exam(
                 prototype.id,
+                prototype.institutionId,
                 prototype.ownerId,
                 prototype.name,
                 prototype.status,
@@ -161,10 +171,12 @@ public final class Exam {
 
     @Override
     public String toString() {
-        return "Exam [id=" + this.id + ", ownerId=" + this.ownerId + ", name=" + this.name + ", status=" + this.status
-                + ", startTime="
-                + this.startTime + ", endTime=" + this.endTime + ", lmsExamURL=" + this.lmsExamURL + ", indicators="
-                + this.indicators
-                + ", sebConfigMapping=" + this.sebConfigMapping + "]";
+        return "Exam [id=" + this.id + ", institutionId=" + this.institutionId + ", ownerId=" + this.ownerId + ", name="
+                + this.name
+                + ", status=" + this.status + ", startTime=" + this.startTime + ", endTime=" + this.endTime
+                + ", lmsExamURL="
+                + this.lmsExamURL + ", indicators=" + this.indicators + ", sebConfigMapping=" + this.sebConfigMapping
+                + "]";
     }
+
 }

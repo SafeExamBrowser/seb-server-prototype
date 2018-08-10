@@ -173,7 +173,9 @@ public class RunningExamView implements ViewComposer {
             final List<GUIIndicatorValue> indicatorValues = restCallBuilder
                     .exam(String.valueOf(clientTable.exam.id))
                     .doAPICall()
-                    .onError(t -> {throw new RuntimeException(t);}); // TODO error handling
+                    .onError(t -> {
+                        throw new RuntimeException(t);
+                    }); // TODO error handling
 
             clientTable.updateValues(indicatorValues);
         };

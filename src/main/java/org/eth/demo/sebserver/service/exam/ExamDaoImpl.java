@@ -193,6 +193,7 @@ public class ExamDaoImpl implements ExamDao {
             if (prototype == null) {
                 prototype = Exam.of(
                         record.id,
+                        record.institutionId,
                         record.ownerId,
                         record.name,
                         ExamStatus.valueOf(record.status),

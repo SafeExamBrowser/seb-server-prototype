@@ -30,7 +30,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
     public static final String[] GUI_CLIENT_GRANT_TYPES = new String[] { "password", "refresh_token" };
-    public static final String[] GUI_CLIENT_SCOPES = new String[] { "read", "write" };
+    public static final String[] GUI_CLIENT_SCOPES = new String[] { "web-service-api-read", "web-service-api-write" };
     public static final String SEB_SERVER_API_RESOURCE_ID = "seb-server-web-service-api";
 
     @Value("${sebserver.oauth.clients.guiClient.id}")
@@ -74,7 +74,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                     .scopes(GUI_CLIENT_SCOPES)
                     .resourceIds(SEB_SERVER_API_RESOURCE_ID)
                     .accessTokenValiditySeconds(this.guiClientAccessTokenValiditySeconds)
-                    .refreshTokenValiditySeconds(this.guiClientRefreshTokenValiditySeconds);
+                    .refreshTokenValiditySeconds(this.guiClientRefreshTokenValiditySeconds)
+                .and();
       //@formatter:on
     }
 

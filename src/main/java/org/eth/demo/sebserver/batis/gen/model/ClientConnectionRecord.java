@@ -3,69 +3,69 @@ package org.eth.demo.sebserver.batis.gen.model;
 import javax.annotation.Generated;
 
 public class ClientConnectionRecord {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.054+02:00", comments="Source field: client_connection.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.863+02:00", comments="Source field: client_connection.id")
     private Long id;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.054+02:00", comments="Source field: client_connection.exam_id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.863+02:00", comments="Source field: client_connection.exam_id")
     private Long examId;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.055+02:00", comments="Source field: client_connection.status")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.863+02:00", comments="Source field: client_connection.status")
     private String status;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.055+02:00", comments="Source field: client_connection.username")
-    private String username;
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.863+02:00", comments="Source field: client_connection.connection_token")
+    private String connectionToken;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.055+02:00", comments="Source field: client_connection.client_address")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.863+02:00", comments="Source field: client_connection.client_identifier")
+    private String clientIdentifier;
+
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.863+02:00", comments="Source field: client_connection.client_address")
     private String clientAddress;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.055+02:00", comments="Source field: client_connection.token")
-    private String token;
-
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.054+02:00", comments="Source Table: client_connection")
-    public ClientConnectionRecord(Long id, Long examId, String status, String username, String clientAddress, String token) {
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.863+02:00", comments="Source Table: client_connection")
+    public ClientConnectionRecord(Long id, Long examId, String status, String connectionToken, String clientIdentifier, String clientAddress) {
         this.id = id;
         this.examId = examId;
         this.status = status;
-        this.username = username;
+        this.connectionToken = connectionToken;
+        this.clientIdentifier = clientIdentifier;
         this.clientAddress = clientAddress;
-        this.token = token;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.054+02:00", comments="Source field: client_connection.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.863+02:00", comments="Source field: client_connection.id")
     public Long getId() {
         return id;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.055+02:00", comments="Source field: client_connection.exam_id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.863+02:00", comments="Source field: client_connection.exam_id")
     public Long getExamId() {
         return examId;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.055+02:00", comments="Source field: client_connection.status")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.863+02:00", comments="Source field: client_connection.status")
     public String getStatus() {
         return status;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.055+02:00", comments="Source field: client_connection.username")
-    public String getUsername() {
-        return username;
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.863+02:00", comments="Source field: client_connection.connection_token")
+    public String getConnectionToken() {
+        return connectionToken;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.055+02:00", comments="Source field: client_connection.client_address")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.863+02:00", comments="Source field: client_connection.client_identifier")
+    public String getClientIdentifier() {
+        return clientIdentifier;
+    }
+
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-10T09:36:55.864+02:00", comments="Source field: client_connection.client_address")
     public String getClientAddress() {
         return clientAddress;
-    }
-
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-06T14:02:57.055+02:00", comments="Source field: client_connection.token")
-    public String getToken() {
-        return token;
     }
 
     /**
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table client_connection
      *
-     * @mbg.generated Mon Aug 06 14:02:57 CEST 2018
+     * @mbg.generated Fri Aug 10 09:36:55 CEST 2018
      */
     @Override
     public String toString() {
@@ -76,9 +76,9 @@ public class ClientConnectionRecord {
         sb.append(", id=").append(id);
         sb.append(", examId=").append(examId);
         sb.append(", status=").append(status);
-        sb.append(", username=").append(username);
+        sb.append(", connectionToken=").append(connectionToken);
+        sb.append(", clientIdentifier=").append(clientIdentifier);
         sb.append(", clientAddress=").append(clientAddress);
-        sb.append(", token=").append(token);
         sb.append("]");
         return sb.toString();
     }
@@ -87,7 +87,7 @@ public class ClientConnectionRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table client_connection
      *
-     * @mbg.generated Mon Aug 06 14:02:57 CEST 2018
+     * @mbg.generated Fri Aug 10 09:36:55 CEST 2018
      */
     @Override
     public boolean equals(Object that) {
@@ -104,16 +104,16 @@ public class ClientConnectionRecord {
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
             && (this.getExamId() == null ? other.getExamId() == null : this.getExamId().equals(other.getExamId()))
             && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
-            && (this.getUsername() == null ? other.getUsername() == null : this.getUsername().equals(other.getUsername()))
-            && (this.getClientAddress() == null ? other.getClientAddress() == null : this.getClientAddress().equals(other.getClientAddress()))
-            && (this.getToken() == null ? other.getToken() == null : this.getToken().equals(other.getToken()));
+            && (this.getConnectionToken() == null ? other.getConnectionToken() == null : this.getConnectionToken().equals(other.getConnectionToken()))
+            && (this.getClientIdentifier() == null ? other.getClientIdentifier() == null : this.getClientIdentifier().equals(other.getClientIdentifier()))
+            && (this.getClientAddress() == null ? other.getClientAddress() == null : this.getClientAddress().equals(other.getClientAddress()));
     }
 
     /**
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table client_connection
      *
-     * @mbg.generated Mon Aug 06 14:02:57 CEST 2018
+     * @mbg.generated Fri Aug 10 09:36:55 CEST 2018
      */
     @Override
     public int hashCode() {
@@ -122,9 +122,9 @@ public class ClientConnectionRecord {
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getExamId() == null) ? 0 : getExamId().hashCode());
         result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
-        result = prime * result + ((getUsername() == null) ? 0 : getUsername().hashCode());
+        result = prime * result + ((getConnectionToken() == null) ? 0 : getConnectionToken().hashCode());
+        result = prime * result + ((getClientIdentifier() == null) ? 0 : getClientIdentifier().hashCode());
         result = prime * result + ((getClientAddress() == null) ? 0 : getClientAddress().hashCode());
-        result = prime * result + ((getToken() == null) ? 0 : getToken().hashCode());
         return result;
     }
 }

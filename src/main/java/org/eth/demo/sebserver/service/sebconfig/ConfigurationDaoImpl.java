@@ -34,15 +34,11 @@ import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.Attribute;
 import org.joda.time.DateTime;
 import org.mybatis.dynamic.sql.select.MyBatis3SelectModelAdapter;
 import org.mybatis.dynamic.sql.select.QueryExpressionDSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class ConfigurationDaoImpl implements ConfigurationDao {
-
-    private static final Logger log = LoggerFactory.getLogger(ConfigurationDaoImpl.class);
 
     private final ConfigurationNodeRecordMapper configurationNodeRecordMapper;
     private final ConfigurationRecordMapper configurationRecordMapper;
@@ -241,6 +237,7 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
             if (prototype == null) {
                 prototype = new ConfigurationNode(
                         record.id,
+                        record.institutionId,
                         record.ownerId,
                         record.name,
                         ConfigurationType.valueOf(record.type),
@@ -277,6 +274,7 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
 
         return new ConfigurationNode(
                 prototype.id,
+                prototype.institutionId,
                 prototype.ownerId,
                 prototype.name,
                 prototype.type,
@@ -305,10 +303,15 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
     }
 
     private static final ConfigurationNodeRecord toRecord(final ConfigurationNode node) {
-        return new ConfigurationNodeRecord(node.id, node.ownerId, node.name, node.type.name());
+        return new ConfigurationNodeRecord(
+                node.id,
+                node.institutionId,
+                node.ownerId,
+                node.name,
+                node.type.name());
     }
 
-    private static final ConfigurationRecord toRecord(final Configuration config) {
+    public static final ConfigurationRecord toRecord(final Configuration config) {
         return new ConfigurationRecord(config.id, config.nodeId, config.version, config.versionDate, config.followup);
     }
 

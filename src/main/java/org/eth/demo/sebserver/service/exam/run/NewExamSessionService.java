@@ -19,7 +19,6 @@ import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordDynamicSqlS
 import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ClientConnectionRecord;
 import org.eth.demo.sebserver.domain.ClientConnection;
-import org.eth.demo.sebserver.domain.rest.exam.ClientConnectionStatus;
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.SEBClientAuth;
@@ -56,10 +55,10 @@ public class NewExamSessionService {
         final ClientConnectionRecord ccRecord = new ClientConnectionRecord(
                 null,
                 null,
-                ClientConnectionStatus.AUTHENTICATED.name(),
-                sebClientAuth.username,
-                sebClientAuth.clientAddress,
-                sebClientAuth.authToken);
+                ClientConnection.ConnectionStatus.CONNECTION_REQUESTED.name(),
+                sebClientAuth.connectionToken,
+                "[AWATING_LMS_CONFIRMATION]",
+                sebClientAuth.clientAddress);
 
         this.clientConnectionRecordMapper.insert(ccRecord);
         return ccRecord.getId();
@@ -69,7 +68,7 @@ public class NewExamSessionService {
     public Exam connectClientToExam(
             final Long examId,
             final String username,
-            final String token) {
+            final String connectionToken) {
 
         if (!this.examStateService.isRunning(examId)) {
             throw new IllegalStateException("Exam with id: " + examId + " is not running");
@@ -78,15 +77,16 @@ public class NewExamSessionService {
         final Exam runningExam = this.examStateService.getRunningExam(examId);
         final List<ClientConnectionRecord> result = this.clientConnectionRecordMapper.selectByExample()
                 .where(ClientConnectionRecordDynamicSqlSupport.status,
-                        isEqualTo(ClientConnectionStatus.AUTHENTICATED.name()))
-                .and(ClientConnectionRecordDynamicSqlSupport.username, isEqualTo(username))
-                .and(ClientConnectionRecordDynamicSqlSupport.token, isEqualTo(token))
+                        isEqualTo(ClientConnection.ConnectionStatus.AUTHENTICATED.name()))
+                .and(ClientConnectionRecordDynamicSqlSupport.connectionToken, isEqualTo(connectionToken))
                 .build()
                 .execute();
 
         final ClientConnectionRecord clientConnectionRecord = Utils.getSingle(result);
 
         // TODO create a ClientConnection POJO and store it within the cache
+
+        // TODO update connection-record status and invalidate connectionToken
 
         return runningExam;
     }

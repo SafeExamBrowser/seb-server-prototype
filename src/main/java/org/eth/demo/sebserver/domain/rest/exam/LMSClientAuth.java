@@ -11,26 +11,26 @@ package org.eth.demo.sebserver.domain.rest.exam;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class SEBClientAuth {
+public class LMSClientAuth {
 
     public final String connectionToken;
-    public final String clientAddress;
+    public final String clientIdentifier;
 
     @JsonCreator
-    public SEBClientAuth(
+    public LMSClientAuth(
             @JsonProperty("connectionToken") final String connectionToken,
-            @JsonProperty("clientAddress") final String clientAddress) {
+            @JsonProperty("clientIdentifier") final String clientIdentifier) {
 
         this.connectionToken = connectionToken;
-        this.clientAddress = clientAddress;
+        this.clientIdentifier = clientIdentifier;
     }
 
     public String getConnectionToken() {
         return this.connectionToken;
     }
 
-    public String getClientAddress() {
-        return this.clientAddress;
+    public String getClientIdentifier() {
+        return this.clientIdentifier;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class SEBClientAuth {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final SEBClientAuth other = (SEBClientAuth) obj;
+        final LMSClientAuth other = (LMSClientAuth) obj;
         if (this.connectionToken == null) {
             if (other.connectionToken != null)
                 return false;
@@ -60,7 +60,8 @@ public class SEBClientAuth {
 
     @Override
     public String toString() {
-        return "SEBClientAuth [connectionToken=" + this.connectionToken + ", clientAddress=" + this.clientAddress + "]";
+        return "LMSClientAuth [connectionToken=" + this.connectionToken + ", clientIdentifier=" + this.clientIdentifier
+                + "]";
     }
 
 }

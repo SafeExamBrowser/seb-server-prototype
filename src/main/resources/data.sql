@@ -1,13 +1,16 @@
+INSERT INTO institution VALUES
+    (1, "ethz")
+
 INSERT INTO user VALUES 
-    (1, "Admin1", "admin", "$2a$08$c2GKYEYoUVXH1Yb8GXVXVu66ltPvbZgLMcVSXRH.LgZNF/YeaYB8m", "admin@nomail.nomail", '2018-01-01 00:00:00', 1),
-    (2, "User1", "user1", "$2a$08$0mBB2.NPUsg0afMhYq5NE.Te.g.QnzIH8ncKs65zYtoyV/NV2X8ne", "user1@nomail.nomail", '2018-01-01 00:00:00', 1),
-    (3, "User2", "user2", "$2a$08$VSQl35ERwunAEKMGt7XhkuqkDD4ze4I8j/RDdRw8jzqhjwzuqiGQi", "user2@nomail.nomail", '2018-01-01 00:00:00', 1)
+    (1, 1, "Admin1", "admin", "$2a$08$c2GKYEYoUVXH1Yb8GXVXVu66ltPvbZgLMcVSXRH.LgZNF/YeaYB8m", "admin@nomail.nomail", '2018-01-01 00:00:00', 1),
+    (2, 1, "User1", "user1", "$2a$08$0mBB2.NPUsg0afMhYq5NE.Te.g.QnzIH8ncKs65zYtoyV/NV2X8ne", "user1@nomail.nomail", '2018-01-01 00:00:00', 1),
+    (3, 1, "User2", "user2", "$2a$08$VSQl35ERwunAEKMGt7XhkuqkDD4ze4I8j/RDdRw8jzqhjwzuqiGQi", "user2@nomail.nomail", '2018-01-01 00:00:00', 1)
     ;
     
 INSERT INTO user_role VALUES
-    (1, 1, "ADMIN_USER"),
-    (2, 2, "STANDARD_USER"),
-    (3, 3, "STANDARD_USER")
+    (1, 1, "SEB_SERVER_ADMIN"),
+    (2, 2, "EXAM_ADMIN"),
+    (3, 3, "EXAM_ADMIN")
     ;
 
 INSERT INTO configuration_attribute VALUES
@@ -59,7 +62,7 @@ INSERT INTO orientation VALUES
     ;
     
 INSERT INTO configuration_node VALUES
-    (1, 2, "Demo Config", "CLIENT")
+    (1, 1, 2, "Demo Config", "CLIENT")
     ;
     
 INSERT INTO configuration VALUES
@@ -67,10 +70,10 @@ INSERT INTO configuration VALUES
     ;
     
 INSERT INTO `exam` VALUES 
-    (1, 2,'Demo Exam 1','IN_PROGRESS', null, null, null),
-    (2, 2,'Demo Exam 2','IN_PROGRESS', null, null, null),
-    (3, 3,'Demo Exam 3','READY', '2018-07-30 09:00:00' ,'2018-08-01 00:00:00', 'https://localhost:8090/exams/exam3'),
-    (4, 3,'Demo Exam 4','RUNNING', '2018-01-01 00:00:00', '2019-01-01 00:00:00', 'https://localhost:8090/exams/exam4')
+    (1, 1, 2,'Demo Exam 1','IN_PROGRESS', null, null, null),
+    (2, 1, 2,'Demo Exam 2','IN_PROGRESS', null, null, null),
+    (3, 1, 3,'Demo Exam 3','READY', '2018-07-30 09:00:00' ,'2018-08-01 00:00:00', 'https://localhost:8090/exams/exam3'),
+    (4, 1, 3,'Demo Exam 4','RUNNING', '2018-01-01 00:00:00', '2019-01-01 00:00:00', 'https://localhost:8090/exams/exam4')
     ;
 
 INSERT INTO indicator VALUES 

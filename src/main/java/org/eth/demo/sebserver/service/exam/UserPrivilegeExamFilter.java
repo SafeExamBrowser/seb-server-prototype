@@ -26,7 +26,7 @@ public final class UserPrivilegeExamFilter implements Predicate<Exam> {
         this.isAdmin = this.user
                 .getAuthorities()
                 .stream()
-                .anyMatch(ga -> Role.UserRole.ADMIN_USER.name().equals(ga.getAuthority()));
+                .anyMatch(ga -> Role.UserRole.EXAM_ADMIN.name().equals(ga.getAuthority()));
     }
 
     @Override

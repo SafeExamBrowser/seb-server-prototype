@@ -23,7 +23,6 @@ import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordDynamicSqlS
 import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ClientConnectionRecord;
 import org.eth.demo.sebserver.domain.ClientConnection;
-import org.eth.demo.sebserver.domain.rest.exam.ClientConnectionStatus;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorValue;
 import org.eth.demo.sebserver.service.exam.ExamStateService;
@@ -60,7 +59,7 @@ public class ClientConnectionService {
         final ClientConnectionRecord ccRecord = new ClientConnectionRecord(
                 null,
                 runningExam.id,
-                ClientConnectionStatus.CONNECTED_TO_RUNNING_EXAM.name(),
+                ClientConnection.ConnectionStatus.WEB_SOCKET_ESTABLISHED.name(),
                 "[TEST_CLIENT_BOT]",
                 "localhost",
                 clientUUID.toString());
@@ -84,7 +83,7 @@ public class ClientConnectionService {
                 new ClientConnectionRecord(
                         clientConnection.clientId,
                         clientConnection.examId,
-                        ClientConnectionStatus.FINISHED.name(),
+                        ClientConnection.ConnectionStatus.FINISHED.name(),
                         null, null, ""));
 
         this.connectionCache.remove(clientUUID);
@@ -132,7 +131,7 @@ public class ClientConnectionService {
 
     private ClientConnectionRecord getActiveClientByToken(final UUID clientUUID) {
         final List<ClientConnectionRecord> connections = this.clientConnectionRecordMapper.selectByExample()
-                .where(ClientConnectionRecordDynamicSqlSupport.token, isEqualTo(clientUUID.toString()))
+                .where(ClientConnectionRecordDynamicSqlSupport.connectionToken, isEqualTo(clientUUID.toString()))
                 .build()
                 .execute();
 
