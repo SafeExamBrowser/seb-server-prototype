@@ -6,14 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.service.exam.run;
+package org.eth.demo.sebserver.service.exam.indicator;
 
-import java.util.UUID;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.eth.demo.sebserver.domain.ClientConnection;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
-import org.eth.demo.sebserver.service.exam.indicator.ClientIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,15 +24,15 @@ import org.springframework.stereotype.Component;
 
 @Lazy
 @Component
-public class ClientConnectionFactory {
+public class ClientIndicatorFactory {
 
-    private static final Logger log = LoggerFactory.getLogger(ClientConnectionFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(ClientIndicatorFactory.class);
 
     private final ApplicationContext applicationContext;
     private final boolean enableCaching;
 
     @Autowired
-    public ClientConnectionFactory(
+    public ClientIndicatorFactory(
             final ApplicationContext applicationContext,
             @Value("${sebserver.indicator.caching}") final boolean enableCaching) {
 
@@ -40,21 +40,21 @@ public class ClientConnectionFactory {
         this.enableCaching = enableCaching;
     }
 
-    public ClientConnection create(final Long examId, final Long clientId, final UUID uuid, final Exam exam) {
-        final ClientConnection result = new ClientConnection(examId, clientId, uuid);
+    public Map<IndicatorDefinition, ClientIndicator> createFor(final Exam exam, final String clientIdentifier) {
+        final Map<IndicatorDefinition, ClientIndicator> result = new HashMap<>();
 
         for (final IndicatorDefinition indicatorDef : exam.getIndicators()) {
             try {
                 final ClientIndicator indicator =
                         this.applicationContext.getBean(indicatorDef.type, ClientIndicator.class);
-                indicator.init(examId, clientId, uuid, this.enableCaching);
-                result.add(indicatorDef, indicator);
+                indicator.init(exam.id, clientIdentifier, this.enableCaching);
+                result.put(indicatorDef, indicator);
             } catch (final Exception e) {
                 log.warn("No Indicator with type: {} found as registered bean. Ignore this one.", indicatorDef.type, e);
             }
         }
 
-        return result;
+        return Collections.unmodifiableMap(result);
     }
 
 }

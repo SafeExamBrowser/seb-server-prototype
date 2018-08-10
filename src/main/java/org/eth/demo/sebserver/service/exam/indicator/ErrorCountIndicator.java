@@ -12,8 +12,6 @@ import static org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordDynamicSq
 import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 import static org.mybatis.dynamic.sql.SqlBuilder.isLessThan;
 
-import java.math.BigDecimal;
-
 import org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordMapper;
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent.EventType;
@@ -48,24 +46,24 @@ public class ErrorCountIndicator extends ClientIndicatorAdapter {
 
     @Override
     @Transactional(readOnly = true)
-    public BigDecimal computeValueAt(final Long timestamp) {
+    public Double computeValueAt(final Long timestamp) {
         final Long time = (timestamp != null) ? timestamp : System.currentTimeMillis();
 
         final Long errors = this.clientEventRecordMapper.countByExample()
                 .where(clientEventRecord.examId, isEqualTo(this.examId))
-                .and(clientEventRecord.clientId, isEqualTo(this.clientId))
+                .and(clientEventRecord.clientIdentifier, isEqualTo(this.clientIdentifier))
                 .and(clientEventRecord.type, isEqualTo(ClientEvent.EventType.ERROR.id))
                 .and(clientEventRecord.timestamp, isLessThan(time))
                 .build()
                 .execute();
 
-        return new BigDecimal(errors);
+        return errors.doubleValue();
     }
 
     @Override
     public void notifyClientEvent(final ClientEvent event) {
         if (event.type == EventType.ERROR) {
-            this.currentValue = getCurrentValue().add(BigDecimal.ONE);
+            this.currentValue = getCurrentValue().doubleValue() + 1.0;
         }
     }
 

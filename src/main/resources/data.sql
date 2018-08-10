@@ -1,5 +1,6 @@
 INSERT INTO institution VALUES
     (1, "ethz")
+    ;
 
 INSERT INTO user VALUES 
     (1, 1, "Admin1", "admin", "$2a$08$c2GKYEYoUVXH1Yb8GXVXVu66ltPvbZgLMcVSXRH.LgZNF/YeaYB8m", "admin@nomail.nomail", '2018-01-01 00:00:00', 1),
@@ -8,9 +9,9 @@ INSERT INTO user VALUES
     ;
     
 INSERT INTO user_role VALUES
-    (1, 1, "SEB_SERVER_ADMIN"),
-    (2, 2, "EXAM_ADMIN"),
-    (3, 3, "EXAM_ADMIN")
+    (1, 1, "EXAM_ADMIN"),
+    (2, 2, "EXAM_SUPPORTER"),
+    (3, 3, "EXAM_SUPPORTER")
     ;
 
 INSERT INTO configuration_attribute VALUES

@@ -9,7 +9,6 @@
 package org.eth.demo.sebserver.domain.rest.exam;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 import org.eth.demo.sebserver.batis.gen.model.ClientEventRecord;
 
@@ -19,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public final class ClientEvent {
 
     public static enum EventType {
-        UNKNOWN(-1), PING(1), ERROR(2);
+        UNKNOWN(-1), PING(1), LOG(2), ERROR(3);
 
         public final int id;
 
@@ -38,28 +37,29 @@ public final class ClientEvent {
         }
     }
 
-    public final UUID clientId;
+    public final String clientIdentifier;
     public final EventType type;
     public final Long timestamp;
     public final BigDecimal numValue;
     public final String text;
 
     @JsonCreator
-    ClientEvent(@JsonProperty("clientId") final UUID clientId,
+    ClientEvent(
+            @JsonProperty("clientIdentifier") final String clientIdentifier,
             @JsonProperty("type") final Integer type,
             @JsonProperty("timestamp") final Long timestamp,
             @JsonProperty("numValue") final BigDecimal numValue,
             @JsonProperty("text") final String text) {
 
-        this.clientId = clientId;
+        this.clientIdentifier = clientIdentifier;
         this.type = (type != null) ? EventType.byId(type) : EventType.UNKNOWN;
         this.timestamp = (timestamp != null) ? timestamp : System.currentTimeMillis();
         this.numValue = numValue;
         this.text = text;
     }
 
-    public UUID getClientId() {
-        return this.clientId;
+    public String getClientIdentifier() {
+        return this.clientIdentifier;
     }
 
     public EventType getType() {
@@ -78,8 +78,14 @@ public final class ClientEvent {
         return this.text;
     }
 
-    public ClientEventRecord toRecord(final Long examId, final Long clientId) {
-        return new ClientEventRecord(null, examId, clientId, this.type.id, this.timestamp, this.numValue,
+    public ClientEventRecord toRecord(final Long examId) {
+        return new ClientEventRecord(
+                null,
+                examId,
+                this.clientIdentifier,
+                this.type.id,
+                this.timestamp,
+                this.numValue,
                 this.text);
     }
 

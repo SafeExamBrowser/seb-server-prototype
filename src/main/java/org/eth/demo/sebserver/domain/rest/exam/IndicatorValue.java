@@ -8,51 +8,40 @@
 
 package org.eth.demo.sebserver.domain.rest.exam;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class IndicatorValue {
 
-    public final UUID clientUUID;
+    public final String clientIdentifier;
     public final String type;
-    @JsonSerialize(using = IndicatorValue.BigDecimalSerializer.class)
-    private final BigDecimal value;
+    public final Double value;
 
     public IndicatorValue(
-            @JsonProperty("clientUUID") final UUID clientUUID,
+            @JsonProperty("clientIdentifier") final String clientIdentifier,
             @JsonProperty("type") final String type,
-            @JsonProperty("value") final BigDecimal value) {
+            @JsonProperty("value") final Double value) {
 
-        this.clientUUID = clientUUID;
+        this.clientIdentifier = clientIdentifier;
         this.type = type;
         this.value = value;
+    }
+
+    public String getClientIdentifier() {
+        return this.clientIdentifier;
     }
 
     public String getType() {
         return this.type;
     }
 
-    public BigDecimal getValue() {
+    public Double getValue() {
         return this.value;
     }
 
-    public static final class BigDecimalSerializer extends JsonSerializer<BigDecimal> {
-        @Override
-        public void serialize(
-                final BigDecimal value,
-                final JsonGenerator gen,
-                final SerializerProvider provider) throws IOException, JsonProcessingException {
-
-            gen.writeString(value.setScale(4, BigDecimal.ROUND_HALF_UP).toString());
-        }
+    @Override
+    public String toString() {
+        return "IndicatorValue [clientIdentifier=" + this.clientIdentifier + ", type=" + this.type + ", value="
+                + this.value + "]";
     }
 
 }

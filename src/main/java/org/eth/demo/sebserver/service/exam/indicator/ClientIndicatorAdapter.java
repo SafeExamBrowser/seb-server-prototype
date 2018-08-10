@@ -8,23 +8,22 @@
 
 package org.eth.demo.sebserver.service.exam.indicator;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
 public abstract class ClientIndicatorAdapter implements ClientIndicator {
 
     protected Long examId;
-    protected Long clientId;
-    protected UUID clientUUID;
+    protected String clientIdentifier;
     protected boolean cachingEnabled;
 
-    protected BigDecimal currentValue = null;
+    protected Double currentValue = null;
 
     @Override
-    public void init(final Long examId, final Long clientId, final UUID clientUUID, final boolean cachingEnabled) {
+    public void init(
+            final Long examId,
+            final String clientIdentifier,
+            final boolean cachingEnabled) {
+
         this.examId = examId;
-        this.clientId = clientId;
-        this.clientUUID = clientUUID;
+        this.clientIdentifier = clientIdentifier;
         this.cachingEnabled = cachingEnabled;
     }
 
@@ -34,17 +33,12 @@ public abstract class ClientIndicatorAdapter implements ClientIndicator {
     }
 
     @Override
-    public Long clientId() {
-        return this.clientId;
+    public String clientIdentifier() {
+        return this.clientIdentifier;
     }
 
     @Override
-    public UUID clientUUID() {
-        return this.clientUUID;
-    }
-
-    @Override
-    public BigDecimal getCurrentValue() {
+    public Double getCurrentValue() {
         if (this.currentValue == null || !this.cachingEnabled) {
             this.currentValue = computeValueAt(System.currentTimeMillis());
         }

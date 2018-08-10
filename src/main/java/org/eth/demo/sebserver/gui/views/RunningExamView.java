@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.eclipse.swt.SWT;
@@ -190,9 +189,9 @@ public class RunningExamView implements ViewComposer {
         final Color color2;
         final Color color3;
 
-        final Set<UUID> toRemove;
-        final Map<UUID, float[]> indicatorValues;
-        final Map<UUID, UpdatableTableItem> tableMapping;
+        final Set<String> toRemove;
+        final Map<String, double[]> indicatorValues;
+        final Map<String, UpdatableTableItem> tableMapping;
 
         ClientTable(final Display display, final Composite tableRoot, final RunningExam exam) {
             this.exam = exam;
@@ -201,7 +200,7 @@ public class RunningExamView implements ViewComposer {
 
             this.table = new Table(tableRoot, SWT.NULL);
             final TableColumn t1c = new TableColumn(this.table, SWT.NONE);
-            t1c.setText("UUID");
+            t1c.setText("Identifier");
             t1c.setWidth(300);
             for (final Indicator indDef : exam.getIndicators()) {
                 final TableColumn tc = new TableColumn(this.table, SWT.NONE);
@@ -223,20 +222,20 @@ public class RunningExamView implements ViewComposer {
         void updateValues(final List<GUIIndicatorValue> indicatorValues) {
             this.toRemove.addAll(this.indicatorValues.keySet());
             for (final GUIIndicatorValue value : indicatorValues) {
-                final float[] valueMapping = this.indicatorValues.computeIfAbsent(
-                        value.clientUUID,
-                        uuid -> new float[this.exam.getNumberOfIndicators()]);
+                final double[] valueMapping = this.indicatorValues.computeIfAbsent(
+                        value.clientIdentifier,
+                        uuid -> new double[this.exam.getNumberOfIndicators()]);
 
                 final int indicatorIndex = this.exam.getIndicatorIndex(value.type);
                 valueMapping[indicatorIndex] = value.value;
-                if (!this.tableMapping.containsKey(value.clientUUID)) {
+                if (!this.tableMapping.containsKey(value.clientIdentifier)) {
                     this.tableMapping.put(
-                            value.clientUUID,
-                            new UpdatableTableItem(this.table, value.clientUUID));
+                            value.clientIdentifier,
+                            new UpdatableTableItem(this.table, value.clientIdentifier));
                 } else {
-                    this.tableMapping.get(value.clientUUID).needsUpdate.set(indicatorIndex);
+                    this.tableMapping.get(value.clientIdentifier).needsUpdate.set(indicatorIndex);
                 }
-                this.toRemove.remove(value.clientUUID);
+                this.toRemove.remove(value.clientIdentifier);
             }
 
             this.indicatorValues.keySet()
@@ -249,11 +248,11 @@ public class RunningExamView implements ViewComposer {
                 final UpdatableTableItem item = iterator.next();
                 item.update(this.table);
 
-                if (!this.indicatorValues.containsKey(item.clientId)) {
+                if (!this.indicatorValues.containsKey(item.clientIdentifier)) {
                     item.tableItem.dispose();
                     iterator.remove();
                 } else {
-                    final float[] values = this.indicatorValues.get(item.clientId);
+                    final double[] values = this.indicatorValues.get(item.clientIdentifier);
                     for (int i = item.needsUpdate.nextSetBit(0); i >= 0; i = item.needsUpdate.nextSetBit(i + 1)) {
                         item.tableItem.setText(i + 1, String.valueOf(values[i]));
                         item.tableItem.setBackground(i + 1, getColorForValue(i, values[i]));
@@ -268,7 +267,7 @@ public class RunningExamView implements ViewComposer {
             this.table.layout();
         }
 
-        private Color getColorForValue(final int indicatorIndex, final float value) {
+        private Color getColorForValue(final int indicatorIndex, final double value) {
             final Indicator indicator = this.exam.getIndicator(indicatorIndex);
             if (value >= indicator.threshold3) {
                 return this.color3;
@@ -283,18 +282,18 @@ public class RunningExamView implements ViewComposer {
     private static final class UpdatableTableItem {
 
         final BitSet needsUpdate = new BitSet();
-        final UUID clientId;
+        final String clientIdentifier;
         TableItem tableItem;
 
-        UpdatableTableItem(final Table parent, final UUID clientId) {
+        UpdatableTableItem(final Table parent, final String clientIdentifier) {
             this.tableItem = null;
-            this.clientId = clientId;
+            this.clientIdentifier = clientIdentifier;
         }
 
         void update(final Table parent) {
             if (this.tableItem == null) {
                 this.tableItem = new TableItem(parent, SWT.NONE);
-                this.tableItem.setText(0, this.clientId.toString());
+                this.tableItem.setText(0, this.clientIdentifier);
                 this.needsUpdate.set(0);
                 this.needsUpdate.set(1);
             }

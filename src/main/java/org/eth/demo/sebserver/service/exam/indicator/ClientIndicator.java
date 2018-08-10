@@ -8,11 +8,7 @@
 
 package org.eth.demo.sebserver.service.exam.indicator;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface ClientIndicator {
 
@@ -20,18 +16,15 @@ public interface ClientIndicator {
 
     String getDisplayName();
 
-    void init(Long examId, Long clientId, UUID clientUUID, boolean alwaysCompute);
+    void init(Long examId, String clientIdentifier, boolean alwaysCompute);
 
     Long examId();
 
-    Long clientId();
+    String clientIdentifier();
 
-    UUID clientUUID();
+    Double getCurrentValue();
 
-    BigDecimal getCurrentValue();
-
-    @Transactional(readOnly = true)
-    BigDecimal computeValueAt(Long timestamp);
+    Double computeValueAt(Long timestamp);
 
     void notifyClientEvent(ClientEvent event);
 

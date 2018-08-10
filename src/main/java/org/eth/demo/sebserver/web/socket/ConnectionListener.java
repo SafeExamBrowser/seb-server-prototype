@@ -8,8 +8,6 @@
 
 package org.eth.demo.sebserver.web.socket;
 
-import java.util.UUID;
-
 import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +35,14 @@ public class ConnectionListener {
     }
 
     @EventListener
-    public void handleUnsbscribe(final SessionUnsubscribeEvent event) {
+    public void handleUnsubscribe(final SessionUnsubscribeEvent event) {
         log.info("unsubscribe: {}", event);
         final StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         final String token = headerAccessor.getFirstNativeHeader("TOKEN");
 
-        // TODO how can we dedicate in which channel the unsubscribe event ha been applied
+        // TODO how can we dedicate in which channel the unsubscribe event has been applied
         if (token != null) {
-            this.examSessionService.disconnectClient(UUID.fromString(token));
+            this.examSessionService.closeConnection(token, false);
         }
     }
 

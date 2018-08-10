@@ -8,71 +8,40 @@
 
 package org.eth.demo.sebserver.gui.domain.exam;
 
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GUIIndicatorValue {
 
-    // TODO clarify which id to use here the record id (Long) or new connectionId
-    public final UUID clientUUID;
+    public final String clientIdentifier;
     public final String type;
-    public final Float value;
+    public final Double value;
 
     public GUIIndicatorValue(
-            @JsonProperty("clientUUID") final UUID clientUUID,
+            @JsonProperty("clientIdentifier") final String clientIdentifier,
             @JsonProperty("type") final String type,
-            @JsonProperty("value") final Float value) {
+            @JsonProperty("value") final Double value) {
 
-        this.clientUUID = clientUUID;
+        this.clientIdentifier = clientIdentifier;
         this.type = type;
         this.value = value;
+    }
+
+    public String getClientIdentifier() {
+        return this.clientIdentifier;
     }
 
     public String getType() {
         return this.type;
     }
 
-    public Float getValue() {
+    public Double getValue() {
         return this.value;
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((this.clientUUID == null) ? 0 : this.clientUUID.hashCode());
-        result = prime * result + ((this.type == null) ? 0 : this.type.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        final GUIIndicatorValue other = (GUIIndicatorValue) obj;
-        if (this.clientUUID == null) {
-            if (other.clientUUID != null)
-                return false;
-        } else if (!this.clientUUID.equals(other.clientUUID))
-            return false;
-        if (this.type == null) {
-            if (other.type != null)
-                return false;
-        } else if (!this.type.equals(other.type))
-            return false;
-        return true;
-    }
-
-    @Override
     public String toString() {
-        return "GUIIndicatorValue [clientUUID=" + this.clientUUID
-                + ", type=" + this.type
-                + ", value=" + this.value + "]";
+        return "GUIIndicatorValue [clientIdentifier=" + this.clientIdentifier + ", type=" + this.type + ", value="
+                + this.value + "]";
     }
 
 }

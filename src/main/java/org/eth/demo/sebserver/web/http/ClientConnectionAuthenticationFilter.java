@@ -224,8 +224,7 @@ public final class ClientConnectionAuthenticationFilter extends GenericFilterBea
 
         @Override
         public String getName() {
-            //return this.user.username;
-            return null;
+            return "SEBClientAuth";
         }
 
         @Override

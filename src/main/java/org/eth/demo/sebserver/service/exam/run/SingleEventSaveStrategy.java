@@ -31,17 +31,18 @@ public class SingleEventSaveStrategy implements EventHandlingStrategy {
 
     private static final Logger log = LoggerFactory.getLogger(SingleEventSaveStrategy.class);
 
-    private final ClientConnectionService clientConnectionService;
     private final ClientEventRecordMapper clientEventRecordMapper;
+    private ClientConnectionDelegate clientConnectionDelegate;
 
     private boolean enabled = false;
 
-    public SingleEventSaveStrategy(
-            final ClientConnectionService clientConnectionService,
-            final ClientEventRecordMapper clientEventRecordMapper) {
-
-        this.clientConnectionService = clientConnectionService;
+    public SingleEventSaveStrategy(final ClientEventRecordMapper clientEventRecordMapper) {
         this.clientEventRecordMapper = clientEventRecordMapper;
+    }
+
+    @Override
+    public void setClientConnectionDelegate(final ClientConnectionDelegate clientConnectionDelegate) {
+        this.clientConnectionDelegate = clientConnectionDelegate;
     }
 
     @Override
@@ -59,24 +60,20 @@ public class SingleEventSaveStrategy implements EventHandlingStrategy {
         }
 
         try {
-            if (!this.clientConnectionService.checkActiveConnection(event.clientId)) {
-                throw new IllegalStateException("Client with UUID: " + event.clientId + " is not registered");
-            }
-
-            final int saved = this.clientConnectionService
-                    .getClientConnection(event.clientId)
-                    .map(cc -> this.clientEventRecordMapper.insert(event.toRecord(
-                            cc.examId,
-                            cc.clientId)))
+            final int saved = this.clientConnectionDelegate
+                    .getClientConnection(event.clientIdentifier)
+                    .map(cc -> this.clientEventRecordMapper.insert(event.toRecord(cc.clientConnection.examId)))
                     .orElse(0);
 
             if (saved < 1) {
-                System.out.println("######################## missing connection: " + event.clientId);
-            } else {
-//              System.out.println("************************* saveClientEvent on Thread: " + Thread.currentThread());
+                log.error("Missing client connection for event store {}", event.clientIdentifier);
+                throw new IllegalStateException("Missing client connection for event store " + event.clientIdentifier);
             }
         } catch (final Exception e) {
-            log.error("Unexpected error while trying to save client event: {}, {} : ", event.clientId, event, e);
+            log.error("Unexpected error while trying to save client event: {}, {} : ",
+                    event.clientIdentifier,
+                    event,
+                    e);
         }
     }
 

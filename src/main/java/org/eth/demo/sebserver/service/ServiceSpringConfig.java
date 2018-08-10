@@ -12,11 +12,9 @@ import java.util.concurrent.Executor;
 
 import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordMapper;
 import org.eth.demo.sebserver.service.exam.ExamStateService;
-import org.eth.demo.sebserver.service.exam.run.ClientConnectionFactory;
-import org.eth.demo.sebserver.service.exam.run.ClientConnectionService;
+import org.eth.demo.sebserver.service.exam.indicator.ClientIndicatorFactory;
 import org.eth.demo.sebserver.service.exam.run.EventHandlingStrategy;
 import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
-import org.eth.demo.sebserver.service.exam.run.NewExamSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -32,13 +30,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 public class ServiceSpringConfig implements AsyncConfigurer {
 
     @Autowired
-    private ClientConnectionService clientConnectionService;
-    @Autowired
     private ExamStateService examStateService;
     @Autowired
-    private ClientConnectionFactory clientConnectionFactory;
-    @Autowired
     private ClientConnectionRecordMapper clientConnectionRecordMapper;
+    @Autowired
+    private ClientIndicatorFactory clientIndicatorFactory;
 
     @Value("${sebserver.indicator.caching}")
     private boolean indicatorValueCachingEnabled;
@@ -54,24 +50,9 @@ public class ServiceSpringConfig implements AsyncConfigurer {
         eventHandlingStrategy.enable(true);
         return new ExamSessionService(
                 this.examStateService,
-                this.clientConnectionService,
-                eventHandlingStrategy,
-                this.indicatorValueCachingEnabled);
-    }
-
-    @Lazy
-    @Bean
-    public NewExamSessionService newExamSessionService(final ApplicationContext applicationContext) {
-        final EventHandlingStrategy eventHandlingStrategy = applicationContext
-                .getBean(this.eventHandlingStrategyBeanName, EventHandlingStrategy.class);
-
-        eventHandlingStrategy.enable(true);
-        return new NewExamSessionService(
-                this.examStateService,
-                this.clientConnectionFactory,
                 this.clientConnectionRecordMapper,
                 eventHandlingStrategy,
-                this.indicatorValueCachingEnabled);
+                this.clientIndicatorFactory);
     }
 
     @Override

@@ -23,7 +23,8 @@ public final class IndicatorDefinition {
     public final BigDecimal threshold3;
 
     @JsonCreator
-    public IndicatorDefinition(@JsonProperty("type") final String type,
+    public IndicatorDefinition(
+            @JsonProperty("type") final String type,
             @JsonProperty("threshold1") final BigDecimal threshold1,
             @JsonProperty("threshold2") final BigDecimal threshold2,
             @JsonProperty("threshold3") final BigDecimal threshold3) {

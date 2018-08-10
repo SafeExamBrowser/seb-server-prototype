@@ -8,7 +8,11 @@
 
 package org.eth.demo.sebserver.web.socket;
 
+import java.util.UUID;
+
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
+import org.eth.demo.sebserver.domain.rest.exam.LMSClientAuth;
+import org.eth.demo.sebserver.domain.rest.exam.SEBClientAuth;
 import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
 import org.eth.demo.sebserver.web.socket.Message.Type;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -23,6 +27,7 @@ import org.springframework.stereotype.Controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@Deprecated // New implementation is in SEBClientConnectionController this works only with old SEB-Client-Bot's
 @Controller
 public class ExamSessionController {
 
@@ -39,12 +44,15 @@ public class ExamSessionController {
             @DestinationVariable final String sessionId) {
 
         try {
-            final String token = this.examSessionService
-                    .connectClient(Long.valueOf(examId))
-                    .toString();
+            final String uuid = UUID.randomUUID().toString();
+            this.examSessionService.handshakeSEBClient(new SEBClientAuth(uuid, ""));
+            this.examSessionService.handshakeLMSClient(new LMSClientAuth(uuid, uuid));
+            this.examSessionService.connectClientToExam(Long.valueOf(examId), uuid);
+
             return messageToString(
-                    new Message(Type.CONNECT, System.currentTimeMillis(), token));
+                    new Message(Type.CONNECT, System.currentTimeMillis(), uuid));
         } catch (final Exception e) {
+            e.printStackTrace();
             return messageToString(
                     new Message(Type.ERROR, System.currentTimeMillis(), e.getMessage()));
         }

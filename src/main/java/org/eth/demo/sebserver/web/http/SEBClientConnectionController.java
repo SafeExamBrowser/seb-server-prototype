@@ -14,7 +14,7 @@ import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
 import org.eth.demo.sebserver.domain.rest.exam.SEBClientAuth;
 import org.eth.demo.sebserver.service.exam.ExamDao;
-import org.eth.demo.sebserver.service.exam.run.NewExamSessionService;
+import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
 import org.eth.demo.sebserver.web.socket.Message;
 import org.eth.demo.sebserver.web.socket.Message.Type;
 import org.eth.demo.util.Const;
@@ -31,47 +31,47 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 @RestController
-public class SEBClientConnection {
+public class SEBClientConnectionController {
 
     private final ExamDao examDao;
-    private final NewExamSessionService examSessionService;
+    private final ExamSessionService examSessionService;
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
-    public SEBClientConnection(
+    public SEBClientConnectionController(
             final ExamDao examDao,
-            final NewExamSessionService examSessionService) {
+            final ExamSessionService examSessionService) {
 
         this.examDao = examDao;
         this.examSessionService = examSessionService;
     }
 
-    /** SEB-Client authentication is the fist step on SEB-Client connection setup for a running exam. The
-     * upstream-filter ClientConnectionAuthenticationFilter can define several methods to authenticate a SEB-Client and
-     * login the SEB-Client within the clients LMS system.
+    /** SEB-Client authentication is the fist step on SEB-Client connection setup for a running exam.
      *
-     * After successful authentication of the SEB-Client within the upstream-filter ClientConnectionAuthenticationFilter
-     * This mapping gets an Authentication instance with a SEBClientAuth principal. This end-point then registers the
-     * authenticated SEB-Client within the SEB-Server and sends back a list of currently running exams.
+     * After successful authentication of the SEB-Client within the upstream-filter SEBClientAuthenticationFilter This
+     * mapping gets an Authentication instance with a SEBClientAuth principal.
+     *
+     * This end-point correspond to point 3.a. and 3.b within specification (https://confluence.let.ethz.ch/x/uofQAQ)
+     * In case of 3.a. the end-point responses with a list of running exams of the clients institution in JSON format.
+     * In case of 3.b. there is only one Exam in the list but we have first to clarify how to associates a SEB-Client to
+     * a specific exam within the SEB-Client start-config which should only be generated once per institution.
+     * NOTE: This point is currently not really clear from the specification.
      *
      * @param authentication Authentication instance with a SEBClientAuth principal
-     * @return a list of currently running exams */
+     * @return a list of currently running exams of the clients institution */
     @RequestMapping(
             value = "/runningexam/auth",
             method = RequestMethod.GET,
             produces = Const.CONTENT_TYPE_APPLICATION_JSON)
-    public final Collection<Exam> sebClientAuth(final Authentication authentication) {
+    public final Collection<Exam> sebClientAuth_A(final Authentication authentication) {
 
-        // NOTE: after ClientConnectionAuthenticationFilter has successfully authenticated
-        //       a client against an LMS, we should be able here to get the User instance
-        //       created ad-hoc by the ClientConnectionAuthenticationFilter with all
-        //       needed information (institution)
-        final SEBClientAuth client = (SEBClientAuth) authentication.getPrincipal();
-        this.examSessionService.registerConnection(client);
+        final SEBClientAuth clientAuth = (SEBClientAuth) authentication.getPrincipal();
+        this.examSessionService.handshakeSEBClient(clientAuth);
 
-        // TODO add also institution extracted from the User to the filter
-        final Collection<Exam> runningExams = this.examDao.getAll(e -> e.status == ExamStatus.RUNNING);
+        // get running exams for clients institution
+        return this.examDao.getAll(
+                e -> e.status == ExamStatus.RUNNING &&
+                        e.institutionId.longValue() == clientAuth.getInstitutionId().longValue());
 
-        return runningExams;
     }
 
     @SubscribeMapping("/runningexam/wsconnect")

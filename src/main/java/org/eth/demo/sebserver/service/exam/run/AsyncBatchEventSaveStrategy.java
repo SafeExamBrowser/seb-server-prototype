@@ -64,11 +64,12 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
     private static final int NUMBER_OF_WORKER_THREADS = 4;
     private static final int BATCH_SIZE = 100;
 
-    private final ClientConnectionService clientConnectionService;
     private final SqlSessionFactory sqlSessionFactory;
     private final ExamRecordMapper examRecordMapper;
     private final Executor executor;
     private final TransactionTemplate transactionTemplate;
+
+    private ClientConnectionDelegate clientConnectionDelegate;
 
     private final BlockingDeque<ClientEvent> eventQueue = new LinkedBlockingDeque<>();
 
@@ -76,19 +77,22 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
     private boolean workersRunning = false;
 
     public AsyncBatchEventSaveStrategy(
-            final ClientConnectionService clientConnectionService,
             final SqlSessionFactory sqlSessionFactory,
             final ExamRecordMapper examRecordMapper,
             final AsyncConfigurer asyncConfigurer,
             final PlatformTransactionManager transactionManager) {
 
-        this.clientConnectionService = clientConnectionService;
         this.sqlSessionFactory = sqlSessionFactory;
         this.examRecordMapper = examRecordMapper;
         this.executor = asyncConfigurer.getAsyncExecutor();
 
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+    }
+
+    @Override
+    public void setClientConnectionDelegate(final ClientConnectionDelegate clientConnectionDelegate) {
+        this.clientConnectionDelegate = clientConnectionDelegate;
     }
 
     @Override
@@ -156,7 +160,7 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
             final ClientEventRecordMapper clientEventMapper = sqlSessionTemplate.getMapper(
                     ClientEventRecordMapper.class);
             final TransactionCallback<Result<Void>> batchStore = batchStore(
-                    this.clientConnectionService,
+                    this.clientConnectionDelegate,
                     events,
                     clientEventMapper);
 
@@ -188,17 +192,15 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
     }
 
     private static final TransactionCallback<Result<Void>> batchStore(
-            final ClientConnectionService clientConnectionService,
+            final ClientConnectionDelegate clientConnectionDelegate,
             final Collection<ClientEvent> events,
             final ClientEventRecordMapper clientEventMapper) {
 
         return status -> {
             try {
                 final List<ClientEventRecord> records = events.stream()
-                        .map(event -> clientConnectionService.getClientConnection(event.clientId)
-                                .map(cc -> event.toRecord(
-                                        cc.examId,
-                                        cc.clientId))
+                        .map(event -> clientConnectionDelegate.getClientConnection(event.clientIdentifier)
+                                .map(cc -> event.toRecord(cc.clientConnection.examId))
                                 .orElse(null))
                         .filter(cer -> cer != null)
                         .collect(Collectors.toList());

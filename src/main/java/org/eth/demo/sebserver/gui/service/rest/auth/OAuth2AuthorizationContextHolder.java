@@ -9,7 +9,9 @@
 package org.eth.demo.sebserver.gui.service.rest.auth;
 
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
@@ -114,6 +116,10 @@ public class OAuth2AuthorizationContextHolder implements AuthorizationContextHol
 
     private static final class OAuth2AuthorizationContext implements SEBServerAuthorizationContext {
 
+        private static final String GRANT_TYPE = "password";
+        private static final List<String> SCOPES = Collections.unmodifiableList(
+                Arrays.asList("web-service-api-read", "web-service-api-write"));
+
         private boolean valid = true;
 
         private final ResourceOwnerPasswordResourceDetails resource;
@@ -132,11 +138,8 @@ public class OAuth2AuthorizationContextHolder implements AuthorizationContextHol
             this.resource.setAccessTokenUri(restCallBuilder.withPath(OAUTH_TOKEN_URI_PATH));
             this.resource.setClientId(guiClientId);
             this.resource.setClientSecret(guiClientSecret);
-            this.resource.setGrantType("password");
-            final ArrayList<String> scopes = new ArrayList<>();
-            scopes.add("read");
-            scopes.add("write");
-            this.resource.setScope(scopes);
+            this.resource.setGrantType(GRANT_TYPE);
+            this.resource.setScope(SCOPES);
 
             this.restTemplate = new DisposableOAuth2RestTemplate(this.resource);
 

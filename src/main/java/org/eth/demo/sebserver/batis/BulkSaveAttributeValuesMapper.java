@@ -30,7 +30,8 @@ import org.mybatis.dynamic.sql.util.SqlProviderAdapter;
 public interface BulkSaveAttributeValuesMapper {
 
     @InsertProvider(type = SqlProviderAdapter.class, method = "insert")
-    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "record.id", before = false, resultType = Long.class)
+    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "record.id", before = false,
+            resultType = Long.class)
     int insert(InsertStatementProvider<ConfigurationValueRecord> insertStatement);
 
     @UpdateProvider(type = SqlProviderAdapter.class, method = "update")
@@ -61,6 +62,7 @@ public interface BulkSaveAttributeValuesMapper {
     }
 
     // TODO test this and check what exactly flush is returning
+    @SuppressWarnings("rawtypes")
     @Flush
     List flush();
 

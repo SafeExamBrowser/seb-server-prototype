@@ -12,6 +12,8 @@ import java.util.UUID;
 
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorValue;
+import org.eth.demo.sebserver.domain.rest.exam.LMSClientAuth;
+import org.eth.demo.sebserver.domain.rest.exam.SEBClientAuth;
 import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,15 +39,20 @@ public class ExamSessionControllerHTTP {
 
     @RequestMapping(value = "/connect/{examId}", method = RequestMethod.GET)
     public final Mono<String> connect(@PathVariable final Long examId) {
-        return Mono.fromCallable(() -> this.examSessionService
-                .connectClient(examId)
-                .toString());
+        return Mono.fromCallable(() -> {
+            final String uuid = UUID.randomUUID().toString();
+            this.examSessionService.handshakeSEBClient(new SEBClientAuth(uuid, ""));
+            this.examSessionService.handshakeLMSClient(new LMSClientAuth(uuid, uuid));
+            this.examSessionService.connectClientToExam(Long.valueOf(examId), uuid);
+
+            return uuid;
+        });
     }
 
     @RequestMapping(value = "/disconnect", method = RequestMethod.POST)
     public final Mono<Void> disconnect(@RequestHeader(value = REQUEST_HEADER_KEY_TOKEN) final String clientUUID) {
         return Mono.fromRunnable(() -> this.examSessionService
-                .disconnectClient(UUID.fromString(clientUUID)));
+                .closeConnection(clientUUID, false));
     }
 
     @RequestMapping(value = "/event/{examId}", method = RequestMethod.POST)

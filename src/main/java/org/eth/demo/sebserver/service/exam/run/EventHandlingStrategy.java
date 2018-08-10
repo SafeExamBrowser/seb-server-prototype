@@ -17,5 +17,7 @@ public interface EventHandlingStrategy extends Consumer<ClientEvent> {
     String EVENT_CONSUMER_STRATEGY_SINGLE_EVENT_STORE = "SINGLE_EVENT_STORE_STRATEGY";
     String EVENT_CONSUMER_STRATEGY_ASYNC_BATCH_STORE = "ASYNC_BATCH_STORE_STRATEGY";
 
+    void setClientConnectionDelegate(final ClientConnectionDelegate clientConnectionDelegate);
+
     void enable(boolean enable);
 }

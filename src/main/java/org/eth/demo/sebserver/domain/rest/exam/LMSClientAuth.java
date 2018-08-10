@@ -8,18 +8,14 @@
 
 package org.eth.demo.sebserver.domain.rest.exam;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class LMSClientAuth {
 
     public final String connectionToken;
     public final String clientIdentifier;
 
-    @JsonCreator
     public LMSClientAuth(
-            @JsonProperty("connectionToken") final String connectionToken,
-            @JsonProperty("clientIdentifier") final String clientIdentifier) {
+            final String connectionToken,
+            final String clientIdentifier) {
 
         this.connectionToken = connectionToken;
         this.clientIdentifier = clientIdentifier;
@@ -31,6 +27,11 @@ public class LMSClientAuth {
 
     public String getClientIdentifier() {
         return this.clientIdentifier;
+    }
+
+    public Long getInstitutionId() {
+        // TODO extract the institution id from connectionToken
+        return 1l;
     }
 
     @Override

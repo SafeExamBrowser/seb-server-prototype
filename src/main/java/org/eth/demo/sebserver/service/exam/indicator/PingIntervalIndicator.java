@@ -12,8 +12,6 @@ import static org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordDynamicSq
 import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 import static org.mybatis.dynamic.sql.SqlBuilder.isLessThan;
 
-import java.math.BigDecimal;
-
 import org.eth.demo.sebserver.batis.ClientEventExtentionMapper;
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent.EventType;
@@ -54,37 +52,37 @@ public class PingIntervalIndicator extends ClientIndicatorAdapter {
 
     @Override
     @Transactional(readOnly = true)
-    public BigDecimal computeValueAt(final Long timestamp) {
+    public Double computeValueAt(final Long timestamp) {
         final long time = (timestamp != null) ? timestamp : System.currentTimeMillis();
 
         final Long lastPing = this.clientEventExtentionMapper.maxByExample(clientEventRecord.timestamp)
                 .where(clientEventRecord.examId, isEqualTo(this.examId))
-                .and(clientEventRecord.clientId, isEqualTo(this.clientId))
+                .and(clientEventRecord.clientIdentifier, isEqualTo(this.clientIdentifier))
                 .and(clientEventRecord.type, isEqualTo(ClientEvent.EventType.PING.id))
                 .and(clientEventRecord.timestamp, isLessThan(time))
                 .build()
                 .execute();
 
         if (lastPing == null) {
-            return BigDecimal.ZERO;
+            return 0.0;
         } else {
-            return new BigDecimal(lastPing);
+            return lastPing.doubleValue();
         }
     }
 
     @Override
-    public BigDecimal getCurrentValue() {
+    public Double getCurrentValue() {
         if (this.currentValue == null) {
             this.currentValue = computeValueAt(System.currentTimeMillis());
         }
 
-        return new BigDecimal(System.currentTimeMillis() - this.currentValue.longValue());
+        return new Double(System.currentTimeMillis() - this.currentValue.longValue());
     }
 
     @Override
     public void notifyClientEvent(final ClientEvent event) {
         if (event.type == EventType.PING) {
-            this.currentValue = new BigDecimal(event.timestamp);
+            this.currentValue = new Double(event.timestamp);
         }
     }
 

@@ -8,18 +8,14 @@
 
 package org.eth.demo.sebserver.domain.rest.exam;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class SEBClientAuth {
 
     public final String connectionToken;
     public final String clientAddress;
 
-    @JsonCreator
     public SEBClientAuth(
-            @JsonProperty("connectionToken") final String connectionToken,
-            @JsonProperty("clientAddress") final String clientAddress) {
+            final String connectionToken,
+            final String clientAddress) {
 
         this.connectionToken = connectionToken;
         this.clientAddress = clientAddress;
@@ -31,6 +27,11 @@ public class SEBClientAuth {
 
     public String getClientAddress() {
         return this.clientAddress;
+    }
+
+    public Long getInstitutionId() {
+        // TODO extract the institution id from connectionToken
+        return 1l;
     }
 
     @Override

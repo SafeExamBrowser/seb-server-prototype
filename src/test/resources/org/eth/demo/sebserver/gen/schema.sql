@@ -77,11 +77,12 @@ CREATE TABLE IF NOT EXISTS `client_connection` (
   `exam_id` BIGINT UNSIGNED NULL,
   `status` VARCHAR(45) NOT NULL,
   `connection_token` VARCHAR(255) NOT NULL,
-  `client_identifier` VARCHAR(255) NOT NULL,
+  `client_identifier` VARCHAR(255) NULL,
   `client_address` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `connection_exam_ref_idx` (`exam_id` ASC),
-  CONSTRAINT `client_connection_exam_ref`
+  UNIQUE INDEX `client_identifier_UNIQUE` (`client_identifier` ASC),
+  CONSTRAINT `clientConnectionExamRef`
     FOREIGN KEY (`exam_id`)
     REFERENCES `exam` (`id`)
     ON DELETE NO ACTION
@@ -96,16 +97,16 @@ DROP TABLE IF EXISTS `client_event` ;
 CREATE TABLE IF NOT EXISTS `client_event` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `exam_id` BIGINT UNSIGNED NOT NULL,
-  `client_id` BIGINT UNSIGNED NOT NULL,
+  `client_identifier` VARCHAR(255) NOT NULL,
   `type` INT(2) UNSIGNED NOT NULL,
   `timestamp` BIGINT UNSIGNED NOT NULL,
   `numeric_value` DECIMAL(10,4) NULL,
   `text` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
-  INDEX `client_connection_ref_idx` (`client_id` ASC),
-  CONSTRAINT `client_connection_ref`
-    FOREIGN KEY (`client_id`)
-    REFERENCES `client_connection` (`id`)
+  INDEX `eventClientIdentifierRef_idx` (`client_identifier` ASC),
+  CONSTRAINT `eventClientIdentifierRef`
+    FOREIGN KEY (`client_identifier`)
+    REFERENCES `client_connection` (`client_identifier`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
