@@ -25,7 +25,6 @@ import org.eth.demo.sebserver.batis.gen.mapper.IndicatorRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ExamRecord;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.ExamSEBConfigMapping;
-import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
 import org.mybatis.dynamic.sql.select.MyBatis3SelectModelAdapter;
 import org.mybatis.dynamic.sql.select.QueryExpressionDSL;
@@ -196,7 +195,9 @@ public class ExamDaoImpl implements ExamDao {
                         record.institutionId,
                         record.ownerId,
                         record.name,
-                        ExamStatus.valueOf(record.status),
+                        record.description,
+                        Exam.ExamType.valueOf(record.type),
+                        Exam.ExamStatus.valueOf(record.status),
                         record.startTime,
                         record.endTime,
                         record.lmsExamURL);

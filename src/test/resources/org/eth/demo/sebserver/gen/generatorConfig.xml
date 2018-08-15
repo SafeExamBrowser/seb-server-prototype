@@ -73,28 +73,36 @@
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
         <table tableName="client_event" domainObjectName="ClientEventRecord">
-            <property name="virtualKeyColumns" value="id"/>
+            <property name="immutable" value="true"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
         <table tableName="indicator" domainObjectName="IndicatorRecord" >
-            <property name="virtualKeyColumns" value="id"/>
+            <property name="immutable" value="true"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
         <table tableName="exam_indicator" domainObjectName="ExamIndicatorRecord">
-            <property name="virtualKeyColumns" value="id"/>
+            <property name="immutable" value="true"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+        
+        <table tableName="institution" domainObjectName="InstitutionRecord">
+            <property name="immutable" value="true"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+        <table tableName="seb_lms_setup" domainObjectName="SebLmsSetupRecord">
+            <property name="immutable" value="true"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
         <table tableName="user" domainObjectName="UserRecord">
-            <property name="virtualKeyColumns" value="id"/>
+            <property name="immutable" value="true"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
             <columnOverride column="creation_date" javaType="org.joda.time.DateTime" typeHandler="org.eth.demo.sebserver.batis.JodaTimeTypeResolver" />
         </table>
         <table tableName="user_role" domainObjectName="RoleRecord">
-            <property name="virtualKeyColumns" value="id"/>
+            <property name="immutable" value="true"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
-        
-        
+
         
     </context>
 </generatorConfiguration>

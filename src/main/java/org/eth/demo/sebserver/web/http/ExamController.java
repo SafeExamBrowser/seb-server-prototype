@@ -13,7 +13,6 @@ import java.util.Collection;
 
 import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
-import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
 import org.eth.demo.sebserver.service.admin.UserFacade;
 import org.eth.demo.sebserver.service.exam.ExamDao;
 import org.eth.demo.sebserver.service.exam.ExamStateService;
@@ -66,7 +65,7 @@ public class ExamController {
 
     @RequestMapping(value = "/statechange/{examId}/{stateName}", method = RequestMethod.POST)
     final Exam processStateChange(@PathVariable final Long examId, @PathVariable final String stateName) {
-        return this.examStateService.processStateChange(examId, ExamStatus.valueOf(stateName));
+        return this.examStateService.processStateChange(examId, Exam.ExamStatus.valueOf(stateName));
     }
 
 }

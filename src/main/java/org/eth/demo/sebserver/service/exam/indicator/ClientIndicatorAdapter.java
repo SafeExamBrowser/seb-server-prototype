@@ -11,7 +11,7 @@ package org.eth.demo.sebserver.service.exam.indicator;
 public abstract class ClientIndicatorAdapter implements ClientIndicator {
 
     protected Long examId;
-    protected String clientIdentifier;
+    protected String userIdentifier;
     protected boolean cachingEnabled;
 
     protected Double currentValue = null;
@@ -19,11 +19,11 @@ public abstract class ClientIndicatorAdapter implements ClientIndicator {
     @Override
     public void init(
             final Long examId,
-            final String clientIdentifier,
+            final String userIdentifier,
             final boolean cachingEnabled) {
 
         this.examId = examId;
-        this.clientIdentifier = clientIdentifier;
+        this.userIdentifier = userIdentifier;
         this.cachingEnabled = cachingEnabled;
     }
 
@@ -33,8 +33,8 @@ public abstract class ClientIndicatorAdapter implements ClientIndicator {
     }
 
     @Override
-    public String clientIdentifier() {
-        return this.clientIdentifier;
+    public String userIdentifier() {
+        return this.userIdentifier;
     }
 
     @Override

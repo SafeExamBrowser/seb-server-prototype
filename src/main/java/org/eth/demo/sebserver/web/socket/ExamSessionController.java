@@ -8,11 +8,7 @@
 
 package org.eth.demo.sebserver.web.socket;
 
-import java.util.UUID;
-
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
-import org.eth.demo.sebserver.domain.rest.exam.LMSClientAuth;
-import org.eth.demo.sebserver.domain.rest.exam.SEBClientAuth;
 import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
 import org.eth.demo.sebserver.web.socket.Message.Type;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -44,9 +40,8 @@ public class ExamSessionController {
             @DestinationVariable final String sessionId) {
 
         try {
-            final String uuid = UUID.randomUUID().toString();
-            this.examSessionService.handshakeSEBClient(new SEBClientAuth(uuid, ""));
-            this.examSessionService.handshakeLMSClient(new LMSClientAuth(uuid, uuid));
+            final String uuid = this.examSessionService.handshakeSEBClient("", examId);
+            this.examSessionService.handshakeLMSClient(uuid, uuid, null);
             this.examSessionService.connectClientToExam(Long.valueOf(examId), uuid);
 
             return messageToString(

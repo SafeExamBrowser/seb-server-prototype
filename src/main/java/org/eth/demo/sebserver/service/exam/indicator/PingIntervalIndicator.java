@@ -56,8 +56,7 @@ public class PingIntervalIndicator extends ClientIndicatorAdapter {
         final long time = (timestamp != null) ? timestamp : System.currentTimeMillis();
 
         final Long lastPing = this.clientEventExtentionMapper.maxByExample(clientEventRecord.timestamp)
-                .where(clientEventRecord.examId, isEqualTo(this.examId))
-                .and(clientEventRecord.clientIdentifier, isEqualTo(this.clientIdentifier))
+                .where(clientEventRecord.userIdentifier, isEqualTo(this.userIdentifier))
                 .and(clientEventRecord.type, isEqualTo(ClientEvent.EventType.PING.id))
                 .and(clientEventRecord.timestamp, isLessThan(time))
                 .build()

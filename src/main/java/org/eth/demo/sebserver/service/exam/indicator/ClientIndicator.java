@@ -20,7 +20,7 @@ public interface ClientIndicator {
 
     Long examId();
 
-    String clientIdentifier();
+    String userIdentifier();
 
     Double getCurrentValue();
 

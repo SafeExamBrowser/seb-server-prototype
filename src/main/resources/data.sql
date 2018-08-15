@@ -1,6 +1,11 @@
 INSERT INTO institution VALUES
     (1, "ethz")
     ;
+    
+INSERT INTO seb_lms_setup VALUES
+    (1, 1, "sebclient", "$2a$04$SkWmoq0fL2wWyEk.cQj98ewdBH0Jtj.JWH/2vo6fJpo8wgK2/iv1W", "lmsclient", "$2a$04$KtWx03i61fPqibYXyzd/6.ZKsmxJuPlQgFKaDnZLmHbnSuhjbmi3a", "https://lms.example.com"),
+    (2, 1, "sebclient2", "$2a$04$SkWmoq0fL2wWyEk.cQj98ewdBH0Jtj.JWH/2vo6fJpo8wgK2/iv1W", "lmsclient2", "$2a$04$KtWx03i61fPqibYXyzd/6.ZKsmxJuPlQgFKaDnZLmHbnSuhjbmi3a", null)
+    ;
 
 INSERT INTO user VALUES 
     (1, 1, "Admin1", "admin", "$2a$08$c2GKYEYoUVXH1Yb8GXVXVu66ltPvbZgLMcVSXRH.LgZNF/YeaYB8m", "admin@nomail.nomail", '2018-01-01 00:00:00', 1),
@@ -71,10 +76,10 @@ INSERT INTO configuration VALUES
     ;
     
 INSERT INTO `exam` VALUES 
-    (1, 1, 2,'Demo Exam 1','IN_PROGRESS', null, null, null),
-    (2, 1, 2,'Demo Exam 2','IN_PROGRESS', null, null, null),
-    (3, 1, 3,'Demo Exam 3','READY', '2018-07-30 09:00:00' ,'2018-08-01 00:00:00', 'https://localhost:8090/exams/exam3'),
-    (4, 1, 3,'Demo Exam 4','RUNNING', '2018-01-01 00:00:00', '2019-01-01 00:00:00', 'https://localhost:8090/exams/exam4')
+    (1, 1, 2,'Demo Exam 1','Demo Exam', 'TYPE_1', 'IN_PROGRESS', null, null, null),
+    (2, 1, 2,'Demo Exam 2','Demo Exam', 'TYPE_1','IN_PROGRESS', null, null, null),
+    (3, 1, 3,'Demo Exam 3','Demo Exam', 'TYPE_1','READY', '2018-07-30 09:00:00' ,'2018-08-01 00:00:00', 'https://localhost:8090/exams/exam3'),
+    (4, 1, 3,'Demo Exam 4','Demo Exam', 'TYPE_1','RUNNING', '2018-01-01 00:00:00', '2019-01-01 00:00:00', 'https://localhost:8090/exams/exam4')
     ;
 
 INSERT INTO indicator VALUES 

@@ -19,10 +19,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class Exam {
 
+  //@formatter:off
+    public enum ExamStatus {
+        IN_PROGRESS,
+        READY,
+        RUNNING,
+        FINISHED
+    }
+
+    // TODO to define
+    public enum ExamType {
+        TYPE_1,
+        TYPE_2
+    }
+
+    //@formatter:on
+
     public final Long id;
     public final Long institutionId;
     public final Long ownerId;
     public final String name;
+    public final String description;
+    public final ExamType type;
     public final ExamStatus status;
     public final DateTime startTime;
     public final DateTime endTime;
@@ -37,6 +55,8 @@ public final class Exam {
             @JsonProperty("institutionId") final Long institutionId,
             @JsonProperty("ownerId") final Long ownerId,
             @JsonProperty("name") final String name,
+            @JsonProperty("description") final String description,
+            @JsonProperty("type") final ExamType type,
             @JsonProperty("status") final ExamStatus status,
             @JsonProperty("startTime") final DateTime startTime,
             @JsonProperty("endTime") final DateTime endTime,
@@ -48,6 +68,8 @@ public final class Exam {
         this.institutionId = institutionId;
         this.ownerId = ownerId;
         this.name = name;
+        this.description = description;
+        this.type = type;
         this.status = status;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -75,6 +97,14 @@ public final class Exam {
 
     public String getName() {
         return this.name;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public ExamType getType() {
+        return this.type;
     }
 
     public ExamStatus getStatus() {
@@ -132,6 +162,8 @@ public final class Exam {
                 this.institutionId,
                 this.ownerId,
                 this.name,
+                this.description,
+                this.type.name(),
                 this.status.name(),
                 this.startTime,
                 this.endTime,
@@ -143,12 +175,16 @@ public final class Exam {
             final Long institutionId,
             final Long ownerId,
             final String name,
+            final String description,
+            final ExamType type,
             final ExamStatus status,
             final DateTime startTime,
             final DateTime endTime,
             final String lmsLoginURL) {
 
-        return new Exam(id, institutionId, ownerId, name, status, startTime, endTime, lmsLoginURL, null, null);
+        return new Exam(
+                id, institutionId, ownerId, name, description,
+                type, status, startTime, endTime, lmsLoginURL, null, null);
     }
 
     public static final Exam of(
@@ -161,6 +197,8 @@ public final class Exam {
                 prototype.institutionId,
                 prototype.ownerId,
                 prototype.name,
+                prototype.description,
+                prototype.type,
                 prototype.status,
                 prototype.startTime,
                 prototype.endTime,
@@ -173,10 +211,10 @@ public final class Exam {
     public String toString() {
         return "Exam [id=" + this.id + ", institutionId=" + this.institutionId + ", ownerId=" + this.ownerId + ", name="
                 + this.name
-                + ", status=" + this.status + ", startTime=" + this.startTime + ", endTime=" + this.endTime
-                + ", lmsExamURL="
-                + this.lmsExamURL + ", indicators=" + this.indicators + ", sebConfigMapping=" + this.sebConfigMapping
-                + "]";
+                + ", description=" + this.description + ", type=" + this.type + ", status=" + this.status
+                + ", startTime=" + this.startTime
+                + ", endTime=" + this.endTime + ", lmsExamURL=" + this.lmsExamURL + ", indicators=" + this.indicators
+                + ", sebConfigMapping=" + this.sebConfigMapping + "]";
     }
 
 }

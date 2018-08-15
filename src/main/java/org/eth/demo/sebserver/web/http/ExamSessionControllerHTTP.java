@@ -8,12 +8,8 @@
 
 package org.eth.demo.sebserver.web.http;
 
-import java.util.UUID;
-
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorValue;
-import org.eth.demo.sebserver.domain.rest.exam.LMSClientAuth;
-import org.eth.demo.sebserver.domain.rest.exam.SEBClientAuth;
 import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,9 +36,8 @@ public class ExamSessionControllerHTTP {
     @RequestMapping(value = "/connect/{examId}", method = RequestMethod.GET)
     public final Mono<String> connect(@PathVariable final Long examId) {
         return Mono.fromCallable(() -> {
-            final String uuid = UUID.randomUUID().toString();
-            this.examSessionService.handshakeSEBClient(new SEBClientAuth(uuid, ""));
-            this.examSessionService.handshakeLMSClient(new LMSClientAuth(uuid, uuid));
+            final String uuid = this.examSessionService.handshakeSEBClient("", null);
+            this.examSessionService.handshakeLMSClient(uuid, uuid, null);
             this.examSessionService.connectClientToExam(Long.valueOf(examId), uuid);
 
             return uuid;

@@ -27,7 +27,7 @@ import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordDynamicSqlSupport;
 import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ClientEventRecord;
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
-import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
+import org.eth.demo.sebserver.domain.rest.exam.Exam.ExamStatus;
 import org.eth.demo.util.Result;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
@@ -199,7 +199,7 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
         return status -> {
             try {
                 final List<ClientEventRecord> records = events.stream()
-                        .map(event -> clientConnectionDelegate.getClientConnection(event.clientIdentifier)
+                        .map(event -> clientConnectionDelegate.getClientConnection(event.userIdentifier)
                                 .map(cc -> event.toRecord(cc.clientConnection.examId))
                                 .orElse(null))
                         .filter(cer -> cer != null)

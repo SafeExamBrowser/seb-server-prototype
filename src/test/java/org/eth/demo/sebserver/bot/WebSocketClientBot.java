@@ -41,7 +41,7 @@ public class WebSocketClientBot {
 
     public static final String DEFAULT_ROOT_URL = "ws://localhost:8080/ws";
     public static final long DEFAULT_EXAM_ID = 4;
-    public static final int DEFAULT_CONNECT_ATTEMPTS = 3;
+    public static final int DEFAULT_CONNECT_ATTEMPTS = 1;
 
     private static final Logger log = LoggerFactory.getLogger(WebSocketClientBot.class);
 

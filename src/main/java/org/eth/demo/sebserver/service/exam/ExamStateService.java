@@ -19,7 +19,7 @@ import org.eth.demo.sebserver.appevents.ExamStartedEvent;
 import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ExamRecord;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
-import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
+import org.eth.demo.sebserver.domain.rest.exam.Exam.ExamStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -140,10 +140,8 @@ public class ExamStateService {
 
     private void save(final Long examId, final ExamStatus toState) {
         final ExamRecord recordWithIdAndChanges = new ExamRecord(
-                examId,
-                null, null, null,
-                toState.name(),
-                null, null, null);
+                examId, null, null, null, null, null,
+                toState.name(), null, null, null);
         this.examRecordMapper.updateByPrimaryKeySelective(recordWithIdAndChanges);
     }
 

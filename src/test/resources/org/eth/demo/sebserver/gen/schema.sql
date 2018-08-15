@@ -47,7 +47,9 @@ CREATE TABLE IF NOT EXISTS `exam` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `institution_id` BIGINT UNSIGNED NOT NULL,
   `owner_id` BIGINT UNSIGNED NOT NULL,
-  `name` VARCHAR(45) NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `description` VARCHAR(4000) NULL,
+  `type` VARCHAR(45) NOT NULL,
   `status` VARCHAR(45) NOT NULL,
   `start_time` DATETIME NULL,
   `end_time` DATETIME NULL,
@@ -77,11 +79,11 @@ CREATE TABLE IF NOT EXISTS `client_connection` (
   `exam_id` BIGINT UNSIGNED NULL,
   `status` VARCHAR(45) NOT NULL,
   `connection_token` VARCHAR(255) NOT NULL,
-  `client_identifier` VARCHAR(255) NULL,
+  `user_identifier` VARCHAR(255) NOT NULL,
   `client_address` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `connection_exam_ref_idx` (`exam_id` ASC),
-  UNIQUE INDEX `client_identifier_UNIQUE` (`client_identifier` ASC),
+  UNIQUE INDEX `client_identifier_UNIQUE` (`user_identifier` ASC),
   CONSTRAINT `clientConnectionExamRef`
     FOREIGN KEY (`exam_id`)
     REFERENCES `exam` (`id`)
@@ -96,17 +98,16 @@ DROP TABLE IF EXISTS `client_event` ;
 
 CREATE TABLE IF NOT EXISTS `client_event` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `exam_id` BIGINT UNSIGNED NOT NULL,
-  `client_identifier` VARCHAR(255) NOT NULL,
+  `user_identifier` VARCHAR(255) NOT NULL,
   `type` INT(2) UNSIGNED NOT NULL,
   `timestamp` BIGINT UNSIGNED NOT NULL,
   `numeric_value` DECIMAL(10,4) NULL,
   `text` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
-  INDEX `eventClientIdentifierRef_idx` (`client_identifier` ASC),
-  CONSTRAINT `eventClientIdentifierRef`
-    FOREIGN KEY (`client_identifier`)
-    REFERENCES `client_connection` (`client_identifier`)
+  INDEX `eventUserIdentifierRef_idx` (`user_identifier` ASC),
+  CONSTRAINT `eventUserIdentifierRef`
+    FOREIGN KEY (`user_identifier`)
+    REFERENCES `client_connection` (`user_identifier`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
@@ -310,3 +311,25 @@ CREATE TABLE IF NOT EXISTS `oauth_refresh_token` (
   `token_id` VARCHAR(255) NULL,
   `token` BLOB NULL,
   `authentication` BLOB NULL);
+
+
+-- -----------------------------------------------------
+-- Table `seb_lms_setup`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `seb_lms_setup` ;
+
+CREATE TABLE IF NOT EXISTS `seb_lms_setup` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `institution_id` BIGINT UNSIGNED NOT NULL,
+  `seb_clientname` VARCHAR(255) NOT NULL,
+  `seb_clientsecret` VARCHAR(255) NOT NULL,
+  `lms_clientname` VARCHAR(255) NOT NULL,
+  `lms_clientsecret` VARCHAR(255) NOT NULL,
+  `lms_url` VARCHAR(255) NULL,
+  PRIMARY KEY (`id`),
+  INDEX `setupInstitutionRef_idx` (`institution_id` ASC),
+  CONSTRAINT `setupInstitutionRef`
+    FOREIGN KEY (`institution_id`)
+    REFERENCES `institution` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);

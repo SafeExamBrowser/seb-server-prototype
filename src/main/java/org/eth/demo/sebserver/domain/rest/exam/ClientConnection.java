@@ -22,7 +22,7 @@ public class ClientConnection {
     public final Long id;
     public final Long examId;
     public final ConnectionStatus status;
-    public final String clientIdentifier;
+    public final String userIdentifier;
     public final String clientAddress;
 
     @JsonCreator
@@ -30,13 +30,13 @@ public class ClientConnection {
             @JsonProperty("id") final Long id,
             @JsonProperty("examId") final Long examId,
             @JsonProperty("status") final ConnectionStatus status,
-            @JsonProperty("clientIdentifier") final String clientIdentifier,
+            @JsonProperty("userIdentifier") final String userIdentifier,
             @JsonProperty("clientAddress") final String clientAddress) {
 
         this.id = id;
         this.examId = examId;
         this.status = status;
-        this.clientIdentifier = clientIdentifier;
+        this.userIdentifier = userIdentifier;
         this.clientAddress = clientAddress;
     }
 
@@ -52,8 +52,8 @@ public class ClientConnection {
         return this.status;
     }
 
-    public String getClientIdentifier() {
-        return this.clientIdentifier;
+    public String getUserIdentifier() {
+        return this.userIdentifier;
     }
 
     public String getClientAddress() {
@@ -61,11 +61,12 @@ public class ClientConnection {
     }
 
     public static final ClientConnection fromRecord(final ClientConnectionRecord record) {
+
         return new ClientConnection(
                 record.getId(),
                 record.getExamId(),
                 ClientConnection.ConnectionStatus.valueOf(record.getStatus()),
-                record.getClientIdentifier(),
+                record.getUserIdentifier(),
                 record.getClientAddress());
     }
 
@@ -97,8 +98,8 @@ public class ClientConnection {
     @Override
     public String toString() {
         return "ClientConnection [id=" + this.id + ", examId=" + this.examId + ", status=" + this.status
-                + ", clientIdentifier="
-                + this.clientIdentifier + ", clientAddress=" + this.clientAddress + "]";
+                + ", userIdentifier="
+                + this.userIdentifier + ", clientAddress=" + this.clientAddress + "]";
     }
 
 }

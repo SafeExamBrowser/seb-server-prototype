@@ -41,6 +41,8 @@ public interface ExamJoinMapper {
             @Arg(column = "institution_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
             @Arg(column = "owner_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
             @Arg(column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Arg(column = "description", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Arg(column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "status", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "start_time", javaType = DateTime.class, typeHandler = JodaTimeTypeResolver.class,
                     jdbcType = JdbcType.TIMESTAMP),
@@ -67,6 +69,8 @@ public interface ExamJoinMapper {
                 examRecord.institutionId,
                 examRecord.ownerId,
                 examRecord.name,
+                examRecord.description,
+                examRecord.type,
                 examRecord.status,
                 examRecord.startTime,
                 examRecord.endTime,
@@ -96,6 +100,8 @@ public interface ExamJoinMapper {
         public final Long institutionId;
         public final Long ownerId;
         public final String name;
+        public final String description;
+        public final String type;
         public final String status;
         public final DateTime startTime;
         public final DateTime endTime;
@@ -109,6 +115,8 @@ public interface ExamJoinMapper {
                 final Long institutionId,
                 final Long ownerId,
                 final String name,
+                final String description,
+                final String examType,
                 final String status,
                 final DateTime startTime,
                 final DateTime endTime,
@@ -127,6 +135,8 @@ public interface ExamJoinMapper {
             this.institutionId = institutionId;
             this.ownerId = ownerId;
             this.name = name;
+            this.description = description;
+            this.type = examType;
             this.status = status;
             this.startTime = startTime;
             this.endTime = endTime;

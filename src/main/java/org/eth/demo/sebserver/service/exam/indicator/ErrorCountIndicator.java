@@ -50,8 +50,7 @@ public class ErrorCountIndicator extends ClientIndicatorAdapter {
         final Long time = (timestamp != null) ? timestamp : System.currentTimeMillis();
 
         final Long errors = this.clientEventRecordMapper.countByExample()
-                .where(clientEventRecord.examId, isEqualTo(this.examId))
-                .and(clientEventRecord.clientIdentifier, isEqualTo(this.clientIdentifier))
+                .where(clientEventRecord.userIdentifier, isEqualTo(this.userIdentifier))
                 .and(clientEventRecord.type, isEqualTo(ClientEvent.EventType.ERROR.id))
                 .and(clientEventRecord.timestamp, isLessThan(time))
                 .build()

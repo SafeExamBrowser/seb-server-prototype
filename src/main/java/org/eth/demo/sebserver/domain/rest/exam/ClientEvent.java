@@ -37,7 +37,7 @@ public final class ClientEvent {
         }
     }
 
-    public final String clientIdentifier;
+    public final String userIdentifier;
     public final EventType type;
     public final Long timestamp;
     public final BigDecimal numValue;
@@ -45,21 +45,21 @@ public final class ClientEvent {
 
     @JsonCreator
     ClientEvent(
-            @JsonProperty("clientIdentifier") final String clientIdentifier,
+            @JsonProperty("userIdentifier") final String userIdentifier,
             @JsonProperty("type") final Integer type,
             @JsonProperty("timestamp") final Long timestamp,
             @JsonProperty("numValue") final BigDecimal numValue,
             @JsonProperty("text") final String text) {
 
-        this.clientIdentifier = clientIdentifier;
+        this.userIdentifier = userIdentifier;
         this.type = (type != null) ? EventType.byId(type) : EventType.UNKNOWN;
         this.timestamp = (timestamp != null) ? timestamp : System.currentTimeMillis();
         this.numValue = numValue;
         this.text = text;
     }
 
-    public String getClientIdentifier() {
-        return this.clientIdentifier;
+    public String getUserIdentifier() {
+        return this.userIdentifier;
     }
 
     public EventType getType() {
@@ -81,8 +81,7 @@ public final class ClientEvent {
     public ClientEventRecord toRecord(final Long examId) {
         return new ClientEventRecord(
                 null,
-                examId,
-                this.clientIdentifier,
+                this.userIdentifier,
                 this.type.id,
                 this.timestamp,
                 this.numValue,

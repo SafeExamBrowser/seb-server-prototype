@@ -6,10 +6,11 @@
         </encoder>
     </appender>
  
-    <Logger name="org.eth.demo.sebserver" level="INFO" additivity="true" />
+    <Logger name="org.eth.demo.sebserver" level="DEBUG" additivity="true" />
     <Logger name="org.mybatis.generator" level="INFO" additivity="true" />
     <Logger name="org.eth.demo.sebserver.batis" level="INFO" additivity="true" />
     <Logger name="org.springframework.security" level="DEBUG" additivity="true" />
+    <Logger name="org.springframework.web.socket.messaging" level="TRACE" additivity="true" />
     
     <Logger name="org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper" level="INFO" additivity="true" />
 

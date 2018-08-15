@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.time.DateUtils;
 import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ExamRecord;
-import org.eth.demo.sebserver.domain.rest.exam.ExamStatus;
+import org.eth.demo.sebserver.domain.rest.exam.Exam.ExamStatus;
 import org.eth.demo.util.Result;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -106,7 +106,7 @@ public class ExamRunner implements DisposableBean {
                         .stream()
                         .forEach(examUpdateMapper::startExam);
 
-                log.debug("Check extams to finish");
+                log.trace("Check extams to finish");
 
                 examUpdateMapper.getExamsToFinish()
                         .stream()
@@ -137,21 +137,19 @@ public class ExamRunner implements DisposableBean {
         }
 
         void startExam(final Long examId) {
-            log.debug("Start Exam with id: {}", id);
+            log.info("Start Exam with id: {}", examId);
             updateExam(examId, ExamStatus.RUNNING);
         }
 
         void finishExam(final Long examId) {
-            log.debug("Stop Exam with id: {}", id);
+            log.info("Stop Exam with id: {}", examId);
             updateExam(examId, ExamStatus.FINISHED);
         }
 
         void updateExam(final Long examId, final ExamStatus status) {
             final ExamRecord stateChange = new ExamRecord(
-                    examId,
-                    null, null, null,
-                    status.name(),
-                    null, null, null);
+                    examId, null, null, null, null, null,
+                    status.name(), null, null, null);
 
             this.examMapper.updateByPrimaryKeySelective(stateChange);
         }

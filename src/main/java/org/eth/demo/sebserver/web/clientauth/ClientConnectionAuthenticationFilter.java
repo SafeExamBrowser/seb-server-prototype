@@ -6,13 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.web.http;
+package org.eth.demo.sebserver.web.clientauth;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -21,7 +17,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.eth.demo.sebserver.domain.rest.admin.Role;
-import org.eth.demo.sebserver.domain.rest.exam.SEBClientAuth;
+import org.eth.demo.sebserver.web.clientauth.ClientAuth.ClientAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -30,8 +26,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.GenericFilterBean;
@@ -83,9 +77,12 @@ public final class ClientConnectionAuthenticationFilter extends GenericFilterBea
         if (httpRequest.getRequestURI().startsWith("/ws")) {
             SecurityContextHolder
                     .getContext()
-                    .setAuthentication(new SEBClientAuthentication(new SEBClientAuth(
-                            "[NO_TOKEN_YET]",
-                            httpRequest.getRemoteAddr())));
+                    .setAuthentication(new ClientAuthentication(
+                            new ClientAuth(
+                                    1L,
+                                    "[NO_TOKEN_YET]",
+                                    httpRequest.getRemoteAddr()),
+                            Role.UserRole.LMS_CLIENT));
         } else if (clientToken != null) {
             // Case 1: SEB_CLIENT_TOKEN sent
             // There is a client token already within the request. Let's authorize the client within the LMS and given token
@@ -123,14 +120,14 @@ public final class ClientConnectionAuthenticationFilter extends GenericFilterBea
             final String lmsAuthUrl,
             final String clientAddress) {
 
-        final SEBClientAuth clientUser = requestAuthenticationOnLMS(
+        final ClientAuth clientUser = requestAuthenticationOnLMS(
                 clientToken,
                 lmsAuthUrl,
                 clientAddress);
 
         SecurityContextHolder
                 .getContext()
-                .setAuthentication(new SEBClientAuthentication(clientUser));
+                .setAuthentication(new ClientAuthentication(clientUser, Role.UserRole.SEB_CLIENT));
 
     }
 
@@ -153,19 +150,19 @@ public final class ClientConnectionAuthenticationFilter extends GenericFilterBea
                 .getHeaders()
                 .get(HEADER_ATTR_CLIENT_TOKEN).get(0);
 
-        final SEBClientAuth clientUser = requestAuthenticationOnLMS(
+        final ClientAuth clientUser = requestAuthenticationOnLMS(
                 clientToken,
                 lmsAuthUrl,
                 clientAddress);
 
         SecurityContextHolder
                 .getContext()
-                .setAuthentication(new SEBClientAuthentication(clientUser));
+                .setAuthentication(new ClientAuthentication(clientUser, Role.UserRole.SEB_CLIENT));
 
         return clientToken;
     }
 
-    private SEBClientAuth requestAuthenticationOnLMS(
+    private ClientAuth requestAuthenticationOnLMS(
             final String clientToken,
             final String lmsAuthUrl,
             final String clientAddress) {
@@ -180,7 +177,7 @@ public final class ClientConnectionAuthenticationFilter extends GenericFilterBea
                 new HttpEntity<String>(httpHeaders),
                 String.class);
 
-        final SEBClientAuth clientUser = extractClientUserFromResponse(
+        final ClientAuth clientUser = extractClientUserFromResponse(
                 authorizationResponse.getBody(),
                 clientToken,
                 clientAddress);
@@ -188,7 +185,7 @@ public final class ClientConnectionAuthenticationFilter extends GenericFilterBea
         return clientUser;
     }
 
-    private SEBClientAuth extractClientUserFromResponse(
+    private ClientAuth extractClientUserFromResponse(
             final String bodyContent,
             final String token,
             final String clientAddress) {
@@ -197,7 +194,8 @@ public final class ClientConnectionAuthenticationFilter extends GenericFilterBea
         try {
             final JsonNode node = mapper.readTree(bodyContent);
 
-            return new SEBClientAuth(
+            return new ClientAuth(
+                    1L,
                     token,
                     clientAddress);
 
@@ -208,53 +206,4 @@ public final class ClientConnectionAuthenticationFilter extends GenericFilterBea
         }
     }
 
-    private class SEBClientAuthentication implements Authentication {
-
-        private static final long serialVersionUID = 4832650248834396365L;
-
-        private final SEBClientAuth user;
-        private final Collection<GrantedAuthority> authorities;
-
-        public SEBClientAuthentication(final SEBClientAuth user) {
-            this.user = user;
-            final List<GrantedAuthority> roles = new ArrayList<>();
-            roles.add(Role.UserRole.SEB_CLIENT.role);
-            this.authorities = Collections.unmodifiableList(roles);
-        }
-
-        @Override
-        public String getName() {
-            return "SEBClientAuth";
-        }
-
-        @Override
-        public Collection<? extends GrantedAuthority> getAuthorities() {
-            return this.authorities;
-        }
-
-        @Override
-        public Object getCredentials() {
-            return this.user;
-        }
-
-        @Override
-        public Object getDetails() {
-            return this.user;
-        }
-
-        @Override
-        public Object getPrincipal() {
-            return this.user;
-        }
-
-        @Override
-        public boolean isAuthenticated() {
-            return true;
-        }
-
-        @Override
-        public void setAuthenticated(final boolean isAuthenticated) throws IllegalArgumentException {
-            throw new UnsupportedOperationException();
-        }
-    }
 }

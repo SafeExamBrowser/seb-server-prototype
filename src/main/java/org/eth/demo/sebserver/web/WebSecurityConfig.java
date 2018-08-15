@@ -8,12 +8,16 @@
 
 package org.eth.demo.sebserver.web;
 
-import org.eth.demo.sebserver.web.http.ClientConnectionAuthenticationFilter;
+import org.eth.demo.sebserver.batis.gen.mapper.SebLmsSetupRecordMapper;
+import org.eth.demo.sebserver.web.clientauth.LMSClientAuthenticationFilter;
+import org.eth.demo.sebserver.web.clientauth.SEBClientAuthenticationFilter;
 import org.eth.demo.sebserver.web.oauth.InternalUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
@@ -24,6 +28,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -45,13 +50,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             // RAP/RWT resources has to be accessible
             new AntPathRequestMatcher("/rwt-resources/**"));
 
-    public static final RequestMatcher SEB_CLIENT_PROTECTED_URLS = new OrRequestMatcher(
-            new AntPathRequestMatcher("/client-connect/**"),
-            new AntPathRequestMatcher("/ws/**"));
+    public static final AntPathRequestMatcher SEB_HANDSHAKE_ENDPOINT =
+            new AntPathRequestMatcher("/sebauth/sebhandshake/**");
+    public static final AntPathRequestMatcher SEB_WEB_SOCKET_ENDPOINT =
+            new AntPathRequestMatcher("/ws/**");
+    public static final AntPathRequestMatcher LMS_HANDSHAKE_ENDPOINT =
+            new AntPathRequestMatcher("/sebauth/lmshandshake/**");
+
+    public static final RequestMatcher SEB_CLIENT_ENDPOINTS = new OrRequestMatcher(
+            SEB_HANDSHAKE_ENDPOINT,
+            SEB_WEB_SOCKET_ENDPOINT);
+
+    public static final RequestMatcher SEB_CONNECTION_PROTECTED_URLS = new OrRequestMatcher(
+            SEB_CLIENT_ENDPOINTS,
+            LMS_HANDSHAKE_ENDPOINT);
 
     public static final RequestMatcher SEB_SERVER_API_IGNORE_URL = new OrRequestMatcher(
             new AntPathRequestMatcher("/error/**"),
-            new AntPathRequestMatcher("/client-connect/**"),
+            new AntPathRequestMatcher("/sebauth/**"),
             new AntPathRequestMatcher("/ws/**"),
             new AntPathRequestMatcher("/gui/**"),
             new AntPathRequestMatcher("/rwt-resources/**"));
@@ -62,46 +78,31 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private InternalUserDetailsService userDetailsService;
     @Autowired
-    private PasswordEncoder userPasswordEncoder;
-    @Autowired
     private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     @Autowired
     private DefaultAuthenticationEventPublisher defaultAuthenticationEventPublisher;
+    @Autowired
+    private SebLmsSetupRecordMapper sebLmsSetupRecordMapper;
+
+    public static final String USER_PASSWORD_ENCODER_BEAN_NAME = "userPasswordEncoder";
+
+    @Bean(USER_PASSWORD_ENCODER_BEAN_NAME)
+    public PasswordEncoder userPasswordEncoder() {
+        return new BCryptPasswordEncoder(8);
+    }
+
+    public static final String CLIENT_PASSWORD_ENCODER_BEAN_NAME = "clientPasswordEncoder";
+
+    @Bean(CLIENT_PASSWORD_ENCODER_BEAN_NAME)
+    public PasswordEncoder clientPasswordEncoder() {
+        return new BCryptPasswordEncoder(4);
+    }
 
     @Override
     public void configure(final WebSecurity web) {
         web
                 .ignoring()
                 .requestMatchers(PUBLIC_URLS);
-    }
-
-    @Override
-    protected void configure(final HttpSecurity http) throws Exception {
-      //@formatter:off
-        http
-                    .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                    .requestMatcher(SEB_CLIENT_PROTECTED_URLS)
-                    .addFilterBefore(
-                            clientConnectionAuthenticationFilter(),
-                            BasicAuthenticationFilter.class)
-                    .authorizeRequests()
-                    .requestMatchers(SEB_CLIENT_PROTECTED_URLS)
-                    .authenticated()
-                .and()
-                    .exceptionHandling()
-                    .defaultAuthenticationEntryPointFor(
-                            this.customAuthenticationEntryPoint,
-                            WebSecurityConfig.SEB_CLIENT_PROTECTED_URLS)
-                .and()
-                    .formLogin().disable()
-                    .httpBasic().disable()
-                    .logout().disable()
-                    .headers().frameOptions().disable()
-                 .and()
-                    .csrf().disable(); // TODO enable?
-      //@formatter:on
     }
 
     @Override
@@ -114,23 +115,120 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .userDetailsService(this.userDetailsService)
-                .passwordEncoder(this.userPasswordEncoder);
+                .passwordEncoder(userPasswordEncoder());
+    }
+
+    @Lazy
+    @Bean
+    public SEBClientAuthenticationFilter sebClientAuthenticationFilter() {
+        return new SEBClientAuthenticationFilter(
+                this.defaultAuthenticationEventPublisher,
+                this.sebLmsSetupRecordMapper,
+                clientPasswordEncoder());
+    }
+
+    @Override
+    protected void configure(final HttpSecurity http) throws Exception {
+      //@formatter:off
+        http
+                    .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                    .requestMatcher(SEB_CLIENT_ENDPOINTS)
+                    .addFilterBefore(
+                            this.sebClientAuthenticationFilter(),
+                            BasicAuthenticationFilter.class)
+                    .authorizeRequests()
+                    .requestMatchers(SEB_CONNECTION_PROTECTED_URLS)
+                    .authenticated()
+                .and()
+                    .exceptionHandling()
+                    .defaultAuthenticationEntryPointFor(
+                            this.customAuthenticationEntryPoint,
+                            WebSecurityConfig.SEB_CONNECTION_PROTECTED_URLS)
+                .and()
+                    .formLogin().disable()
+                    .httpBasic().disable()
+                    .logout().disable()
+                    .headers().frameOptions().disable()
+                 .and()
+                    .csrf().disable(); // TODO enable?
+      //@formatter:on
     }
 
     @Bean
-    public FilterRegistrationBean<ClientConnectionAuthenticationFilter> registration(
-            final ClientConnectionAuthenticationFilter filter) {
+    public FilterRegistrationBean<SEBClientAuthenticationFilter> sebClientAuthenticationFilterReg(
+            final SEBClientAuthenticationFilter filter) {
 
-        final FilterRegistrationBean<ClientConnectionAuthenticationFilter> registration =
+        final FilterRegistrationBean<SEBClientAuthenticationFilter> registration =
                 new FilterRegistrationBean<>(filter);
         registration.setEnabled(false);
         return registration;
     }
 
-    @Bean
-    public ClientConnectionAuthenticationFilter clientConnectionAuthenticationFilter() throws Exception {
-        return new ClientConnectionAuthenticationFilter(
-                this.defaultAuthenticationEventPublisher);
+    @Configuration
+    @EnableWebSecurity
+    @Order(2) // NOTE: Places this HttpSecurity-Filter before the OAuth Security-Filter defined by the ResourceServerConfig
+              //       and after the SEBAuthConfig Security-Filter
+    public static class LMSAuthConfig extends WebSecurityConfigurerAdapter {
+
+        @Autowired
+        private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+        @Autowired
+        private DefaultAuthenticationEventPublisher defaultAuthenticationEventPublisher;
+        @Autowired
+        private SebLmsSetupRecordMapper sebLmsSetupRecordMapper;
+        @Autowired
+        @Qualifier(WebSecurityConfig.CLIENT_PASSWORD_ENCODER_BEAN_NAME)
+        private PasswordEncoder clientPasswordEncoder;
+
+        @Lazy
+        @Bean
+        public LMSClientAuthenticationFilter lmsClientAuthenticationFilter() {
+            return new LMSClientAuthenticationFilter(
+                    this.defaultAuthenticationEventPublisher,
+                    this.sebLmsSetupRecordMapper,
+                    this.clientPasswordEncoder);
+        }
+
+        @Override
+        protected void configure(final HttpSecurity http) throws Exception {
+          //@formatter:off
+            http
+                        .sessionManagement()
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
+                        .requestMatcher(LMS_HANDSHAKE_ENDPOINT)
+                        .addFilterBefore(
+                                this.lmsClientAuthenticationFilter(),
+                                BasicAuthenticationFilter.class)
+                        .authorizeRequests()
+                        .requestMatchers(LMS_HANDSHAKE_ENDPOINT)
+                        .authenticated()
+                    .and()
+                        .exceptionHandling()
+                        .defaultAuthenticationEntryPointFor(
+                                this.customAuthenticationEntryPoint,
+                                LMS_HANDSHAKE_ENDPOINT)
+                    .and()
+                        .formLogin().disable()
+                        .httpBasic().disable()
+                        .logout().disable()
+                        .headers().frameOptions().disable()
+                     .and()
+                        .csrf().disable(); // TODO enable?
+          //@formatter:on
+        }
+
+        @Bean
+        public FilterRegistrationBean<LMSClientAuthenticationFilter> lmsClientAuthenticationFilter(
+                final LMSClientAuthenticationFilter filter) {
+
+            final FilterRegistrationBean<LMSClientAuthenticationFilter> registration =
+                    new FilterRegistrationBean<>(filter);
+            registration.setEnabled(false);
+            return registration;
+        }
     }
 
 }
