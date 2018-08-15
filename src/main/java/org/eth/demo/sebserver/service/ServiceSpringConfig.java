@@ -12,8 +12,8 @@ import java.util.concurrent.Executor;
 
 import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordMapper;
 import org.eth.demo.sebserver.service.exam.ExamStateService;
-import org.eth.demo.sebserver.service.exam.indicator.ClientIndicatorFactory;
 import org.eth.demo.sebserver.service.exam.run.EventHandlingStrategy;
+import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
 import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +34,7 @@ public class ServiceSpringConfig implements AsyncConfigurer {
     @Autowired
     private ClientConnectionRecordMapper clientConnectionRecordMapper;
     @Autowired
-    private ClientIndicatorFactory clientIndicatorFactory;
+    private ExamConnectionService examConnectionService;
 
     @Value("${sebserver.indicator.caching}")
     private boolean indicatorValueCachingEnabled;
@@ -49,10 +49,10 @@ public class ServiceSpringConfig implements AsyncConfigurer {
 
         eventHandlingStrategy.enable(true);
         return new ExamSessionService(
+                this.examConnectionService,
                 this.examStateService,
                 this.clientConnectionRecordMapper,
-                eventHandlingStrategy,
-                this.clientIndicatorFactory);
+                eventHandlingStrategy);
     }
 
     @Override

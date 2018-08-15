@@ -9,9 +9,12 @@
 package org.eth.demo.sebserver.web.clientauth;
 
 import static org.eth.demo.sebserver.batis.gen.mapper.SebLmsSetupRecordDynamicSqlSupport.sebClientname;
+import static org.eth.demo.sebserver.web.clientauth.SEBClientConnectionController.CONNECTION_TOKEN_KEY_NAME;
 import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,10 +30,8 @@ import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.SebLmsSetupRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ClientConnectionRecord;
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
-import org.eth.demo.sebserver.domain.rest.admin.Role;
 import org.eth.demo.sebserver.domain.rest.admin.Role.UserRole;
 import org.eth.demo.sebserver.domain.rest.exam.ClientConnection.ConnectionStatus;
-import org.eth.demo.sebserver.web.clientauth.ClientAuth.ClientAuthentication;
 import org.eth.demo.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,51 +66,12 @@ public class SEBClientAuthenticationFilter extends AbstractClientAuthenticationF
             final FilterChain chain) throws IOException, ServletException {
 
         try {
-            // TODO: For now WebSocket connection attempt is just railroaded.
-            //       Later the WebSocket connection must also have an access token within and a check with LMS must be done here
             final HttpServletRequest httpRequest = (HttpServletRequest) request;
             if (httpRequest.getRequestURI().startsWith("/ws")) {
 
                 log.debug("************************ SEB-Client Web-Socket connection authentication step");
 
-                final String connectionToken = httpRequest.getHeader(
-                        SEBClientConnectionController.CONNECTION_TOKEN_KEY_NAME);
-
-                if (StringUtils.isBlank(connectionToken)) {
-                    //throw new ConnectException("Missing connectionToken within request header");
-                    SecurityContextHolder
-                            .getContext()
-                            .setAuthentication(new ClientAuthentication(
-                                    "[NONE]",
-                                    new ClientAuth(
-                                            null,
-                                            connectionToken,
-                                            httpRequest.getRemoteAddr()),
-                                    Role.UserRole.LMS_CLIENT));
-
-                    chain.doFilter(request, response);
-                    return;
-                }
-
-                final ClientConnectionRecord connection = Utils.getSingle(this.clientConnectionRecordMapper
-                        .selectByExample()
-                        .where(ClientConnectionRecordDynamicSqlSupport.status,
-                                isEqualTo(ConnectionStatus.AUTHENTICATED.name()))
-                        .and(ClientConnectionRecordDynamicSqlSupport.connectionToken,
-                                isEqualTo(connectionToken))
-                        .build()
-                        .execute());
-
-                SecurityContextHolder
-                        .getContext()
-                        .setAuthentication(new ClientAuthentication(
-                                connection.getUserIdentifier(),
-                                new ClientAuth(
-                                        null,
-                                        connectionToken,
-                                        httpRequest.getRemoteAddr()),
-                                Role.UserRole.LMS_CLIENT));
-
+                doFilterWebSocketConnection(httpRequest);
                 chain.doFilter(request, response);
                 return;
             }
@@ -124,8 +86,42 @@ public class SEBClientAuthenticationFilter extends AbstractClientAuthenticationF
         super.doFilter(request, response, chain);
     }
 
+    private void doFilterWebSocketConnection(final HttpServletRequest httpRequest) {
+        System.out.println("******************* parameter " + new HashMap<>(httpRequest.getParameterMap()));
+        System.out.println("******************* header " + Collections.list(httpRequest.getHeaderNames()));
+
+        final String connectionToken = (httpRequest.getParameterMap().containsKey(CONNECTION_TOKEN_KEY_NAME))
+                ? httpRequest.getParameter(CONNECTION_TOKEN_KEY_NAME)
+                : httpRequest.getHeader(CONNECTION_TOKEN_KEY_NAME);
+
+        // TODO this supports old bot's without LMS integration. remove it
+        if (StringUtils.isBlank(connectionToken)) {
+            //throw new ConnectException("Missing connectionToken within request header");
+            SecurityContextHolder
+                    .getContext()
+                    .setAuthentication(ClientConnectionAuth.sebWebSocketAuthOf(
+                            0L,
+                            0L,
+                            ""));
+            return;
+        }
+
+        final ClientConnectionRecord connection = Utils.getSingle(this.clientConnectionRecordMapper
+                .selectByExample()
+                .where(ClientConnectionRecordDynamicSqlSupport.status,
+                        isEqualTo(ConnectionStatus.AUTHENTICATED.name()))
+                .and(ClientConnectionRecordDynamicSqlSupport.connectionToken,
+                        isEqualTo(connectionToken))
+                .build()
+                .execute());
+
+        SecurityContextHolder
+                .getContext()
+                .setAuthentication(ClientConnectionAuth.sebWebSocketAuthOf(connection));
+    }
+
     @Override
-    protected ClientAuth auth(
+    protected ClientConnectionAuth auth(
             final String username,
             final String password,
             final HttpServletRequest httpRequest) {
@@ -145,11 +141,9 @@ public class SEBClientAuthenticationFilter extends AbstractClientAuthenticationF
 
         log.debug("Found match: {}", matching);
 
-        return new ClientAuth(
-                matching.getInstitutionId(),
-                matching.getSebClientname(),
-                httpRequest.getRemoteAddr(),
-                matching.getLmsUrl());
+        return ClientConnectionAuth.sebAuthOf(
+                matching,
+                httpRequest.getRemoteAddr());
     }
 
     @Override

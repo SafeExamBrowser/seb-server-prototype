@@ -11,27 +11,21 @@ package org.eth.demo.sebserver.web.clientauth;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.Exam.ExamStatus;
 import org.eth.demo.sebserver.domain.rest.exam.ExamLink;
 import org.eth.demo.sebserver.service.exam.ExamDao;
-import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
+import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
+import org.eth.demo.sebserver.web.clientauth.ClientConnectionAuth.LMSConnectionAuth;
+import org.eth.demo.sebserver.web.clientauth.ClientConnectionAuth.SEBConnectionAuth;
 import org.eth.demo.sebserver.web.socket.Message;
 import org.eth.demo.sebserver.web.socket.Message.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -52,15 +46,16 @@ public class SEBClientConnectionController {
     public static final String EXAM_IDENTIFIER_KEY_NAME = "examId";
 
     private final ExamDao examDao;
-    private final ExamSessionService examSessionService;
-    private final ObjectMapper jsonMapper = new ObjectMapper();
+    private final ExamConnectionService examConnectionService;
+    private final ObjectMapper jsonMapper;
 
     public SEBClientConnectionController(
             final ExamDao examDao,
-            final ExamSessionService examSessionService) {
+            final ExamConnectionService examConnectionService) {
 
         this.examDao = examDao;
-        this.examSessionService = examSessionService;
+        this.examConnectionService = examConnectionService;
+        this.jsonMapper = new ObjectMapper();
     }
 
     /** SEB-Client authentication is the fist step on SEB-Client connection setup for a running exam.
@@ -89,11 +84,9 @@ public class SEBClientConnectionController {
     @RequestMapping(value = "/sebauth/sebhandshake", method = RequestMethod.GET)
     public ResponseEntity<String> sebHandshake(
             @RequestParam(name = EXAM_IDENTIFIER_KEY_NAME, required = false) final Long examId,
-            final Authentication authentication) {
+            final SEBConnectionAuth auth) {
 
-        final ClientAuth clientAuth = (ClientAuth) authentication.getPrincipal();
-
-        log.debug("SEB-Client hand-shake with ClientAuth: {}", clientAuth);
+        log.debug("SEB-Client hand-shake with ClientAuth: {}", auth);
 
         try {
             if (examId != null) {
@@ -104,14 +97,14 @@ public class SEBClientConnectionController {
                 log.debug("SEB-Client hand-shake case 3.a. on exam id: ", examId);
 
                 final Exam exam = this.examDao.byId(examId);
-                final String connectionToken = this.examSessionService.handshakeSEBClient(
-                        clientAuth.clientAddress,
+                final String connectionToken = this.examConnectionService.handshakeSEBClient(
+                        auth.clientAddress,
                         exam.id);
 
                 return ResponseEntity.ok()
                         .header(CONNECTION_TOKEN_KEY_NAME, connectionToken)
                         .body(this.jsonMapper.writeValueAsString(exam.lmsExamURL));
-            } else if (clientAuth.lmsUrl == null) {
+            } else if (auth.lmsUrl == null) {
                 // if no overall LMS URL is set on the specified seb-lms-setup,
                 // this response with a list of currently running exams for selection
                 // Specification case 3.a.
@@ -120,7 +113,7 @@ public class SEBClientConnectionController {
 
                 final List<ExamLink> collect = this.examDao.getAll(
                         e -> e.status == ExamStatus.RUNNING &&
-                                e.institutionId.longValue() == clientAuth.institutionId.longValue())
+                                e.institutionId.longValue() == auth.institutionId.longValue())
                         .stream()
                         .map(exam -> new ExamLink(exam))
                         .collect(Collectors.toList());
@@ -137,13 +130,13 @@ public class SEBClientConnectionController {
 
                 log.debug("SEB-Client hand-shake case 3.b. sending overal LMS login page");
 
-                final String connectionToken = this.examSessionService.handshakeSEBClient(
-                        clientAuth.clientAddress,
+                final String connectionToken = this.examConnectionService.handshakeSEBClient(
+                        auth.clientAddress,
                         null);
 
                 return ResponseEntity.ok()
                         .header(CONNECTION_TOKEN_KEY_NAME, connectionToken)
-                        .body(this.jsonMapper.writeValueAsString(clientAuth.lmsUrl));
+                        .body(this.jsonMapper.writeValueAsString(auth.lmsUrl));
             }
         } catch (final Exception e) {
             log.error("Unexpected Error while SEB handshake :", e);
@@ -165,14 +158,12 @@ public class SEBClientConnectionController {
             @RequestParam(name = CONNECTION_TOKEN_KEY_NAME, required = true) final String connectionToken,
             @RequestParam(name = USER_IDENTIFIER_KEY_NAME, required = true) final String userIdentifier,
             @RequestParam(name = EXAM_IDENTIFIER_KEY_NAME, required = false) final Long examId,
-            final Authentication authentication) {
+            final LMSConnectionAuth auth) {
 
-        final ClientAuth clientAuth = (ClientAuth) authentication.getPrincipal();
-
-        log.debug("LMS-Client hand-shake with ClientAuth: {}", clientAuth);
+        log.debug("LMS-Client hand-shake with ClientAuth: {}", auth);
 
         try {
-            this.examSessionService.handshakeLMSClient(
+            this.examConnectionService.handshakeLMSClient(
                     connectionToken,
                     userIdentifier,
                     examId);
@@ -193,7 +184,7 @@ public class SEBClientConnectionController {
 
         try {
 
-            final Exam connectClientToExam = this.examSessionService
+            final Exam connectClientToExam = this.examConnectionService
                     .connectClientToExam(connectionToken);
 
             // TODO verify and get and send SEB-configuration for specified SEB-client
@@ -208,24 +199,6 @@ public class SEBClientConnectionController {
                     System.currentTimeMillis(),
                     e.getMessage()));
         }
-    }
-
-    @MessageMapping("/runningexam/event")
-    public void event(
-            @DestinationVariable final long examId,
-            @Payload final ClientEvent clientEvent,
-            final SimpMessageHeaderAccessor accessor) {
-
-        this.examSessionService.notifyClientEvent(clientEvent);
-    }
-
-    @MessageExceptionHandler(Exception.class)
-    @SendToUser("/runningexam/error")
-    public String handleException(final Exception e) {
-        return messageToString(new Message(
-                Type.ERROR,
-                System.currentTimeMillis(),
-                e.getMessage()));
     }
 
     private String messageToString(final Message message) {

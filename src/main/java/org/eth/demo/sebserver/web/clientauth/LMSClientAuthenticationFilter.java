@@ -42,7 +42,7 @@ public class LMSClientAuthenticationFilter extends AbstractClientAuthenticationF
     }
 
     @Override
-    protected ClientAuth auth(
+    protected ClientConnectionAuth auth(
             final String username,
             final String password,
             final HttpServletRequest httpRequest) {
@@ -62,11 +62,9 @@ public class LMSClientAuthenticationFilter extends AbstractClientAuthenticationF
 
         log.debug("Found match: {}", matching);
 
-        return new ClientAuth(
-                matching.getInstitutionId(),
-                matching.getLmsClientname(),
-                httpRequest.getRemoteAddr(),
-                matching.getLmsUrl());
+        return ClientConnectionAuth.lmsAuthOf(
+                matching,
+                httpRequest.getRemoteAddr());
     }
 
     @Override

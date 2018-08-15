@@ -10,7 +10,7 @@ package org.eth.demo.sebserver.service.exam.run;
 
 import java.util.Optional;
 
-import org.eth.demo.sebserver.service.exam.run.ExamSessionService.ConnectionData;
+import org.eth.demo.sebserver.service.exam.run.ExamConnectionService.ConnectionData;
 
 public interface ClientConnectionDelegate {
 

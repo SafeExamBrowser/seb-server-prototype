@@ -16,7 +16,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ClientConnection {
 
     public enum ConnectionStatus {
-        CONNECTION_REQUESTED, AUTHENTICATED, WEB_SOCKET_ESTABLISHED, ABORTED, FINISHED
+        CONNECTION_REQUESTED,
+        AUTHENTICATED,
+        ESTABLISHED,
+        CLOSED,
+        ABORTED,
+        RELEASED
     }
 
     public final Long id;

@@ -8,7 +8,7 @@
 
 package org.eth.demo.sebserver.web.socket;
 
-import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
+import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -23,10 +23,10 @@ public class ConnectionListener {
 
     private static final Logger log = LoggerFactory.getLogger(ConnectionListener.class);
 
-    private final ExamSessionService examSessionService;
+    private final ExamConnectionService examConnectionService;
 
-    public ConnectionListener(final ExamSessionService examSessionService) {
-        this.examSessionService = examSessionService;
+    public ConnectionListener(final ExamConnectionService examConnectionService) {
+        this.examConnectionService = examConnectionService;
     }
 
     @EventListener
@@ -42,7 +42,11 @@ public class ConnectionListener {
 
         // TODO how can we dedicate in which channel the unsubscribe event has been applied
         if (token != null) {
-            this.examSessionService.closeConnection(token, false);
+            try {
+                this.examConnectionService.closeConnection(token, false);
+            } catch (final Exception e) {
+                log.error("Unexpected error while trying to close connection on handleUnsubscribe", e);
+            }
         }
     }
 

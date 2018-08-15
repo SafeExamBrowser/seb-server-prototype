@@ -4,27 +4,31 @@ import java.math.BigDecimal;
 import javax.annotation.Generated;
 
 public class ClientEventRecord {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.029+02:00", comments="Source field: client_event.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.427+02:00", comments="Source field: client_event.id")
     private Long id;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.029+02:00", comments="Source field: client_event.user_identifier")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.427+02:00", comments="Source field: client_event.connection_id")
+    private Long connectionId;
+
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.427+02:00", comments="Source field: client_event.user_identifier")
     private String userIdentifier;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.029+02:00", comments="Source field: client_event.type")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.427+02:00", comments="Source field: client_event.type")
     private Integer type;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.029+02:00", comments="Source field: client_event.timestamp")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.427+02:00", comments="Source field: client_event.timestamp")
     private Long timestamp;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.029+02:00", comments="Source field: client_event.numeric_value")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.427+02:00", comments="Source field: client_event.numeric_value")
     private BigDecimal numericValue;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.030+02:00", comments="Source field: client_event.text")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.427+02:00", comments="Source field: client_event.text")
     private String text;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.029+02:00", comments="Source Table: client_event")
-    public ClientEventRecord(Long id, String userIdentifier, Integer type, Long timestamp, BigDecimal numericValue, String text) {
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.427+02:00", comments="Source Table: client_event")
+    public ClientEventRecord(Long id, Long connectionId, String userIdentifier, Integer type, Long timestamp, BigDecimal numericValue, String text) {
         this.id = id;
+        this.connectionId = connectionId;
         this.userIdentifier = userIdentifier;
         this.type = type;
         this.timestamp = timestamp;
@@ -32,32 +36,37 @@ public class ClientEventRecord {
         this.text = text;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.029+02:00", comments="Source field: client_event.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.427+02:00", comments="Source field: client_event.id")
     public Long getId() {
         return id;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.029+02:00", comments="Source field: client_event.user_identifier")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.427+02:00", comments="Source field: client_event.connection_id")
+    public Long getConnectionId() {
+        return connectionId;
+    }
+
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.427+02:00", comments="Source field: client_event.user_identifier")
     public String getUserIdentifier() {
         return userIdentifier;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.029+02:00", comments="Source field: client_event.type")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.427+02:00", comments="Source field: client_event.type")
     public Integer getType() {
         return type;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.029+02:00", comments="Source field: client_event.timestamp")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.427+02:00", comments="Source field: client_event.timestamp")
     public Long getTimestamp() {
         return timestamp;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.030+02:00", comments="Source field: client_event.numeric_value")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.427+02:00", comments="Source field: client_event.numeric_value")
     public BigDecimal getNumericValue() {
         return numericValue;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.030+02:00", comments="Source field: client_event.text")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.427+02:00", comments="Source field: client_event.text")
     public String getText() {
         return text;
     }
@@ -66,7 +75,7 @@ public class ClientEventRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table client_event
      *
-     * @mbg.generated Wed Aug 15 08:13:40 CEST 2018
+     * @mbg.generated Wed Aug 15 14:53:13 CEST 2018
      */
     @Override
     public String toString() {
@@ -75,6 +84,7 @@ public class ClientEventRecord {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
+        sb.append(", connectionId=").append(connectionId);
         sb.append(", userIdentifier=").append(userIdentifier);
         sb.append(", type=").append(type);
         sb.append(", timestamp=").append(timestamp);
@@ -88,7 +98,7 @@ public class ClientEventRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table client_event
      *
-     * @mbg.generated Wed Aug 15 08:13:40 CEST 2018
+     * @mbg.generated Wed Aug 15 14:53:13 CEST 2018
      */
     @Override
     public boolean equals(Object that) {
@@ -103,6 +113,7 @@ public class ClientEventRecord {
         }
         ClientEventRecord other = (ClientEventRecord) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
+            && (this.getConnectionId() == null ? other.getConnectionId() == null : this.getConnectionId().equals(other.getConnectionId()))
             && (this.getUserIdentifier() == null ? other.getUserIdentifier() == null : this.getUserIdentifier().equals(other.getUserIdentifier()))
             && (this.getType() == null ? other.getType() == null : this.getType().equals(other.getType()))
             && (this.getTimestamp() == null ? other.getTimestamp() == null : this.getTimestamp().equals(other.getTimestamp()))
@@ -114,13 +125,14 @@ public class ClientEventRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table client_event
      *
-     * @mbg.generated Wed Aug 15 08:13:40 CEST 2018
+     * @mbg.generated Wed Aug 15 14:53:13 CEST 2018
      */
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        result = prime * result + ((getConnectionId() == null) ? 0 : getConnectionId().hashCode());
         result = prime * result + ((getUserIdentifier() == null) ? 0 : getUserIdentifier().hashCode());
         result = prime * result + ((getType() == null) ? 0 : getType().hashCode());
         result = prime * result + ((getTimestamp() == null) ? 0 : getTimestamp().hashCode());

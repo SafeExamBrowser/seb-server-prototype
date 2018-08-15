@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class Exam {
 
-  //@formatter:off
     public enum ExamStatus {
         IN_PROGRESS,
         READY,
@@ -32,8 +31,6 @@ public final class Exam {
         TYPE_1,
         TYPE_2
     }
-
-    //@formatter:on
 
     public final Long id;
     public final Long institutionId;

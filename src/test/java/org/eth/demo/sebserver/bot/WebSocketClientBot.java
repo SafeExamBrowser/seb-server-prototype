@@ -49,6 +49,20 @@ public class WebSocketClientBot {
     private static final long TEN_SECONDS = 10 * ONE_SECOND;
     private static final long ONE_MINUTE = 60 * ONE_SECOND;
 
+    public static void main(final String[] args) {
+        new WebSocketClientBot(
+                DEFAULT_ROOT_URL,
+                DEFAULT_EXAM_ID,
+                DEFAULT_CONNECT_ATTEMPTS,
+                TEN_SECONDS, 100,
+                TEN_SECONDS);
+    }
+
+    private final int connectAttempts;
+    private final long errorTimeInterval;
+    private final long pingTimeInterval;
+    private final long runtime;
+
     private WebSocketClientBot(final String rootURL,
             final long examId,
             final int connectAttempts,
@@ -56,30 +70,37 @@ public class WebSocketClientBot {
             final long pingTimeInterval,
             final long runtime) {
 
-        final SEBServerConnection connection = new SEBServerConnection(examId);
-        final String token = connection.connect(rootURL, connectAttempts);
+        this.connectAttempts = connectAttempts;
+        this.errorTimeInterval = errorTimeInterval;
+        this.pingTimeInterval = pingTimeInterval;
+        this.runtime = runtime;
 
-        if (token == null) {
-            log.error("Failed to connecto the SEBServer. Give up after {} attempts", connectAttempts);
-            return;
-        }
+        // TODO connection attempt, LMS simulation
 
-        log.info("Successfully connected to SEBServer. Token: {}", token);
+        final WebSocketConnection connection = new WebSocketConnection();
+        final String sebConfiguration = connection.connect(rootURL, connectAttempts);
 
+        log.info("Successfully establish web-socket connection to SEB-Server");
+        log.debug("SEB-Server sent configuration {}", sebConfiguration);
+
+        sendEvents(connection);
+    }
+
+    private void sendEvents(final WebSocketConnection connection) {
         try {
             final long startTime = System.currentTimeMillis();
-            final long endTime = startTime + runtime;
+            final long endTime = startTime + this.runtime;
             long currentTime = startTime;
             long lastPingTime = startTime;
             long lastErrorTime = startTime;
 
             while (currentTime < endTime) {
-                if (currentTime - lastPingTime >= pingTimeInterval) {
-                    connection.sendEvent(token, 1, "Ping from client: " + token);
+                if (currentTime - lastPingTime >= this.pingTimeInterval) {
+                    connection.sendEvent(1, "Ping from client: " + this);
                     lastPingTime = currentTime;
                 }
-                if (currentTime - lastErrorTime >= errorTimeInterval) {
-                    connection.sendEvent(token, 2, "Error from client: " + token);
+                if (currentTime - lastErrorTime >= this.errorTimeInterval) {
+                    connection.sendEvent(2, "Error from client: " + this);
                     lastErrorTime = currentTime;
                 }
                 try {
@@ -97,29 +118,17 @@ public class WebSocketClientBot {
                 log.error("Error on disconnect: " + t);
             }
         }
-        connection.sendEvent(token, 1, "Ping from client: " + token);
     }
 
-    public static void main(final String[] args) {
-        new WebSocketClientBot(
-                DEFAULT_ROOT_URL,
-                DEFAULT_EXAM_ID,
-                DEFAULT_CONNECT_ATTEMPTS,
-                TEN_SECONDS, 100,
-                ONE_MINUTE);
-    }
+    static final class WebSocketConnection {
 
-    static final class SEBServerConnection {
-
-        private static final Logger log = LoggerFactory.getLogger(WebSocketClientBot.SEBServerConnection.class);
+        private static final Logger log = LoggerFactory.getLogger(WebSocketClientBot.WebSocketConnection.class);
 
         private final WebSocketStompClient client;
 
-        private final long examId;
         private ConnectionReference connRef;
 
-        SEBServerConnection(final long examId) {
-            this.examId = examId;
+        WebSocketConnection() {
 
             this.client = new WebSocketStompClient(new SockJsClient(
                     Stream.of(new WebSocketTransport(new StandardWebSocketClient()))
@@ -145,7 +154,7 @@ public class WebSocketClientBot {
 
                 log.info("Trying to connect to SEBServer on URL: {}, attempt: {}", url, connectAttempts);
 
-                this.connRef = new ConnectionReference(this.examId);
+                this.connRef = new ConnectionReference();
                 return this.connRef.connect(this.client, url);
 
             } catch (final Exception e) {
@@ -167,19 +176,16 @@ public class WebSocketClientBot {
             return this.connRef != null && this.connRef.isConnected();
         }
 
-        boolean sendEvent(final String token,
-                final int eventType,
-                final String text) {
+        boolean sendEvent(final int eventType, final String text) {
 
             if (!isConnected()) {
                 return false;
             }
 
-            log.debug("Trying to post an event to {} using token: {}", "/app/exam.4/event", token);
+            log.debug("Trying to post an event to {}", "/app/exam.4/event");
 
             final JSONObject json = new JSONObject();
             try {
-                json.put("clientId", token);
                 json.put("type", eventType);
                 json.put("timestamp", System.currentTimeMillis());
                 json.put("text", text);
@@ -211,9 +217,9 @@ public class WebSocketClientBot {
             Subscription sessionSubscription;
             Subscription errorSubscription;
 
-            ConnectionReference(final long examId) {
-                this.sessionSubscriptionPrefix = "/app/exam." + examId + "/session.";
-                this.eventEndpoint = "/app/exam." + examId + "/event";
+            ConnectionReference() {
+                this.sessionSubscriptionPrefix = "/sebauth/wsconnect";
+                this.eventEndpoint = "/app/runningexam/event";
 
                 this.sessionHandler = new SessionHandler();
 

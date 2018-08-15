@@ -32,20 +32,20 @@ import org.mybatis.dynamic.sql.util.SqlProviderAdapter;
 
 @Mapper
 public interface SebLmsSetupRecordMapper {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.042+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.441+02:00", comments="Source Table: seb_lms_setup")
     @SelectProvider(type=SqlProviderAdapter.class, method="select")
     long count(SelectStatementProvider selectStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.042+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.441+02:00", comments="Source Table: seb_lms_setup")
     @DeleteProvider(type=SqlProviderAdapter.class, method="delete")
     int delete(DeleteStatementProvider deleteStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.042+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.441+02:00", comments="Source Table: seb_lms_setup")
     @InsertProvider(type=SqlProviderAdapter.class, method="insert")
     @SelectKey(statement="SELECT LAST_INSERT_ID()", keyProperty="record.id", before=false, resultType=Long.class)
     int insert(InsertStatementProvider<SebLmsSetupRecord> insertStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.042+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.441+02:00", comments="Source Table: seb_lms_setup")
     @SelectProvider(type=SqlProviderAdapter.class, method="select")
     @ConstructorArgs({
         @Arg(column="id", javaType=Long.class, jdbcType=JdbcType.BIGINT, id=true),
@@ -58,7 +58,7 @@ public interface SebLmsSetupRecordMapper {
     })
     SebLmsSetupRecord selectOne(SelectStatementProvider selectStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.042+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.441+02:00", comments="Source Table: seb_lms_setup")
     @SelectProvider(type=SqlProviderAdapter.class, method="select")
     @ConstructorArgs({
         @Arg(column="id", javaType=Long.class, jdbcType=JdbcType.BIGINT, id=true),
@@ -71,22 +71,22 @@ public interface SebLmsSetupRecordMapper {
     })
     List<SebLmsSetupRecord> selectMany(SelectStatementProvider selectStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.042+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.441+02:00", comments="Source Table: seb_lms_setup")
     @UpdateProvider(type=SqlProviderAdapter.class, method="update")
     int update(UpdateStatementProvider updateStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.042+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.441+02:00", comments="Source Table: seb_lms_setup")
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<Long>> countByExample() {
         return SelectDSL.selectWithMapper(this::count, SqlBuilder.count())
                 .from(sebLmsSetupRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.042+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.441+02:00", comments="Source Table: seb_lms_setup")
     default DeleteDSL<MyBatis3DeleteModelAdapter<Integer>> deleteByExample() {
         return DeleteDSL.deleteFromWithMapper(this::delete, sebLmsSetupRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.042+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.441+02:00", comments="Source Table: seb_lms_setup")
     default int deleteByPrimaryKey(Long id_) {
         return DeleteDSL.deleteFromWithMapper(this::delete, sebLmsSetupRecord)
                 .where(id, isEqualTo(id_))
@@ -94,7 +94,7 @@ public interface SebLmsSetupRecordMapper {
                 .execute();
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.043+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.441+02:00", comments="Source Table: seb_lms_setup")
     default int insert(SebLmsSetupRecord record) {
         return insert(SqlBuilder.insert(record)
                 .into(sebLmsSetupRecord)
@@ -108,7 +108,7 @@ public interface SebLmsSetupRecordMapper {
                 .render(RenderingStrategy.MYBATIS3));
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.043+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.441+02:00", comments="Source Table: seb_lms_setup")
     default int insertSelective(SebLmsSetupRecord record) {
         return insert(SqlBuilder.insert(record)
                 .into(sebLmsSetupRecord)
@@ -122,19 +122,19 @@ public interface SebLmsSetupRecordMapper {
                 .render(RenderingStrategy.MYBATIS3));
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.043+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.441+02:00", comments="Source Table: seb_lms_setup")
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<List<SebLmsSetupRecord>>> selectByExample() {
         return SelectDSL.selectWithMapper(this::selectMany, id, institutionId, sebClientname, sebClientsecret, lmsClientname, lmsClientsecret, lmsUrl)
                 .from(sebLmsSetupRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.043+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.442+02:00", comments="Source Table: seb_lms_setup")
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<List<SebLmsSetupRecord>>> selectDistinctByExample() {
         return SelectDSL.selectDistinctWithMapper(this::selectMany, id, institutionId, sebClientname, sebClientsecret, lmsClientname, lmsClientsecret, lmsUrl)
                 .from(sebLmsSetupRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.043+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.442+02:00", comments="Source Table: seb_lms_setup")
     default SebLmsSetupRecord selectByPrimaryKey(Long id_) {
         return SelectDSL.selectWithMapper(this::selectOne, id, institutionId, sebClientname, sebClientsecret, lmsClientname, lmsClientsecret, lmsUrl)
                 .from(sebLmsSetupRecord)
@@ -143,7 +143,7 @@ public interface SebLmsSetupRecordMapper {
                 .execute();
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.043+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.442+02:00", comments="Source Table: seb_lms_setup")
     default UpdateDSL<MyBatis3UpdateModelAdapter<Integer>> updateByExample(SebLmsSetupRecord record) {
         return UpdateDSL.updateWithMapper(this::update, sebLmsSetupRecord)
                 .set(institutionId).equalTo(record::getInstitutionId)
@@ -154,7 +154,7 @@ public interface SebLmsSetupRecordMapper {
                 .set(lmsUrl).equalTo(record::getLmsUrl);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.043+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.442+02:00", comments="Source Table: seb_lms_setup")
     default UpdateDSL<MyBatis3UpdateModelAdapter<Integer>> updateByExampleSelective(SebLmsSetupRecord record) {
         return UpdateDSL.updateWithMapper(this::update, sebLmsSetupRecord)
                 .set(institutionId).equalToWhenPresent(record::getInstitutionId)
@@ -165,7 +165,7 @@ public interface SebLmsSetupRecordMapper {
                 .set(lmsUrl).equalToWhenPresent(record::getLmsUrl);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.043+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.442+02:00", comments="Source Table: seb_lms_setup")
     default int updateByPrimaryKey(SebLmsSetupRecord record) {
         return UpdateDSL.updateWithMapper(this::update, sebLmsSetupRecord)
                 .set(institutionId).equalTo(record::getInstitutionId)
@@ -179,7 +179,7 @@ public interface SebLmsSetupRecordMapper {
                 .execute();
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T08:13:40.043+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.442+02:00", comments="Source Table: seb_lms_setup")
     default int updateByPrimaryKeySelective(SebLmsSetupRecord record) {
         return UpdateDSL.updateWithMapper(this::update, sebLmsSetupRecord)
                 .set(institutionId).equalToWhenPresent(record::getInstitutionId)

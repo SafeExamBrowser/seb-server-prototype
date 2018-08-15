@@ -37,10 +37,13 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
+/** An exam scheduler, scheduling exams on their start- and end-date and us running as a background thread.
+ *
+ * @author anhefti */
 @Component
-public class ExamRunner implements DisposableBean {
+public class ExamScheduler implements DisposableBean {
 
-    private static final Logger log = LoggerFactory.getLogger(ExamRunner.class);
+    private static final Logger log = LoggerFactory.getLogger(ExamScheduler.class);
 
     private final Executor executor;
     private final TransactionTemplate transactionTemplate;
@@ -48,7 +51,7 @@ public class ExamRunner implements DisposableBean {
 
     private boolean running = false;
 
-    public ExamRunner(
+    public ExamScheduler(
             final AsyncConfigurer asyncConfigurer,
             final PlatformTransactionManager transactionManager,
             final SqlSessionTemplate sqlSessionTemplate) {

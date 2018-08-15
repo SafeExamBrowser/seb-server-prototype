@@ -13,6 +13,7 @@ import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eth.demo.sebserver.appevents.ExamFinishedEvent;
 import org.eth.demo.sebserver.appevents.ExamStartedEvent;
@@ -107,20 +108,16 @@ public class ExamStateService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isRunning(final Long id) {
-        if (this.runningExamsCache.containsKey(id)) {
-            return true;
-        }
-
-        return cacheRunningExam(id);
-    }
-
-    public Exam getRunningExam(final long examId) {
+    public Optional<Exam> getRunningExam(final Long examId) {
         if (!this.runningExamsCache.containsKey(examId)) {
-            throw new IllegalArgumentException("Exam with id: " + examId + " is not running");
+            cacheRunningExam(examId);
         }
 
-        return this.runningExamsCache.get(examId);
+        if (this.runningExamsCache.containsKey(examId)) {
+            return Optional.of(this.runningExamsCache.get(examId));
+        } else {
+            return Optional.empty();
+        }
     }
 
     private boolean cacheRunningExam(final Long id) {

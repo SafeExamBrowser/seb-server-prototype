@@ -10,6 +10,7 @@ package org.eth.demo.sebserver.web.http;
 
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorValue;
+import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
 import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,18 +28,23 @@ import reactor.core.publisher.Mono;
 public class ExamSessionControllerHTTP {
 
     private static final String REQUEST_HEADER_KEY_TOKEN = "Token";
+    private final ExamConnectionService examConnectionService;
     private final ExamSessionService examSessionService;
 
-    public ExamSessionControllerHTTP(final ExamSessionService examSessionService) {
+    public ExamSessionControllerHTTP(
+            final ExamConnectionService examConnectionService,
+            final ExamSessionService examSessionService) {
+
+        this.examConnectionService = examConnectionService;
         this.examSessionService = examSessionService;
     }
 
     @RequestMapping(value = "/connect/{examId}", method = RequestMethod.GET)
     public final Mono<String> connect(@PathVariable final Long examId) {
         return Mono.fromCallable(() -> {
-            final String uuid = this.examSessionService.handshakeSEBClient("", null);
-            this.examSessionService.handshakeLMSClient(uuid, uuid, null);
-            this.examSessionService.connectClientToExam(Long.valueOf(examId), uuid);
+            final String uuid = this.examConnectionService.handshakeSEBClient("", null);
+            this.examConnectionService.handshakeLMSClient(uuid, uuid, null);
+            this.examConnectionService.connectClientToExam(Long.valueOf(examId), uuid);
 
             return uuid;
         });
@@ -46,7 +52,7 @@ public class ExamSessionControllerHTTP {
 
     @RequestMapping(value = "/disconnect", method = RequestMethod.POST)
     public final Mono<Void> disconnect(@RequestHeader(value = REQUEST_HEADER_KEY_TOKEN) final String clientUUID) {
-        return Mono.fromRunnable(() -> this.examSessionService
+        return Mono.fromRunnable(() -> this.examConnectionService
                 .closeConnection(clientUUID, false));
     }
 

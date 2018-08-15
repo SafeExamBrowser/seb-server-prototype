@@ -94,7 +94,6 @@ CREATE TABLE IF NOT EXISTS `client_connection` (
   `client_address` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `connection_exam_ref_idx` (`exam_id` ASC),
-  UNIQUE INDEX `client_identifier_UNIQUE` (`user_identifier` ASC),
   CONSTRAINT `clientConnectionExamRef`
     FOREIGN KEY (`exam_id`)
     REFERENCES `exam` (`id`)
@@ -110,16 +109,17 @@ DROP TABLE IF EXISTS `client_event` ;
 
 CREATE TABLE IF NOT EXISTS `client_event` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `connection_id` BIGINT UNSIGNED NOT NULL,
   `user_identifier` VARCHAR(255) NOT NULL,
   `type` INT(2) UNSIGNED NOT NULL,
   `timestamp` BIGINT UNSIGNED NOT NULL,
   `numeric_value` DECIMAL(10,4) NULL,
   `text` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
-  INDEX `eventUserIdentifierRef_idx` (`user_identifier` ASC),
-  CONSTRAINT `eventUserIdentifierRef`
-    FOREIGN KEY (`user_identifier`)
-    REFERENCES `client_connection` (`user_identifier`)
+  INDEX `eventConnectionRef_idx` (`connection_id` ASC),
+  CONSTRAINT `eventConnectionRef`
+    FOREIGN KEY (`connection_id`)
+    REFERENCES `client_connection` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

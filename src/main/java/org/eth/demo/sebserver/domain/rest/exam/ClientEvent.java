@@ -11,6 +11,7 @@ package org.eth.demo.sebserver.domain.rest.exam;
 import java.math.BigDecimal;
 
 import org.eth.demo.sebserver.batis.gen.model.ClientEventRecord;
+import org.eth.demo.sebserver.web.clientauth.ClientConnectionAuth.SEBWebSocketAuth;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -37,29 +38,24 @@ public final class ClientEvent {
         }
     }
 
-    public final String userIdentifier;
     public final EventType type;
     public final Long timestamp;
     public final BigDecimal numValue;
     public final String text;
 
+    private SEBWebSocketAuth auth = null;
+
     @JsonCreator
     ClientEvent(
-            @JsonProperty("userIdentifier") final String userIdentifier,
             @JsonProperty("type") final Integer type,
             @JsonProperty("timestamp") final Long timestamp,
             @JsonProperty("numValue") final BigDecimal numValue,
             @JsonProperty("text") final String text) {
 
-        this.userIdentifier = userIdentifier;
         this.type = (type != null) ? EventType.byId(type) : EventType.UNKNOWN;
         this.timestamp = (timestamp != null) ? timestamp : System.currentTimeMillis();
         this.numValue = numValue;
         this.text = text;
-    }
-
-    public String getUserIdentifier() {
-        return this.userIdentifier;
     }
 
     public EventType getType() {
@@ -78,10 +74,20 @@ public final class ClientEvent {
         return this.text;
     }
 
-    public ClientEventRecord toRecord(final Long examId) {
+    public SEBWebSocketAuth getAuth() {
+        return this.auth;
+    }
+
+    public ClientEvent setAuth(final SEBWebSocketAuth auth) {
+        this.auth = auth;
+        return this;
+    }
+
+    public ClientEventRecord toRecord() {
         return new ClientEventRecord(
                 null,
-                this.userIdentifier,
+                this.auth.connectionId,
+                this.auth.userIdentifier,
                 this.type.id,
                 this.timestamp,
                 this.numValue,

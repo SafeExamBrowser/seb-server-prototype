@@ -32,17 +32,11 @@ public class SingleEventSaveStrategy implements EventHandlingStrategy {
     private static final Logger log = LoggerFactory.getLogger(SingleEventSaveStrategy.class);
 
     private final ClientEventRecordMapper clientEventRecordMapper;
-    private ClientConnectionDelegate clientConnectionDelegate;
 
     private boolean enabled = false;
 
     public SingleEventSaveStrategy(final ClientEventRecordMapper clientEventRecordMapper) {
         this.clientEventRecordMapper = clientEventRecordMapper;
-    }
-
-    @Override
-    public void setClientConnectionDelegate(final ClientConnectionDelegate clientConnectionDelegate) {
-        this.clientConnectionDelegate = clientConnectionDelegate;
     }
 
     @Override
@@ -59,22 +53,7 @@ public class SingleEventSaveStrategy implements EventHandlingStrategy {
             return;
         }
 
-        try {
-            final int saved = this.clientConnectionDelegate
-                    .getClientConnection(event.userIdentifier)
-                    .map(cc -> this.clientEventRecordMapper.insert(event.toRecord(cc.clientConnection.examId)))
-                    .orElse(0);
-
-            if (saved < 1) {
-                log.error("Missing client connection for event store {}", event.userIdentifier);
-                throw new IllegalStateException("Missing client connection for event store " + event.userIdentifier);
-            }
-        } catch (final Exception e) {
-            log.error("Unexpected error while trying to save client event: {}, {} : ",
-                    event.userIdentifier,
-                    event,
-                    e);
-        }
+        this.clientEventRecordMapper.insert(event.toRecord());
     }
 
 }

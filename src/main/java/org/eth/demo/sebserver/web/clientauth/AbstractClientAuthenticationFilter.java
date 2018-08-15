@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.eth.demo.sebserver.batis.gen.mapper.SebLmsSetupRecordMapper;
 import org.eth.demo.sebserver.domain.rest.admin.Role.UserRole;
-import org.eth.demo.sebserver.web.clientauth.ClientAuth.ClientAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -59,10 +58,10 @@ public abstract class AbstractClientAuthenticationFilter extends GenericFilterBe
 
         try {
             final HttpServletRequest httpRequest = (HttpServletRequest) request;
-            final ClientAuth clientAuth = verifyClientFromCredentials(httpRequest);
+            final ClientConnectionAuth clientAuth = verifyClientFromCredentials(httpRequest);
             SecurityContextHolder
                     .getContext()
-                    .setAuthentication(new ClientAuthentication(clientAuth, getRole()));
+                    .setAuthentication(clientAuth);
         } catch (final Exception e) {
             log.error("Unexpected error while trying to verify client-user from credientials", e);
             this.defaultAuthenticationEventPublisher.publishAuthenticationFailure(
@@ -73,7 +72,7 @@ public abstract class AbstractClientAuthenticationFilter extends GenericFilterBe
         chain.doFilter(request, response);
     }
 
-    private ClientAuth verifyClientFromCredentials(final HttpServletRequest httpRequest)
+    private ClientConnectionAuth verifyClientFromCredentials(final HttpServletRequest httpRequest)
             throws UnsupportedEncodingException {
 
         // First try to get the SEB-Client credentials from header AUTHORIZATION
@@ -92,7 +91,7 @@ public abstract class AbstractClientAuthenticationFilter extends GenericFilterBe
         throw new BadCredentialsException("Unable to extract client credentials");
     }
 
-    private ClientAuth getFromBasicAuth(
+    private ClientConnectionAuth getFromBasicAuth(
             final HttpServletRequest httpRequest,
             final String credentials) throws UnsupportedEncodingException {
 
@@ -113,7 +112,7 @@ public abstract class AbstractClientAuthenticationFilter extends GenericFilterBe
         return auth(username, password, httpRequest);
     }
 
-    protected abstract ClientAuth auth(
+    protected abstract ClientConnectionAuth auth(
             String username,
             String password,
             HttpServletRequest httpRequest);
