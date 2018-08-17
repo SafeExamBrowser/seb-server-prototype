@@ -61,8 +61,8 @@ public class ExamConnectionService implements ClientConnectionDelegate {
 
         log.debug("Connection Handshake from SEB-Client. Checking integrity first");
 
-        // Integrity check: is the specified exam running?
-        if (!this.examStateService.getRunningExam(examId).isPresent()) {
+        // Integrity check: in case examId is provided is the specified exam running?
+        if (examId != null && !this.examStateService.getRunningExam(examId).isPresent()) {
             log.error("The exam {} is not running", examId);
             throw new IllegalStateException("The exam " + examId + " is not running");
         }

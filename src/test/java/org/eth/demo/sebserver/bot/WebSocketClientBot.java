@@ -11,6 +11,7 @@ package org.eth.demo.sebserver.bot;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -18,17 +19,24 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eth.demo.util.Const;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSession.Subscription;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
@@ -39,9 +47,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class WebSocketClientBot {
 
-    public static final String DEFAULT_ROOT_URL = "ws://localhost:8080/ws";
+    public static final String DEFAULT_HANDSHAKE_URL = "http://localhost:8080/sebauth/sebhandshake";
+    public static final String DEFAULT_LMS_HANDSHAKE_URL = "http://localhost:8080/sebauth/lmshandshake";
+    public static final String DEFAULT_WEB_SOCKET_ROOT_URL = "ws://localhost:8080/ws";
     public static final long DEFAULT_EXAM_ID = 4;
     public static final int DEFAULT_CONNECT_ATTEMPTS = 1;
+
+    public static final boolean MOCK_LMS = true;
 
     private static final Logger log = LoggerFactory.getLogger(WebSocketClientBot.class);
 
@@ -51,14 +63,13 @@ public class WebSocketClientBot {
 
     public static void main(final String[] args) {
         new WebSocketClientBot(
-                DEFAULT_ROOT_URL,
+                DEFAULT_WEB_SOCKET_ROOT_URL,
                 DEFAULT_EXAM_ID,
                 DEFAULT_CONNECT_ATTEMPTS,
                 TEN_SECONDS, 100,
                 TEN_SECONDS);
     }
 
-    private final int connectAttempts;
     private final long errorTimeInterval;
     private final long pingTimeInterval;
     private final long runtime;
@@ -70,10 +81,22 @@ public class WebSocketClientBot {
             final long pingTimeInterval,
             final long runtime) {
 
-        this.connectAttempts = connectAttempts;
         this.errorTimeInterval = errorTimeInterval;
         this.pingTimeInterval = pingTimeInterval;
         this.runtime = runtime;
+
+        final ResponseEntity<String> handshake = doHandshake("sebclient", "sebclient");
+        final String body = handshake.getBody();
+        final String token = handshake.getHeaders().getFirst("connectionToken");
+
+        if (MOCK_LMS) {
+            final ResponseEntity<String> lmsHandshake = mockLMSHandshake(
+                    token,
+                    "testUser" + UUID.randomUUID().toString(),
+                    "lmsclient",
+                    "lmsclient",
+                    "4");
+        }
 
         // TODO connection attempt, LMS simulation
 
@@ -84,6 +107,56 @@ public class WebSocketClientBot {
         log.debug("SEB-Server sent configuration {}", sebConfiguration);
 
         sendEvents(connection);
+    }
+
+    private ResponseEntity<String> doHandshake(final String clientname, final String secret) {
+        final RestTemplate restTemplate = new RestTemplate();
+        String credentials;
+        try {
+            credentials = Base64Utils.encodeToString((clientname + ":" + secret).getBytes("UTF8"));
+            final HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add(HttpHeaders.CONTENT_TYPE, Const.CONTENT_TYPE_APPLICATION_JSON);
+            httpHeaders.add(HttpHeaders.AUTHORIZATION, "Basic " + credentials);
+
+            return restTemplate.exchange(
+                    DEFAULT_HANDSHAKE_URL,
+                    HttpMethod.POST,
+                    new HttpEntity<String>(httpHeaders),
+                    String.class);
+
+        } catch (final Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    private ResponseEntity<String> mockLMSHandshake(
+            final String token,
+            final String userId,
+            final String clientname,
+            final String secret,
+            final String examId) {
+
+        final RestTemplate restTemplate = new RestTemplate();
+        String credentials;
+        try {
+            credentials = Base64Utils.encodeToString((clientname + ":" + secret).getBytes("UTF8"));
+            final HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add(HttpHeaders.CONTENT_TYPE, Const.CONTENT_TYPE_APPLICATION_JSON);
+            httpHeaders.add(HttpHeaders.AUTHORIZATION, "Basic " + credentials);
+            httpHeaders.add("connectionToken", token);
+            httpHeaders.add("userId", userId);
+
+            return restTemplate.exchange(
+                    DEFAULT_LMS_HANDSHAKE_URL + "?examId=" + examId,
+                    HttpMethod.POST,
+                    new HttpEntity<String>(httpHeaders),
+                    String.class);
+
+        } catch (final Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     private void sendEvents(final WebSocketConnection connection) {
@@ -125,7 +198,6 @@ public class WebSocketClientBot {
         private static final Logger log = LoggerFactory.getLogger(WebSocketClientBot.WebSocketConnection.class);
 
         private final WebSocketStompClient client;
-
         private ConnectionReference connRef;
 
         WebSocketConnection() {
@@ -218,7 +290,7 @@ public class WebSocketClientBot {
             Subscription errorSubscription;
 
             ConnectionReference() {
-                this.sessionSubscriptionPrefix = "/sebauth/wsconnect";
+                this.sessionSubscriptionPrefix = "/sebauth/wsconnect/";
                 this.eventEndpoint = "/app/runningexam/event";
 
                 this.sessionHandler = new SessionHandler();
@@ -233,7 +305,7 @@ public class WebSocketClientBot {
                 this.sessionSubscriptionHeaders.add(StompHeaders.CONTENT_TYPE, "application/json");
 
                 this.errorSubscriptionHeaders = new StompHeaders();
-                this.errorSubscriptionHeaders.setDestination("/user/exam/error");
+                this.errorSubscriptionHeaders.setDestination("/app/runningexam/error");
 
                 this.unsubscribeHeaders = new StompHeaders();
             }

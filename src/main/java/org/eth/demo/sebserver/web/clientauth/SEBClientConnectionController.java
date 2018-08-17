@@ -27,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -81,7 +82,7 @@ public class SEBClientConnectionController {
      * @param examId The identifier of the exam that was selected by an examinee
      * @param authentication Authentication instance with a SEBClientAuth principal
      * @return a list of currently running exams of the client's institution or a LMS login link */
-    @RequestMapping(value = "/sebauth/sebhandshake", method = RequestMethod.GET)
+    @RequestMapping(value = "/sebauth/sebhandshake", method = RequestMethod.POST)
     public ResponseEntity<String> sebHandshake(
             @RequestParam(name = EXAM_IDENTIFIER_KEY_NAME, required = false) final Long examId,
             final SEBConnectionAuth auth) {
@@ -153,10 +154,10 @@ public class SEBClientConnectionController {
      * @param examId The identifier of the exam that was enrolled by the LMS (this is only required if case 3.b was
      *            applied before)
      * @param authentication */
-    @RequestMapping(value = "/sebauth/lmshandshake", method = RequestMethod.GET)
+    @RequestMapping(value = "/sebauth/lmshandshake", method = RequestMethod.POST)
     public ResponseEntity<Object> lmsHandshake(
-            @RequestParam(name = CONNECTION_TOKEN_KEY_NAME, required = true) final String connectionToken,
-            @RequestParam(name = USER_IDENTIFIER_KEY_NAME, required = true) final String userIdentifier,
+            @RequestHeader(name = CONNECTION_TOKEN_KEY_NAME, required = true) final String connectionToken,
+            @RequestHeader(name = USER_IDENTIFIER_KEY_NAME, required = true) final String userIdentifier,
             @RequestParam(name = EXAM_IDENTIFIER_KEY_NAME, required = false) final Long examId,
             final LMSConnectionAuth auth) {
 
