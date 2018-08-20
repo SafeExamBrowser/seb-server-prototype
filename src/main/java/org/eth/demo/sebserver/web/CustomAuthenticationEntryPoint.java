@@ -31,5 +31,4 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.getOutputStream().println("{ \"error\": \"" + authenticationException.getMessage() + "\" }");
 
     }
-
 }

@@ -14,17 +14,18 @@ public abstract class Utils {
 
     /** Use this to extract a single element from a Collection. This also checks if there is only a single element
      * within the Collection.
-     * 
+     *
      * @param collection the Collection to extract the single and only element
      * @return The single element
      * @throws IllegalArgumentException if the collection is null, or empty or has more then one element */
-    public static final <T> T getSingle(final Collection<T> collection) {
+    public static final <T> Result<T> getSingle(final Collection<T> collection) {
         if (collection == null || collection.isEmpty() || collection.size() > 1) {
-            throw new IllegalArgumentException(
-                    "Collection has no or more then one element. Expected is exaclty one: " + collection);
+            return Result.ofError(
+                    new IllegalArgumentException(
+                            "Collection has no or more then one element. Expected is exaclty one: " + collection));
         }
 
-        return collection.iterator().next();
+        return Result.of(collection.iterator().next());
     }
 
 }

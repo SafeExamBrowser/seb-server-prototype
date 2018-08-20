@@ -41,7 +41,7 @@ public class GETIndicatorValues implements SEBServerAPICall<List<GUIIndicatorVal
             return Result.of(
                     restTemplate.exchange(
                             this.restCallBuilder
-                                    .withPath("exam/indicatorValues/" + examId),
+                                    .withPath("runningexam/indicatorValues/" + examId),
                             HttpMethod.GET,
                             this.restCallBuilder.httpEntity()
                                     .withContentTypeJson()

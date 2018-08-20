@@ -8,15 +8,9 @@
 
 package org.eth.demo.sebserver.web.clientauth;
 
-import static org.eth.demo.sebserver.batis.gen.mapper.SebLmsSetupRecordDynamicSqlSupport.sebClientname;
 import static org.eth.demo.sebserver.web.clientauth.SEBClientConnectionController.CONNECTION_TOKEN_KEY_NAME;
-import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -25,38 +19,32 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordDynamicSqlSupport;
-import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordMapper;
-import org.eth.demo.sebserver.batis.gen.mapper.SebLmsSetupRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ClientConnectionRecord;
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
 import org.eth.demo.sebserver.domain.rest.admin.Role.UserRole;
 import org.eth.demo.sebserver.domain.rest.exam.ClientConnection.ConnectionStatus;
-import org.eth.demo.util.Utils;
+import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.common.exceptions.BadClientCredentialsException;
+import org.springframework.stereotype.Component;
 
+@Lazy
+@Component
 public class SEBClientAuthenticationFilter extends AbstractClientAuthenticationFilter {
 
     private static final Logger log = LoggerFactory.getLogger(SEBClientAuthenticationFilter.class);
 
-    // TODO create and use Dao here and also inject by constructor
-    @Autowired
-    private ClientConnectionRecordMapper clientConnectionRecordMapper;
-
     public SEBClientAuthenticationFilter(
             final DefaultAuthenticationEventPublisher defaultAuthenticationEventPublisher,
-            final SebLmsSetupRecordMapper sebLmsSetupRecordMapper,
-            final PasswordEncoder clientPasswordEncoder) {
+            final ExamConnectionService examConnectionService) {
 
         super(defaultAuthenticationEventPublisher,
-                sebLmsSetupRecordMapper,
-                clientPasswordEncoder);
+                examConnectionService);
     }
 
     @Override
@@ -69,7 +57,7 @@ public class SEBClientAuthenticationFilter extends AbstractClientAuthenticationF
             final HttpServletRequest httpRequest = (HttpServletRequest) request;
             if (httpRequest.getRequestURI().startsWith("/ws")) {
 
-                log.debug("************************ SEB-Client Web-Socket connection authentication step");
+                log.debug("SEB-Client Web-Socket connection authentication step");
 
                 doFilterWebSocketConnection(httpRequest);
                 chain.doFilter(request, response);
@@ -87,33 +75,23 @@ public class SEBClientAuthenticationFilter extends AbstractClientAuthenticationF
     }
 
     private void doFilterWebSocketConnection(final HttpServletRequest httpRequest) {
-        System.out.println("******************* parameter " + new HashMap<>(httpRequest.getParameterMap()));
-        System.out.println("******************* header " + Collections.list(httpRequest.getHeaderNames()));
-
         final String connectionToken = (httpRequest.getParameterMap().containsKey(CONNECTION_TOKEN_KEY_NAME))
                 ? httpRequest.getParameter(CONNECTION_TOKEN_KEY_NAME)
                 : httpRequest.getHeader(CONNECTION_TOKEN_KEY_NAME);
 
-        // TODO this supports old bot's without LMS integration. remove it
         if (StringUtils.isBlank(connectionToken)) {
-            //throw new ConnectException("Missing connectionToken within request header");
-            SecurityContextHolder
-                    .getContext()
-                    .setAuthentication(ClientConnectionAuth.sebWebSocketAuthOf(
-                            0L,
-                            0L,
-                            ""));
-            return;
+            log.error("Missing connectionToken on SEB-Client WebSocket connect");
+            throw new IllegalArgumentException("Missing connectionToken on SEB-Client WebSocket connect");
         }
 
-        final ClientConnectionRecord connection = Utils.getSingle(this.clientConnectionRecordMapper
-                .selectByExample()
-                .where(ClientConnectionRecordDynamicSqlSupport.status,
-                        isEqualTo(ConnectionStatus.AUTHENTICATED.name()))
-                .and(ClientConnectionRecordDynamicSqlSupport.connectionToken,
-                        isEqualTo(connectionToken))
-                .build()
-                .execute());
+        final ClientConnectionRecord connection = this.examConnectionService.getConnectionByToken(
+                connectionToken,
+                ConnectionStatus.AUTHENTICATED)
+                .onError(t -> {
+                    log.error("Unable to find SEB-Client connection in status: {} for token: {}",
+                            ConnectionStatus.AUTHENTICATED.name(), connectionToken);
+                    throw new BadClientCredentialsException();
+                });
 
         SecurityContextHolder
                 .getContext()
@@ -128,16 +106,11 @@ public class SEBClientAuthenticationFilter extends AbstractClientAuthenticationF
 
         log.debug("Apply filter SEBClientAuthenticationFilter");
 
-        final List<SebLmsSetupRecord> setups = this.sebLmsSetupRecordMapper.selectByExample()
-                .where(sebClientname, isEqualTo(username))
-                .build()
-                .execute();
-
-        log.debug("Found SebLmsSetupRecord matches: {}", setups);
-
-        final SebLmsSetupRecord matching = Utils.getSingle(setups.stream()
-                .filter(record -> this.clientPasswordEncoder.matches(password, record.getSebClientsecret()))
-                .collect(Collectors.toList()));
+        final SebLmsSetupRecord matching = this.examConnectionService.getLMSSetup(username, password, false)
+                .onError(t -> {
+                    log.error("Unable to find matching LMS-Setup for SEB-Client name: {}", username, t);
+                    throw new BadClientCredentialsException();
+                });
 
         log.debug("Found match: {}", matching);
 

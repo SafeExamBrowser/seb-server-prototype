@@ -37,6 +37,7 @@ import org.springframework.util.Base64Utils;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
@@ -87,21 +88,19 @@ public class WebSocketClientBot {
 
         final ResponseEntity<String> handshake = doHandshake("sebclient", "sebclient");
         final String body = handshake.getBody();
-        final String token = handshake.getHeaders().getFirst("connectionToken");
+        final String connectionToken = handshake.getHeaders().getFirst("connectionToken");
 
         if (MOCK_LMS) {
             final ResponseEntity<String> lmsHandshake = mockLMSHandshake(
-                    token,
+                    connectionToken,
                     "testUser" + UUID.randomUUID().toString(),
                     "lmsclient",
                     "lmsclient",
                     "4");
         }
 
-        // TODO connection attempt, LMS simulation
-
         final WebSocketConnection connection = new WebSocketConnection();
-        final String sebConfiguration = connection.connect(rootURL, connectAttempts);
+        final String sebConfiguration = connection.connect(rootURL, connectionToken, connectAttempts);
 
         log.info("Successfully establish web-socket connection to SEB-Server");
         log.debug("SEB-Server sent configuration {}", sebConfiguration);
@@ -217,7 +216,7 @@ public class WebSocketClientBot {
             });
         }
 
-        String connect(final String url, int connectAttempts) {
+        String connect(final String url, final String connectionToken, int connectAttempts) {
             try {
                 connectAttempts--;
                 if (connectAttempts < 0) {
@@ -226,7 +225,7 @@ public class WebSocketClientBot {
 
                 log.info("Trying to connect to SEBServer on URL: {}, attempt: {}", url, connectAttempts);
 
-                this.connRef = new ConnectionReference();
+                this.connRef = new ConnectionReference(connectionToken);
                 return this.connRef.connect(this.client, url);
 
             } catch (final Exception e) {
@@ -240,7 +239,7 @@ public class WebSocketClientBot {
                     disconnect();
                 }
 
-                return connect(url, connectAttempts);
+                return connect(url, connectionToken, connectAttempts);
             }
         }
 
@@ -280,7 +279,7 @@ public class WebSocketClientBot {
             final String sessionSubscriptionPrefix;
             final String eventEndpoint;
 
-            final StompHeaders connectionHeaders;
+            final WebSocketHttpHeaders connectionHeaders;
             final StompHeaders sessionSubscriptionHeaders;
             final StompHeaders errorSubscriptionHeaders;
             final StompHeaders eventHeaders;
@@ -289,13 +288,14 @@ public class WebSocketClientBot {
             Subscription sessionSubscription;
             Subscription errorSubscription;
 
-            ConnectionReference() {
-                this.sessionSubscriptionPrefix = "/sebauth/wsconnect/";
+            ConnectionReference(final String connectionToken) {
+                this.sessionSubscriptionPrefix = "/app/runningexam/wsconnect/";
                 this.eventEndpoint = "/app/runningexam/event";
 
                 this.sessionHandler = new SessionHandler();
 
-                this.connectionHeaders = new StompHeaders();
+                this.connectionHeaders = new WebSocketHttpHeaders();
+                this.connectionHeaders.add("connectionToken", connectionToken);
 
                 this.eventHeaders = new StompHeaders();
                 this.eventHeaders.add(StompHeaders.CONTENT_TYPE, "application/json");
@@ -303,19 +303,24 @@ public class WebSocketClientBot {
 
                 this.sessionSubscriptionHeaders = new StompHeaders();
                 this.sessionSubscriptionHeaders.add(StompHeaders.CONTENT_TYPE, "application/json");
+                this.sessionSubscriptionHeaders.add("connectionToken", connectionToken);
 
                 this.errorSubscriptionHeaders = new StompHeaders();
-                this.errorSubscriptionHeaders.setDestination("/app/runningexam/error");
+                this.errorSubscriptionHeaders.setDestination("/app/runningexam/error/");
+                this.errorSubscriptionHeaders.add("connectionToken", connectionToken);
 
                 this.unsubscribeHeaders = new StompHeaders();
+                this.unsubscribeHeaders.add("connectionToken", connectionToken);
             }
 
-            String connect(final WebSocketStompClient client, final String url)
-                    throws InterruptedException, ExecutionException, TimeoutException {
+            String connect(
+                    final WebSocketStompClient client,
+                    final String url) throws InterruptedException, ExecutionException, TimeoutException {
+
                 this.stompSession = client.connect(
                         url,
-                        this.sessionHandler,
-                        this.connectionHeaders).get();
+                        this.connectionHeaders,
+                        this.sessionHandler).get();
 
                 log.debug("Connection established, trying to subscribe...");
 
@@ -324,8 +329,7 @@ public class WebSocketClientBot {
                         this.sessionHandler);
 
                 this.sessionSubscriptionHeaders.setDestination(
-                        this.sessionSubscriptionPrefix +
-                                this.stompSession.getSessionId());
+                        this.sessionSubscriptionPrefix);
 
                 this.sessionSubscription = this.stompSession.subscribe(
                         this.sessionSubscriptionHeaders,
@@ -333,10 +337,8 @@ public class WebSocketClientBot {
 
                 log.debug("subscription successfull");
 
-                final String token = this.sessionHandler.connectioToken.get(5, TimeUnit.SECONDS);
-                this.eventHeaders.set("TOKEN", token);
-                this.unsubscribeHeaders.set("TOKEN", token);
-                return token;
+                // block and wait for answer or timeout
+                return this.sessionHandler.awaitingAnswer.get(5, TimeUnit.SECONDS);
             }
 
             boolean isConnected() {
@@ -361,7 +363,7 @@ public class WebSocketClientBot {
         private final ObjectMapper jsonMapper = new ObjectMapper();
 
         int connectAttempts = 0;
-        CompletableFuture<String> connectioToken = new CompletableFuture<>();
+        CompletableFuture<String> awaitingAnswer = new CompletableFuture<>();
 
         @Override
         public Type getPayloadType(final StompHeaders headers) {
@@ -377,11 +379,11 @@ public class WebSocketClientBot {
 
                 switch (message.type) {
                     case CONNECT: {
-                        this.connectioToken.complete(message.content);
+                        this.awaitingAnswer.complete(message.content);
                         break;
                     }
                     case ERROR: {
-                        this.connectioToken.completeExceptionally(
+                        this.awaitingAnswer.completeExceptionally(
                                 new RuntimeException("SEBServer sent connection error: " + message.content));
                         break;
                     }

@@ -10,7 +10,7 @@ package org.eth.demo.sebserver.web.oauth;
 
 import javax.sql.DataSource;
 
-import org.eth.demo.sebserver.web.WebSecurityConfig;
+import org.eth.demo.sebserver.web.WebSecurityConfig.EncodingConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +49,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Autowired
     private InternalUserDetailsService userDetailsService;
     @Autowired
-    @Qualifier(WebSecurityConfig.CLIENT_PASSWORD_ENCODER_BEAN_NAME)
+    @Qualifier(EncodingConfig.CLIENT_PASSWORD_ENCODER_BEAN_NAME)
     private PasswordEncoder clientPasswordEncoder;
 
     @Autowired

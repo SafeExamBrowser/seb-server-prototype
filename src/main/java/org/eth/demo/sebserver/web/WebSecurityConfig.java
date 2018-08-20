@@ -8,7 +8,6 @@
 
 package org.eth.demo.sebserver.web;
 
-import org.eth.demo.sebserver.batis.gen.mapper.SebLmsSetupRecordMapper;
 import org.eth.demo.sebserver.web.clientauth.LMSClientAuthenticationFilter;
 import org.eth.demo.sebserver.web.clientauth.SEBClientAuthenticationFilter;
 import org.eth.demo.sebserver.web.oauth.InternalUserDetailsService;
@@ -17,10 +16,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -80,23 +77,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     @Autowired
-    private DefaultAuthenticationEventPublisher defaultAuthenticationEventPublisher;
+    private SEBClientAuthenticationFilter sebClientAuthenticationFilter;
     @Autowired
-    private SebLmsSetupRecordMapper sebLmsSetupRecordMapper;
-
-    public static final String USER_PASSWORD_ENCODER_BEAN_NAME = "userPasswordEncoder";
-
-    @Bean(USER_PASSWORD_ENCODER_BEAN_NAME)
-    public PasswordEncoder userPasswordEncoder() {
-        return new BCryptPasswordEncoder(8);
-    }
-
-    public static final String CLIENT_PASSWORD_ENCODER_BEAN_NAME = "clientPasswordEncoder";
-
-    @Bean(CLIENT_PASSWORD_ENCODER_BEAN_NAME)
-    public PasswordEncoder clientPasswordEncoder() {
-        return new BCryptPasswordEncoder(4);
-    }
+    @Qualifier(EncodingConfig.USER_PASSWORD_ENCODER_BEAN_NAME)
+    private PasswordEncoder userPasswordEncoder;
 
     @Override
     public void configure(final WebSecurity web) {
@@ -115,16 +99,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .userDetailsService(this.userDetailsService)
-                .passwordEncoder(userPasswordEncoder());
-    }
-
-    @Lazy
-    @Bean
-    public SEBClientAuthenticationFilter sebClientAuthenticationFilter() {
-        return new SEBClientAuthenticationFilter(
-                this.defaultAuthenticationEventPublisher,
-                this.sebLmsSetupRecordMapper,
-                clientPasswordEncoder());
+                .passwordEncoder(this.userPasswordEncoder);
     }
 
     @Override
@@ -136,7 +111,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .requestMatcher(SEB_CLIENT_ENDPOINTS)
                     .addFilterBefore(
-                            this.sebClientAuthenticationFilter(),
+                            this.sebClientAuthenticationFilter,
                             BasicAuthenticationFilter.class)
                     .authorizeRequests()
                     .requestMatchers(SEB_CONNECTION_PROTECTED_URLS)
@@ -175,21 +150,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         @Autowired
         private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
         @Autowired
-        private DefaultAuthenticationEventPublisher defaultAuthenticationEventPublisher;
-        @Autowired
-        private SebLmsSetupRecordMapper sebLmsSetupRecordMapper;
-        @Autowired
-        @Qualifier(WebSecurityConfig.CLIENT_PASSWORD_ENCODER_BEAN_NAME)
-        private PasswordEncoder clientPasswordEncoder;
-
-        @Lazy
-        @Bean
-        public LMSClientAuthenticationFilter lmsClientAuthenticationFilter() {
-            return new LMSClientAuthenticationFilter(
-                    this.defaultAuthenticationEventPublisher,
-                    this.sebLmsSetupRecordMapper,
-                    this.clientPasswordEncoder);
-        }
+        private LMSClientAuthenticationFilter lmsClientAuthenticationFilter;
 
         @Override
         protected void configure(final HttpSecurity http) throws Exception {
@@ -200,7 +161,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .and()
                         .requestMatcher(LMS_HANDSHAKE_ENDPOINT)
                         .addFilterBefore(
-                                this.lmsClientAuthenticationFilter(),
+                                this.lmsClientAuthenticationFilter,
                                 BasicAuthenticationFilter.class)
                         .authorizeRequests()
                         .requestMatchers(LMS_HANDSHAKE_ENDPOINT)
@@ -228,6 +189,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     new FilterRegistrationBean<>(filter);
             registration.setEnabled(false);
             return registration;
+        }
+    }
+
+    @Configuration
+    public static class EncodingConfig {
+        public static final String USER_PASSWORD_ENCODER_BEAN_NAME = "userPasswordEncoder";
+        public static final String CLIENT_PASSWORD_ENCODER_BEAN_NAME = "clientPasswordEncoder";
+
+        @Bean(USER_PASSWORD_ENCODER_BEAN_NAME)
+        public PasswordEncoder userPasswordEncoder() {
+            return new BCryptPasswordEncoder(8);
+        }
+
+        @Bean(CLIENT_PASSWORD_ENCODER_BEAN_NAME)
+        public PasswordEncoder clientPasswordEncoder() {
+            return new BCryptPasswordEncoder(4);
         }
     }
 

@@ -18,25 +18,18 @@ import org.eth.demo.sebserver.service.exam.ExamDao;
 import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
 import org.eth.demo.sebserver.web.clientauth.ClientConnectionAuth.LMSConnectionAuth;
 import org.eth.demo.sebserver.web.clientauth.ClientConnectionAuth.SEBConnectionAuth;
-import org.eth.demo.sebserver.web.socket.Message;
-import org.eth.demo.sebserver.web.socket.Message.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Controller
 @RestController
 public class SEBClientConnectionController {
 
@@ -176,38 +169,6 @@ public class SEBClientConnectionController {
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
                 .build();
-    }
-
-    @SubscribeMapping("/sebauth/wsconnect")
-    public String subscribe(@Header(CONNECTION_TOKEN_KEY_NAME) final String connectionToken) {
-
-        log.debug("SEB-Client Web-Socket subscription");
-
-        try {
-
-            final Exam connectClientToExam = this.examConnectionService
-                    .connectClientToExam(connectionToken);
-
-            // TODO verify and get and send SEB-configuration for specified SEB-client
-
-            return messageToString(new Message(
-                    Type.CONNECT,
-                    System.currentTimeMillis(),
-                    "TODO: send SEB-configuration"));
-        } catch (final Exception e) {
-            return messageToString(new Message(
-                    Type.ERROR,
-                    System.currentTimeMillis(),
-                    e.getMessage()));
-        }
-    }
-
-    private String messageToString(final Message message) {
-        try {
-            return this.jsonMapper.writeValueAsString(message);
-        } catch (final JsonProcessingException e) {
-            return e.getMessage();
-        }
     }
 
 }

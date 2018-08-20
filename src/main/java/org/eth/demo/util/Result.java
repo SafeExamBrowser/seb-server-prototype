@@ -33,6 +33,14 @@ public class Result<T> {
         return this.value != null ? this.value : supplier.get();
     }
 
+    public <U> Result<U> map(final Function<T, U> mapf) {
+        if (this.error == null) {
+            return Result.of(mapf.apply(this.value));
+        } else {
+            return Result.ofError(this.error);
+        }
+    }
+
     public T onError(final Function<Throwable, T> errorHandler) {
         return this.error != null ? errorHandler.apply(this.error) : this.value;
     }

@@ -8,23 +8,20 @@
 
 package org.eth.demo.sebserver.web.clientauth;
 
-import static org.eth.demo.sebserver.batis.gen.mapper.SebLmsSetupRecordDynamicSqlSupport.lmsClientname;
-import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.servlet.http.HttpServletRequest;
 
-import org.eth.demo.sebserver.batis.gen.mapper.SebLmsSetupRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
 import org.eth.demo.sebserver.domain.rest.admin.Role.UserRole;
-import org.eth.demo.util.Utils;
+import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.common.exceptions.BadClientCredentialsException;
+import org.springframework.stereotype.Component;
 
+@Lazy
+@Component
 public class LMSClientAuthenticationFilter extends AbstractClientAuthenticationFilter {
 
     private static final Logger log = LoggerFactory.getLogger(LMSClientAuthenticationFilter.class);
@@ -33,12 +30,10 @@ public class LMSClientAuthenticationFilter extends AbstractClientAuthenticationF
 
     public LMSClientAuthenticationFilter(
             final DefaultAuthenticationEventPublisher defaultAuthenticationEventPublisher,
-            final SebLmsSetupRecordMapper sebLmsSetupRecordMapper,
-            final PasswordEncoder clientPasswordEncoder) {
+            final ExamConnectionService examConnectionService) {
 
         super(defaultAuthenticationEventPublisher,
-                sebLmsSetupRecordMapper,
-                clientPasswordEncoder);
+                examConnectionService);
     }
 
     @Override
@@ -49,16 +44,11 @@ public class LMSClientAuthenticationFilter extends AbstractClientAuthenticationF
 
         log.debug("Apply filter LMSClientAuthenticationFilter");
 
-        final List<SebLmsSetupRecord> setups = this.sebLmsSetupRecordMapper.selectByExample()
-                .where(lmsClientname, isEqualTo(username))
-                .build()
-                .execute();
-
-        log.debug("Found SebLmsSetupRecord matches: {}", setups);
-
-        final SebLmsSetupRecord matching = Utils.getSingle(setups.stream()
-                .filter(record -> this.clientPasswordEncoder.matches(password, record.getLmsClientsecret()))
-                .collect(Collectors.toList()));
+        final SebLmsSetupRecord matching = this.examConnectionService.getLMSSetup(username, password, true)
+                .onError(t -> {
+                    log.error("Unable to find matching LMS-Setup for LMS-Client name: {}", username, t);
+                    throw new BadClientCredentialsException();
+                });
 
         log.debug("Found match: {}", matching);
 

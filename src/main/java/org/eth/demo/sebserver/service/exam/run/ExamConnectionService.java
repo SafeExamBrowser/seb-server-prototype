@@ -8,6 +8,8 @@
 
 package org.eth.demo.sebserver.service.exam.run;
 
+import static org.eth.demo.sebserver.batis.gen.mapper.SebLmsSetupRecordDynamicSqlSupport.lmsClientname;
+import static org.eth.demo.sebserver.batis.gen.mapper.SebLmsSetupRecordDynamicSqlSupport.sebClientname;
 import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 
 import java.util.Collection;
@@ -21,7 +23,9 @@ import java.util.stream.Stream;
 
 import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordDynamicSqlSupport;
 import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordMapper;
+import org.eth.demo.sebserver.batis.gen.mapper.SebLmsSetupRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ClientConnectionRecord;
+import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
 import org.eth.demo.sebserver.domain.rest.exam.ClientConnection;
 import org.eth.demo.sebserver.domain.rest.exam.ClientConnection.ConnectionStatus;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
@@ -29,9 +33,16 @@ import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
 import org.eth.demo.sebserver.service.exam.ExamStateService;
 import org.eth.demo.sebserver.service.exam.indicator.ClientIndicator;
 import org.eth.demo.sebserver.service.exam.indicator.ClientIndicatorFactory;
+import org.eth.demo.sebserver.web.WebSecurityConfig.EncodingConfig;
+import org.eth.demo.sebserver.web.clientauth.ClientConnectionAuth;
+import org.eth.demo.sebserver.web.clientauth.ClientConnectionAuth.SEBWebSocketAuth;
+import org.eth.demo.util.Result;
 import org.eth.demo.util.Utils;
+import org.mybatis.dynamic.sql.SqlColumn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,18 +53,24 @@ public class ExamConnectionService implements ClientConnectionDelegate {
 
     private final ExamStateService examStateService;
     private final ClientConnectionRecordMapper clientConnectionRecordMapper;
+    private final SebLmsSetupRecordMapper sebLmsSetupRecordMapper;
     private final ClientIndicatorFactory clientIndicatorFactory;
+    private final PasswordEncoder clientPasswordEncoder;
 
     private final Map<String, ConnectionData> connectionCache = new ConcurrentHashMap<>();
 
     public ExamConnectionService(
             final ExamStateService examStateService,
             final ClientConnectionRecordMapper clientConnectionRecordMapper,
-            final ClientIndicatorFactory clientIndicatorFactory) {
+            final SebLmsSetupRecordMapper sebLmsSetupRecordMapper,
+            final ClientIndicatorFactory clientIndicatorFactory,
+            @Qualifier(EncodingConfig.CLIENT_PASSWORD_ENCODER_BEAN_NAME) final PasswordEncoder clientPasswordEncoder) {
 
         this.examStateService = examStateService;
         this.clientConnectionRecordMapper = clientConnectionRecordMapper;
+        this.sebLmsSetupRecordMapper = sebLmsSetupRecordMapper;
         this.clientIndicatorFactory = clientIndicatorFactory;
+        this.clientPasswordEncoder = clientPasswordEncoder;
     }
 
     @Transactional
@@ -117,31 +134,24 @@ public class ExamConnectionService implements ClientConnectionDelegate {
         //      if so and the connection is in RELEASED state, allow the connection
         //      if so and the connection is in some different state, we have to specify what to do, deny the connection attempt
 
-        Long connectionId = null;
-        Long examIdToSet = null;
-        try {
-            final ClientConnectionRecord connection = getConnection(
-                    connectionToken,
-                    ClientConnection.ConnectionStatus.CONNECTION_REQUESTED);
-            connectionId = connection.getId();
+        final ClientConnectionRecord connection = getConnectionByToken(
+                connectionToken,
+                ClientConnection.ConnectionStatus.CONNECTION_REQUESTED)
+                        .onError(t -> {
+                            // TODO: This indicates some irregularity on SEB-Client connection attempt.
+                            //       Later we should handle this more accurately, and maybe indicate this to the monitoring board
+                            log.error("Unable to establish SEB-Client connection for {}", userIdentifier);
+                            throw new IllegalStateException("Unable to establish SEB-Client connection", t);
+                        });
 
-            if (examId == null && connection.getExamId() == null) {
-                log.error("Missing exam identifier within LMS handshake");
-                throw new IllegalArgumentException("Missing exam identifier within LMS handshake");
-            }
-
-            examIdToSet = (examId == null) ? connection.getExamId() : examId;
-
-        } catch (final Exception e) {
-            // TODO: This indicates some irregularity on SEB-Client connection attempt.
-            //       Later we should handle this more accurately, and maybe indicate this to the monitoring board
-            log.error("Unable to establish SEB-Client connection for {}", userIdentifier);
-            throw new IllegalStateException("Unable to establish SEB-Client connection", e);
+        if (examId == null && connection.getExamId() == null) {
+            log.error("Missing exam identifier within LMS handshake");
+            throw new IllegalArgumentException("Missing exam identifier within LMS handshake");
         }
 
         this.clientConnectionRecordMapper.updateByPrimaryKeySelective(new ClientConnectionRecord(
-                connectionId,
-                examIdToSet,
+                connection.getId(),
+                (examId == null) ? connection.getExamId() : examId,
                 ClientConnection.ConnectionStatus.AUTHENTICATED.name(),
                 null,
                 userIdentifier,
@@ -151,72 +161,78 @@ public class ExamConnectionService implements ClientConnectionDelegate {
     }
 
     @Transactional
-    public Exam connectClientToExam(final String connectionToken) {
-        // TODO Integrity check and exception handling
-        final ClientConnectionRecord connection = getConnection(
+    public ClientConnectionAuth verifyWebSocketConnectionAuthentication(final String connectionToken) {
+        final ClientConnectionRecord connection = getConnectionByToken(
                 connectionToken,
-                ClientConnection.ConnectionStatus.AUTHENTICATED);
+                ClientConnection.ConnectionStatus.AUTHENTICATED)
+                        .onError(t -> {
+                            log.error("Unable to find connection for token: {}", connectionToken, t);
+                            return null;
+                        });
 
-        return connectClientToExam(
-                connection.getExamId(),
-                connection.getUserIdentifier());
+        return SEBWebSocketAuth.sebWebSocketAuthOf(connection);
     }
 
     @Transactional
-    public Exam connectClientToExam(final Long examId, final String userIdentifier) {
-        final Optional<Exam> exam = this.examStateService.getRunningExam(examId);
+    public Exam establishConnection(final SEBWebSocketAuth auth) {
+        final Optional<Exam> exam = this.examStateService.getRunningExam(auth.examId);
         if (!exam.isPresent()) {
-            log.error("The exam {} is not running. Unable to connect user with identifier {} ", examId, userIdentifier);
-            throw new IllegalStateException("The exam " + examId + " is not running");
+            log.error("The exam {} is not running. Unable to connect user with identifier {} ",
+                    auth.examId,
+                    auth.userIdentifier);
+            throw new IllegalStateException("The exam " + auth.examId + " is not running");
         }
 
         final Exam runningExam = exam.get();
-        Long connectionId = null;
-        try {
-            connectionId = getConnectionId(
-                    userIdentifier,
-                    ClientConnection.ConnectionStatus.AUTHENTICATED);
-        } catch (final Exception e) {
-            // TODO: This indicates some irregularity on SEB-Client connection attempt.
-            //       Later we should handle this more accurately, and maybe indicate this to the monitoring board
-            log.debug("Unable to connect SEB-Client {} to exam {}", userIdentifier, runningExam.name);
-            throw new IllegalStateException("Unable to connect SEB-Client to exam");
+        final Long connectionId = getConnectionId(
+                auth.userIdentifier,
+                ClientConnection.ConnectionStatus.AUTHENTICATED)
+                        .onError(t -> {
+                            // TODO: This indicates some irregularity on SEB-Client connection attempt.
+                            //       Later we should handle this more accurately, and maybe indicate this to the monitoring board
+                            //       For example; check if there is already a connection for the userIdentifier and
+                            //       if true in which state it is.
+                            log.debug("Unable to connect SEB-Client {} to exam {}",
+                                    auth.userIdentifier,
+                                    runningExam.name);
+                            throw new IllegalStateException("Unable to connect SEB-Client to exam");
+                        });
 
-        }
-
-        log.debug("Connect client {} to exam {}", userIdentifier, runningExam.name);
+        log.debug("Connect client {} to exam {}", auth.userIdentifier, runningExam.name);
 
         // create a ClientConnection POJO and store it within the cache
-        createClientConnection(userIdentifier)
-                .ifPresent(connectionData -> this.connectionCache.put(userIdentifier, connectionData));
+        createClientConnection(auth.userIdentifier)
+                .ifPresent(connectionData -> this.connectionCache.put(
+                        auth.userIdentifier,
+                        connectionData));
 
         // update connection-record status and invalidate connectionToken
         this.clientConnectionRecordMapper.updateByPrimaryKeySelective(new ClientConnectionRecord(
                 connectionId,
                 null,
                 ClientConnection.ConnectionStatus.ESTABLISHED.name(),
-                "[NO_TOKEN]",
+                null,
                 null, null));
 
         return runningExam;
     }
 
     @Transactional
-    public void closeConnection(final String userIdentifier, final boolean aborted) {
-        if (!this.connectionCache.containsKey(userIdentifier)) {
+    public void closeConnection(final SEBWebSocketAuth auth, final boolean aborted) {
+        if (!this.connectionCache.containsKey(auth.userIdentifier)) {
             log.warn("No connection with clientIdentifier {} registered");
         }
 
         // Integrity check: Connection available in expected state?
-        Long connectionId = null;
-        try {
-            connectionId = getConnectionId(userIdentifier, ClientConnection.ConnectionStatus.ESTABLISHED);
-        } catch (final Exception e) {
-            // TODO: This indicates some irregularity on SEB-Client connection attempt.
-            //       Later we should handle this more accurately, and maybe indicate this to the monitoring board
-            log.debug("Unable to close connection or mark as aborted {}", userIdentifier);
-            throw new IllegalStateException("Unable to close connection or mark as aborted", e);
-        }
+        final Long connectionId = getConnectionId(
+                auth.userIdentifier,
+                ClientConnection.ConnectionStatus.ESTABLISHED)
+                        .onError(t -> {
+                            // TODO: This indicates some irregularity on SEB-Client connection attempt.
+                            //       Later we should handle this more accurately, and maybe indicate this to the monitoring board
+                            log.debug("Unable to close connection or mark as aborted {}", auth.userIdentifier);
+                            throw new IllegalStateException("Unable to close connection or mark as aborted", t);
+                        });
 
         final ConnectionStatus state = (aborted)
                 ? ClientConnection.ConnectionStatus.ABORTED
@@ -224,9 +240,26 @@ public class ExamConnectionService implements ClientConnectionDelegate {
         this.clientConnectionRecordMapper.updateByPrimaryKeySelective(
                 new ClientConnectionRecord(connectionId, null, state.name(), null, null, null));
 
-        this.connectionCache.remove(userIdentifier);
+        this.connectionCache.remove(auth.userIdentifier);
 
-        log.debug("Connection {} {}", (aborted) ? "aborted" : "closed", userIdentifier);
+        log.debug("Connection {} {}", (aborted) ? "aborted" : "closed", auth.userIdentifier);
+    }
+
+    public Result<SebLmsSetupRecord> getLMSSetup(
+            final String clientname,
+            final String secret,
+            final boolean byLMSClient) {
+
+        final SqlColumn<String> clientNameColumn = (byLMSClient) ? lmsClientname : sebClientname;
+        return Utils.getSingle(this.sebLmsSetupRecordMapper.selectByExample()
+                .where(clientNameColumn, isEqualTo(clientname))
+                .build()
+                .execute()
+                .stream()
+                .filter(record -> this.clientPasswordEncoder.matches(
+                        secret,
+                        (byLMSClient) ? record.getLmsClientsecret() : record.getSebClientsecret()))
+                .collect(Collectors.toList()));
     }
 
     @Override
@@ -244,6 +277,20 @@ public class ExamConnectionService implements ClientConnectionDelegate {
         } else {
             return Optional.empty();
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Result<ClientConnectionRecord> getConnectionByToken(
+            final String connectionToken,
+            final ConnectionStatus cStatus) {
+
+        return Utils.getSingle(this.clientConnectionRecordMapper.selectByExample()
+                .where(ClientConnectionRecordDynamicSqlSupport.status,
+                        isEqualTo(cStatus.name()))
+                .and(ClientConnectionRecordDynamicSqlSupport.connectionToken,
+                        isEqualTo(connectionToken))
+                .build()
+                .execute());
     }
 
     public Collection<String> getConnectedClientIds(final Long examId) {
@@ -269,7 +316,7 @@ public class ExamConnectionService implements ClientConnectionDelegate {
                 }).orElse(Optional.empty());
     }
 
-    private Long getConnectionId(
+    private Result<Long> getConnectionId(
             final String clientIdentifier,
             final ConnectionStatus expectedCurrentStatus) {
 
@@ -278,22 +325,8 @@ public class ExamConnectionService implements ClientConnectionDelegate {
                         isEqualTo(expectedCurrentStatus.name()))
                 .and(ClientConnectionRecordDynamicSqlSupport.userIdentifier, isEqualTo(clientIdentifier))
                 .build()
-                .execute()).getId();
-    }
-
-    private ClientConnectionRecord getConnection(
-            final String connectionToken,
-            final ConnectionStatus cStatus) {
-
-        final ClientConnectionRecord connection =
-                Utils.getSingle(this.clientConnectionRecordMapper.selectByExample()
-                        .where(ClientConnectionRecordDynamicSqlSupport.status,
-                                isEqualTo(cStatus.name()))
-                        .and(ClientConnectionRecordDynamicSqlSupport.connectionToken,
-                                isEqualTo(connectionToken))
-                        .build()
-                        .execute());
-        return connection;
+                .execute())
+                .map(t -> t.getId());
     }
 
     private Optional<ClientConnectionRecord> getActiveClientByToken(final String userIdentifier) {

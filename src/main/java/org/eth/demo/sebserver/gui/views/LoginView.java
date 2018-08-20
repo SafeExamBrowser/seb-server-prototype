@@ -155,7 +155,7 @@ public class LoginView implements ViewComposer {
                     .getAuthorizationContext()
                     .logout();
         } catch (final Exception e) {
-            log.info("Cleanup logout failed: ", e);
+            log.info("Cleanup logout failed: {}", e.getMessage());
         }
         viewService
                 .createViewOn(parent)

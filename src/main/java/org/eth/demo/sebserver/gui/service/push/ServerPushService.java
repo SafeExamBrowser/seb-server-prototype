@@ -33,9 +33,17 @@ public class ServerPushService {
         final Thread bgThread = new Thread(() -> {
             while (!context.isDisposed() && context.runAgain()) {
 
-                log.trace("Call business on Server Push Session on: {}", Thread.currentThread().getName());
-
-                business.accept(context);
+                try {
+                    log.trace("Call business on Server Push Session on: {}", Thread.currentThread().getName());
+                    business.accept(context);
+                } catch (final Exception e) {
+                    log.error("Unexpected error while do business for server push service", e);
+                    if (context.runAgain()) {
+                        continue;
+                    } else {
+                        return;
+                    }
+                }
 
                 if (!context.isDisposed()) {
 

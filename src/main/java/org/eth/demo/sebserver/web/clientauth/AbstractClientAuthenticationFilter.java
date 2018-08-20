@@ -19,8 +19,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eth.demo.sebserver.batis.gen.mapper.SebLmsSetupRecordMapper;
 import org.eth.demo.sebserver.domain.rest.admin.Role.UserRole;
+import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +28,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.filter.GenericFilterBean;
 
 public abstract class AbstractClientAuthenticationFilter extends GenericFilterBean {
@@ -36,18 +35,14 @@ public abstract class AbstractClientAuthenticationFilter extends GenericFilterBe
     private static final Logger log = LoggerFactory.getLogger(AbstractClientAuthenticationFilter.class);
 
     protected final DefaultAuthenticationEventPublisher defaultAuthenticationEventPublisher;
-    // TODO create and use Dao here
-    protected final SebLmsSetupRecordMapper sebLmsSetupRecordMapper;
-    protected final PasswordEncoder clientPasswordEncoder;
+    protected final ExamConnectionService examConnectionService;
 
     protected AbstractClientAuthenticationFilter(
             final DefaultAuthenticationEventPublisher defaultAuthenticationEventPublisher,
-            final SebLmsSetupRecordMapper sebLmsSetupRecordMapper,
-            final PasswordEncoder clientPasswordEncoder) {
+            final ExamConnectionService examConnectionService) {
 
         this.defaultAuthenticationEventPublisher = defaultAuthenticationEventPublisher;
-        this.sebLmsSetupRecordMapper = sebLmsSetupRecordMapper;
-        this.clientPasswordEncoder = clientPasswordEncoder;
+        this.examConnectionService = examConnectionService;
     }
 
     @Override

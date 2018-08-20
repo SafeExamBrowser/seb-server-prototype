@@ -8,13 +8,15 @@
 
 package org.eth.demo.sebserver.web.socket;
 
+import java.security.Principal;
+
 import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
+import org.eth.demo.sebserver.web.clientauth.ClientConnectionAuth.SEBWebSocketAuth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
@@ -30,29 +32,27 @@ public class ConnectionListener {
     }
 
     @EventListener
-    public void handleWebSocketConnect(final SessionConnectedEvent event) {
-        log.info("Received a new web socket connection: {}", event);
-    }
-
-    @EventListener
     public void handleUnsubscribe(final SessionUnsubscribeEvent event) {
-        log.info("unsubscribe: {}", event);
-        final StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-        final String token = headerAccessor.getFirstNativeHeader("TOKEN");
 
-        // TODO how can we dedicate in which channel the unsubscribe event has been applied
-        if (token != null) {
-            try {
-                this.examConnectionService.closeConnection(token, false);
-            } catch (final Exception e) {
-                log.error("Unexpected error while trying to close connection on handleUnsubscribe", e);
-            }
+        log.info("******************************* unsubscribe: {}", event);
+
+        final StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+        final Principal user = headerAccessor.getUser();
+        if (user instanceof SEBWebSocketAuth) {
+            this.examConnectionService.closeConnection((SEBWebSocketAuth) user, false);
         }
     }
 
     @EventListener
     public void handleWebSocketDisconnect(final SessionDisconnectEvent event) {
-        log.info("disconnect: {}", event);
+
+        log.info("*********************** disconnect: {}", event);
+
+        final StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+        final Principal user = headerAccessor.getUser();
+        if (user instanceof SEBWebSocketAuth) {
+            this.examConnectionService.closeConnection((SEBWebSocketAuth) user, true);
+        }
     }
 
 }
