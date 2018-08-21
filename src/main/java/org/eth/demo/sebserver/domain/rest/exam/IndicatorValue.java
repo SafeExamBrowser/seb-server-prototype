@@ -12,22 +12,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class IndicatorValue {
 
-    public final String clientIdentifier;
     public final String type;
     public final Double value;
 
     public IndicatorValue(
-            @JsonProperty("clientIdentifier") final String clientIdentifier,
             @JsonProperty("type") final String type,
             @JsonProperty("value") final Double value) {
 
-        this.clientIdentifier = clientIdentifier;
         this.type = type;
         this.value = value;
-    }
-
-    public String getClientIdentifier() {
-        return this.clientIdentifier;
     }
 
     public String getType() {
@@ -40,8 +33,7 @@ public class IndicatorValue {
 
     @Override
     public String toString() {
-        return "IndicatorValue [clientIdentifier=" + this.clientIdentifier + ", type=" + this.type + ", value="
-                + this.value + "]";
+        return "IndicatorValue [type=" + this.type + ", value=" + this.value + "]";
     }
 
 }

@@ -11,7 +11,7 @@ package org.eth.demo.sebserver.gui.service.rest;
 import java.util.List;
 import java.util.Map;
 
-import org.eth.demo.sebserver.gui.domain.exam.GUIIndicatorValue;
+import org.eth.demo.sebserver.gui.domain.exam.ConnectionRow;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.eth.demo.util.Result;
 import org.springframework.context.annotation.Lazy;
@@ -22,16 +22,16 @@ import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
-public class GETIndicatorValues implements SEBServerAPICall<List<GUIIndicatorValue>> {
+public class GETConnectionInfo implements SEBServerAPICall<List<ConnectionRow>> {
 
     private final RestCallBuilder restCallBuilder;
 
-    public GETIndicatorValues(final RestCallBuilder restCallBuilder) {
+    public GETConnectionInfo(final RestCallBuilder restCallBuilder) {
         this.restCallBuilder = restCallBuilder;
     }
 
     @Override
-    public Result<List<GUIIndicatorValue>> doAPICall(
+    public Result<List<ConnectionRow>> doAPICall(
             final RestTemplate restTemplate,
             final Map<String, String> attributes) {
 
@@ -46,7 +46,7 @@ public class GETIndicatorValues implements SEBServerAPICall<List<GUIIndicatorVal
                             this.restCallBuilder.httpEntity()
                                     .withContentTypeJson()
                                     .build(),
-                            new ParameterizedTypeReference<List<GUIIndicatorValue>>() {
+                            new ParameterizedTypeReference<List<ConnectionRow>>() {
                             })
                             .getBody());
         } catch (final Throwable t) {

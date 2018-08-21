@@ -83,12 +83,12 @@ public class ExamOverview implements ViewComposer {
 
         viewService.centringView(parent);
 
-        final Group group = new Group(parent, SWT.SHADOW_NONE);
+        final Group group = new Group(parent, SWT.NONE);
         group.setLayout(new RowLayout(SWT.VERTICAL));
         group.setLayoutData(new RowData(800, 500));
         group.setText(" Dashboard ");
 
-        final Composite titleGroup = new Composite(group, SWT.SHADOW_NONE);
+        final Composite titleGroup = new Composite(group, SWT.NONE);
         titleGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
         titleGroup.setLayoutData(new RowData(800, 50));
 

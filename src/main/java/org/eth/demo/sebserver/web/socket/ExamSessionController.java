@@ -9,8 +9,8 @@
 package org.eth.demo.sebserver.web.socket;
 
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
+import org.eth.demo.sebserver.domain.rest.exam.ConnectionInfo;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
-import org.eth.demo.sebserver.domain.rest.exam.IndicatorValue;
 import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
 import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
 import org.eth.demo.sebserver.web.clientauth.ClientConnectionAuth.SEBWebSocketAuth;
@@ -98,9 +98,9 @@ public class ExamSessionController {
     //       But a better (performance) strategy would be to establish also a WebSocket connection
     //       here and push indicator changes to the GUI
     @RequestMapping(value = "/runningexam/indicatorValues/{examId}", method = RequestMethod.GET)
-    public Flux<IndicatorValue> indicatorValues(@PathVariable final Long examId) {
+    public Flux<ConnectionInfo> connectionInfo(@PathVariable final Long examId) {
         return Flux.fromIterable(
-                this.examSessionService.getIndicatorValues(examId));
+                this.examSessionService.getConnectionInfo(examId));
     }
 
     private String messageToString(final Message message) {

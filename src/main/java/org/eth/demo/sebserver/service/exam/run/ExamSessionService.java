@@ -11,12 +11,13 @@ package org.eth.demo.sebserver.service.exam.run;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordMapper;
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
+import org.eth.demo.sebserver.domain.rest.exam.ConnectionInfo;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorValue;
 import org.eth.demo.sebserver.service.exam.ExamStateService;
+import org.eth.demo.sebserver.service.exam.run.ExamConnectionService.ConnectionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,17 +41,20 @@ public class ExamSessionService {
         this.eventHandlingStrategy = eventHandlingStrategy;
     }
 
-    public Collection<IndicatorValue> getIndicatorValues(final Long examId) {
+    public Collection<ConnectionInfo> getConnectionInfo(final Long examId) {
         if (!this.examStateService.getRunningExam(examId).isPresent()) {
             log.error("The exam {} is not running");
             return Collections.emptyList();
         }
 
-        return this.examConnectionService.getConnectedClientIds(examId)
+        return this.examConnectionService.getConnectionInfo(examId)
                 .stream()
-                .flatMap(this::indicatorValues)
+                .map(data -> new ConnectionInfo(
+                        data.clientConnection.userIdentifier,
+                        data.clientConnection.status.name(),
+                        data.clientConnection.clientAddress,
+                        indicatorValues(data)))
                 .collect(Collectors.toList());
-
     }
 
     @Transactional(readOnly = true)
@@ -63,14 +67,12 @@ public class ExamSessionService {
                         .forEach(ci -> ci.notifyClientEvent(event)));
     }
 
-    public Stream<IndicatorValue> indicatorValues(final String userIdentifier) {
-        return this.examConnectionService.getClientConnection(userIdentifier)
-                .map(cc -> cc.valuesStream()
-                        .map(ci -> new IndicatorValue(
-                                cc.clientConnection.userIdentifier,
-                                ci.getType(),
-                                ci.getCurrentValue())))
-                .orElse(Stream.empty());
+    public Collection<IndicatorValue> indicatorValues(final ConnectionData data) {
+        return data.valuesStream()
+                .map(ci -> new IndicatorValue(
+                        ci.getType(),
+                        ci.getCurrentValue()))
+                .collect(Collectors.toList());
     }
 
     public boolean checkActiveConnection(final String userIdentifier) {

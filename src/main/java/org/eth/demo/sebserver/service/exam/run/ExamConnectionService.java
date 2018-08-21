@@ -107,7 +107,7 @@ public class ExamConnectionService implements ClientConnectionDelegate {
 
         final ClientConnectionRecord ccRecord = new ClientConnectionRecord(
                 null,
-                (examId != null) ? examId : null,
+                examId,
                 ClientConnection.ConnectionStatus.CONNECTION_REQUESTED.name(),
                 connectionToken,
                 "[AWATING_LMS_CONFIRMATION [" + connectionToken + "]]",
@@ -151,7 +151,7 @@ public class ExamConnectionService implements ClientConnectionDelegate {
 
         this.clientConnectionRecordMapper.updateByPrimaryKeySelective(new ClientConnectionRecord(
                 connection.getId(),
-                (examId == null) ? connection.getExamId() : examId,
+                examId,
                 ClientConnection.ConnectionStatus.AUTHENTICATED.name(),
                 null,
                 userIdentifier,
@@ -200,12 +200,6 @@ public class ExamConnectionService implements ClientConnectionDelegate {
 
         log.debug("Connect client {} to exam {}", auth.userIdentifier, runningExam.name);
 
-        // create a ClientConnection POJO and store it within the cache
-        createClientConnection(auth.userIdentifier)
-                .ifPresent(connectionData -> this.connectionCache.put(
-                        auth.userIdentifier,
-                        connectionData));
-
         // update connection-record status and invalidate connectionToken
         this.clientConnectionRecordMapper.updateByPrimaryKeySelective(new ClientConnectionRecord(
                 connectionId,
@@ -213,6 +207,12 @@ public class ExamConnectionService implements ClientConnectionDelegate {
                 ClientConnection.ConnectionStatus.ESTABLISHED.name(),
                 null,
                 null, null));
+
+        // create a ClientConnection POJO and store it within the cache
+        createClientConnection(auth.userIdentifier)
+                .ifPresent(connectionData -> this.connectionCache.put(
+                        auth.userIdentifier,
+                        connectionData));
 
         return runningExam;
     }
@@ -240,7 +240,11 @@ public class ExamConnectionService implements ClientConnectionDelegate {
         this.clientConnectionRecordMapper.updateByPrimaryKeySelective(
                 new ClientConnectionRecord(connectionId, null, state.name(), null, null, null));
 
-        this.connectionCache.remove(auth.userIdentifier);
+        // update cache
+        if (this.connectionCache.containsKey(auth.userIdentifier)) {
+            this.connectionCache.remove(auth.userIdentifier);
+            getClientConnection(auth.userIdentifier);
+        }
 
         log.debug("Connection {} {}", (aborted) ? "aborted" : "closed", auth.userIdentifier);
     }
@@ -293,12 +297,12 @@ public class ExamConnectionService implements ClientConnectionDelegate {
                 .execute());
     }
 
-    public Collection<String> getConnectedClientIds(final Long examId) {
+    public Collection<ConnectionData> getConnectionInfo(final Long examId) {
         return this.connectionCache
                 .entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().clientConnection.examId.longValue() == examId)
-                .map(entry -> entry.getKey())
+                .map(entry -> entry.getValue())
                 .collect(Collectors.toList());
     }
 

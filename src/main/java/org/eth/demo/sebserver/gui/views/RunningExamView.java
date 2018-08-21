@@ -8,22 +8,20 @@
 
 package org.eth.demo.sebserver.gui.views;
 
-import java.util.BitSet;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -32,7 +30,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eth.demo.sebserver.gui.domain.exam.GUIIndicatorValue;
+import org.eth.demo.sebserver.gui.domain.exam.ConnectionRow;
 import org.eth.demo.sebserver.gui.domain.exam.Indicator;
 import org.eth.demo.sebserver.gui.domain.exam.RunningExam;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
@@ -40,7 +38,7 @@ import org.eth.demo.sebserver.gui.service.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
 import org.eth.demo.sebserver.gui.service.push.ServerPushContext;
 import org.eth.demo.sebserver.gui.service.push.ServerPushService;
-import org.eth.demo.sebserver.gui.service.rest.GETIndicatorValues;
+import org.eth.demo.sebserver.gui.service.rest.GETConnectionInfo;
 import org.eth.demo.sebserver.gui.service.rest.GETRunningExamDetails;
 import org.eth.demo.sebserver.gui.service.rest.SEBServerAPICall.APICallBuilder;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
@@ -53,13 +51,13 @@ public class RunningExamView implements ViewComposer {
 
     private final ServerPushService serverPushService;
     private final GETRunningExamDetails examDetailRequest;
-    private final GETIndicatorValues indicatorValuesRequest;
+    private final GETConnectionInfo indicatorValuesRequest;
     private final AuthorizationContextHolder authorizationContextHolder;
 
     public RunningExamView(
             final ServerPushService serverPushService,
             final GETRunningExamDetails examDetailRequest,
-            final GETIndicatorValues indicatorValuesRequest,
+            final GETConnectionInfo indicatorValuesRequest,
             final AuthorizationContextHolder authorizationContextHolder) {
 
         this.serverPushService = serverPushService;
@@ -89,10 +87,9 @@ public class RunningExamView implements ViewComposer {
                 }); // TODO error handling
 
         final Display display = parent.getDisplay();
-
         viewService.centringView(parent);
-
-        final Composite root = new Composite(parent, SWT.SHADOW_NONE);
+        final Composite root = new Composite(parent, SWT.NONE);
+        root.setLayoutData(new RowData(800, 400));
 
         final RowLayout layout = new RowLayout();
         layout.type = SWT.VERTICAL;
@@ -106,7 +103,7 @@ public class RunningExamView implements ViewComposer {
                         fontData.getHeight(), SWT.BOLD));
         title.setFont(boldFont);
 
-        final Composite group = new Composite(root, SWT.SHADOW_NONE);
+        final Composite group = new Composite(root, SWT.NONE);
         final GridLayout gridLayout = new GridLayout();
         gridLayout.numColumns = 4;
         group.setLayout(gridLayout);
@@ -137,7 +134,14 @@ public class RunningExamView implements ViewComposer {
         clients.setText("Connected Clients:");
         clients.setFont(boldFont);
 
-        final ClientTable clientTable = new ClientTable(display, root, exam);
+        final ScrolledComposite tablePane = new ScrolledComposite(root, SWT.V_SCROLL);
+        tablePane.setExpandVertical(true);
+        tablePane.setAlwaysShowScrollBars(true);
+        tablePane.setLayout(new RowLayout());
+        tablePane.setLayoutData(new RowData(800, 200));
+
+        final ClientTable clientTable = new ClientTable(display, tablePane, exam);
+        tablePane.setContent(clientTable.table);
 
         final Button button = new Button(root, SWT.FLAT);
         button.setText("To Exam Overview");
@@ -159,7 +163,7 @@ public class RunningExamView implements ViewComposer {
     }
 
     private static final Consumer<ServerPushContext> dataPoll(
-            final APICallBuilder<List<GUIIndicatorValue>> restCallBuilder,
+            final APICallBuilder<List<ConnectionRow>> restCallBuilder,
             final ClientTable clientTable) {
 
         return context -> {
@@ -169,14 +173,14 @@ public class RunningExamView implements ViewComposer {
             }
 
             restCallBuilder.clear();
-            final List<GUIIndicatorValue> indicatorValues = restCallBuilder
+            final List<ConnectionRow> connectionInfo = restCallBuilder
                     .exam(String.valueOf(clientTable.exam.id))
                     .doAPICall()
                     .onError(t -> {
                         throw new RuntimeException(t);
                     }); // TODO error handling
 
-            clientTable.updateValues(indicatorValues);
+            clientTable.updateValues(connectionInfo);
         };
     }
 
@@ -189,23 +193,24 @@ public class RunningExamView implements ViewComposer {
         final Color color2;
         final Color color3;
 
-        final Set<String> toRemove;
-        final Map<String, double[]> indicatorValues;
         final Map<String, UpdatableTableItem> tableMapping;
 
         ClientTable(final Display display, final Composite tableRoot, final RunningExam exam) {
             this.exam = exam;
-            this.toRemove = new HashSet<>();
-            this.indicatorValues = new HashMap<>();
-
-            this.table = new Table(tableRoot, SWT.NULL);
+            this.table = new Table(tableRoot, SWT.NONE);
             final TableColumn t1c = new TableColumn(this.table, SWT.NONE);
             t1c.setText("Identifier");
-            t1c.setWidth(300);
+            t1c.setWidth(200);
+            final TableColumn t2c = new TableColumn(this.table, SWT.NONE);
+            t2c.setText("Status");
+            t2c.setWidth(150);
+            final TableColumn t3c = new TableColumn(this.table, SWT.NONE);
+            t3c.setText("Address");
+            t3c.setWidth(150);
             for (final Indicator indDef : exam.getIndicators()) {
                 final TableColumn tc = new TableColumn(this.table, SWT.NONE);
                 tc.setText(indDef.type);
-                tc.setWidth(200);
+                tc.setWidth(100);
             }
 
             this.table.setHeaderVisible(true);
@@ -217,54 +222,69 @@ public class RunningExamView implements ViewComposer {
             this.color3 = new Color(display, new RGB(255, 0, 0), 100);
 
             this.tableMapping = new HashMap<>();
-        }
-
-        void updateValues(final List<GUIIndicatorValue> indicatorValues) {
-            this.toRemove.addAll(this.indicatorValues.keySet());
-            for (final GUIIndicatorValue value : indicatorValues) {
-                final double[] valueMapping = this.indicatorValues.computeIfAbsent(
-                        value.clientIdentifier,
-                        uuid -> new double[this.exam.getNumberOfIndicators()]);
-
-                final int indicatorIndex = this.exam.getIndicatorIndex(value.type);
-                valueMapping[indicatorIndex] = value.value;
-                if (!this.tableMapping.containsKey(value.clientIdentifier)) {
-                    this.tableMapping.put(
-                            value.clientIdentifier,
-                            new UpdatableTableItem(this.table, value.clientIdentifier));
-                } else {
-                    this.tableMapping.get(value.clientIdentifier).needsUpdate.set(indicatorIndex);
-                }
-                this.toRemove.remove(value.clientIdentifier);
-            }
-
-            this.indicatorValues.keySet()
-                    .removeAll(this.toRemove);
-        }
-
-        void updateGUI() {
-            final Iterator<UpdatableTableItem> iterator = this.tableMapping.values().iterator();
-            while (iterator.hasNext()) {
-                final UpdatableTableItem item = iterator.next();
-                item.update(this.table);
-
-                if (!this.indicatorValues.containsKey(item.clientIdentifier)) {
-                    item.tableItem.dispose();
-                    iterator.remove();
-                } else {
-                    final double[] values = this.indicatorValues.get(item.clientIdentifier);
-                    for (int i = item.needsUpdate.nextSetBit(0); i >= 0; i = item.needsUpdate.nextSetBit(i + 1)) {
-                        item.tableItem.setText(i + 1, String.valueOf(values[i]));
-                        item.tableItem.setBackground(i + 1, getColorForValue(i, values[i]));
-                    }
-
-                }
-
-                item.needsUpdate.clear();
-            }
 
             this.table.pack();
             this.table.layout();
+        }
+
+        void updateValues(final List<ConnectionRow> connectionInfo) {
+            for (final ConnectionRow row : connectionInfo) {
+                final UpdatableTableItem tableItem = this.tableMapping.computeIfAbsent(
+                        row.userIdentifier,
+                        (userIdentifier -> new UpdatableTableItem(this.table, row.userIdentifier)));
+                tableItem.push(row);
+            }
+        }
+
+        void updateGUI() {
+            for (final UpdatableTableItem uti : this.tableMapping.values()) {
+                if (uti.tableItem == null) {
+                    uti.tableItem = new TableItem(this.table, SWT.NONE);
+                    uti.tableItem.setText(0, uti.userIdentifier);
+                    uti.tableItem.setText(1, uti.connectionRow.status);
+                    uti.tableItem.setText(2, uti.connectionRow.address);
+                    updateIndicatorValues(uti);
+                    updateConnectionStatusColor(uti);
+                } else {
+                    if (!uti.connectionRow.status.equals(uti.previous_connectionRow.status)) {
+                        uti.tableItem.setText(1, uti.connectionRow.status);
+                        updateConnectionStatusColor(uti);
+                    }
+                    if ("ESTABLISHED".equals(uti.connectionRow.status)) {
+                        updateIndicatorValues(uti);
+                    }
+                }
+                uti.tableItem.getDisplay();
+            }
+        }
+
+        private void updateIndicatorValues(final UpdatableTableItem uti) {
+            for (final ConnectionRow.IndicatorValue iv : uti.connectionRow.indicatorValues) {
+                final int indicatorIndex = this.exam.getIndicatorIndex(iv.type);
+                final int columnIndex = indicatorIndex + 3;
+                uti.tableItem.setText(columnIndex, String.valueOf(iv.value));
+                uti.tableItem.setBackground(
+                        columnIndex,
+                        this.getColorForValue(indicatorIndex, iv.value));
+
+//                if (iv.type.startsWith("error")) {
+//                    System.out.println("***************** " + iv.value);
+//                }
+            }
+        }
+
+        private void updateConnectionStatusColor(final UpdatableTableItem uti) {
+            Color color = null;
+            if ("ESTABLISHED".equals(uti.connectionRow.status)) {
+                color = this.color1;
+            } else if ("CLOSED".equals(uti.connectionRow.status)) {
+                color = this.color2;
+            } else if ("ABORTED".equals(uti.connectionRow.status)) {
+                color = this.color3;
+            }
+            if (color != null) {
+                uti.tableItem.setBackground(1, color);
+            }
         }
 
         private Color getColorForValue(final int indicatorIndex, final double value) {
@@ -281,23 +301,22 @@ public class RunningExamView implements ViewComposer {
 
     private static final class UpdatableTableItem {
 
-        final BitSet needsUpdate = new BitSet();
-        final String clientIdentifier;
+        final String userIdentifier;
         TableItem tableItem;
+        ConnectionRow previous_connectionRow;
+        ConnectionRow connectionRow;
 
-        UpdatableTableItem(final Table parent, final String clientIdentifier) {
+        UpdatableTableItem(final Table parent, final String userIdentifier) {
             this.tableItem = null;
-            this.clientIdentifier = clientIdentifier;
+            this.userIdentifier = userIdentifier;
         }
 
-        void update(final Table parent) {
-            if (this.tableItem == null) {
-                this.tableItem = new TableItem(parent, SWT.NONE);
-                this.tableItem.setText(0, this.clientIdentifier);
-                this.needsUpdate.set(0);
-                this.needsUpdate.set(1);
+        public void push(final ConnectionRow connectionRow) {
+            if (!this.userIdentifier.equals(connectionRow.userIdentifier)) {
+                throw new IllegalArgumentException("UserIdentifier mismatch");
             }
+            this.previous_connectionRow = this.connectionRow;
+            this.connectionRow = connectionRow;
         }
     }
-
 }

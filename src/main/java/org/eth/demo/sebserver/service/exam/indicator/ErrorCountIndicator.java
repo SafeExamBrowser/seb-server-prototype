@@ -62,7 +62,7 @@ public class ErrorCountIndicator extends ClientIndicatorAdapter {
     @Override
     public void notifyClientEvent(final ClientEvent event) {
         if (event.type == EventType.ERROR) {
-            this.currentValue = getCurrentValue().doubleValue() + 1.0;
+            this.currentValue = getCurrentValue().doubleValue() + 1.0d;
         }
     }
 

@@ -68,7 +68,7 @@ public class WebSocketClientBot {
                 DEFAULT_EXAM_ID,
                 DEFAULT_CONNECT_ATTEMPTS,
                 TEN_SECONDS, 100,
-                TEN_SECONDS);
+                ONE_MINUTE);
     }
 
     private final long errorTimeInterval;
@@ -172,7 +172,7 @@ public class WebSocketClientBot {
                     lastPingTime = currentTime;
                 }
                 if (currentTime - lastErrorTime >= this.errorTimeInterval) {
-                    connection.sendEvent(2, "Error from client: " + this);
+                    connection.sendEvent(3, "Error from client: " + this);
                     lastErrorTime = currentTime;
                 }
                 try {
