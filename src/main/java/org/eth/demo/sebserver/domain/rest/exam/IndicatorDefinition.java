@@ -17,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class IndicatorDefinition {
 
+    public final String name;
     public final String type;
     public final BigDecimal threshold1;
     public final BigDecimal threshold2;
@@ -24,23 +25,37 @@ public final class IndicatorDefinition {
 
     @JsonCreator
     public IndicatorDefinition(
+            @JsonProperty("name") final String name,
             @JsonProperty("type") final String type,
             @JsonProperty("threshold1") final BigDecimal threshold1,
             @JsonProperty("threshold2") final BigDecimal threshold2,
             @JsonProperty("threshold3") final BigDecimal threshold3) {
 
+        this.name = name;
         this.type = type;
         this.threshold1 = threshold1;
         this.threshold2 = threshold2;
         this.threshold3 = threshold3;
     }
 
-    @Override
-    public String toString() {
-        return "Indicator [type=" + this.type
-                + ", threshold1=" + this.threshold1
-                + ", threshold2=" + this.threshold2
-                + ", threshold3=" + this.threshold3 + "]";
+    public String getName() {
+        return this.name;
+    }
+
+    public String getType() {
+        return this.type;
+    }
+
+    public BigDecimal getThreshold1() {
+        return this.threshold1;
+    }
+
+    public BigDecimal getThreshold2() {
+        return this.threshold2;
+    }
+
+    public BigDecimal getThreshold3() {
+        return this.threshold3;
     }
 
     public final IndicatorRecord toRecord(final Long examId) {
@@ -48,6 +63,7 @@ public final class IndicatorDefinition {
                 null,
                 examId,
                 this.type,
+                this.name,
                 this.threshold1,
                 this.threshold2,
                 this.threshold3);
@@ -55,6 +71,7 @@ public final class IndicatorDefinition {
 
     public static final IndicatorDefinition fromRecord(final IndicatorRecord record) {
         return new IndicatorDefinition(
+                record.getName(),
                 record.getType(),
                 record.getThreshold1(),
                 record.getThreshold2(),
@@ -84,6 +101,13 @@ public final class IndicatorDefinition {
         } else if (!this.type.equals(other.type))
             return false;
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "IndicatorDefinition [name=" + this.name + ", type=" + this.type + ", threshold1=" + this.threshold1
+                + ", threshold2="
+                + this.threshold2 + ", threshold3=" + this.threshold3 + "]";
     }
 
 }

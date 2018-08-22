@@ -40,14 +40,14 @@ public class ClientIndicatorFactory {
         this.enableCaching = enableCaching;
     }
 
-    public Map<IndicatorDefinition, ClientIndicator> createFor(final Exam exam, final String clientIdentifier) {
+    public Map<IndicatorDefinition, ClientIndicator> createFor(final Exam exam, final Long connectionId) {
         final Map<IndicatorDefinition, ClientIndicator> result = new HashMap<>();
 
         for (final IndicatorDefinition indicatorDef : exam.getIndicators()) {
             try {
                 final ClientIndicator indicator =
                         this.applicationContext.getBean(indicatorDef.type, ClientIndicator.class);
-                indicator.init(exam.id, clientIdentifier, this.enableCaching);
+                indicator.init(exam.id, connectionId, this.enableCaching);
                 result.put(indicatorDef, indicator);
             } catch (final Exception e) {
                 log.warn("No Indicator with type: {} found as registered bean. Ignore this one.", indicatorDef.type, e);

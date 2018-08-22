@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Indicator {
 
+    public final String name;
     public final String type;
     public final Float threshold1;
     public final Float threshold2;
@@ -22,23 +23,37 @@ public class Indicator {
 
     @JsonCreator
     public Indicator(
+            @JsonProperty("name") final String name,
             @JsonProperty("type") final String type,
             @JsonProperty("threshold1") final Float threshold1,
             @JsonProperty("threshold2") final Float threshold2,
             @JsonProperty("threshold3") final Float threshold3) {
 
+        this.name = name;
         this.type = type;
         this.threshold1 = threshold1;
         this.threshold2 = threshold2;
         this.threshold3 = threshold3;
     }
 
-    @Override
-    public String toString() {
-        return "Indicator [type=" + this.type
-                + ", threshold1=" + this.threshold1
-                + ", threshold2=" + this.threshold2
-                + ", threshold3=" + this.threshold3 + "]";
+    public String getName() {
+        return this.name;
+    }
+
+    public String getType() {
+        return this.type;
+    }
+
+    public Float getThreshold1() {
+        return this.threshold1;
+    }
+
+    public Float getThreshold2() {
+        return this.threshold2;
+    }
+
+    public Float getThreshold3() {
+        return this.threshold3;
     }
 
     @Override
@@ -64,6 +79,13 @@ public class Indicator {
         } else if (!this.type.equals(other.type))
             return false;
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Indicator [name=" + this.name + ", type=" + this.type + ", threshold1=" + this.threshold1
+                + ", threshold2="
+                + this.threshold2 + ", threshold3=" + this.threshold3 + "]";
     }
 
 }

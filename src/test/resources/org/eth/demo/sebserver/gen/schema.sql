@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS `institution` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `name_UNIQUE` (`name` ASC));
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC))
+;
 
 
 -- -----------------------------------------------------
@@ -35,7 +36,8 @@ CREATE TABLE IF NOT EXISTS `user` (
     FOREIGN KEY (`institution_id`)
     REFERENCES `institution` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION)
+;
 
 
 -- -----------------------------------------------------
@@ -66,7 +68,8 @@ CREATE TABLE IF NOT EXISTS `exam` (
     FOREIGN KEY (`institution_id`)
     REFERENCES `institution` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION)
+;
 
 
 -- -----------------------------------------------------
@@ -87,7 +90,8 @@ CREATE TABLE IF NOT EXISTS `client_connection` (
     FOREIGN KEY (`exam_id`)
     REFERENCES `exam` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION)
+;
 
 
 -- -----------------------------------------------------
@@ -109,7 +113,8 @@ CREATE TABLE IF NOT EXISTS `client_event` (
     FOREIGN KEY (`connection_id`)
     REFERENCES `client_connection` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION)
+;
 
 
 -- -----------------------------------------------------
@@ -121,6 +126,7 @@ CREATE TABLE IF NOT EXISTS `indicator` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `exam_id` BIGINT UNSIGNED NOT NULL,
   `type` VARCHAR(45) NOT NULL,
+  `name` VARCHAR(45) NULL,
   `threshold1` DECIMAL(10,4) NULL,
   `threshold2` DECIMAL(10,4) NULL,
   `threshold3` DECIMAL(10,4) NULL,
@@ -130,7 +136,8 @@ CREATE TABLE IF NOT EXISTS `indicator` (
     FOREIGN KEY (`exam_id`)
     REFERENCES `exam` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION)
+;
 
 
 -- -----------------------------------------------------
@@ -150,7 +157,8 @@ CREATE TABLE IF NOT EXISTS `configuration_node` (
     FOREIGN KEY (`institution_id`)
     REFERENCES `institution` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION)
+;
 
 
 -- -----------------------------------------------------
@@ -170,7 +178,8 @@ CREATE TABLE IF NOT EXISTS `configuration` (
     FOREIGN KEY (`configuration_node_id`)
     REFERENCES `configuration_node` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION)
+;
 
 
 -- -----------------------------------------------------
@@ -193,7 +202,8 @@ CREATE TABLE IF NOT EXISTS `configuration_attribute` (
     FOREIGN KEY (`parent_id`)
     REFERENCES `configuration_attribute` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION)
+;
 
 
 -- -----------------------------------------------------
@@ -220,7 +230,8 @@ CREATE TABLE IF NOT EXISTS `configuration_value` (
     FOREIGN KEY (`configuration_attribute_id`)
     REFERENCES `configuration_attribute` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION)
+;
 
 
 -- -----------------------------------------------------
@@ -241,7 +252,8 @@ CREATE TABLE IF NOT EXISTS `orientation` (
     FOREIGN KEY (`config_attribute_id`)
     REFERENCES `configuration_attribute` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION)
+;
 
 
 -- -----------------------------------------------------
@@ -266,7 +278,8 @@ CREATE TABLE IF NOT EXISTS `exam_configuration_map` (
     FOREIGN KEY (`configuration_node_id`)
     REFERENCES `configuration_node` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION)
+;
 
 
 -- -----------------------------------------------------
@@ -284,7 +297,8 @@ CREATE TABLE IF NOT EXISTS `user_role` (
     FOREIGN KEY (`user_id`)
     REFERENCES `user` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION)
+;
 
 
 -- -----------------------------------------------------
@@ -299,7 +313,8 @@ CREATE TABLE IF NOT EXISTS `oauth_access_token` (
   `user_name` VARCHAR(255) NULL,
   `client_id` VARCHAR(255) NULL,
   `authentication` BLOB NULL,
-  `refresh_token` VARCHAR(255) NULL);
+  `refresh_token` VARCHAR(255) NULL)
+;
 
 
 -- -----------------------------------------------------
@@ -321,11 +336,12 @@ DROP TABLE IF EXISTS `seb_lms_setup` ;
 CREATE TABLE IF NOT EXISTS `seb_lms_setup` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `institution_id` BIGINT UNSIGNED NOT NULL,
-  `seb_clientname` VARCHAR(255) NOT NULL,
-  `seb_clientsecret` VARCHAR(255) NOT NULL,
+  `lms_type` VARCHAR(45) NOT NULL,
   `lms_clientname` VARCHAR(255) NOT NULL,
   `lms_clientsecret` VARCHAR(255) NOT NULL,
   `lms_url` VARCHAR(255) NULL,
+  `seb_clientname` VARCHAR(255) NOT NULL,
+  `seb_clientsecret` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `setupInstitutionRef_idx` (`institution_id` ASC),
   CONSTRAINT `setupInstitutionRef`

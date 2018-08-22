@@ -209,7 +209,7 @@ public class RunningExamView implements ViewComposer {
             t3c.setWidth(150);
             for (final Indicator indDef : exam.getIndicators()) {
                 final TableColumn tc = new TableColumn(this.table, SWT.NONE);
-                tc.setText(indDef.type);
+                tc.setText(indDef.name);
                 tc.setWidth(100);
             }
 
@@ -247,6 +247,7 @@ public class RunningExamView implements ViewComposer {
                     updateConnectionStatusColor(uti);
                 } else {
                     if (!uti.connectionRow.status.equals(uti.previous_connectionRow.status)) {
+                        uti.tableItem.setText(0, uti.connectionRow.userIdentifier);
                         uti.tableItem.setText(1, uti.connectionRow.status);
                         updateConnectionStatusColor(uti);
                     }
@@ -266,10 +267,6 @@ public class RunningExamView implements ViewComposer {
                 uti.tableItem.setBackground(
                         columnIndex,
                         this.getColorForValue(indicatorIndex, iv.value));
-
-//                if (iv.type.startsWith("error")) {
-//                    System.out.println("***************** " + iv.value);
-//                }
             }
         }
 

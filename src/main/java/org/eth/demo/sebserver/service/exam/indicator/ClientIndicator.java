@@ -16,11 +16,11 @@ public interface ClientIndicator {
 
     String getDisplayName();
 
-    void init(Long examId, String clientIdentifier, boolean alwaysCompute);
+    void init(Long examId, Long connectionId, boolean alwaysCompute);
 
     Long examId();
 
-    String userIdentifier();
+    Long connectionId();
 
     Double getCurrentValue();
 

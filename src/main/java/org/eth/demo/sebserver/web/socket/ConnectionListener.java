@@ -65,9 +65,10 @@ public class ConnectionListener {
                     user.userIdentifier,
                     (aborted) ? ConnectionStatus.ABORTED : ConnectionStatus.CLOSED);
 
-            final boolean alreadyClosed = this.examConnectionService.hasClosedOrAbortedConnection(user);
-            if (!alreadyClosed) {
+            try {
                 this.examConnectionService.closeConnection(user, aborted);
+            } catch (final Exception e) {
+                log.error("Unexpected error while trying to close connection for user. {}", user);
             }
         } else {
             log.error("Principal is null or not of expected type SEBWebSocketAuth. Skip closing connection");

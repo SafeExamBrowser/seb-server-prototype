@@ -4,37 +4,37 @@ import javax.annotation.Generated;
 import org.joda.time.DateTime;
 
 public class ExamRecord {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.418+02:00", comments="Source field: exam.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.456+02:00", comments="Source field: exam.id")
     private Long id;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.418+02:00", comments="Source field: exam.institution_id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.456+02:00", comments="Source field: exam.institution_id")
     private Long institutionId;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.418+02:00", comments="Source field: exam.owner_id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.456+02:00", comments="Source field: exam.owner_id")
     private Long ownerId;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.418+02:00", comments="Source field: exam.name")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.457+02:00", comments="Source field: exam.name")
     private String name;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.418+02:00", comments="Source field: exam.description")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.457+02:00", comments="Source field: exam.description")
     private String description;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.418+02:00", comments="Source field: exam.type")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.457+02:00", comments="Source field: exam.type")
     private String type;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.419+02:00", comments="Source field: exam.status")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.457+02:00", comments="Source field: exam.status")
     private String status;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.419+02:00", comments="Source field: exam.start_time")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.458+02:00", comments="Source field: exam.start_time")
     private DateTime startTime;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.419+02:00", comments="Source field: exam.end_time")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.459+02:00", comments="Source field: exam.end_time")
     private DateTime endTime;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.419+02:00", comments="Source field: exam.lms_exam_url")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.460+02:00", comments="Source field: exam.lms_exam_url")
     private String lmsExamUrl;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.418+02:00", comments="Source Table: exam")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.456+02:00", comments="Source Table: exam")
     public ExamRecord(Long id, Long institutionId, Long ownerId, String name, String description, String type, String status, DateTime startTime, DateTime endTime, String lmsExamUrl) {
         this.id = id;
         this.institutionId = institutionId;
@@ -48,52 +48,52 @@ public class ExamRecord {
         this.lmsExamUrl = lmsExamUrl;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.418+02:00", comments="Source field: exam.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.456+02:00", comments="Source field: exam.id")
     public Long getId() {
         return id;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.418+02:00", comments="Source field: exam.institution_id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.456+02:00", comments="Source field: exam.institution_id")
     public Long getInstitutionId() {
         return institutionId;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.418+02:00", comments="Source field: exam.owner_id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.457+02:00", comments="Source field: exam.owner_id")
     public Long getOwnerId() {
         return ownerId;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.418+02:00", comments="Source field: exam.name")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.457+02:00", comments="Source field: exam.name")
     public String getName() {
         return name;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.418+02:00", comments="Source field: exam.description")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.457+02:00", comments="Source field: exam.description")
     public String getDescription() {
         return description;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.419+02:00", comments="Source field: exam.type")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.457+02:00", comments="Source field: exam.type")
     public String getType() {
         return type;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.419+02:00", comments="Source field: exam.status")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.458+02:00", comments="Source field: exam.status")
     public String getStatus() {
         return status;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.419+02:00", comments="Source field: exam.start_time")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.458+02:00", comments="Source field: exam.start_time")
     public DateTime getStartTime() {
         return startTime;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.419+02:00", comments="Source field: exam.end_time")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.459+02:00", comments="Source field: exam.end_time")
     public DateTime getEndTime() {
         return endTime;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-15T14:53:13.419+02:00", comments="Source field: exam.lms_exam_url")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.460+02:00", comments="Source field: exam.lms_exam_url")
     public String getLmsExamUrl() {
         return lmsExamUrl;
     }
@@ -102,7 +102,7 @@ public class ExamRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table exam
      *
-     * @mbg.generated Wed Aug 15 14:53:13 CEST 2018
+     * @mbg.generated Wed Aug 22 11:48:06 CEST 2018
      */
     @Override
     public String toString() {
@@ -128,7 +128,7 @@ public class ExamRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table exam
      *
-     * @mbg.generated Wed Aug 15 14:53:13 CEST 2018
+     * @mbg.generated Wed Aug 22 11:48:06 CEST 2018
      */
     @Override
     public boolean equals(Object that) {
@@ -158,7 +158,7 @@ public class ExamRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table exam
      *
-     * @mbg.generated Wed Aug 15 14:53:13 CEST 2018
+     * @mbg.generated Wed Aug 22 11:48:06 CEST 2018
      */
     @Override
     public int hashCode() {

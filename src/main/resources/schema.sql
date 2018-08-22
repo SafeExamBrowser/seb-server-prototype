@@ -134,6 +134,7 @@ CREATE TABLE IF NOT EXISTS `indicator` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `exam_id` BIGINT UNSIGNED NOT NULL,
   `type` VARCHAR(45) NOT NULL,
+  `name` VARCHAR(45) NULL,
   `threshold1` DECIMAL(10,4) NULL,
   `threshold2` DECIMAL(10,4) NULL,
   `threshold3` DECIMAL(10,4) NULL,
@@ -344,11 +345,12 @@ DROP TABLE IF EXISTS `seb_lms_setup` ;
 CREATE TABLE IF NOT EXISTS `seb_lms_setup` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `institution_id` BIGINT UNSIGNED NOT NULL,
-  `seb_clientname` VARCHAR(255) NOT NULL,
-  `seb_clientsecret` VARCHAR(255) NOT NULL,
+  `lms_type` VARCHAR(45) NOT NULL,
   `lms_clientname` VARCHAR(255) NOT NULL,
   `lms_clientsecret` VARCHAR(255) NOT NULL,
   `lms_url` VARCHAR(255) NULL,
+  `seb_clientname` VARCHAR(255) NOT NULL,
+  `seb_clientsecret` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `setupInstitutionRef_idx` (`institution_id` ASC),
   CONSTRAINT `setupInstitutionRef`
@@ -357,6 +359,7 @@ CREATE TABLE IF NOT EXISTS `seb_lms_setup` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
+
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

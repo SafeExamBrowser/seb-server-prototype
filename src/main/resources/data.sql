@@ -3,8 +3,8 @@ INSERT INTO institution VALUES
     ;
     
 INSERT INTO seb_lms_setup VALUES
-    (1, 1, "sebclient", "$2a$04$SkWmoq0fL2wWyEk.cQj98ewdBH0Jtj.JWH/2vo6fJpo8wgK2/iv1W", "lmsclient", "$2a$04$KtWx03i61fPqibYXyzd/6.ZKsmxJuPlQgFKaDnZLmHbnSuhjbmi3a", "https://localhost:8090/lms/authorisationRequest"),
-    (2, 1, "sebclient2", "$2a$04$SkWmoq0fL2wWyEk.cQj98ewdBH0Jtj.JWH/2vo6fJpo8wgK2/iv1W", "lmsclient2", "$2a$04$KtWx03i61fPqibYXyzd/6.ZKsmxJuPlQgFKaDnZLmHbnSuhjbmi3a", null)
+    (1, 1, "MOCK", "lmsclient", "$2a$04$KtWx03i61fPqibYXyzd/6.ZKsmxJuPlQgFKaDnZLmHbnSuhjbmi3a", "https://localhost:8090/lms/authorisationRequest", "sebclient", "$2a$04$SkWmoq0fL2wWyEk.cQj98ewdBH0Jtj.JWH/2vo6fJpo8wgK2/iv1W"),
+    (2, 1, "MOCK", "lmsclient2", "$2a$04$KtWx03i61fPqibYXyzd/6.ZKsmxJuPlQgFKaDnZLmHbnSuhjbmi3a", null, "sebclient2", "$2a$04$SkWmoq0fL2wWyEk.cQj98ewdBH0Jtj.JWH/2vo6fJpo8wgK2/iv1W")
     ;
 
 INSERT INTO user VALUES 
@@ -83,11 +83,11 @@ INSERT INTO `exam` VALUES
     ;
 
 INSERT INTO indicator VALUES 
-    (NULL,1,"DemoIndicator1",20.0000,40.0000,60.0000),
-    (NULL,1,"errorCountIndicator",1.0000,2.0000,3.0000),
-    (NULL,3,"errorCountIndicator",1.0000,2.0000,3.0000),
-    (NULL,4,"errorCountIndicator",1.0000,2.0000,3.0000),
-    (NULL,3,"pingIntervalIndicator",1000,2000,5000),
-    (NULL,4,"pingIntervalIndicator",1000,2000,5000)
+    (1,1,"DemoIndicator1", "Demo Indicator", 20.0000,40.0000,60.0000),
+    (2,1,"errorCountIndicator", "Error Count", 1.0000,2.0000,3.0000),
+    (3,3,"errorCountIndicator", "Error Count", 1.0000,2.0000,3.0000),
+    (4,4,"errorCountIndicator", "Error Count", 1.0000,2.0000,3.0000),
+    (5,3,"pingIntervalIndicator", "Ping", 1000,2000,5000),
+    (6,4,"pingIntervalIndicator", "Ping", 1000,2000,5000)
     ;
 

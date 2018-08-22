@@ -110,15 +110,21 @@ public abstract class ClientConnectionAuth implements Authentication {
             this.clientAddress = clientAddress;
             this.lmsUrl = lmsUrl;
         }
+
+        @Override
+        public String toString() {
+            return "SEBConnectionAuth [institutionId=" + this.institutionId + ", sebClientname=" + this.sebClientname
+                    + ", clientAddress=" + this.clientAddress + ", lmsUrl=" + this.lmsUrl + "]";
+        }
     }
 
     public static final class SEBWebSocketAuth extends ClientConnectionAuth {
 
         private static final long serialVersionUID = -2254669992045447197L;
 
+        public final String userIdentifier;
         public final Long examId;
         public final Long connectionId;
-        public final String userIdentifier;
 
         private SEBWebSocketAuth(
                 final Long examId,
@@ -130,6 +136,14 @@ public abstract class ClientConnectionAuth implements Authentication {
             this.connectionId = connectionId;
             this.userIdentifier = userIdentifier;
         }
+
+        @Override
+        public String toString() {
+            return "SEBWebSocketAuth [userIdentifier=" + this.userIdentifier + ", examId=" + this.examId
+                    + ", connectionId="
+                    + this.connectionId + "]";
+        }
+
     }
 
     public static final class LMSConnectionAuth extends ClientConnectionAuth {
@@ -137,14 +151,20 @@ public abstract class ClientConnectionAuth implements Authentication {
         private static final long serialVersionUID = 1112691657763662897L;
 
         public final Long institutionId;
-        public final String sebClientname;
+        public final String lmsClientname;
         public final String clientAddress;
 
-        private LMSConnectionAuth(final Long institutionId, final String sebClientname, final String clientAddress) {
+        private LMSConnectionAuth(final Long institutionId, final String lmsClientname, final String clientAddress) {
             super(Role.UserRole.LMS_CLIENT.role);
             this.institutionId = institutionId;
-            this.sebClientname = sebClientname;
+            this.lmsClientname = lmsClientname;
             this.clientAddress = clientAddress;
+        }
+
+        @Override
+        public String toString() {
+            return "LMSConnectionAuth [institutionId=" + this.institutionId + ", lmsClientname=" + this.lmsClientname
+                    + ", clientAddress=" + this.clientAddress + "]";
         }
     }
 

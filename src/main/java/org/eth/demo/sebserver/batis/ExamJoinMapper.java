@@ -52,6 +52,7 @@ public interface ExamJoinMapper {
 
             @Arg(column = "indicatorId", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "indicatorType", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Arg(column = "indicatorName", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "threshold1", javaType = BigDecimal.class, jdbcType = JdbcType.DECIMAL),
             @Arg(column = "threshold2", javaType = BigDecimal.class, jdbcType = JdbcType.DECIMAL),
             @Arg(column = "threshold3", javaType = BigDecimal.class, jdbcType = JdbcType.DECIMAL),
@@ -78,6 +79,7 @@ public interface ExamJoinMapper {
 
                 indicatorRecord.id.as("indicatorId"),
                 indicatorRecord.type.as("indicatorType"),
+                indicatorRecord.name.as("indicatorName"),
                 indicatorRecord.threshold1,
                 indicatorRecord.threshold2,
                 indicatorRecord.threshold3,
@@ -124,6 +126,7 @@ public interface ExamJoinMapper {
 
                 final Long indicatorId,
                 final String indicatorType,
+                final String indicatorName,
                 final BigDecimal threshold1,
                 final BigDecimal threshold2,
                 final BigDecimal threshold3,
@@ -143,7 +146,7 @@ public interface ExamJoinMapper {
             this.lmsExamURL = lmsExamURL;
 
             indicator = (indicatorId != null)
-                    ? new IndicatorDefinition(indicatorType, threshold1, threshold2, threshold3)
+                    ? new IndicatorDefinition(indicatorName, indicatorType, threshold1, threshold2, threshold3)
                     : null;
             configMapping = (configMappingId != null)
                     ? new ExamSEBConfigMapping(configMappingId, id, configurationId, clientInfo)

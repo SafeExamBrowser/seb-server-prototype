@@ -62,7 +62,7 @@ public class ExamSessionService {
         this.eventHandlingStrategy.accept(event);
 
         // notify client indicators for update
-        this.examConnectionService.getClientConnection(event.getAuth().userIdentifier)
+        this.examConnectionService.getActiveClientConnection(event.getAuth().connectionId)
                 .ifPresent(cc -> cc.indicators()
                         .forEach(ci -> ci.notifyClientEvent(event)));
     }
@@ -73,10 +73,6 @@ public class ExamSessionService {
                         ci.getType(),
                         ci.getCurrentValue()))
                 .collect(Collectors.toList());
-    }
-
-    public boolean checkActiveConnection(final String userIdentifier) {
-        return this.examConnectionService.getClientConnection(userIdentifier) != null;
     }
 
 }
