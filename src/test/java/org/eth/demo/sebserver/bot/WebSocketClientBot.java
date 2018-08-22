@@ -54,7 +54,7 @@ public class WebSocketClientBot {
     public static final long DEFAULT_EXAM_ID = 4;
     public static final int DEFAULT_CONNECT_ATTEMPTS = 1;
 
-    public static final boolean MOCK_LMS = true;
+    public static final boolean MOCK_LMS = false;
 
     private static final Logger log = LoggerFactory.getLogger(WebSocketClientBot.class);
 
@@ -68,7 +68,7 @@ public class WebSocketClientBot {
                 DEFAULT_EXAM_ID,
                 DEFAULT_CONNECT_ATTEMPTS,
                 TEN_SECONDS, 100,
-                ONE_MINUTE);
+                TEN_SECONDS);
     }
 
     private final long errorTimeInterval;
@@ -87,16 +87,39 @@ public class WebSocketClientBot {
         this.runtime = runtime;
 
         final ResponseEntity<String> handshake = doHandshake("sebclient", "sebclient");
-        final String body = handshake.getBody();
+
+        final String lmsURL = handshake.getHeaders().getFirst("lmsURL");
         final String connectionToken = handshake.getHeaders().getFirst("connectionToken");
+        log.info("Handshake SEBClient --> SEBServer : {} token : {}", lmsURL, connectionToken);
 
         if (MOCK_LMS) {
-            final ResponseEntity<String> lmsHandshake = mockLMSHandshake(
+            final ResponseEntity<String> lmsHandshakeResponse = mockLMSHandshake(
                     connectionToken,
                     "testUser" + UUID.randomUUID().toString(),
                     "lmsclient",
                     "lmsclient",
                     "4");
+
+            log.info("Mocked handshake LMS --> SEB-Server status {}",
+                    lmsHandshakeResponse.getStatusCode());
+
+            if (lmsHandshakeResponse.getStatusCodeValue() != 202) {
+                log.error("SEB-Server rejected the mocked LMS handshake");
+                return;
+            }
+        } else {
+            final ResponseEntity<String> lmsLoginResponse = lmsLogin(
+                    lmsURL,
+                    connectionToken,
+                    "client1",
+                    "client1");
+
+            log.info("LMS login SEB-Client --> LMS status {}", lmsLoginResponse.getStatusCode());
+
+            if (lmsLoginResponse.getStatusCodeValue() != 202) {
+                log.error("LMS rejected login");
+                return;
+            }
         }
 
         final WebSocketConnection connection = new WebSocketConnection();
@@ -119,6 +142,33 @@ public class WebSocketClientBot {
 
             return restTemplate.exchange(
                     DEFAULT_HANDSHAKE_URL,
+                    HttpMethod.POST,
+                    new HttpEntity<String>(httpHeaders),
+                    String.class);
+
+        } catch (final Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    private ResponseEntity<String> lmsLogin(
+            final String lmsURL,
+            final String token,
+            final String clientname,
+            final String secret) {
+
+        final RestTemplate restTemplate = new RestTemplate();
+        String credentials;
+        try {
+            credentials = Base64Utils.encodeToString((clientname + ":" + secret).getBytes("UTF8"));
+            final HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add(HttpHeaders.CONTENT_TYPE, Const.CONTENT_TYPE_APPLICATION_JSON);
+            httpHeaders.add(HttpHeaders.AUTHORIZATION, "Basic " + credentials);
+            httpHeaders.add("connectionToken", token);
+
+            return restTemplate.exchange(
+                    lmsURL,
                     HttpMethod.POST,
                     new HttpEntity<String>(httpHeaders),
                     String.class);

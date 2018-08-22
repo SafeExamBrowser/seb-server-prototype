@@ -38,6 +38,7 @@ public class SEBClientConnectionController {
     public static final String CONNECTION_TOKEN_KEY_NAME = "connectionToken";
     public static final String USER_IDENTIFIER_KEY_NAME = "userId";
     public static final String EXAM_IDENTIFIER_KEY_NAME = "examId";
+    public static final String LMS_URL_KEY_NAME = "lmsURL";
 
     private final ExamDao examDao;
     private final ExamConnectionService examConnectionService;
@@ -130,7 +131,8 @@ public class SEBClientConnectionController {
 
                 return ResponseEntity.ok()
                         .header(CONNECTION_TOKEN_KEY_NAME, connectionToken)
-                        .body(this.jsonMapper.writeValueAsString(auth.lmsUrl));
+                        .header(LMS_URL_KEY_NAME, auth.lmsUrl)
+                        .body("");
             }
         } catch (final Exception e) {
             log.error("Unexpected Error while SEB handshake :", e);

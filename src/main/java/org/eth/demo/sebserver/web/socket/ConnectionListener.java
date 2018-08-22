@@ -10,8 +10,10 @@ package org.eth.demo.sebserver.web.socket;
 
 import java.security.Principal;
 
+import org.eth.demo.sebserver.domain.rest.exam.ClientConnection.ConnectionStatus;
 import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
 import org.eth.demo.sebserver.web.clientauth.ClientConnectionAuth.SEBWebSocketAuth;
+import org.eth.demo.sebserver.web.clientauth.SEBClientConnectionController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -34,24 +36,41 @@ public class ConnectionListener {
     @EventListener
     public void handleUnsubscribe(final SessionUnsubscribeEvent event) {
 
-        log.info("******************************* unsubscribe: {}", event);
+        log.info("Received unsubscribe event: {}", event);
 
         final StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-        final Principal user = headerAccessor.getUser();
-        if (user instanceof SEBWebSocketAuth) {
-            this.examConnectionService.closeConnection((SEBWebSocketAuth) user, false);
+        final Principal principal = headerAccessor.getUser();
+        final boolean hasConnectionToken = headerAccessor.containsNativeHeader(
+                SEBClientConnectionController.CONNECTION_TOKEN_KEY_NAME);
+        if (hasConnectionToken) {
+            markClosedOrAborted(principal, false);
         }
     }
 
     @EventListener
     public void handleWebSocketDisconnect(final SessionDisconnectEvent event) {
 
-        log.info("*********************** disconnect: {}", event);
+        log.info("Received disconnect event: {}", event);
 
         final StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-        final Principal user = headerAccessor.getUser();
-        if (user instanceof SEBWebSocketAuth) {
-            this.examConnectionService.closeConnection((SEBWebSocketAuth) user, true);
+        final Principal principal = headerAccessor.getUser();
+        markClosedOrAborted(principal, true);
+    }
+
+    private void markClosedOrAborted(final Principal principal, final boolean aborted) {
+        if (principal instanceof SEBWebSocketAuth) {
+            final SEBWebSocketAuth user = (SEBWebSocketAuth) principal;
+
+            log.info("Closing connection for user: {} to status: {}",
+                    user.userIdentifier,
+                    (aborted) ? ConnectionStatus.ABORTED : ConnectionStatus.CLOSED);
+
+            final boolean alreadyClosed = this.examConnectionService.hasClosedOrAbortedConnection(user);
+            if (!alreadyClosed) {
+                this.examConnectionService.closeConnection(user, aborted);
+            }
+        } else {
+            log.error("Principal is null or not of expected type SEBWebSocketAuth. Skip closing connection");
         }
     }
 

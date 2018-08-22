@@ -217,12 +217,20 @@ public class ExamConnectionService implements ClientConnectionDelegate {
         return runningExam;
     }
 
+    @Transactional(readOnly = true)
+    public boolean hasClosedOrAbortedConnection(final SEBWebSocketAuth auth) {
+        final Optional<ConnectionData> clientConnection = getClientConnection(auth.userIdentifier);
+        return clientConnection
+                .map(cd -> cd.clientConnection.status == ConnectionStatus.CLOSED ||
+                        cd.clientConnection.status == ConnectionStatus.ABORTED)
+                .orElse(false);
+    }
+
     @Transactional
     public void closeConnection(final SEBWebSocketAuth auth, final boolean aborted) {
         if (!this.connectionCache.containsKey(auth.userIdentifier)) {
             log.warn("No connection with clientIdentifier {} registered");
         }
-
         // Integrity check: Connection available in expected state?
         final Long connectionId = getConnectionId(
                 auth.userIdentifier,
@@ -230,7 +238,7 @@ public class ExamConnectionService implements ClientConnectionDelegate {
                         .onError(t -> {
                             // TODO: This indicates some irregularity on SEB-Client connection attempt.
                             //       Later we should handle this more accurately, and maybe indicate this to the monitoring board
-                            log.debug("Unable to close connection or mark as aborted {}", auth.userIdentifier);
+                            log.error("Unable to close connection or mark as aborted {}", auth.userIdentifier);
                             throw new IllegalStateException("Unable to close connection or mark as aborted", t);
                         });
 
