@@ -19,6 +19,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class ConfigurationNode {
 
+    public enum ConfigurationType {
+        TEMPLATE,
+        CLIENT,
+        VIRTUAL_CLIENT
+    }
+
     public final Long id;
     public final Long institutionId;
     public final Long ownerId;
@@ -30,7 +36,7 @@ public final class ConfigurationNode {
     @JsonCreator
     public ConfigurationNode(
             @JsonProperty("id") final Long id,
-            @JsonProperty("ownerId") final Long institutionId,
+            @JsonProperty("institutionId") final Long institutionId,
             @JsonProperty("ownerId") final Long ownerId,
             @JsonProperty("name") final String name,
             @JsonProperty("type") final ConfigurationType type,
@@ -64,6 +70,14 @@ public final class ConfigurationNode {
 
     public String getName() {
         return this.name;
+    }
+
+    public String getLatestVersion() {
+        if (this.configurationHistory != null && !this.configurationHistory.isEmpty()) {
+            return this.configurationHistory.get(0).version;
+        } else {
+            return "--";
+        }
     }
 
     public ConfigurationType getType() {

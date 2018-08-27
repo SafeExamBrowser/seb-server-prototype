@@ -48,6 +48,25 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/** This Service defines connection-handshake functionality for both, SEB-Client connection-request-handshake and LMS
+ * connection-confirm-handshake as well as the SEB-Clients Web-Socket connection establishment/closing. This Service
+ * also maps active SEB-Client connections and their indicator data to provide connection-based indicator data for a
+ * running exam.
+ *
+ * NOTE: The strategy that is implemented here works with an internal cache to improve performance. This is working well
+ * as long as there is only one instance of the SEB-Server running for one exam. This also should working well if there
+ * is another SEB-Server as stand-by. Because on failure, SEB-Clients has all to reconnect to the stand-by server. As
+ * long as they do not connect and run on different server-instances this should work.
+ *
+ * If there are different SEB-Server instances for horizontal scaling and it is possible that SEB-Clients of the same
+ * exam connects to different server, this should also work but the caching for indicators must be off
+ * (sebserver.indicator.caching=false) what probably is leading to a loss of performance.
+ *
+ * If performance is an issue here, using another strategy for horizontal scaling scenario should be considered. One for
+ * example could be to store the results of indicators for each client connection to the DB instead of select all events
+ * of a connection and recalculate the indicator value for every request.
+ *
+ * @author anhefti */
 @Service
 public class ExamConnectionService {
 
@@ -123,7 +142,7 @@ public class ExamConnectionService {
                 clientAddress);
 
         this.clientConnectionRecordMapper.insert(ccRecord);
-        updateCache(ccRecord.getId());
+        getAndUpdateCache(ccRecord.getId());
 
         log.debug("Registered SEB-Client connection for {}", clientAddress);
 
@@ -194,7 +213,7 @@ public class ExamConnectionService {
                 userIdentifier,
                 null));
 
-        updateCache(connection.getId());
+        getAndUpdateCache(connection.getId());
 
         log.debug("Established SEB-Client connection within LMS authentication {}", userIdentifier);
     }
@@ -234,7 +253,7 @@ public class ExamConnectionService {
                 null,
                 null, null));
 
-        updateCache(connectionId);
+        getAndUpdateCache(connectionId);
 
         return runningExam;
     }
@@ -268,7 +287,7 @@ public class ExamConnectionService {
         this.clientConnectionRecordMapper.updateByPrimaryKeySelective(
                 new ClientConnectionRecord(auth.connectionId, null, state.name(), null, null, null));
 
-        updateCache(auth.connectionId);
+        getAndUpdateCache(auth.connectionId);
 
         log.debug("Connection {} {}", (aborted) ? "aborted" : "closed", auth.userIdentifier);
     }
@@ -293,7 +312,7 @@ public class ExamConnectionService {
     @Transactional(readOnly = true)
     public Optional<ConnectionData> getActiveClientConnection(final Long connectionId) {
         if (!this.activeConnectionCache.containsKey(connectionId)) {
-            updateCache(connectionId);
+            getAndUpdateCache(connectionId);
         }
 
         if (this.activeConnectionCache.containsKey(connectionId)) {
@@ -317,18 +336,42 @@ public class ExamConnectionService {
                 .execute());
     }
 
-    public Collection<ConnectionData> getConnectionInfo(final Long examId) {
-        return this.activeConnectionCache
-                .entrySet()
+    /** This gets a list of primary-keys of all active connections for a specified exam
+     *
+     * @param examId the primary-key of the exam
+     * @return A list of primary-keys of all active connections for a specified exam */
+    @Transactional(readOnly = true)
+    public Collection<Long> getConnectionIds(final Long examId) {
+        return this.clientConnectionRecordMapper.selectByExample()
+                .where(ClientConnectionRecordDynamicSqlSupport.examId, isEqualTo(examId))
+                .build()
+                .execute()
                 .stream()
-                .filter(entry -> entry.getValue().clientConnection.examId.longValue() == examId)
-                .map(entry -> entry.getValue())
+                .map(record -> record.getId())
                 .collect(Collectors.toList());
     }
 
-    private void updateCache(final Long connectionId) {
-        activeConnectionDataById(connectionId).ifPresent(
-                cd -> this.activeConnectionCache.put(cd.clientConnection.id, cd));
+    @Transactional(readOnly = true)
+    public Collection<ConnectionData> getActiveConnectionData(final Long examId) {
+        return getConnectionIds(examId).stream()
+                .map(this::getConnectionData)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
+    private Optional<ConnectionData> getConnectionData(final Long connectionId) {
+        if (this.activeConnectionCache.containsKey(connectionId)) {
+            return Optional.of(this.activeConnectionCache.get(connectionId));
+        } else {
+            return getAndUpdateCache(connectionId);
+        }
+    }
+
+    private Optional<ConnectionData> getAndUpdateCache(final Long connectionId) {
+        final Optional<ConnectionData> activeConnection = activeConnectionDataById(connectionId);
+        activeConnection.ifPresent(cd -> this.activeConnectionCache.put(cd.clientConnection.id, cd));
+        return activeConnection;
     }
 
     /** Creates a ConnectionData from specified connection-record-id if and only if the connection record refers to a

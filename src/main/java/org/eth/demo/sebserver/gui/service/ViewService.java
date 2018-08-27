@@ -18,7 +18,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eth.demo.sebserver.gui.views.ExamOverview;
+import org.eth.demo.sebserver.gui.views.Dashboard;
 import org.eth.demo.sebserver.gui.views.LoginView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class ViewService {
     private static final Logger log = LoggerFactory.getLogger(ViewService.class);
 
     public static final String LOGIN_PAGE = LoginView.class.getName();
-    public static final String MAIN_PAGE = ExamOverview.class.getName();
+    public static final String MAIN_PAGE = Dashboard.class.getName();
     //public static final Class<? extends ViewComposer> ERROR_PAGE_COMPOSER_CLASS = TODO.class;
 
     private Map<String, ViewComposer> viewComposer;
@@ -95,6 +95,7 @@ public class ViewService {
         parentLayout.justify = true;
         parentLayout.type = SWT.HORIZONTAL;
         parentLayout.center = true;
+        parentLayout.fill = true;
         parent.setLayout(parentLayout);
     }
 

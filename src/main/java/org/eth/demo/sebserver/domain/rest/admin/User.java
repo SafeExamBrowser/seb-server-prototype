@@ -26,18 +26,20 @@ public final class User implements UserDetails {
 
     private static final long serialVersionUID = -2490638288935417827L;
 
-    private final Long id;
-    private final String name;
-    private final String username;
-    private final String password;
-    private final String email;
-    private final DateTime creationDate;
-    private final Boolean active;
-    private final Collection<Role> roles;
+    public final Long id;
+    public final Long institutionId;
+    public final String name;
+    public final String username;
+    public final String password;
+    public final String email;
+    public final DateTime creationDate;
+    public final Boolean active;
+    public final Collection<Role> roles;
 
     @JsonCreator
     public User(
             @JsonProperty("id") final Long id,
+            @JsonProperty("institutionId") final Long institutionId,
             @JsonProperty("name") final String name,
             @JsonProperty("username") final String username,
             @JsonProperty("password") final String password,
@@ -47,6 +49,7 @@ public final class User implements UserDetails {
             @JsonProperty("roles") final Collection<Role> roles) {
 
         this.id = id;
+        this.institutionId = institutionId;
         this.name = name;
         this.username = username;
         this.password = password;
@@ -58,6 +61,10 @@ public final class User implements UserDetails {
 
     public Long getId() {
         return this.id;
+    }
+
+    public Long getInstitutionId() {
+        return this.institutionId;
     }
 
     public String getName() {
@@ -121,9 +128,19 @@ public final class User implements UserDetails {
         return this.active;
     }
 
+    @Override
+    public String toString() {
+        return "User [id=" + this.id + ", institutionId=" + this.institutionId + ", name=" + this.name + ", username="
+                + this.username
+                + ", password=" + this.password + ", email=" + this.email + ", creationDate=" + this.creationDate
+                + ", active="
+                + this.active + ", roles=" + this.roles + "]";
+    }
+
     public static User fromRecord(final UserRecord record, final List<RoleRecord> roles) {
         return new User(
                 record.getId(),
+                record.getInstitutionId(),
                 record.getName(),
                 record.getUserName(),
                 record.getPassword(),

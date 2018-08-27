@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -26,10 +27,11 @@ import org.eth.demo.sebserver.batis.gen.mapper.ConfigurationRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ConfigurationNodeRecord;
 import org.eth.demo.sebserver.batis.gen.model.ConfigurationRecord;
 import org.eth.demo.sebserver.batis.gen.model.ConfigurationValueRecord;
+import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.domain.rest.exam.ExamSEBConfigMapping;
 import org.eth.demo.sebserver.domain.rest.sebconfig.Configuration;
 import org.eth.demo.sebserver.domain.rest.sebconfig.ConfigurationNode;
-import org.eth.demo.sebserver.domain.rest.sebconfig.ConfigurationType;
+import org.eth.demo.sebserver.domain.rest.sebconfig.ConfigurationNode.ConfigurationType;
 import org.eth.demo.sebserver.domain.rest.sebconfig.attribute.Attribute;
 import org.joda.time.DateTime;
 import org.mybatis.dynamic.sql.select.MyBatis3SelectModelAdapter;
@@ -92,56 +94,53 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
     public ConfigurationNode byId(final Long id) {
         final QueryExpressionDSL<MyBatis3SelectModelAdapter<Collection<ConfigNodeJoinRecord>>>.JoinSpecificationFinisher selectByExample =
                 this.configurationNodeJoinMapper.selectByExample();
-        final Collection<ConfigNodeJoinRecord> joinRecords = selectByExample
+
+        return createNode(selectByExample
                 .where(ConfigurationNodeRecordDynamicSqlSupport.id, isEqualTo(id))
                 .build()
-                .execute();
-
-        if (joinRecords == null) {
-            return null;
-        }
-
-        return createNode(joinRecords);
+                .execute());
     }
 
     @Override
     @Transactional(readOnly = true)
     public ConfigurationNode byName(final String name) {
-        final Collection<ConfigNodeJoinRecord> joinRecords = this.configurationNodeJoinMapper
+        return createNode(this.configurationNodeJoinMapper
                 .selectByExample()
                 .where(ConfigurationNodeRecordDynamicSqlSupport.name, isEqualTo(name))
                 .build()
-                .execute();
-
-        if (joinRecords == null) {
-            return null;
-        }
-
-        return createNode(joinRecords);
+                .execute());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<ConfigurationNode> getAll() {
-        final Collection<ConfigNodeJoinRecord> joinRecords = this.configurationNodeJoinMapper
+    public Collection<ConfigurationNode> getOwned(final User user) {
+        return fromJoinRecords(this.configurationNodeJoinMapper
                 .selectByExample()
+                .where(ConfigurationNodeRecordDynamicSqlSupport.ownerId, isEqualTo(user.id))
                 .build()
-                .execute();
+                .execute());
+    }
 
-        if (joinRecords == null) {
-            return null;
-        }
-
-        return fromJoinRecords(joinRecords);
+    @Override
+    @Transactional(readOnly = true)
+    public Collection<ConfigurationNode> getAll(final User user) {
+        return fromJoinRecords(this.configurationNodeJoinMapper
+                .selectByExample()
+                .where(ConfigurationNodeRecordDynamicSqlSupport.institutionId, isEqualTo(user.institutionId))
+                .build()
+                .execute());
     }
 
     @Override
     @Transactional(readOnly = true)
     public Collection<ConfigurationNode> getAll(final Predicate<ConfigurationNode> predicate) {
-        return getAll()
-                .stream()
-                .filter(predicate)
-                .collect(Collectors.toList());
+        return fromJoinRecords(this.configurationNodeJoinMapper
+                .selectByExample()
+                .build()
+                .execute())
+                        .stream()
+                        .filter(predicate)
+                        .collect(Collectors.toList());
     }
 
     @Override
@@ -225,10 +224,12 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
                 .values()
                 .stream()
                 .map(ConfigurationDaoImpl::createNode)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
     private static final ConfigurationNode createNode(final Collection<ConfigNodeJoinRecord> joinRecords) {
+
         ConfigurationNode prototype = null;
         final Collection<ExamSEBConfigMapping> examMappings = new ArrayList<>();
         final List<Configuration> configHistory = new ArrayList<>();
@@ -265,6 +266,10 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
                         record.versionDate,
                         record.followup));
             }
+        }
+
+        if (prototype == null) {
+            return null;
         }
 
         // Sort by date

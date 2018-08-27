@@ -47,7 +47,7 @@ public class ExamSessionService {
             return Collections.emptyList();
         }
 
-        return this.examConnectionService.getConnectionInfo(examId)
+        return this.examConnectionService.getActiveConnectionData(examId)
                 .stream()
                 .map(data -> new ConnectionInfo(
                         data.clientConnection.userIdentifier,

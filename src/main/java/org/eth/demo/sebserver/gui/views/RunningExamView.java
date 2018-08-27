@@ -40,6 +40,7 @@ import org.eth.demo.sebserver.gui.service.push.ServerPushContext;
 import org.eth.demo.sebserver.gui.service.push.ServerPushService;
 import org.eth.demo.sebserver.gui.service.rest.GETConnectionInfo;
 import org.eth.demo.sebserver.gui.service.rest.GETRunningExamDetails;
+import org.eth.demo.sebserver.gui.service.rest.RestServices;
 import org.eth.demo.sebserver.gui.service.rest.SEBServerAPICall.APICallBuilder;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.springframework.context.annotation.Lazy;
@@ -55,14 +56,13 @@ public class RunningExamView implements ViewComposer {
     private final AuthorizationContextHolder authorizationContextHolder;
 
     public RunningExamView(
+            final RestServices restServices,
             final ServerPushService serverPushService,
-            final GETRunningExamDetails examDetailRequest,
-            final GETConnectionInfo indicatorValuesRequest,
             final AuthorizationContextHolder authorizationContextHolder) {
 
         this.serverPushService = serverPushService;
-        this.examDetailRequest = examDetailRequest;
-        this.indicatorValuesRequest = indicatorValuesRequest;
+        this.examDetailRequest = restServices.getSEBServerAPICall(GETRunningExamDetails.class);
+        this.indicatorValuesRequest = restServices.getSEBServerAPICall(GETConnectionInfo.class);
         this.authorizationContextHolder = authorizationContextHolder;
     }
 
@@ -146,7 +146,7 @@ public class RunningExamView implements ViewComposer {
         final Button button = new Button(root, SWT.FLAT);
         button.setText("To Exam Overview");
         button.addListener(SWT.Selection, event -> {
-            viewService.composeView(parent, ExamOverview.class);
+            viewService.composeView(parent, Dashboard.class);
         });
 
         this.serverPushService.runServerPush(

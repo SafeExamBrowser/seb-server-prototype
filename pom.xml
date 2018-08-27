@@ -149,19 +149,20 @@
     <dependency>
       <groupId>org.eclipse.rap</groupId>
       <artifactId>org.eclipse.rap.rwt</artifactId>
-      <version>3.4.0</version>
+      <version>3.5.0</version>
     </dependency>
+<!-- JFace seems to need org.eclipse.core to work and even then did't work very well? -->
 <!--     <dependency> -->
 <!--       <groupId>org.eclipse.rap</groupId> -->
 <!--       <artifactId>org.eclipse.rap.jface</artifactId> -->
-<!--       <version>3.4.0</version> -->
+<!--       <version>3.5.0</version> -->
 <!--     </dependency> -->
 <!--     <dependency> -->
-<!--       <groupId>org.eclipse.platform</groupId> -->
-<!--       <artifactId>org.eclipse.equinox.common</artifactId> -->
-<!--       <version>3.9.0</version> -->
+<!--         <groupId>org.eclipse.core</groupId> -->
+<!--         <artifactId>org.eclipse.core.runtime</artifactId> -->
+<!--         <version>3.7.0</version> -->
 <!--     </dependency> -->
-<!-- Thanks for using https://jar-download.com -->
+
     
     
     <dependency>
