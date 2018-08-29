@@ -29,11 +29,6 @@ public abstract class ClientConnectionAuth implements Authentication {
     }
 
     @Override
-    public String getName() {
-        return this.getClass().getSimpleName();
-    }
-
-    @Override
     public Object getCredentials() {
         return null;
     }
@@ -112,6 +107,11 @@ public abstract class ClientConnectionAuth implements Authentication {
         }
 
         @Override
+        public String getName() {
+            return this.sebClientname;
+        }
+
+        @Override
         public String toString() {
             return "SEBConnectionAuth [institutionId=" + this.institutionId + ", sebClientname=" + this.sebClientname
                     + ", clientAddress=" + this.clientAddress + ", lmsUrl=" + this.lmsUrl + "]";
@@ -138,6 +138,11 @@ public abstract class ClientConnectionAuth implements Authentication {
         }
 
         @Override
+        public String getName() {
+            return this.userIdentifier;
+        }
+
+        @Override
         public String toString() {
             return "SEBWebSocketAuth [userIdentifier=" + this.userIdentifier + ", examId=" + this.examId
                     + ", connectionId="
@@ -159,6 +164,11 @@ public abstract class ClientConnectionAuth implements Authentication {
             this.institutionId = institutionId;
             this.lmsClientname = lmsClientname;
             this.clientAddress = clientAddress;
+        }
+
+        @Override
+        public String getName() {
+            return this.lmsClientname;
         }
 
         @Override

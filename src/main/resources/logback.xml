@@ -10,7 +10,8 @@
     <Logger name="org.mybatis.generator" level="INFO" additivity="true" />
     <Logger name="org.eth.demo.sebserver.batis" level="INFO" additivity="true" />
     <Logger name="org.springframework.security" level="INFO" additivity="true" />
-    <Logger name="org.springframework.web.socket.messaging" level="INFO" additivity="true" />
+    <Logger name="org.springframework.web.socket.messaging" level="TRACE" additivity="true" />
+    <Logger name="org.springframework.messaging" level="TRACE" additivity="true" />
     
     <Logger name="org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper" level="INFO" additivity="true" />
 

@@ -218,11 +218,11 @@ public class WebSocketClientBot {
 
             while (currentTime < endTime) {
                 if (currentTime - lastPingTime >= this.pingTimeInterval) {
-                    connection.sendEvent(1, "Ping from client: " + this);
+                    connection.sendEvent(1, "Ping");
                     lastPingTime = currentTime;
                 }
                 if (currentTime - lastErrorTime >= this.errorTimeInterval) {
-                    connection.sendEvent(3, "Error from client: " + this);
+                    connection.sendEvent(3, "Some Error");
                     lastErrorTime = currentTime;
                 }
                 try {

@@ -70,7 +70,7 @@ public class ExamSessionController {
             return messageToString(new Message(
                     Type.CONNECT,
                     System.currentTimeMillis(),
-                    "TODO: send SEB-configuration"));
+                    "TODO: send SEB-configuration for Exam: " + connectClientToExam));
         } catch (final Exception e) {
             return messageToString(new Message(
                     Type.ERROR,
@@ -78,11 +78,6 @@ public class ExamSessionController {
                     e.getMessage()));
         }
     }
-
-//    @MessageMapping("/runningexam/wsconnect/*")
-//    public void connectionMessages(@Payload final String payload) {
-//        System.out.println("****************************** payload " + payload);
-//    }
 
     @MessageMapping("/runningexam/event")
     public void eventpoint(
