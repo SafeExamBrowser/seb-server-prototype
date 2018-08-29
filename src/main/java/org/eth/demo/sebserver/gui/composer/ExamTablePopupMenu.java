@@ -18,18 +18,18 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
+import org.eth.demo.sebserver.gui.composer.views.RunningExamView;
 import org.eth.demo.sebserver.gui.domain.exam.ExamStatus;
 import org.eth.demo.sebserver.gui.domain.exam.ExamTableRow;
 import org.eth.demo.sebserver.gui.service.ViewService;
 import org.eth.demo.sebserver.gui.service.rest.POSTExamStateChange;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
-import org.eth.demo.sebserver.gui.views.RunningExamView;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Lazy
 @Component
-public class ExamTablePopupMenu implements TableRowPopupMenuComposer {
+public class ExamTablePopupMenu implements PopupMenuComposer {
 
     private final ViewService viewService;
     private final AuthorizationContextHolder authorizationContextHolder;
@@ -46,15 +46,19 @@ public class ExamTablePopupMenu implements TableRowPopupMenuComposer {
     }
 
     @Override
-    public final void onTableRowMenuEvent(final Event event) {
+    public final void onMenuEvent(final Event event) {
         final Table table = (Table) event.widget;
         final TableItem[] selection = table.getSelection();
         if (selection != null && selection.length > 0) {
             final Rectangle bounds = getRealBounds(selection[0]);
+            final Menu menu = table.getMenu();
+            if (menu.getItemCount() > 0) {
+                for (final MenuItem mItem : menu.getItems()) {
+                    mItem.dispose();
+                }
+            }
             if (bounds.contains(event.x, event.y)) {
-                composeExamMenu(table.getMenu(), selection[0]);
-            } else {
-                table.deselectAll();
+                composeExamMenu(menu, selection[0]);
             }
         }
     }
@@ -74,13 +78,7 @@ public class ExamTablePopupMenu implements TableRowPopupMenuComposer {
     }
 
     private final void composeExamMenu(final Menu menu, final TableItem item) {
-        if (menu.getItemCount() > 0) {
-            for (final MenuItem mItem : menu.getItems()) {
-                mItem.dispose();
-            }
-        }
-
-        final ExamTableRow exam = (ExamTableRow) item.getData(TABLE_ROW_DATA);
+        final ExamTableRow exam = (ExamTableRow) item.getData(TableBuilder.TABLE_ROW_DATA);
         if (exam == null) {
             menu.setVisible(false);
             return;
@@ -156,7 +154,7 @@ public class ExamTablePopupMenu implements TableRowPopupMenuComposer {
                     }); // TODO error handling
 
             tItem.setText(2, newExam.status);
-            tItem.setData(TABLE_ROW_DATA, newExam);
+            tItem.setData(TableBuilder.TABLE_ROW_DATA, newExam);
         });
     }
 
@@ -167,7 +165,7 @@ public class ExamTablePopupMenu implements TableRowPopupMenuComposer {
 
             @SuppressWarnings("unchecked")
             final Supplier<Composite> rootCompositeSupplier =
-                    (Supplier<Composite>) menu.getData(ROOT_COMPOSITE_SUPPLIER);
+                    (Supplier<Composite>) menu.getData(TableBuilder.ROOT_COMPOSITE_SUPPLIER);
             this.viewService
                     .createViewOn(rootCompositeSupplier.get())
                     .exam(examId)

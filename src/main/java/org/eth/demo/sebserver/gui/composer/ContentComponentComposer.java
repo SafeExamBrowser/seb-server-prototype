@@ -8,13 +8,10 @@
 
 package org.eth.demo.sebserver.gui.composer;
 
-import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Composite;
 
-public interface TableRowPopupMenuComposer {
+public interface ContentComponentComposer<C> {
 
-    String TABLE_ROW_DATA = "TABLE_ROW_DATA";
-    String ROOT_COMPOSITE_SUPPLIER = "ROOT_COMPOSITE_SUPPLIER";
-
-    void onTableRowMenuEvent(final Event event);
+    C compose(final Composite parent, final Composite group);
 
 }

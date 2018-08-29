@@ -79,10 +79,10 @@ public class ExamSessionController {
         }
     }
 
-    @MessageMapping("/runningexam/wsconnect/*")
-    public void connectionMessages(@Payload final String payload) {
-        System.out.println("****************************** payload " + payload);
-    }
+//    @MessageMapping("/runningexam/wsconnect/*")
+//    public void connectionMessages(@Payload final String payload) {
+//        System.out.println("****************************** payload " + payload);
+//    }
 
     @MessageMapping("/runningexam/event")
     public void eventpoint(

@@ -18,6 +18,7 @@ import org.eth.demo.sebserver.service.exam.ExamDao;
 import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
 import org.eth.demo.sebserver.web.clientauth.ClientConnectionAuth.LMSConnectionAuth;
 import org.eth.demo.sebserver.web.clientauth.ClientConnectionAuth.SEBConnectionAuth;
+import org.eth.demo.util.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -76,7 +77,11 @@ public class SEBClientConnectionController {
      * @param examId The identifier of the exam that was selected by an examinee
      * @param authentication Authentication instance with a SEBClientAuth principal
      * @return a list of currently running exams of the client's institution or a LMS login link */
-    @RequestMapping(value = "/sebauth/sebhandshake", method = RequestMethod.POST)
+    @RequestMapping(
+            value = "/sebauth/sebhandshake",
+            method = RequestMethod.POST,
+            consumes = { Const.CONTENT_TYPE_PLAIN_TEXT, Const.CONTENT_TYPE_APPLICATION_JSON },
+            produces = Const.CONTENT_TYPE_APPLICATION_JSON)
     public ResponseEntity<String> sebHandshake(
             @RequestParam(name = EXAM_IDENTIFIER_KEY_NAME, required = false) final Long examId,
             final SEBConnectionAuth auth) {
@@ -98,7 +103,8 @@ public class SEBClientConnectionController {
 
                 return ResponseEntity.ok()
                         .header(CONNECTION_TOKEN_KEY_NAME, connectionToken)
-                        .body(this.jsonMapper.writeValueAsString(exam.lmsExamURL));
+                        .header(LMS_URL_KEY_NAME, exam.lmsExamURL)
+                        .build();
             } else if (auth.lmsUrl == null) {
                 // if no overall LMS URL is set on the specified seb-lms-setup,
                 // this response with a list of currently running exams for selection
@@ -149,7 +155,11 @@ public class SEBClientConnectionController {
      * @param examId The identifier of the exam that was enrolled by the LMS (this is only required if case 3.b was
      *            applied before)
      * @param authentication */
-    @RequestMapping(value = "/sebauth/lmshandshake", method = RequestMethod.POST)
+    @RequestMapping(
+            value = "/sebauth/lmshandshake",
+            method = RequestMethod.POST,
+            consumes = { Const.CONTENT_TYPE_PLAIN_TEXT, Const.CONTENT_TYPE_APPLICATION_JSON },
+            produces = Const.CONTENT_TYPE_APPLICATION_JSON)
     public ResponseEntity<Object> lmsHandshake(
             @RequestHeader(name = CONNECTION_TOKEN_KEY_NAME, required = true) final String connectionToken,
             @RequestHeader(name = USER_IDENTIFIER_KEY_NAME, required = true) final String userIdentifier,
@@ -168,9 +178,7 @@ public class SEBClientConnectionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .build();
+        return ResponseEntity.ok().build();
     }
 
 }

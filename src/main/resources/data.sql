@@ -4,7 +4,7 @@ INSERT INTO institution VALUES
     
 INSERT INTO seb_lms_setup VALUES
     (1, 1, "MOCK", "lmsclient", "$2a$04$KtWx03i61fPqibYXyzd/6.ZKsmxJuPlQgFKaDnZLmHbnSuhjbmi3a", "https://localhost:8090/lms/authorisationRequest", "sebclient", "$2a$04$SkWmoq0fL2wWyEk.cQj98ewdBH0Jtj.JWH/2vo6fJpo8wgK2/iv1W"),
-    (2, 1, "MOCK", "lmsclient2", "$2a$04$KtWx03i61fPqibYXyzd/6.ZKsmxJuPlQgFKaDnZLmHbnSuhjbmi3a", null, "sebclient2", "$2a$04$SkWmoq0fL2wWyEk.cQj98ewdBH0Jtj.JWH/2vo6fJpo8wgK2/iv1W")
+    (2, 1, "MOCK", "lmsclient2", "$2a$04$KtWx03i61fPqibYXyzd/6.ZKsmxJuPlQgFKaDnZLmHbnSuhjbmi3a", null, "sebclient2", "$2a$04$GnvmGGhTz8O3XA6w0Rrwk.gDsdgLmwOfApmxmoVmWkl3bZ.oP0.ry")
     ;
 
 INSERT INTO user VALUES 

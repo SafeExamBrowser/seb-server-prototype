@@ -29,7 +29,7 @@ public class GETConfigs implements SEBServerAPICall<Collection<ConfigTableRow>> 
 
     public GETConfigs(final RestCallBuilder restCallBuilder) {
         this.restCallBuilder = restCallBuilder;
-        this.uri = restCallBuilder.withPath("config");
+        this.uri = restCallBuilder.withPath("sebconfig/all");
     }
 
     @Override

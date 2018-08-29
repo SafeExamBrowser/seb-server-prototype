@@ -6,11 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.service;
+package org.eth.demo.sebserver.gui.composer;
 
 import java.util.Map;
 
 import org.eclipse.swt.widgets.Composite;
+import org.eth.demo.sebserver.gui.service.ViewService;
 
 public interface ViewComposer {
 

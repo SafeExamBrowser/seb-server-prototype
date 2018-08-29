@@ -103,7 +103,7 @@ public class WebSocketClientBot {
             log.info("Mocked handshake LMS --> SEB-Server status {}",
                     lmsHandshakeResponse.getStatusCode());
 
-            if (lmsHandshakeResponse.getStatusCodeValue() != 202) {
+            if (lmsHandshakeResponse.getStatusCodeValue() != 200) {
                 log.error("SEB-Server rejected the mocked LMS handshake");
                 return;
             }

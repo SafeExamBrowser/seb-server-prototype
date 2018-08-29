@@ -220,7 +220,10 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
                             map.computeIfAbsent(rec.id, id -> new ArrayList<>()).add(rec);
                             return map;
                         },
-                        null /* TODO if we allow parallelization we need a proper combiner here */)
+                        (map1, map2) -> {
+                            map1.putAll(map2);
+                            return map1;
+                        })
                 .values()
                 .stream()
                 .map(ConfigurationDaoImpl::createNode)

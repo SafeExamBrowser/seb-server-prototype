@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.views;
+package org.eth.demo.sebserver.gui.composer.views;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,11 +30,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eth.demo.sebserver.gui.composer.ViewComposer;
 import org.eth.demo.sebserver.gui.domain.exam.ConnectionRow;
 import org.eth.demo.sebserver.gui.domain.exam.Indicator;
 import org.eth.demo.sebserver.gui.domain.exam.RunningExam;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
-import org.eth.demo.sebserver.gui.service.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
 import org.eth.demo.sebserver.gui.service.push.ServerPushContext;
 import org.eth.demo.sebserver.gui.service.push.ServerPushService;

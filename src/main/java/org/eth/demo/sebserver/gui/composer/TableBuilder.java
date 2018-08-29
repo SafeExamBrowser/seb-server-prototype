@@ -22,42 +22,65 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-public class TableComposer<R> {
+public class TableBuilder<R> {
 
-    private final Composite parent;
-    private final Composite group;
+    public static final String TABLE_ROW_DATA = "TABLE_ROW_DATA";
+    public static final String ROOT_COMPOSITE_SUPPLIER = "ROOT_COMPOSITE_SUPPLIER";
+
+    private final Collection<R> rows;
     private final List<ColumnDef<R>> columns = new ArrayList<>();
-    private TableRowPopupMenuComposer menuComposer = null;
+    private PopupMenuComposer menuComposer = null;
+    private String emptyNote = "--";
 
-    public TableComposer(final Composite parent, final Composite group) {
-        this.parent = parent;
-        this.group = group;
+    public TableBuilder(final Collection<R> rows) {
+        this.rows = rows;
     }
 
-    public final TableComposer withRowMenu(final TableRowPopupMenuComposer menuComposer) {
+    public final TableBuilder<R> withRowMenu(final PopupMenuComposer menuComposer) {
         this.menuComposer = menuComposer;
         return this;
     }
 
-    public final TableComposer withColumn(final String name, final String tooltip, final int width,
+    public final TableBuilder<R> withColumn(
+            final String name,
+            final String tooltip,
+            final int width,
             final Function<R, String> valueSupplier) {
+
         this.columns.add(new ColumnDef<>(name, tooltip, width, valueSupplier));
         return this;
     }
 
-    public Table compose(final Collection<R> rows) {
-        final Table table = new Table(this.group, SWT.NO_SCROLL);
+    public final TableBuilder<R> withEmptyNote(final String note) {
+        this.emptyNote = note;
+        return this;
+    }
+
+    public Table compose(final Composite parent, final Composite group) {
+        final Table table = new Table(group, SWT.NO_SCROLL);
         table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
+
+        if (this.rows.isEmpty()) {
+            final TableColumn tableColumn = new TableColumn(table, SWT.NONE);
+            tableColumn.setText(this.emptyNote);
+            table.addListener(SWT.Resize, event -> {
+                tableColumn.setWidth(table.getClientArea().width);
+            });
+            return table;
+        }
 
         if (this.menuComposer != null) {
             final Menu menu = new Menu(table);
             menu.setData(
-                    TableRowPopupMenuComposer.ROOT_COMPOSITE_SUPPLIER,
-                    (Supplier<Composite>) () -> this.parent);
+                    ROOT_COMPOSITE_SUPPLIER,
+                    (Supplier<Composite>) () -> parent);
             table.setMenu(menu);
             table.addListener(
                     SWT.MenuDetect,
-                    this.menuComposer::onTableRowMenuEvent);
+                    this.menuComposer::onMenuEvent);
         }
 
         for (final ColumnDef<R> column : this.columns) {
@@ -67,16 +90,15 @@ public class TableComposer<R> {
             tableColumn.setWidth(column.width);
         }
 
-        table.setHeaderVisible(true);
-        table.setLinesVisible(true);
-
-        for (final R row : rows) {
+        for (final R row : this.rows) {
             final TableItem item = new TableItem(table, SWT.NONE);
-            item.setData(TableRowPopupMenuComposer.TABLE_ROW_DATA, row);
-            final int index = 0;
+            item.setData(TABLE_ROW_DATA, row);
+            int index = 0;
             for (final ColumnDef<R> column : this.columns) {
                 item.setText(index, column.valueSupplier.apply(row));
+                index++;
             }
+
         }
 
         return table;

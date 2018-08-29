@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.views;
+package org.eth.demo.sebserver.gui.composer.views;
 
 import java.util.Enumeration;
 import java.util.Map;
@@ -17,7 +17,7 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eth.demo.sebserver.gui.service.ViewComposer;
+import org.eth.demo.sebserver.gui.composer.ViewComposer;
 import org.eth.demo.sebserver.gui.service.ViewService;
 import org.eth.demo.sebserver.gui.service.sebconfig.ConfigViewService;
 import org.eth.demo.sebserver.gui.service.sebconfig.ViewContext;

@@ -6,11 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.util;
+package org.eth.demo.sebserver.gui.composer;
 
-public interface Const {
+import org.eclipse.swt.widgets.Event;
 
-    String CONTENT_TYPE_APPLICATION_JSON = "application/json; charset=UTF-8";
-    String CONTENT_TYPE_PLAIN_TEXT = "text/plain;charset=UTF-8";
+public interface PopupMenuComposer {
+
+    void onMenuEvent(final Event event);
 
 }
