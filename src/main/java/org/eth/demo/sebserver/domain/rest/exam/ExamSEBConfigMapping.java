@@ -21,7 +21,7 @@ public final class ExamSEBConfigMapping {
     @JsonCreator
     public ExamSEBConfigMapping(
             @JsonProperty("id") final Long id,
-            @JsonProperty("id") final Long examId,
+            @JsonProperty("examId") final Long examId,
             @JsonProperty("configurationNodeId") final Long configurationNodeId,
             @JsonProperty("clientInfo") final String clientInfo) {
 

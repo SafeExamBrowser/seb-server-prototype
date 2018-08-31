@@ -17,6 +17,7 @@ import org.eth.demo.sebserver.batis.gen.mapper.IndicatorRecordMapper;
 import org.eth.demo.sebserver.service.ResourceNotFoundException;
 import org.eth.demo.sebserver.service.exam.ExamDaoImpl;
 import org.eth.demo.sebserver.testing.TestWithLogging;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -25,6 +26,7 @@ import ch.qos.logback.classic.spi.LoggingEvent;
 public class ExamDaoImplTest extends TestWithLogging {
 
     @Test
+    @Ignore
     public void testById_NoExamData() {
         final TestHelper tester = new TestHelper();
 
@@ -43,6 +45,7 @@ public class ExamDaoImplTest extends TestWithLogging {
     }
 
     @Test
+    @Ignore
     public void testById_UnexpectedException() {
         final TestHelper tester = new TestHelper();
 

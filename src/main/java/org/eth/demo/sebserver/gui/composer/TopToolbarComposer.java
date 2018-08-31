@@ -58,7 +58,7 @@ public class TopToolbarComposer implements ContentComponentComposer<ToolBar> {
         titleLabel.setText("  Dashboard : ");
 
         final ToolItem sep = new ToolItem(toolBar, SWT.SEPARATOR);
-        sep.setWidth(150);
+        sep.setWidth(100);
 
         final Menu newMenu = new Menu(group.getShell(), SWT.POP_UP);
         final MenuItem config = new MenuItem(newMenu, SWT.PUSH);

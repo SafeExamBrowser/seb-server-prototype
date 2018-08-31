@@ -11,12 +11,9 @@ package org.eth.demo.sebserver.gui.composer;
 import java.util.function.Supplier;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eth.demo.sebserver.gui.composer.views.RunningExamView;
 import org.eth.demo.sebserver.gui.domain.exam.ExamStatus;
@@ -29,7 +26,7 @@ import org.springframework.stereotype.Component;
 
 @Lazy
 @Component
-public class ExamTablePopupMenu implements PopupMenuComposer {
+public class ExamTablePopupMenu extends AbstractTableRowMenuPopup<ExamTableRow> {
 
     private final ViewService viewService;
     private final AuthorizationContextHolder authorizationContextHolder;
@@ -46,45 +43,8 @@ public class ExamTablePopupMenu implements PopupMenuComposer {
     }
 
     @Override
-    public final void onMenuEvent(final Event event) {
-        final Table table = (Table) event.widget;
-        final TableItem[] selection = table.getSelection();
-        if (selection != null && selection.length > 0) {
-            final Rectangle bounds = getRealBounds(selection[0]);
-            final Menu menu = table.getMenu();
-            if (menu.getItemCount() > 0) {
-                for (final MenuItem mItem : menu.getItems()) {
-                    mItem.dispose();
-                }
-            }
-            if (bounds.contains(event.x, event.y)) {
-                composeExamMenu(menu, selection[0]);
-            }
-        }
-    }
-
-    private final Rectangle getRealBounds(final TableItem item) {
-        Rectangle result = item.getBounds();
-        for (int i = 0; i < item.getParent().getColumnCount(); i++) {
-            result = result.union(item.getBounds(i));
-        }
-        Composite parent = item.getParent();
-        while (parent != null) {
-            result.x += parent.getBounds().x;
-            result.y += parent.getBounds().y;
-            parent = parent.getParent();
-        }
-        return result;
-    }
-
-    private final void composeExamMenu(final Menu menu, final TableItem item) {
-        final ExamTableRow exam = (ExamTableRow) item.getData(TableBuilder.TABLE_ROW_DATA);
-        if (exam == null) {
-            menu.setVisible(false);
-            return;
-        }
-
-        final ExamStatus examStatus = exam.getExamStatus();
+    protected final void composeMenu(final Menu menu, final TableItem item, final ExamTableRow rowData) {
+        final ExamStatus examStatus = rowData.getExamStatus();
         if (examStatus == null) {
             menu.setVisible(false);
             return;
@@ -92,23 +52,23 @@ public class ExamTablePopupMenu implements PopupMenuComposer {
 
         switch (examStatus) {
             case IN_PROGRESS: {
-                addViewExamAction(menu, exam.id);
-                if (exam.isOwner(this.authorizationContextHolder)) {
-                    addEditAction(menu, exam.id);
-                    addStateChangeAction("Set Ready", menu, item, exam.id, ExamStatus.READY);
+                addViewExamAction(menu, rowData.id);
+                if (rowData.isOwner(this.authorizationContextHolder)) {
+                    addEditAction(menu, rowData.id);
+                    addStateChangeAction("Set Ready", menu, item, rowData.id, ExamStatus.READY);
                 }
                 break;
             }
             case READY: {
-                addViewExamAction(menu, exam.id);
-                if (exam.isOwner(this.authorizationContextHolder)) {
-                    addStateChangeAction("Back To Edit", menu, item, exam.id, ExamStatus.IN_PROGRESS);
-                    addStateChangeAction("Run", menu, item, exam.id, ExamStatus.RUNNING);
+                addViewExamAction(menu, rowData.id);
+                if (rowData.isOwner(this.authorizationContextHolder)) {
+                    addStateChangeAction("Back To Edit", menu, item, rowData.id, ExamStatus.IN_PROGRESS);
+                    addStateChangeAction("Run", menu, item, rowData.id, ExamStatus.RUNNING);
                 }
                 break;
             }
             case RUNNING: {
-                addViewRunningExamAction(menu, exam.id);
+                addViewRunningExamAction(menu, rowData.id);
                 break;
             }
             default: {

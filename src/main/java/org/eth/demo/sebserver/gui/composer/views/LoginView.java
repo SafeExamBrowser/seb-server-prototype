@@ -142,6 +142,16 @@ public class LoginView implements ViewComposer {
                 loginError(viewService, parent, "Unexpected Error. Please call an Administrator");
             }
         });
+        loginName.addListener(SWT.KeyDown, event -> {
+            if (event.character == '\n' || event.character == '\r') {
+                loginPassword.setFocus();
+            }
+        });
+        loginPassword.addListener(SWT.KeyDown, event -> {
+            if (event.character == '\n' || event.character == '\r') {
+                button.setFocus();
+            }
+        });
     }
 
     private void loginError(

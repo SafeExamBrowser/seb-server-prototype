@@ -10,12 +10,14 @@ package org.eth.demo.sebserver.sec;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class BCryptEncoding {
 
     @Test
+    @Ignore
     public void encrypt() {
         final BCryptPasswordEncoder clientEncoder = new BCryptPasswordEncoder(4);
         final BCryptPasswordEncoder userEncoder = new BCryptPasswordEncoder(8);

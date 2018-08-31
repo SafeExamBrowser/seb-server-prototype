@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.rap.rwt.RWT;
 
 public interface AuthorizationContextHolder {
+
     SEBServerAuthorizationContext getAuthorizationContext(HttpSession session);
 
     // TODO error handling!?

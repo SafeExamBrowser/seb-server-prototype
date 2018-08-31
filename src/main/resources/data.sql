@@ -68,7 +68,7 @@ INSERT INTO orientation VALUES
     ;
     
 INSERT INTO configuration_node VALUES
-    (1, 1, 2, "Demo Config", "CLIENT")
+    (1, 1, 3, "Demo Config", "CLIENT")
     ;
     
 INSERT INTO configuration VALUES

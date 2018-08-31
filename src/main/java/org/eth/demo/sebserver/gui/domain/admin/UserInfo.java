@@ -9,6 +9,7 @@
 package org.eth.demo.sebserver.gui.domain.admin;
 
 import java.util.Collection;
+import java.util.Locale;
 
 import org.joda.time.DateTime;
 
@@ -22,6 +23,8 @@ public class UserInfo {
     public final String username;
     public final String email;
     public final DateTime creationDate;
+    // TODO add this to DB table and user form
+    public final Locale locale = Locale.ENGLISH;
     public final Boolean active;
     public final Collection<Role> roles;
 
@@ -54,6 +57,10 @@ public class UserInfo {
 
     public String getEmail() {
         return this.email;
+    }
+
+    public Locale getLocale() {
+        return this.locale;
     }
 
     public DateTime getCreationDate() {

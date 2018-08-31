@@ -37,6 +37,13 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+             <execution>
+                 <goals>
+                     <goal>repackage</goal>
+                 </goals>
+             </execution>
+         </executions>
       </plugin>
     </plugins>
   </build>
@@ -151,7 +158,8 @@
       <artifactId>org.eclipse.rap.rwt</artifactId>
       <version>3.5.0</version>
     </dependency>
-<!-- JFace seems to need org.eclipse.core to work and even then did't work very well? -->
+<!-- JFace seems to need org.eclipse.core to work and even then did't work very well?
+     NOTE: see end of page: https://www.eclipse.org/rap/developers-guide/devguide.php?topic=rwt-standalone.html&version=2.0 -->
 <!--     <dependency> -->
 <!--       <groupId>org.eclipse.rap</groupId> -->
 <!--       <artifactId>org.eclipse.rap.jface</artifactId> -->

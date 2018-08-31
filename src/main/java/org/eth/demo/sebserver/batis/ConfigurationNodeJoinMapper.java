@@ -42,13 +42,13 @@ public interface ConfigurationNodeJoinMapper {
 
             @Arg(column = "configVersionId", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "version", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Arg(column = "versionDate", typeHandler = JodaTimeTypeResolver.class, javaType = DateTime.class,
+            @Arg(column = "version_date", typeHandler = JodaTimeTypeResolver.class, javaType = DateTime.class,
                     jdbcType = JdbcType.DATE),
             @Arg(column = "followup", javaType = Boolean.class, jdbcType = JdbcType.BIT),
 
             @Arg(column = "examMappingId", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "exam_id", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
-            @Arg(column = "clientInfo", javaType = String.class, jdbcType = JdbcType.VARCHAR)
+            @Arg(column = "client_info", javaType = String.class, jdbcType = JdbcType.VARCHAR)
     })
     Collection<ConfigNodeJoinRecord> selectMany(SelectStatementProvider select);
 

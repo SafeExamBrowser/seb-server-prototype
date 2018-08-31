@@ -17,7 +17,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
-import org.eth.demo.sebserver.gui.I18nSupport;
 import org.eth.demo.sebserver.gui.composer.ExamTablePopupMenu;
 import org.eth.demo.sebserver.gui.composer.SEBConfigTablePopupMenu;
 import org.eth.demo.sebserver.gui.composer.StatusToolbarComposer;
@@ -27,6 +26,7 @@ import org.eth.demo.sebserver.gui.composer.ViewComposer;
 import org.eth.demo.sebserver.gui.domain.exam.ExamTableRow;
 import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigTableRow;
 import org.eth.demo.sebserver.gui.service.ViewService;
+import org.eth.demo.sebserver.gui.service.i18n.I18nSupport;
 import org.eth.demo.sebserver.gui.service.rest.GETConfigs;
 import org.eth.demo.sebserver.gui.service.rest.GETExams;
 import org.eth.demo.sebserver.gui.service.rest.RestServices;
@@ -88,7 +88,7 @@ public class Dashboard implements ViewComposer {
 
         final ExpandBar expandBar = new ExpandBar(group, SWT.BORDER | SWT.V_SCROLL);
         expandBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        expandBar.setSpacing(8);
+        expandBar.setSpacing(10);
 
         final ExpandItem configs = new ExpandItem(expandBar, SWT.NONE, 0);
         configs.setText("Configurations");
