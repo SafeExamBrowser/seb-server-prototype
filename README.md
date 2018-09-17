@@ -42,7 +42,7 @@ mvn clean install
 cd target
 ```
 
-- Now you can start the application like a normal runnable jar by using java command line and give the password for the MariaDB server and the applications encryption password witch is "somePW" for the prototype.
+- Now you can start the application like a normal runnable jar by using java command line and give the password for the MariaDB server and the applications encryption password that is "somePW" for the prototype.
 
 ```
 java -jar seb-server-demo-0.0.1-SNAPSHOT.jar org.eth.demo.sebserver.SEBServer.class --spring.datasource.username=root --spring.datasource.password=somePW --sebserver.encrypt.password=somePW
