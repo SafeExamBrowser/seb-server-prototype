@@ -11,8 +11,12 @@ package org.eth.demo.sebserver.web;
 import org.eth.demo.sebserver.web.clientauth.LMSClientAuthenticationFilter;
 import org.eth.demo.sebserver.web.clientauth.SEBClientAuthenticationFilter;
 import org.eth.demo.sebserver.web.oauth.InternalUserDetailsService;
+import org.jasypt.encryption.StringEncryptor;
+import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
+import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -83,6 +87,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     @Qualifier(EncodingConfig.USER_PASSWORD_ENCODER_BEAN_NAME)
     private PasswordEncoder userPasswordEncoder;
+    @Value("${sebserver.encrypt.password}")
+    private String encryptPass;
 
     @Override
     public void configure(final WebSecurity web) {
@@ -141,6 +147,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 new FilterRegistrationBean<>(filter);
         registration.setEnabled(false);
         return registration;
+    }
+
+    @Bean(name = "encryptorBean")
+    public StringEncryptor stringEncryptor() {
+        final PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
+        final SimpleStringPBEConfig config = new SimpleStringPBEConfig();
+        config.setPassword(this.encryptPass);
+        config.setAlgorithm("PBEWithMD5AndDES");
+        config.setKeyObtentionIterations("1000");
+        config.setPoolSize("1");
+        config.setProviderName("SunJCE");
+        config.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator");
+        config.setStringOutputType("base64");
+        encryptor.setConfig(config);
+        return encryptor;
     }
 
     @Configuration
