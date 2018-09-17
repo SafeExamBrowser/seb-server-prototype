@@ -101,6 +101,7 @@ public class LoginView implements ViewComposer {
         final GridData formCellText = new GridData(100, 20);
         final GridData formCellData = new GridData(200, 20);
         final Label name = new Label(form, SWT.NONE);
+        name.setData(RWT.CUSTOM_VARIANT, "p");
         name.setText("Name: ");
         name.setLayoutData(formCellText);
         final Text loginName = new Text(form, SWT.LEFT | SWT.BORDER);

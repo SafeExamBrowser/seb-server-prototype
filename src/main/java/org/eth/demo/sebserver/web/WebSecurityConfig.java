@@ -45,7 +45,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             // NOTE: The integrated GUI is not covered within Spring-Security
             new AntPathRequestMatcher("/gui/**"),
             // RAP/RWT resources has to be accessible
-            new AntPathRequestMatcher("/rwt-resources/**"));
+            new AntPathRequestMatcher("/rwt-resources/**"),
+            // project specific static resources
+            new AntPathRequestMatcher("/images/**"));
 
     public static final AntPathRequestMatcher SEB_HANDSHAKE_ENDPOINT =
             new AntPathRequestMatcher("/sebauth/sebhandshake/**");

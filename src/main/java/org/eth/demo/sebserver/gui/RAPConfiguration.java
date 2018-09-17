@@ -33,6 +33,7 @@ public class RAPConfiguration implements ApplicationConfiguration {
     @Override
     public void configure(final Application application) {
         application.addEntryPoint("/gui", RAPSpringEntryPointFactory, null);
+        application.addStyleSheet(RWT.DEFAULT_THEME_ID, "static/css/sebserver.css");
     }
 
     private static final EntryPointFactory RAPSpringEntryPointFactory = new EntryPointFactory() {

@@ -1,0 +1,18 @@
+Label.h4 {
+    font: normal 14px Arial, Helvetica, sans-serif;
+    height: 20px;
+}
+
+Label.h5 {
+    font: normal 14px Arial, Helvetica, sans-serif;
+}
+
+Label.h6 {
+    font: normal 12px Arial, Helvetica, sans-serif;
+}
+
+Label.p {
+    font: normal 12px Arial, Helvetica, sans-serif;
+    height: 20px;
+    margin: 0px 0px 10px 0px;
+}
