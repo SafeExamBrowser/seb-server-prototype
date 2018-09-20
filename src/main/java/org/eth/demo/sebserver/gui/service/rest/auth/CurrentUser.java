@@ -9,6 +9,8 @@
 package org.eth.demo.sebserver.gui.service.rest.auth;
 
 import org.eth.demo.sebserver.gui.domain.admin.UserInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
@@ -18,21 +20,32 @@ import org.springframework.web.context.WebApplicationContext;
 @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class CurrentUser {
 
-    private final AuthorizationContextHolder authorizationContextHolder;
+    private static final Logger log = LoggerFactory.getLogger(CurrentUser.class);
 
-    private UserInfo user = null;
+    private final AuthorizationContextHolder authorizationContextHolder;
+    private SEBServerAuthorizationContext authContext = null;
 
     public CurrentUser(final AuthorizationContextHolder authorizationContextHolder) {
         this.authorizationContextHolder = authorizationContextHolder;
     }
 
     public UserInfo get() {
-        if (this.user == null) {
-            this.user = this.authorizationContextHolder
-                    .getAuthorizationContext()
-                    .getLoggedInUser();
+        if (this.authContext == null) {
+            this.authContext = this.authorizationContextHolder
+                    .getAuthorizationContext();
         }
 
-        return this.user;
+        if (isAvailable()) {
+            return this.authContext.getLoggedInUser();
+        }
+
+        log.warn("Current user requested but no user is currently logged in");
+
+        return null;
     }
+
+    public boolean isAvailable() {
+        return this.authContext != null && this.authContext.isLoggedIn();
+    }
+
 }

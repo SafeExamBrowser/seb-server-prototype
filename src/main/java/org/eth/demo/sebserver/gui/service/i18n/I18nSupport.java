@@ -8,11 +8,22 @@
 
 package org.eth.demo.sebserver.gui.service.i18n;
 
+import java.util.Collection;
 import java.util.Locale;
 
 import org.joda.time.DateTime;
 
 public interface I18nSupport {
+
+    Collection<Locale> supportedLanguages();
+
+    /** Use this to get the current Locale either form a user if this is called form a logged in user context or the
+     * applications default locale.
+     *
+     * @return the current Locale to use in context */
+    Locale getCurrentLocale();
+
+    void setSessionLocale(Locale locale);
 
     /** Use this to format a DateTime to displayable text format.
      *
@@ -21,6 +32,8 @@ public interface I18nSupport {
     String formatDisplayDate(DateTime date);
 
     String getText(String key, Object... args);
+
+    String getText(LocTextKey key);
 
     String getText(final String key, String def, Object... args);
 

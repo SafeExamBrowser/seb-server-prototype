@@ -8,6 +8,9 @@
 
 package org.eth.demo.sebserver.gui;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
@@ -17,8 +20,11 @@ import org.eclipse.rap.rwt.application.Application;
 import org.eclipse.rap.rwt.application.ApplicationConfiguration;
 import org.eclipse.rap.rwt.application.EntryPoint;
 import org.eclipse.rap.rwt.application.EntryPointFactory;
+import org.eclipse.rap.rwt.client.WebClient;
 import org.eclipse.swt.widgets.Composite;
-import org.eth.demo.sebserver.gui.service.ViewService;
+import org.eth.demo.sebserver.gui.service.page.ComposerService;
+import org.eth.demo.sebserver.gui.service.page.LoginPage;
+import org.eth.demo.sebserver.gui.service.page.MainPage;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.eth.demo.sebserver.gui.service.rest.auth.SEBServerAuthorizationContext;
 import org.slf4j.Logger;
@@ -32,8 +38,19 @@ public class RAPConfiguration implements ApplicationConfiguration {
 
     @Override
     public void configure(final Application application) {
-        application.addEntryPoint("/gui", RAPSpringEntryPointFactory, null);
-        application.addStyleSheet(RWT.DEFAULT_THEME_ID, "static/css/sebserver.css");
+        final Map<String, String> properties = new HashMap<>();
+        properties.put(WebClient.PAGE_TITLE, "SEB Server");
+        properties.put(WebClient.BODY_HTML, "<big>Loading Application<big>");
+//        properties.put(WebClient.FAVICON, "icons/favicon.png");
+//        properties.put(WebClient.THEME_ID, "MyCustomTheme");
+        application.addEntryPoint("/gui", RAPSpringEntryPointFactory, properties);
+
+        try {
+            // TODO get file path from properties
+            application.addStyleSheet(RWT.DEFAULT_THEME_ID, "static/css/sebserver.css");
+        } catch (final Exception e) {
+            log.error("Error during CSS parsing. Please check the custom CSS files for errors.", e);
+        }
     }
 
     private static final EntryPointFactory RAPSpringEntryPointFactory = new EntryPointFactory() {
@@ -58,14 +75,23 @@ public class RAPConfiguration implements ApplicationConfiguration {
                     }
 
                     final WebApplicationContext webApplicationContext = getWebApplicationContext(httpSession);
-                    final ViewService viewService = webApplicationContext
-                            .getBean(ViewService.class);
+
+                    final ComposerService composerService = webApplicationContext
+                            .getBean(ComposerService.class);
 
                     if (isAuthenticated(httpSession, webApplicationContext)) {
-                        viewService.composeView(parent, ViewService.MAIN_PAGE);
+                        composerService.composePage(MainPage.class, parent);
                     } else {
-                        viewService.composeView(parent, ViewService.LOGIN_PAGE);
+                        composerService.composePage(LoginPage.class, parent);
                     }
+//                    final ViewService viewService = webApplicationContext
+//                            .getBean(ViewService.class);
+//
+//                    if (isAuthenticated(httpSession, webApplicationContext)) {
+//                        viewService.composeView(parent, ViewService.MAIN_PAGE);
+//                    } else {
+//                        viewService.composeView(parent, ViewService.LOGIN_PAGE);
+//                    }
                 }
             };
         }

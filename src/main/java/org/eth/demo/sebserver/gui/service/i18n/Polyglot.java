@@ -6,12 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.util;
+package org.eth.demo.sebserver.gui.service.i18n;
 
-public interface Const {
+public interface Polyglot {
 
-    String CONTENT_TYPE_APPLICATION_JSON = "application/json; charset=UTF-8";
-    String CONTENT_TYPE_PLAIN_TEXT = "text/plain;charset=UTF-8";
-    String CONTENT_TYPE_CSS_TEXT = "text/css;charset=UTF-8";
+    void updateLocale(I18nSupport i18nSupport);
 
 }

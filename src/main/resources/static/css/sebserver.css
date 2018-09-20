@@ -1,18 +1,295 @@
-Label.h4 {
+* {
+    color: #000000;
     font: normal 14px Arial, Helvetica, sans-serif;
+    background-image: none;
+    background-color: #FFFFFF;
+    padding: 0; 
+}
+
+*:disabled {
+    color: #CFCFCF;
+}
+
+/* Label default theme */
+Label {
+    font: 14px Verdana, "Lucida Sans", Arial, Helvetica, sans-serif;
+    color: #4a4a4a;
+    background-color: transparent;
+    background-image: none;
+    background-repeat: repeat;
+    background-position: left top;
+    border: none;
+    border-radius: 0;
+    text-decoration: none;
+    cursor: default;
+    opacity: 1;
+    text-shadow: none;
+}
+
+Label.h1 {
+    font: 25px Arial, Helvetica, sans-serif;
+    height: 28px;
+    padding: 0px 12px 12px 12px;
+    color: #1f407a;
+}
+
+Label.h2 {
+    font: 19px Arial, Helvetica, sans-serif;
+    height: 22px;
+    padding: 0 0 10px 0;
+    color: #1f407a;
+}
+
+Label.h3 {
+    font: bold 14px Arial, Helvetica, sans-serif;
     height: 20px;
+    padding: 0;
+    color: #1f407a;
 }
 
-Label.h5 {
-    font: normal 14px Arial, Helvetica, sans-serif;
+Label:hover.imageButton {
+    background-color: #82BE1E;
+    background-gradient-color: #82BE1E;
+    background-image: gradient( linear, left top, left bottom, from( #82BE1E ), to( #82BE1E ) );
 }
 
-Label.h6 {
-    font: normal 12px Arial, Helvetica, sans-serif;
+Composite.bordered {
+    border: 2px;
 }
 
-Label.p {
-    font: normal 12px Arial, Helvetica, sans-serif;
-    height: 20px;
-    margin: 0px 0px 10px 0px;
+Composite.header {
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+Composite.logo {
+    background-color: #1F407A;
+}
+
+Composite.bgLogo {
+    background-color: #1F407A;
+    background-image: url(static/images/ethz_logo_white.png);
+    background-repeat: no-repeat;
+    background-position: left center;
+}
+
+Composite.bgContent {
+    background-color: #EAECEE;
+    background-image: url(static/images/blueBackground.png);
+    background-repeat: repeat-x;
+}
+
+Composite.content {
+    background-color: #FFFFFF;
+}
+
+Composite.bgFooter {
+    background-color: #EAECEE;
+}
+
+Composite.footer {
+    background-color: #1F407A;
+}
+
+Composite.login {
+    background-color: #EAECEE;
+    margin: 20px 0 0 0;
+    padding: 15px 8px 8px 8px;
+    border: 1px solid #bdbdbd;
+    border-radius: 2px;
+}
+
+*.header {
+    font: bold 12px Arial, Helvetica, sans-serif;
+    color: #FFFFFF;
+    background-color: transparent;
+}
+
+*.footer {
+    font: bold 12px Arial, Helvetica, sans-serif;
+    color: #FFFFFF;
+    background-color: transparent;
+}
+
+
+/* Text default */
+Text {
+    font: 14px Verdana, "Lucida Sans", Arial, Helvetica, sans-serif;
+    border: none;
+    border-radius: 0;
+    padding: 5px 10px 5px 10px;
+    color: #4a4a4a;
+    background-repeat: repeat;
+    background-position: left top;
+    background-color: #ffffff;
+    background-image: none;
+    text-shadow: none;
+    box-shadow: none;
+}
+
+
+
+/* Message titlebar */
+Shell.message {
+  animation: none;
+  border: 1px solid #bdbdbd;
+  background-color: #ffffff;
+  background-image: none;
+  padding: 0px;
+  opacity: 1;
+  box-shadow: none;
+  width: 400px;
+}
+
+Shell-Titlebar.message {
+  background-color: #0069B4;
+  background-gradient-color: #0069B4;
+  color: white;
+  background-image: gradient( linear, left top, left bottom, from( #0069B4 ), to( #0069B4 ) );
+  padding: 2px 5px 2px;
+  margin: 0px;
+  height: 22px;
+  font: 14px Verdana, "Lucida Sans", Arial, Helvetica, sans-serif;
+  border: none;
+  border-radius: 1px 1px 0px 0px;
+  text-shadow: none;
+}
+
+Button {
+    font: 12px Arial, Helvetica, sans-serif;
+    padding: 5px 6px 5px 6px;
+}
+
+/* Push Buttons */
+Button[PUSH],
+Button[PUSH]:default {
+    font: bold 12px Arial, Helvetica, sans-serif;
+    background-color: #0069B4;
+    background-gradient-color: #0069B4;
+    background-image: gradient( linear, left top, left bottom, from( #0069B4 ), to( #0069B4 ) );
+    color: #fff;
+    border: none;
+    border-radius: 0px;
+    padding: 6px 15px;
+    text-shadow: none;
+}
+
+Button[PUSH]:pressed {
+    background-color: #444;
+    color: #fff;
+    background-gradient-color: #444;
+    background-image: gradient( linear, left top, left bottom, from( #444 ), to( #444 ) );
+}
+
+Button[PUSH]:hover {
+    background-color: #82BE1E;
+    background-gradient-color: #82BE1E;
+    background-image: gradient( linear, left top, left bottom, from( #82BE1E ), to( #82BE1E ) );
+    color: #444;
+    cursor: pointer;
+}
+
+Button[PUSH]:disabled {
+    background-color: transparent;
+    border: 1px solid #EAECEE;
+    color: #c0c0c0;
+    background-repeat: no-repeat;
+    background-position: right;
+}
+
+Button-FocusIndicator[PUSH] {
+    background-color: transparent;
+}
+
+/* Push Buttons header */
+Button[PUSH].header,
+Button[PUSH]:default.header {
+    font: bold 12px Arial, Helvetica, sans-serif;
+    background-color: #595959;
+    background-gradient-color: #595959;
+    background-image: gradient( linear, left top, left bottom, from( #595959 ), to( #595959 ) );
+    color: #fff;
+    border: none;
+    border-radius: 0px;
+    padding: 6px 15px;
+    text-shadow: none;
+}
+
+Button[PUSH]:pressed.header {
+    background-color: #444;
+    color: #fff;
+    background-gradient-color: #444;
+    background-image: gradient( linear, left top, left bottom, from( #444 ), to( #444 ) );
+}
+
+Button[PUSH]:hover.header {
+    background-color: #82BE1E;
+    background-gradient-color: #82BE1E;
+    background-image: gradient( linear, left top, left bottom, from( #82BE1E ), to( #82BE1E ) );
+    color: #444;
+    cursor: pointer;
+}
+
+
+/* Sash default */
+Sash {
+    background-image: none;
+    background-color: transparent;
+    background-color: #EAECEE;
+}
+
+Sash:hover {
+    background-color: #444444;
+}
+
+
+/*Standard Einstellungen fuer Trees*/
+Tree {
+    font: bold 12px Arial, Helvetica, sans-serif;
+    background-color: white;
+    border: none;
+    color: #1f407a;
+}
+
+Tree[BORDER] {
+    border: 1px solid #eceeef;
+}
+
+TreeItem {
+    font: bold 12px Arial, Helvetica, sans-serif;
+    background-color: transparent;
+    color: #1f407a;
+    text-decoration: none;
+    text-shadow: none;
+    background-image: none;
+}
+
+TreeItem:linesvisible:even {
+    background-color: #f3f3f4;
+}
+
+Tree-RowOverlay {
+    background-color: transparent;
+    color: inherit;
+    background-image: none;
+}
+
+Tree-RowOverlay:hover {
+    background-color: #82be1e;
+    color: #1F407A;
+}
+
+Tree-RowOverlay:selected {
+    background-color: #1f407a;
+    color: #FFFFFF;
+}
+
+Tree-RowOverlay:selected:unfocused {
+    background-color: #eceeef;
+    color: #1f407a;
+}
+
+Tree-RowOverlay:selected:hover {
+    background-color: #82be1e;
+    color: #000000;
 }

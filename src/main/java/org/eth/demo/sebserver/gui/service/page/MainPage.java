@@ -6,12 +6,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.util;
+package org.eth.demo.sebserver.gui.service.page;
 
-public interface Const {
+import org.springframework.stereotype.Component;
 
-    String CONTENT_TYPE_APPLICATION_JSON = "application/json; charset=UTF-8";
-    String CONTENT_TYPE_PLAIN_TEXT = "text/plain;charset=UTF-8";
-    String CONTENT_TYPE_CSS_TEXT = "text/css;charset=UTF-8";
+@Component
+public class MainPage extends PageComposer {
+
+    public MainPage() {
+        super(MainPageForm.class.getName());
+    }
 
 }
