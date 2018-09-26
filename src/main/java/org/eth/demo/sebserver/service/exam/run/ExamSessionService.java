@@ -16,7 +16,7 @@ import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordMapper;
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.exam.ConnectionInfo;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorValue;
-import org.eth.demo.sebserver.service.exam.ExamStateService;
+import org.eth.demo.sebserver.service.exam.ExamDao;
 import org.eth.demo.sebserver.service.exam.run.ExamConnectionService.ConnectionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,22 +27,22 @@ public class ExamSessionService {
     private static final Logger log = LoggerFactory.getLogger(ExamSessionService.class);
 
     private final ExamConnectionService examConnectionService;
-    private final ExamStateService examStateService;
+    private final ExamDao examDao;
     private final EventHandlingStrategy eventHandlingStrategy;
 
     public ExamSessionService(
             final ExamConnectionService examConnectionService,
-            final ExamStateService examStateService,
+            final ExamDao examDao,
             final ClientConnectionRecordMapper clientConnectionRecordMapper,
             final EventHandlingStrategy eventHandlingStrategy) {
 
         this.examConnectionService = examConnectionService;
-        this.examStateService = examStateService;
+        this.examDao = examDao;
         this.eventHandlingStrategy = eventHandlingStrategy;
     }
 
     public Collection<ConnectionInfo> getConnectionInfo(final Long examId) {
-        if (!this.examStateService.getRunningExam(examId).isPresent()) {
+        if (!this.examDao.runningExam(examId).isPresent()) {
             log.error("The exam {} is not running");
             return Collections.emptyList();
         }

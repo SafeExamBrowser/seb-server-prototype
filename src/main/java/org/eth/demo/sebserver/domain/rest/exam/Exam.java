@@ -11,7 +11,6 @@ package org.eth.demo.sebserver.domain.rest.exam;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.eth.demo.sebserver.batis.gen.model.ExamRecord;
 import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -20,28 +19,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public final class Exam {
 
     public enum ExamStatus {
-        IN_PROGRESS,
         READY,
         RUNNING,
         FINISHED
     }
 
-    // TODO to define
-    public enum ExamType {
-        TYPE_1,
-        TYPE_2
-    }
-
     public final Long id;
     public final Long institutionId;
-    public final Long ownerId;
+    public final Long lmsSetupId;
     public final String name;
     public final String description;
-    public final ExamType type;
     public final ExamStatus status;
     public final DateTime startTime;
     public final DateTime endTime;
-    public final String lmsExamURL;
+    public final String enrollmentURL;
 
     public final Collection<IndicatorDefinition> indicators;
     public final Collection<ExamSEBConfigMapping> sebConfigMapping;
@@ -50,27 +41,25 @@ public final class Exam {
     public Exam(
             @JsonProperty("id") final Long id,
             @JsonProperty("institutionId") final Long institutionId,
-            @JsonProperty("ownerId") final Long ownerId,
+            @JsonProperty("lmsSetupId") final Long lmsSetupId,
             @JsonProperty("name") final String name,
             @JsonProperty("description") final String description,
-            @JsonProperty("type") final ExamType type,
             @JsonProperty("status") final ExamStatus status,
             @JsonProperty("startTime") final DateTime startTime,
             @JsonProperty("endTime") final DateTime endTime,
-            @JsonProperty("lmsExamURL") final String lmsExamURL,
+            @JsonProperty("enrollmentURL") final String enrollmentURL,
             @JsonProperty("indicators") final Collection<IndicatorDefinition> indicators,
             @JsonProperty("sebConfigMapping") final Collection<ExamSEBConfigMapping> sebConfigMapping) {
 
         this.id = id;
         this.institutionId = institutionId;
-        this.ownerId = ownerId;
+        this.lmsSetupId = lmsSetupId;
         this.name = name;
         this.description = description;
-        this.type = type;
         this.status = status;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.lmsExamURL = lmsExamURL;
+        this.enrollmentURL = enrollmentURL;
 
         this.indicators = (indicators != null)
                 ? Collections.unmodifiableCollection(indicators)
@@ -88,8 +77,8 @@ public final class Exam {
         return this.institutionId;
     }
 
-    public Long getOwnerId() {
-        return this.ownerId;
+    public Long getLmsSetupId() {
+        return this.lmsSetupId;
     }
 
     public String getName() {
@@ -98,10 +87,6 @@ public final class Exam {
 
     public String getDescription() {
         return this.description;
-    }
-
-    public ExamType getType() {
-        return this.type;
     }
 
     public ExamStatus getStatus() {
@@ -116,8 +101,8 @@ public final class Exam {
         return this.endTime;
     }
 
-    public String getLmsExamURL() {
-        return this.lmsExamURL;
+    public String getEnrollmentURL() {
+        return this.enrollmentURL;
     }
 
     public Collection<IndicatorDefinition> getIndicators() {
@@ -153,35 +138,20 @@ public final class Exam {
         return true;
     }
 
-    public final ExamRecord toExamRecord() {
-        return new ExamRecord(
-                this.id,
-                this.institutionId,
-                this.ownerId,
-                this.name,
-                this.description,
-                this.type.name(),
-                this.status.name(),
-                this.startTime,
-                this.endTime,
-                this.lmsExamURL);
-    }
-
     public static final Exam of(
             final Long id,
             final Long institutionId,
-            final Long ownerId,
+            final Long lmsSetupId,
             final String name,
             final String description,
-            final ExamType type,
             final ExamStatus status,
             final DateTime startTime,
             final DateTime endTime,
-            final String lmsLoginURL) {
+            final String enrollmentURL) {
 
         return new Exam(
-                id, institutionId, ownerId, name, description,
-                type, status, startTime, endTime, lmsLoginURL, null, null);
+                id, institutionId, lmsSetupId, name, description,
+                status, startTime, endTime, enrollmentURL, null, null);
     }
 
     public static final Exam of(
@@ -192,26 +162,26 @@ public final class Exam {
         return new Exam(
                 prototype.id,
                 prototype.institutionId,
-                prototype.ownerId,
+                prototype.lmsSetupId,
                 prototype.name,
                 prototype.description,
-                prototype.type,
                 prototype.status,
                 prototype.startTime,
                 prototype.endTime,
-                prototype.lmsExamURL,
+                prototype.enrollmentURL,
                 indicators,
                 sebConfigMapping);
     }
 
     @Override
     public String toString() {
-        return "Exam [id=" + this.id + ", institutionId=" + this.institutionId + ", ownerId=" + this.ownerId + ", name="
-                + this.name
-                + ", description=" + this.description + ", type=" + this.type + ", status=" + this.status
-                + ", startTime=" + this.startTime
-                + ", endTime=" + this.endTime + ", lmsExamURL=" + this.lmsExamURL + ", indicators=" + this.indicators
-                + ", sebConfigMapping=" + this.sebConfigMapping + "]";
+        return "Exam [id=" + this.id + ", institutionId=" + this.institutionId + ", lmsSetupId=" + this.lmsSetupId
+                + ", name=" + this.name
+                + ", description=" + this.description + ", status=" + this.status + ", startTime=" + this.startTime
+                + ", endTime="
+                + this.endTime + ", enrollmentURL=" + this.enrollmentURL + ", indicators=" + this.indicators
+                + ", sebConfigMapping="
+                + this.sebConfigMapping + "]";
     }
 
 }

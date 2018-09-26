@@ -32,7 +32,7 @@ import org.eth.demo.sebserver.domain.rest.exam.ClientConnection;
 import org.eth.demo.sebserver.domain.rest.exam.ClientConnection.ConnectionStatus;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
-import org.eth.demo.sebserver.service.exam.ExamStateService;
+import org.eth.demo.sebserver.service.exam.ExamDao;
 import org.eth.demo.sebserver.service.exam.indicator.ClientIndicator;
 import org.eth.demo.sebserver.service.exam.indicator.ClientIndicatorFactory;
 import org.eth.demo.sebserver.web.WebSecurityConfig.EncodingConfig;
@@ -72,7 +72,7 @@ public class ExamConnectionService {
 
     private static final Logger log = LoggerFactory.getLogger(ExamConnectionService.class);
 
-    private final ExamStateService examStateService;
+    private final ExamDao examDao;
     private final ClientConnectionRecordMapper clientConnectionRecordMapper;
     private final SebLmsSetupRecordMapper sebLmsSetupRecordMapper;
     private final ClientIndicatorFactory clientIndicatorFactory;
@@ -81,13 +81,13 @@ public class ExamConnectionService {
     private final Map<Long, ConnectionData> activeConnectionCache = new ConcurrentHashMap<>();
 
     public ExamConnectionService(
-            final ExamStateService examStateService,
+            final ExamDao examDao,
             final ClientConnectionRecordMapper clientConnectionRecordMapper,
             final SebLmsSetupRecordMapper sebLmsSetupRecordMapper,
             final ClientIndicatorFactory clientIndicatorFactory,
             @Qualifier(EncodingConfig.CLIENT_PASSWORD_ENCODER_BEAN_NAME) final PasswordEncoder clientPasswordEncoder) {
 
-        this.examStateService = examStateService;
+        this.examDao = examDao;
         this.clientConnectionRecordMapper = clientConnectionRecordMapper;
         this.sebLmsSetupRecordMapper = sebLmsSetupRecordMapper;
         this.clientIndicatorFactory = clientIndicatorFactory;
@@ -107,7 +107,7 @@ public class ExamConnectionService {
         log.debug("Connection Handshake from SEB-Client. Checking integrity first");
 
         // Integrity check: in case examId is provided is the specified exam running?
-        if (examId != null && !this.examStateService.getRunningExam(examId).isPresent()) {
+        if (examId != null && !this.examDao.runningExam(examId).isPresent()) {
             log.error("The exam {} is not running", examId);
             throw new IllegalStateException("The exam " + examId + " is not running");
         }
@@ -220,7 +220,7 @@ public class ExamConnectionService {
 
     @Transactional
     public Exam establishConnection(final SEBWebSocketAuth auth) {
-        final Optional<Exam> exam = this.examStateService.getRunningExam(auth.examId);
+        final Optional<Exam> exam = this.examDao.runningExam(auth.examId);
         if (!exam.isPresent()) {
             log.error("The exam {} is not running. Unable to connect user with identifier {} ",
                     auth.examId,
@@ -382,7 +382,7 @@ public class ExamConnectionService {
     private Optional<ConnectionData> activeConnectionDataById(final Long connectionId) {
         return Optional.ofNullable(this.clientConnectionRecordMapper.selectByPrimaryKey(connectionId))
                 .map(clientConnectionRecord -> {
-                    return this.examStateService.getRunningExam(clientConnectionRecord.getExamId())
+                    return this.examDao.runningExam(clientConnectionRecord.getExamId())
                             .map(runningExam -> {
                                 return Optional.of(new ConnectionData(
                                         ClientConnection.fromRecord(clientConnectionRecord),

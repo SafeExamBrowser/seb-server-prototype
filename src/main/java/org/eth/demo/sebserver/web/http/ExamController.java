@@ -15,10 +15,8 @@ import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.service.admin.UserFacade;
 import org.eth.demo.sebserver.service.exam.ExamDao;
-import org.eth.demo.sebserver.service.exam.ExamStateService;
 import org.eth.demo.sebserver.service.exam.UserPrivilegeExamFilter;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,11 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class ExamController {
 
     private final ExamDao examDao;
-    private final ExamStateService examStateService;
 
-    public ExamController(final ExamDao examDao, final ExamStateService examStateService) {
+    public ExamController(final ExamDao examDao) {
         this.examDao = examDao;
-        this.examStateService = examStateService;
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -53,19 +49,19 @@ public class ExamController {
         return exam;
     }
 
-    @RequestMapping(value = "/delete/{examId}", method = RequestMethod.DELETE)
-    public final void deleteExam(@PathVariable final Long examId) {
-        this.examDao.delete(examId);
+    @RequestMapping(value = "/remove/{examId}", method = RequestMethod.DELETE)
+    public final void removeExam(@PathVariable final Long examId) {
+        this.examDao.remove(examId);
     }
 
-    @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public final Exam saveExam(@RequestBody final Exam exam) {
-        return this.examDao.save(exam);
-    }
-
-    @RequestMapping(value = "/statechange/{examId}/{stateName}", method = RequestMethod.POST)
-    final Exam processStateChange(@PathVariable final Long examId, @PathVariable final String stateName) {
-        return this.examStateService.processStateChange(examId, Exam.ExamStatus.valueOf(stateName));
-    }
+//    @RequestMapping(value = "/save", method = RequestMethod.POST)
+//    public final Exam saveExam(@RequestBody final Exam exam) {
+//        return this.examDao.save(exam);
+//    }
+//
+//    @RequestMapping(value = "/statechange/{examId}/{stateName}", method = RequestMethod.POST)
+//    final Exam processStateChange(@PathVariable final Long examId, @PathVariable final String stateName) {
+//        return this.examStateService.processStateChange(examId, Exam.ExamStatus.valueOf(stateName));
+//    }
 
 }

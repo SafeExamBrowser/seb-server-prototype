@@ -8,8 +8,6 @@
 
 package org.eth.demo.sebserver.service.exam.run;
 
-import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.BlockingDeque;
@@ -18,13 +16,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.eth.demo.sebserver.appevents.ExamFinishedEvent;
-import org.eth.demo.sebserver.appevents.ExamStartedEvent;
 import org.eth.demo.sebserver.batis.gen.mapper.ClientEventRecordMapper;
-import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordDynamicSqlSupport;
-import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
-import org.eth.demo.sebserver.domain.rest.exam.Exam.ExamStatus;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +53,6 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
     private static final int BATCH_SIZE = 100;
 
     private final SqlSessionFactory sqlSessionFactory;
-    private final ExamRecordMapper examRecordMapper;
     private final Executor executor;
     private final TransactionTemplate transactionTemplate;
 
@@ -71,12 +63,10 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
 
     public AsyncBatchEventSaveStrategy(
             final SqlSessionFactory sqlSessionFactory,
-            final ExamRecordMapper examRecordMapper,
             final AsyncConfigurer asyncConfigurer,
             final PlatformTransactionManager transactionManager) {
 
         this.sqlSessionFactory = sqlSessionFactory;
-        this.examRecordMapper = examRecordMapper;
         this.executor = asyncConfigurer.getAsyncExecutor();
 
         this.transactionTemplate = new TransactionTemplate(transactionManager);
@@ -95,18 +85,6 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
         }
     }
 
-    @EventListener(ExamStartedEvent.class)
-    protected void examStarted() {
-        if (this.enabled && !this.workersRunning) {
-            runWorkers();
-        }
-    }
-
-    @EventListener(ExamFinishedEvent.class)
-    protected void examFinished() {
-        this.workersRunning = hasRunningExams();
-    }
-
     @Override
     public void accept(final ClientEvent event) {
         if (!this.workersRunning) {
@@ -120,11 +98,6 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
     private void runWorkers() {
         if (this.workersRunning) {
             log.warn("runWorkers called when workers are running already. Ignore that");
-            return;
-        }
-
-        if (!hasRunningExams()) {
-            log.info("runWorkers called but no exam is running");
             return;
         }
 
@@ -148,6 +121,8 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
             final ClientEventRecordMapper clientEventMapper = sqlSessionTemplate.getMapper(
                     ClientEventRecordMapper.class);
 
+            long sleepTime = 100;
+
             try {
                 while (this.workersRunning) {
                     events.clear();
@@ -155,6 +130,7 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
 
                     try {
                         if (!events.isEmpty()) {
+                            sleepTime = 100;
                             this.transactionTemplate
                                     .execute(status -> {
                                         events.stream()
@@ -162,13 +138,15 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
                                                 .forEach(record -> clientEventMapper.insert(record));
                                         return null;
                                     });
+                        } else {
+                            sleepTime += 100;
                         }
                     } catch (final Exception e) {
                         log.error("unexpected Error while trying to batch store client-events: ", e);
                     }
 
                     try {
-                        Thread.sleep(20);
+                        Thread.sleep(sleepTime);
                     } catch (final InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -178,13 +156,6 @@ public class AsyncBatchEventSaveStrategy implements EventHandlingStrategy {
                 log.debug("Worker Thread {} stopped", Thread.currentThread());
             }
         };
-    }
-
-    private boolean hasRunningExams() {
-        return this.examRecordMapper.countByExample()
-                .where(ExamRecordDynamicSqlSupport.status, isEqualTo(ExamStatus.RUNNING.name()))
-                .build()
-                .execute() > 0;
     }
 
 }

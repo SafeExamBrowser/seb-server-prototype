@@ -1,8 +1,3 @@
-
--- -----------------------------------------------------
--- Schema SEBServerDemo
--- -----------------------------------------------------
-
 -- -----------------------------------------------------
 -- Table `institution`
 -- -----------------------------------------------------
@@ -11,33 +6,32 @@ DROP TABLE IF EXISTS `institution` ;
 CREATE TABLE IF NOT EXISTS `institution` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
+  `authType` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `name_UNIQUE` (`name` ASC))
-;
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC));
 
 
 -- -----------------------------------------------------
--- Table `user`
+-- Table `seb_lms_setup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `user` ;
+DROP TABLE IF EXISTS `seb_lms_setup` ;
 
-CREATE TABLE IF NOT EXISTS `user` (
+CREATE TABLE IF NOT EXISTS `seb_lms_setup` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `institution_id` BIGINT UNSIGNED NULL,
-  `name` VARCHAR(255) NOT NULL,
-  `user_name` VARCHAR(255) NOT NULL,
-  `password` VARCHAR(255) NOT NULL,
-  `email` VARCHAR(255) NOT NULL,
-  `creation_date` DATETIME NOT NULL,
-  `active` BIT(1) NOT NULL,
+  `institution_id` BIGINT UNSIGNED NOT NULL,
+  `lms_type` VARCHAR(45) NOT NULL,
+  `lms_clientname` VARCHAR(255) NOT NULL,
+  `lms_clientsecret` VARCHAR(255) NOT NULL,
+  `lms_url` VARCHAR(255) NULL,
+  `seb_clientname` VARCHAR(255) NOT NULL,
+  `seb_clientsecret` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `institutionRef_idx` (`institution_id` ASC),
-  CONSTRAINT `institutionRef`
+  INDEX `setupInstitutionRef_idx` (`institution_id` ASC),
+  CONSTRAINT `setupInstitutionRef`
     FOREIGN KEY (`institution_id`)
     REFERENCES `institution` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-;
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -47,29 +41,15 @@ DROP TABLE IF EXISTS `exam` ;
 
 CREATE TABLE IF NOT EXISTS `exam` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `institution_id` BIGINT UNSIGNED NOT NULL,
-  `owner_id` BIGINT UNSIGNED NOT NULL,
-  `name` VARCHAR(255) NOT NULL,
-  `description` VARCHAR(4000) NULL,
-  `type` VARCHAR(45) NOT NULL,
-  `status` VARCHAR(45) NOT NULL,
-  `start_time` DATETIME NULL,
-  `end_time` DATETIME NULL,
-  `lms_exam_url` VARCHAR(255) NULL,
+  `lms_setup_id` BIGINT UNSIGNED NOT NULL,
+  `external_uuid` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `examOwnerRef_idx` (`owner_id` ASC),
-  INDEX `examinstitutionRef_idx` (`institution_id` ASC),
-  CONSTRAINT `examOwnerRef`
-    FOREIGN KEY (`owner_id`)
-    REFERENCES `user` (`id`)
+  INDEX `lms_setup_key_idx` (`lms_setup_id` ASC),
+  CONSTRAINT `lms_setup_key`
+    FOREIGN KEY (`lms_setup_id`)
+    REFERENCES `seb_lms_setup` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `examinstitutionRef`
-    FOREIGN KEY (`institution_id`)
-    REFERENCES `institution` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-;
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -90,8 +70,7 @@ CREATE TABLE IF NOT EXISTS `client_connection` (
     FOREIGN KEY (`exam_id`)
     REFERENCES `exam` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-;
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -113,8 +92,7 @@ CREATE TABLE IF NOT EXISTS `client_event` (
     FOREIGN KEY (`connection_id`)
     REFERENCES `client_connection` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-;
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -136,8 +114,7 @@ CREATE TABLE IF NOT EXISTS `indicator` (
     FOREIGN KEY (`exam_id`)
     REFERENCES `exam` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-;
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -157,8 +134,7 @@ CREATE TABLE IF NOT EXISTS `configuration_node` (
     FOREIGN KEY (`institution_id`)
     REFERENCES `institution` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-;
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -178,8 +154,7 @@ CREATE TABLE IF NOT EXISTS `configuration` (
     FOREIGN KEY (`configuration_node_id`)
     REFERENCES `configuration_node` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-;
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -202,8 +177,7 @@ CREATE TABLE IF NOT EXISTS `configuration_attribute` (
     FOREIGN KEY (`parent_id`)
     REFERENCES `configuration_attribute` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-;
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -230,8 +204,7 @@ CREATE TABLE IF NOT EXISTS `configuration_value` (
     FOREIGN KEY (`configuration_attribute_id`)
     REFERENCES `configuration_attribute` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-;
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -252,8 +225,7 @@ CREATE TABLE IF NOT EXISTS `orientation` (
     FOREIGN KEY (`config_attribute_id`)
     REFERENCES `configuration_attribute` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-;
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -278,8 +250,30 @@ CREATE TABLE IF NOT EXISTS `exam_configuration_map` (
     FOREIGN KEY (`configuration_node_id`)
     REFERENCES `configuration_node` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-;
+    ON UPDATE NO ACTION);
+
+
+-- -----------------------------------------------------
+-- Table `user`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `user` ;
+
+CREATE TABLE IF NOT EXISTS `user` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `institution_id` BIGINT UNSIGNED NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `user_name` VARCHAR(255) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `email` VARCHAR(255) NOT NULL,
+  `creation_date` DATETIME NOT NULL,
+  `active` BIT(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `institutionRef_idx` (`institution_id` ASC),
+  CONSTRAINT `institutionRef`
+    FOREIGN KEY (`institution_id`)
+    REFERENCES `institution` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -297,8 +291,7 @@ CREATE TABLE IF NOT EXISTS `user_role` (
     FOREIGN KEY (`user_id`)
     REFERENCES `user` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-;
+    ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
@@ -313,8 +306,7 @@ CREATE TABLE IF NOT EXISTS `oauth_access_token` (
   `user_name` VARCHAR(255) NULL,
   `client_id` VARCHAR(255) NULL,
   `authentication` BLOB NULL,
-  `refresh_token` VARCHAR(255) NULL)
-;
+  `refresh_token` VARCHAR(255) NULL);
 
 
 -- -----------------------------------------------------
@@ -326,26 +318,3 @@ CREATE TABLE IF NOT EXISTS `oauth_refresh_token` (
   `token_id` VARCHAR(255) NULL,
   `token` BLOB NULL,
   `authentication` BLOB NULL);
-
-
--- -----------------------------------------------------
--- Table `seb_lms_setup`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `seb_lms_setup` ;
-
-CREATE TABLE IF NOT EXISTS `seb_lms_setup` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `institution_id` BIGINT UNSIGNED NOT NULL,
-  `lms_type` VARCHAR(45) NOT NULL,
-  `lms_clientname` VARCHAR(255) NOT NULL,
-  `lms_clientsecret` VARCHAR(255) NOT NULL,
-  `lms_url` VARCHAR(255) NULL,
-  `seb_clientname` VARCHAR(255) NOT NULL,
-  `seb_clientsecret` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `setupInstitutionRef_idx` (`institution_id` ASC),
-  CONSTRAINT `setupInstitutionRef`
-    FOREIGN KEY (`institution_id`)
-    REFERENCES `institution` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);

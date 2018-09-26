@@ -11,7 +11,7 @@ package org.eth.demo.sebserver.service;
 import java.util.concurrent.Executor;
 
 import org.eth.demo.sebserver.batis.gen.mapper.ClientConnectionRecordMapper;
-import org.eth.demo.sebserver.service.exam.ExamStateService;
+import org.eth.demo.sebserver.service.exam.ExamDao;
 import org.eth.demo.sebserver.service.exam.run.EventHandlingStrategy;
 import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
 import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
@@ -30,7 +30,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 public class ServiceSpringConfig implements AsyncConfigurer {
 
     @Autowired
-    private ExamStateService examStateService;
+    private ExamDao examDao;
     @Autowired
     private ClientConnectionRecordMapper clientConnectionRecordMapper;
     @Autowired
@@ -50,7 +50,7 @@ public class ServiceSpringConfig implements AsyncConfigurer {
         eventHandlingStrategy.enable(true);
         return new ExamSessionService(
                 this.examConnectionService,
-                this.examStateService,
+                this.examDao,
                 this.clientConnectionRecordMapper,
                 eventHandlingStrategy);
     }

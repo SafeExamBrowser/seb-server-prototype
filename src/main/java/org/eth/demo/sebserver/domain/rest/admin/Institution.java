@@ -8,21 +8,37 @@
 
 package org.eth.demo.sebserver.domain.rest.admin;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Institution {
 
+    public enum AuthType {
+        INTERNAL,
+        EXTERNAL_LDAP
+    }
+
     public final Long id;
     public final String name;
+    public final AuthType authType;
+    public final Collection<SebLmsSetup> sebLmsSetup;
 
     @JsonCreator
     public Institution(
             @JsonProperty("id") final Long id,
-            @JsonProperty("name") final String name) {
+            @JsonProperty("name") final String name,
+            @JsonProperty("authType") final AuthType authType,
+            @JsonProperty("sebLmsSetup") final Collection<SebLmsSetup> sebLmsSetup) {
 
         this.id = id;
         this.name = name;
+        this.authType = authType;
+        this.sebLmsSetup = (sebLmsSetup != null)
+                ? Collections.unmodifiableCollection(sebLmsSetup)
+                : Collections.emptyList();
     }
 
     public Long getId() {
@@ -31,6 +47,10 @@ public class Institution {
 
     public String getName() {
         return this.name;
+    }
+
+    public AuthType getAuthType() {
+        return this.authType;
     }
 
     @Override

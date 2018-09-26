@@ -24,7 +24,6 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.eth.demo.sebserver.domain.rest.exam.ExamSEBConfigMapping;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
-import org.joda.time.DateTime;
 import org.mybatis.dynamic.sql.select.MyBatis3SelectModelAdapter;
 import org.mybatis.dynamic.sql.select.QueryExpressionDSL;
 import org.mybatis.dynamic.sql.select.SelectDSL;
@@ -38,17 +37,8 @@ public interface ExamJoinMapper {
     @ResultType(ExamJoinMapper.ExamJoinRecord.class)
     @ConstructorArgs({
             @Arg(column = "id", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
-            @Arg(column = "institution_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
-            @Arg(column = "owner_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
-            @Arg(column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Arg(column = "description", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Arg(column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Arg(column = "status", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Arg(column = "start_time", javaType = DateTime.class, typeHandler = JodaTimeTypeResolver.class,
-                    jdbcType = JdbcType.TIMESTAMP),
-            @Arg(column = "end_time", javaType = DateTime.class, typeHandler = JodaTimeTypeResolver.class,
-                    jdbcType = JdbcType.TIMESTAMP),
-            @Arg(column = "lms_exam_url", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Arg(column = "lmsSetupId", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
+            @Arg(column = "externalUuid", javaType = String.class, jdbcType = JdbcType.VARCHAR),
 
             @Arg(column = "indicatorId", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "indicatorType", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -67,15 +57,8 @@ public interface ExamJoinMapper {
         return SelectDSL.selectWithMapper(
                 this::selectMany,
                 examRecord.id,
-                examRecord.institutionId,
-                examRecord.ownerId,
-                examRecord.name,
-                examRecord.description,
-                examRecord.type,
-                examRecord.status,
-                examRecord.startTime,
-                examRecord.endTime,
-                examRecord.lmsExamUrl,
+                examRecord.lmsSetupId,
+                examRecord.externalUuid,
 
                 indicatorRecord.id.as("indicatorId"),
                 indicatorRecord.type.as("indicatorType"),
@@ -99,30 +82,16 @@ public interface ExamJoinMapper {
 
     public static final class ExamJoinRecord {
         public final Long id;
-        public final Long institutionId;
-        public final Long ownerId;
-        public final String name;
-        public final String description;
-        public final String type;
-        public final String status;
-        public final DateTime startTime;
-        public final DateTime endTime;
-        public final String lmsExamURL;
+        public final Long lmsSetupId;
+        public final String externalUuid;
 
         public final IndicatorDefinition indicator;
         public final ExamSEBConfigMapping configMapping;
 
         private ExamJoinRecord(
                 final Long id,
-                final Long institutionId,
-                final Long ownerId,
-                final String name,
-                final String description,
-                final String examType,
-                final String status,
-                final DateTime startTime,
-                final DateTime endTime,
-                final String lmsExamURL,
+                final Long lmsSetupId,
+                final String externalUuid,
 
                 final Long indicatorId,
                 final String indicatorType,
@@ -135,15 +104,8 @@ public interface ExamJoinMapper {
                 final String clientInfo) {
 
             this.id = id;
-            this.institutionId = institutionId;
-            this.ownerId = ownerId;
-            this.name = name;
-            this.description = description;
-            this.type = examType;
-            this.status = status;
-            this.startTime = startTime;
-            this.endTime = endTime;
-            this.lmsExamURL = lmsExamURL;
+            this.lmsSetupId = lmsSetupId;
+            this.externalUuid = externalUuid;
 
             indicator = (indicatorId != null)
                     ? new IndicatorDefinition(indicatorName, indicatorType, threshold1, threshold2, threshold3)

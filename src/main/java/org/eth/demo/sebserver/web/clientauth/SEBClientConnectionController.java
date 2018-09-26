@@ -38,7 +38,7 @@ public class SEBClientConnectionController {
     public static final String CONNECTION_TOKEN_KEY_NAME = "connectionToken";
     public static final String USER_IDENTIFIER_KEY_NAME = "userId";
     public static final String EXAM_IDENTIFIER_KEY_NAME = "examId";
-    public static final String LMS_URL_KEY_NAME = "lmsURL";
+    public static final String LMS_ENROLLMENT_URL_KEY_NAME = "lmsURL";
 
     private final ExamDao examDao;
     private final ExamConnectionService examConnectionService;
@@ -103,7 +103,7 @@ public class SEBClientConnectionController {
 
                 return ResponseEntity.ok()
                         .header(CONNECTION_TOKEN_KEY_NAME, connectionToken)
-                        .header(LMS_URL_KEY_NAME, exam.lmsExamURL)
+                        .header(LMS_ENROLLMENT_URL_KEY_NAME, exam.enrollmentURL)
                         .build();
             } else if (auth.lmsUrl == null) {
                 // if no overall LMS URL is set on the specified seb-lms-setup,
@@ -137,7 +137,7 @@ public class SEBClientConnectionController {
 
                 return ResponseEntity.ok()
                         .header(CONNECTION_TOKEN_KEY_NAME, connectionToken)
-                        .header(LMS_URL_KEY_NAME, auth.lmsUrl)
+                        .header(LMS_ENROLLMENT_URL_KEY_NAME, auth.lmsUrl)
                         .body("");
             }
         } catch (final Exception e) {

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -22,10 +23,12 @@ import org.eth.demo.sebserver.batis.ExamJoinMapper;
 import org.eth.demo.sebserver.batis.ExamJoinMapper.ExamJoinRecord;
 import org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper;
 import org.eth.demo.sebserver.batis.gen.mapper.IndicatorRecordMapper;
-import org.eth.demo.sebserver.batis.gen.model.ExamRecord;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.ExamSEBConfigMapping;
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
+import org.eth.demo.sebserver.service.lms.CourseData;
+import org.eth.demo.sebserver.service.lms.LmsAPIConnectionFactory;
+import org.eth.demo.sebserver.service.lms.LmsConnectionTemplate;
 import org.mybatis.dynamic.sql.select.MyBatis3SelectModelAdapter;
 import org.mybatis.dynamic.sql.select.QueryExpressionDSL;
 import org.springframework.context.annotation.Lazy;
@@ -39,29 +42,27 @@ public class ExamDaoImpl implements ExamDao {
     private final ExamRecordMapper examMapper;
     private final IndicatorRecordMapper indicatorMapper;
     private final ExamJoinMapper examJoinMapper;
+    private final LmsAPIConnectionFactory lmsAPIConnectionFactory;
 
     public ExamDaoImpl(
             final ExamRecordMapper examMapper,
             final IndicatorRecordMapper indicatorMapper,
-            final ExamJoinMapper examJoinMapper) {
+            final ExamJoinMapper examJoinMapper,
+            final LmsAPIConnectionFactory lmsAPIConnectionFactory) {
 
         super();
         this.examMapper = examMapper;
         this.indicatorMapper = indicatorMapper;
         this.examJoinMapper = examJoinMapper;
+        this.lmsAPIConnectionFactory = lmsAPIConnectionFactory;
     }
 
     @Override
-    public Exam createNew(final Exam exam) {
+    public Exam importExam(final Long lmsSetupId, final String externalUuid) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eth.demo.sebserver.service.dao.ExamDao#byId(java.lang.Long)
-     */
     @Transactional(readOnly = true)
     @Override
     public Exam byId(final Long id) {
@@ -76,11 +77,24 @@ public class ExamDaoImpl implements ExamDao {
         return exam;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eth.demo.sebserver.service.dao.ExamDao#getAll()
-     */
+    @Override
+    public Optional<Exam> runningExam(final Long id) {
+        final Exam exam = byId(id);
+        return (isRunning(exam)) ? Optional.of(exam) : Optional.empty();
+    }
+
+    @Override
+    public boolean isRunning(final Long id) {
+        return isRunning(byId(id));
+    }
+
+    private boolean isRunning(final Exam exam) {
+        if (exam == null) {
+            return false;
+        }
+        return exam.getStartTime().isBeforeNow() && exam.getEndTime().isAfterNow();
+    }
+
     @Transactional(readOnly = true)
     @Override
     public Collection<Exam> getAll() {
@@ -90,11 +104,6 @@ public class ExamDaoImpl implements ExamDao {
                 .execute());
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eth.demo.sebserver.service.dao.ExamDao#getAll(java.util.function.Predicate)
-     */
     @Transactional(readOnly = true)
     @Override
     public Collection<Exam> getAll(final Predicate<Exam> predicate) {
@@ -103,47 +112,12 @@ public class ExamDaoImpl implements ExamDao {
                 .collect(Collectors.toList());
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eth.demo.sebserver.service.dao.ExamDao#save(org.eth.demo.sebserver.domain.rest.exam.Exam)
-     */
     @Transactional
     @Override
-    public Exam save(final Exam model) {
-        Long id;
-        if (model.getId() == null) {
-            final ExamRecord record = model.toExamRecord();
-            this.examMapper.insert(record);
-            id = record.getId();
-        } else {
-            this.examMapper.updateByPrimaryKeySelective(model.toExamRecord());
+    public boolean remove(final Long id) {
 
-            // NOTE: delete all existing indicators for this exam. The new ones form request gets inserted after
-            this.indicatorMapper.deleteByExample()
-                    .where(examId, isEqualTo(model.id))
-                    .build()
-                    .execute();
+        // TODO check integrity. E.g. exam has no relations so far
 
-            id = model.id;
-        }
-
-        // save Indicators
-        model.getIndicators().stream()
-                .map(indicator -> indicator.toRecord(id))
-                .forEach(this.indicatorMapper::insert);
-
-        return byId(id);
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eth.demo.sebserver.service.dao.ExamDao#delete(java.lang.Long)
-     */
-    @Transactional
-    @Override
-    public boolean delete(final Long id) {
         this.indicatorMapper.deleteByExample()
                 .where(examId, isEqualTo(id))
                 .build()
@@ -153,15 +127,18 @@ public class ExamDaoImpl implements ExamDao {
         return del > 0;
     }
 
-    private static final Collection<Exam> getManyFromJoinRecords(final Collection<ExamJoinRecord> joinRecords) {
+    private final Collection<Exam> getManyFromJoinRecords(final Collection<ExamJoinRecord> joinRecords) {
         return joinRecords.stream()
                 .reduce(
                         new HashMap<Long, Collection<ExamJoinRecord>>(),
                         ExamDaoImpl::accToMap,
-                        (m1, m2) -> m1) // TODO if we allow parallelization we need a proper combiner here
+                        (m1, m2) -> {
+                            m1.putAll(m2);
+                            return m1;
+                        })
                 .values()
                 .stream()
-                .map(ExamDaoImpl::createExam)
+                .map(recs -> createExam(recs, createPrototype(recs)))
                 .collect(Collectors.toList());
     }
 
@@ -174,34 +151,40 @@ public class ExamDaoImpl implements ExamDao {
         return map;
     }
 
-    private static final Exam getOneFromJoinRecords(final Collection<ExamJoinRecord> joinRecords) {
+    private final Exam getOneFromJoinRecords(final Collection<ExamJoinRecord> joinRecords) {
         return getManyFromJoinRecords(joinRecords)
                 .stream()
                 .findFirst()
                 .orElse(null);
     }
 
-    private static final Exam createExam(final Collection<ExamJoinRecord> records) {
-        assert records != null && !records.isEmpty() : "Expecting none-empty ExamJoinRecord Collection";
+    private final Exam createPrototype(final Collection<ExamJoinRecord> records) {
+        if (records != null && !records.isEmpty()) {
+            final ExamJoinRecord first = records.iterator().next();
+            final LmsConnectionTemplate lmsAPIConnection = this.lmsAPIConnectionFactory
+                    .getLmsAPIConnection(first.lmsSetupId);
+            final CourseData course = lmsAPIConnection.course(first.externalUuid);
+            return Exam.of(
+                    first.id,
+                    lmsAPIConnection.lmsSetup().getInstitutionId(),
+                    first.lmsSetupId,
+                    course.name,
+                    course.description,
+                    course.getStatus(),
+                    course.startTime,
+                    course.endTime,
+                    course.enrollmentURL);
+        }
 
-        Exam prototype = null;
+        return null;
+    }
+
+    private final Exam createExam(final Collection<ExamJoinRecord> records, final Exam prototype) {
+
         final ArrayList<IndicatorDefinition> indicator = new ArrayList<>();
         final ArrayList<ExamSEBConfigMapping> configMappings = new ArrayList<>();
 
         for (final ExamJoinRecord record : records) {
-            if (prototype == null) {
-                prototype = Exam.of(
-                        record.id,
-                        record.institutionId,
-                        record.ownerId,
-                        record.name,
-                        record.description,
-                        Exam.ExamType.valueOf(record.type),
-                        Exam.ExamStatus.valueOf(record.status),
-                        record.startTime,
-                        record.endTime,
-                        record.lmsExamURL);
-            }
             if (record.indicator != null) {
                 indicator.add(record.indicator);
             }

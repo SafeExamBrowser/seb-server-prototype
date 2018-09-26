@@ -2,65 +2,29 @@ package org.eth.demo.sebserver.batis.gen.mapper;
 
 import java.sql.JDBCType;
 import javax.annotation.Generated;
-import org.joda.time.DateTime;
 import org.mybatis.dynamic.sql.SqlColumn;
 import org.mybatis.dynamic.sql.SqlTable;
 
 public final class ExamRecordDynamicSqlSupport {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.460+02:00", comments="Source Table: exam")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-26T09:47:00.631+02:00", comments="Source Table: exam")
     public static final ExamRecord examRecord = new ExamRecord();
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.461+02:00", comments="Source field: exam.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-26T09:47:00.631+02:00", comments="Source field: exam.id")
     public static final SqlColumn<Long> id = examRecord.id;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.461+02:00", comments="Source field: exam.institution_id")
-    public static final SqlColumn<Long> institutionId = examRecord.institutionId;
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-26T09:47:00.631+02:00", comments="Source field: exam.lms_setup_id")
+    public static final SqlColumn<Long> lmsSetupId = examRecord.lmsSetupId;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.461+02:00", comments="Source field: exam.owner_id")
-    public static final SqlColumn<Long> ownerId = examRecord.ownerId;
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-26T09:47:00.631+02:00", comments="Source field: exam.external_uuid")
+    public static final SqlColumn<String> externalUuid = examRecord.externalUuid;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.461+02:00", comments="Source field: exam.name")
-    public static final SqlColumn<String> name = examRecord.name;
-
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.462+02:00", comments="Source field: exam.description")
-    public static final SqlColumn<String> description = examRecord.description;
-
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.462+02:00", comments="Source field: exam.type")
-    public static final SqlColumn<String> type = examRecord.type;
-
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.462+02:00", comments="Source field: exam.status")
-    public static final SqlColumn<String> status = examRecord.status;
-
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.462+02:00", comments="Source field: exam.start_time")
-    public static final SqlColumn<DateTime> startTime = examRecord.startTime;
-
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.462+02:00", comments="Source field: exam.end_time")
-    public static final SqlColumn<DateTime> endTime = examRecord.endTime;
-
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.463+02:00", comments="Source field: exam.lms_exam_url")
-    public static final SqlColumn<String> lmsExamUrl = examRecord.lmsExamUrl;
-
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-08-22T11:48:06.460+02:00", comments="Source Table: exam")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-26T09:47:00.631+02:00", comments="Source Table: exam")
     public static final class ExamRecord extends SqlTable {
         public final SqlColumn<Long> id = column("id", JDBCType.BIGINT);
 
-        public final SqlColumn<Long> institutionId = column("institution_id", JDBCType.BIGINT);
+        public final SqlColumn<Long> lmsSetupId = column("lms_setup_id", JDBCType.BIGINT);
 
-        public final SqlColumn<Long> ownerId = column("owner_id", JDBCType.BIGINT);
-
-        public final SqlColumn<String> name = column("name", JDBCType.VARCHAR);
-
-        public final SqlColumn<String> description = column("description", JDBCType.VARCHAR);
-
-        public final SqlColumn<String> type = column("type", JDBCType.VARCHAR);
-
-        public final SqlColumn<String> status = column("status", JDBCType.VARCHAR);
-
-        public final SqlColumn<DateTime> startTime = column("start_time", JDBCType.TIMESTAMP, "org.eth.demo.sebserver.batis.JodaTimeTypeResolver");
-
-        public final SqlColumn<DateTime> endTime = column("end_time", JDBCType.TIMESTAMP, "org.eth.demo.sebserver.batis.JodaTimeTypeResolver");
-
-        public final SqlColumn<String> lmsExamUrl = column("lms_exam_url", JDBCType.VARCHAR);
+        public final SqlColumn<String> externalUuid = column("external_uuid", JDBCType.VARCHAR);
 
         public ExamRecord() {
             super("exam");

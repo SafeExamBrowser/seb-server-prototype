@@ -34,7 +34,7 @@ public final class UserPrivilegeExamFilter implements Predicate<Exam> {
         if (this.isAdmin) {
             return true;
         } else {
-            return exam.ownerId.longValue() == this.user.getId().longValue();
+            return exam.institutionId.longValue() == this.user.institutionId.longValue();
         }
     }
 

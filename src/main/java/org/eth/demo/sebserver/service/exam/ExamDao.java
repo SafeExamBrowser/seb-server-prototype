@@ -9,22 +9,25 @@
 package org.eth.demo.sebserver.service.exam;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 
 public interface ExamDao {
 
-    Exam createNew(Exam exam);
+    Exam importExam(Long lmsSetupId, String externalUuid);
 
     Exam byId(Long id);
+
+    Optional<Exam> runningExam(Long id);
+
+    boolean isRunning(Long id);
 
     Collection<Exam> getAll();
 
     Collection<Exam> getAll(Predicate<Exam> predicate);
 
-    Exam save(Exam model);
-
-    boolean delete(Long id);
+    boolean remove(Long id);
 
 }
