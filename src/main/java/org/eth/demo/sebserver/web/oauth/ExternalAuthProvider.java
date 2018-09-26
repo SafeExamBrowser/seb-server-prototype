@@ -11,6 +11,7 @@ package org.eth.demo.sebserver.web.oauth;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.eth.demo.sebserver.domain.rest.admin.Role;
 import org.eth.demo.sebserver.domain.rest.admin.User;
@@ -83,7 +84,7 @@ public class ExternalAuthProvider implements AuthenticationProvider {
             null, 1L,
             "extUser", "extUser", "extUser",
             "", DateTime.now(), true,
-            Arrays.asList(Role.UserRole.EXAM_ADMIN.role));
+            new HashSet<>(Arrays.asList(Role.EXAM_ADMIN.name())));
 
     private void createInMemoryMockExample() {
         this.externalAuthProvider.add(new AuthenticationProvider() {

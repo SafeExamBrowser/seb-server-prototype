@@ -99,7 +99,7 @@ public abstract class ClientConnectionAuth implements Authentication {
                 final String clientAddress,
                 final String lmsUrl) {
 
-            super(Role.UserRole.SEB_CLIENT.role);
+            super(Role.SEB_CLIENT);
             this.institutionId = institutionId;
             this.sebClientname = sebClientname;
             this.clientAddress = clientAddress;
@@ -131,7 +131,7 @@ public abstract class ClientConnectionAuth implements Authentication {
                 final Long connectionId,
                 final String userIdentifier) {
 
-            super(Role.UserRole.SEB_CLIENT.role);
+            super(Role.SEB_CLIENT);
             this.examId = examId;
             this.connectionId = connectionId;
             this.userIdentifier = userIdentifier;
@@ -160,7 +160,7 @@ public abstract class ClientConnectionAuth implements Authentication {
         public final String clientAddress;
 
         private LMSConnectionAuth(final Long institutionId, final String lmsClientname, final String clientAddress) {
-            super(Role.UserRole.LMS_CLIENT.role);
+            super(Role.LMS_CLIENT);
             this.institutionId = institutionId;
             this.lmsClientname = lmsClientname;
             this.clientAddress = clientAddress;

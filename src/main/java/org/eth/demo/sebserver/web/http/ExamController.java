@@ -14,8 +14,8 @@ import java.util.Collection;
 import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.service.admin.UserFacade;
+import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService;
 import org.eth.demo.sebserver.service.exam.ExamDao;
-import org.eth.demo.sebserver.service.exam.UserPrivilegeExamFilter;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,15 +26,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class ExamController {
 
     private final ExamDao examDao;
+    private final AuthorizationGrantService authorizationGrantService;
 
-    public ExamController(final ExamDao examDao) {
+    public ExamController(
+            final ExamDao examDao,
+            final AuthorizationGrantService authorizationGrantService) {
+
         this.examDao = examDao;
+        this.authorizationGrantService = authorizationGrantService;
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public final Collection<Exam> exams(final Principal principal) {
-        return this.examDao.getAll(UserPrivilegeExamFilter.of(principal));
-
+        return this.examDao.getAll(
+                this.authorizationGrantService.getReadGrantFilter(Exam.class, principal));
     }
 
     @RequestMapping(value = "/{examId}", method = RequestMethod.GET)

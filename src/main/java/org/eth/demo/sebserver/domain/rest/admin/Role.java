@@ -8,66 +8,20 @@
 
 package org.eth.demo.sebserver.domain.rest.admin;
 
-import org.eth.demo.sebserver.batis.gen.model.RoleRecord;
 import org.springframework.security.core.GrantedAuthority;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+public enum Role implements GrantedAuthority {
 
-public final class Role implements GrantedAuthority {
+    SEB_SERVER_ADMIN,
+    INSTITUTIONAL_ADMIN,
+    EXAM_ADMIN,
+    EXAM_SUPPORTER,
 
-    private static final long serialVersionUID = -5304544591727115010L;
+    LMS_CLIENT,
+    SEB_CLIENT;
 
-    //@formatter:off
-    public enum UserRole {
-        SEB_SERVER_ADMIN(new Role("SEB_SERVER_ADMIN")),
-        INSTITUTIONAL_ADMIN(new Role("INSTITUTIONAL_ADMIN")),
-        EXAM_ADMIN(new Role("EXAM_ADMIN")),
-        EXAM_SUPPORTER(new Role("EXAM_SUPPORTER")),
-
-        LMS_CLIENT(new Role("LMS_CLIENT")),
-        SEB_CLIENT(new Role("SEB_CLIENT"))
-
-        ;
-
-        public final Role role;
-
-        private UserRole(final Role role) {
-            this.role = role;
-        }
-
-        public static final UserRole byName(final String name) {
-            for (final UserRole userRole : UserRole.values()) {
-                if (userRole.role.roleName.equals(name)) {
-                    return userRole;
-                }
-            }
-
-            throw new IllegalArgumentException("No UserRole with name: " + name + " found");
-        }
-    }
-    //@formatter:on
-
-    public final String roleName;
-
-    @JsonCreator
-    public Role(@JsonProperty("role") final String roleName) {
-        this.roleName = roleName;
-    }
-
-    public String getRoleName() {
-        return this.roleName;
-    }
-
-    @JsonIgnore
     @Override
     public String getAuthority() {
-        return this.roleName;
+        return name();
     }
-
-    public static Role fromRecord(final RoleRecord record) {
-        return new Role(record.getRoleName());
-    }
-
 }

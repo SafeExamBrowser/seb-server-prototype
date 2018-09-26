@@ -9,7 +9,9 @@
 package org.eth.demo.sebserver.domain.rest.admin;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eth.demo.sebserver.batis.gen.model.RoleRecord;
@@ -34,7 +36,7 @@ public final class User implements UserDetails {
     public final String email;
     public final DateTime creationDate;
     public final Boolean active;
-    public final Collection<Role> roles;
+    public final EnumSet<Role> roles;
 
     @JsonCreator
     public User(
@@ -46,7 +48,7 @@ public final class User implements UserDetails {
             @JsonProperty("email") final String email,
             @JsonProperty("creationDate") final DateTime creationDate,
             @JsonProperty("active") final Boolean active,
-            @JsonProperty("roles") final Collection<Role> roles) {
+            @JsonProperty("roles") final Set<String> roles) {
 
         this.id = id;
         this.institutionId = institutionId;
@@ -56,7 +58,9 @@ public final class User implements UserDetails {
         this.email = email;
         this.creationDate = creationDate;
         this.active = active;
-        this.roles = roles;
+        this.roles = (roles != null)
+                ? EnumSet.copyOf(roles.stream().map(r -> Role.valueOf(r)).collect(Collectors.toList()))
+                : EnumSet.noneOf(Role.class);
     }
 
     public Long getId() {
@@ -91,6 +95,20 @@ public final class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles;
+    }
+
+    public boolean containsAny(final Role... roles) {
+        if (roles == null) {
+            return false;
+        }
+
+        for (final Role role : roles) {
+            if (this.roles.contains(role)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @JsonIgnore
@@ -148,8 +166,8 @@ public final class User implements UserDetails {
                 record.getCreationDate(),
                 record.getActive(),
                 roles.stream()
-                        .map(Role::fromRecord)
-                        .collect(Collectors.toList()));
+                        .map(r -> r.getRoleName())
+                        .collect(Collectors.toSet()));
     }
 
 }

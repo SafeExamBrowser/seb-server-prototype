@@ -11,7 +11,7 @@ package org.eth.demo.sebserver.web.clientauth;
 import javax.servlet.http.HttpServletRequest;
 
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
-import org.eth.demo.sebserver.domain.rest.admin.Role.UserRole;
+import org.eth.demo.sebserver.domain.rest.admin.Role;
 import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +58,8 @@ public class LMSClientAuthenticationFilter extends AbstractClientAuthenticationF
     }
 
     @Override
-    protected UserRole getRole() {
-        return UserRole.LMS_CLIENT;
+    protected Role getRole() {
+        return Role.LMS_CLIENT;
     }
 
 }

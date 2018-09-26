@@ -19,7 +19,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eth.demo.sebserver.domain.rest.admin.Role.UserRole;
+import org.eth.demo.sebserver.domain.rest.admin.Role;
 import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,6 +112,6 @@ public abstract class AbstractClientAuthenticationFilter extends GenericFilterBe
             String password,
             HttpServletRequest httpRequest);
 
-    protected abstract UserRole getRole();
+    protected abstract Role getRole();
 
 }

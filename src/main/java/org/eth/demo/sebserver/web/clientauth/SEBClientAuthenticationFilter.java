@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.eth.demo.sebserver.batis.gen.model.ClientConnectionRecord;
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
-import org.eth.demo.sebserver.domain.rest.admin.Role.UserRole;
+import org.eth.demo.sebserver.domain.rest.admin.Role;
 import org.eth.demo.sebserver.domain.rest.exam.ClientConnection.ConnectionStatus;
 import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
 import org.slf4j.Logger;
@@ -120,8 +120,8 @@ public class SEBClientAuthenticationFilter extends AbstractClientAuthenticationF
     }
 
     @Override
-    protected UserRole getRole() {
-        return UserRole.SEB_CLIENT;
+    protected Role getRole() {
+        return Role.SEB_CLIENT;
     }
 
 }

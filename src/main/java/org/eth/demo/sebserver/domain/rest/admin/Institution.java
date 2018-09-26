@@ -10,6 +10,11 @@ package org.eth.demo.sebserver.domain.rest.admin;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.eth.demo.sebserver.batis.gen.model.InstitutionRecord;
+import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,7 +34,7 @@ public class Institution {
     @JsonCreator
     public Institution(
             @JsonProperty("id") final Long id,
-            @JsonProperty("name") final String name,
+            @JsonProperty(value = "name", required = true) final String name,
             @JsonProperty("authType") final AuthType authType,
             @JsonProperty("sebLmsSetup") final Collection<SebLmsSetup> sebLmsSetup) {
 
@@ -81,5 +86,15 @@ public class Institution {
     @Override
     public String toString() {
         return "Institution [id=" + this.id + ", name=" + this.name + "]";
+    }
+
+    public static Institution of(final InstitutionRecord record, final List<SebLmsSetupRecord> setups) {
+        return new Institution(
+                record.getId(),
+                record.getName(),
+                AuthType.valueOf(record.getAuthtype()),
+                (setups != null) ? setups.stream()
+                        .map(SebLmsSetup::of)
+                        .collect(Collectors.toList()) : Collections.emptyList());
     }
 }

@@ -35,13 +35,13 @@ public class SebLmsSetup implements LmsSetup {
     @JsonCreator
     public SebLmsSetup(
             @JsonProperty("id") final Long id,
-            @JsonProperty("institutionId") final Long institutionId,
-            @JsonProperty("lmsType") final LMSType lmsType,
-            @JsonProperty("lmsAuthName") final String lmsAuthName,
-            @JsonProperty("lmsAuthSecret") final String lmsAuthSecret,
-            @JsonProperty("lmsApiUrl") final String lmsApiUrl,
-            @JsonProperty("sebAuthName") final String sebAuthName,
-            @JsonProperty("sebAuthSecret") final String sebAuthSecret) {
+            @JsonProperty(value = "institutionId", required = true) final Long institutionId,
+            @JsonProperty(value = "lmsType", required = true) final LMSType lmsType,
+            @JsonProperty(value = "lmsAuthName, required = true") final String lmsAuthName,
+            @JsonProperty(value = "lmsAuthSecret, required = true") final String lmsAuthSecret,
+            @JsonProperty(value = "lmsApiUrl, required = true") final String lmsApiUrl,
+            @JsonProperty(value = "sebAuthName, required = true") final String sebAuthName,
+            @JsonProperty(value = "sebAuthSecret, required = true") final String sebAuthSecret) {
 
         this.id = id;
         this.institutionId = institutionId;
