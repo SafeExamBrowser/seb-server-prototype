@@ -81,6 +81,11 @@ Composite.bgContent {
 
 Composite.content {
     background-color: #FFFFFF;
+    margin: 0 0 0 0;
+}
+
+Composite.selectionPane {
+    background-color: #D3D9DB;
 }
 
 Composite.bgFooter {

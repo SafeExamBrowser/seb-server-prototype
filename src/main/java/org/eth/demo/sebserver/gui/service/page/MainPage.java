@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class MainPage extends PageComposer {
 
+    public static final String ATTR_MAIN_PAGE_STATE = "MAIN_PAGE_STATE";
+
     public MainPage() {
         super(MainPageForm.class.getName());
     }

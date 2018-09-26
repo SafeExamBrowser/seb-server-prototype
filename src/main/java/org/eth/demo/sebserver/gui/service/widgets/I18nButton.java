@@ -12,24 +12,40 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eth.demo.sebserver.gui.service.i18n.I18nSupport;
+import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
 import org.eth.demo.sebserver.gui.service.i18n.Polyglot;
 
 public class I18nButton extends Button implements Polyglot {
 
     private static final long serialVersionUID = 7872020604698010433L;
 
-    private final String locTextKey;
-    private final Object[] args = null;
+    private LocTextKey locTextKey;
+    private LocTextKey locToolTipKey = null;
 
-    public I18nButton(final Composite parent, final I18nSupport i18nSupport, final String locTextKey) {
+    public I18nButton(final Composite parent, final I18nSupport i18nSupport, final LocTextKey locTextKey) {
         super(parent, SWT.NONE);
         this.locTextKey = locTextKey;
         updateLocale(i18nSupport);
     }
 
+    public void setLocTextKey(final LocTextKey locTextKey, final I18nSupport i18nSupport) {
+        this.locTextKey = locTextKey;
+        this.updateLocale(i18nSupport);
+    }
+
+    public void setLocToolTipKey(final LocTextKey locToolTipKey, final I18nSupport i18nSupport) {
+        this.locToolTipKey = locToolTipKey;
+        this.updateLocale(i18nSupport);
+    }
+
     @Override
     public void updateLocale(final I18nSupport i18nSupport) {
-        super.setText(i18nSupport.getText(this.locTextKey, this.args));
+        if (this.locTextKey != null) {
+            super.setText(i18nSupport.getText(this.locTextKey));
+        }
+        if (this.locToolTipKey != null) {
+            super.setToolTipText(i18nSupport.getText(this.locToolTipKey));
+        }
     }
 
 }

@@ -23,6 +23,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
@@ -44,6 +45,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Value("${sebserver.oauth.clients.guiClient.refreshTokenValiditySeconds}")
     private Integer guiClientRefreshTokenValiditySeconds;
 
+    @Autowired
+    private AccessTokenConverter accessTokenConverter;
     @Autowired
     private DataSource dataSource;
     @Autowired
@@ -89,11 +92,13 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(final AuthorizationServerEndpointsConfigurer endpoints) {
+        final JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
+        jwtAccessTokenConverter.setAccessTokenConverter(this.accessTokenConverter);
         endpoints
                 .tokenStore(tokenStore())
                 .authenticationManager(this.authenticationManager)
                 .userDetailsService(this.userDetailsService)
-                .accessTokenConverter(new JwtAccessTokenConverter());
+                .accessTokenConverter(jwtAccessTokenConverter);
     }
 
 }

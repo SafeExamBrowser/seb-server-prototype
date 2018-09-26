@@ -84,6 +84,13 @@ public class ComposerService {
     }
 
     public final void compose(
+            final Class<? extends TemplateComposer> composerType,
+            final ComposerServiceContext context) {
+
+        compose(composerType.getName(), context);
+    }
+
+    public final void compose(
             final String name,
             final ComposerServiceContext ctx) {
 
@@ -130,6 +137,8 @@ public class ComposerService {
         public final Composite parent;
         public final Map<String, String> attributes;
 
+        ActivityListener activityListener = null;
+
         private ComposerServiceContext(
                 final ComposerService composerService,
                 final Composite root,
@@ -166,6 +175,16 @@ public class ComposerService {
             attrs.put(key, value);
             return new ComposerServiceContext(this.composerService, this.root, this.parent, attrs);
         }
+
+        ComposerServiceContext of(final Composite parent, final ActivityListener activityListener) {
+            final ComposerServiceContext composerServiceContext = new ComposerServiceContext(
+                    this.composerService,
+                    this.root, parent,
+                    this.attributes);
+            composerServiceContext.activityListener = activityListener;
+            return composerServiceContext;
+        }
+
     }
 
 }

@@ -161,6 +161,7 @@ public class DefaultPageSkeleton implements TemplateComposer {
             languageSelection.updateLocale(this.i18nSupport);
             languageSelection.addListener(SWT.MouseDown, event -> {
                 this.polyglotPageService.setPageLocale(composerCtx.root, languageSelection.locale);
+                RWT.setLocale(languageSelection.locale);
             });
         }
     }
@@ -173,18 +174,23 @@ public class DefaultPageSkeleton implements TemplateComposer {
         innerGrid.marginLeft = 50;
         innerGrid.marginRight = 50;
         innerGrid.marginHeight = 0;
+        innerGrid.marginWidth = 0;
+
         contentBackground.setLayout(innerGrid);
 
         final Composite content = new Composite(contentBackground, SWT.NONE);
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         content.setData(RWT.CUSTOM_VARIANT, "content");
-        content.setLayout(new GridLayout());
+        final GridLayout contentGrid = new GridLayout();
+        contentGrid.marginHeight = 0;
+        contentGrid.marginWidth = 0;
+        content.setLayout(contentGrid);
 
         final Composite contentInner = new Composite(content, SWT.NONE);
         contentInner.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true));
         final GridLayout gridLayout = new GridLayout();
-        gridLayout.marginTop = 0;
         gridLayout.marginHeight = 0;
+        gridLayout.marginWidth = 0;
         contentInner.setLayout(gridLayout);
 
         final String contentComposerName = composerCtx.attributes.get(ATTR_CONTENT_COMPOSER_NAME);
@@ -200,8 +206,8 @@ public class DefaultPageSkeleton implements TemplateComposer {
         footerBar.setLayoutData(footerCell);
         footerBar.setData(RWT.CUSTOM_VARIANT, "bgFooter");
         final GridLayout innerBarGrid = new GridLayout();
-        innerBarGrid.horizontalSpacing = 0;
         innerBarGrid.marginHeight = 0;
+        innerBarGrid.marginWidth = 0;
         innerBarGrid.marginLeft = 50;
         innerBarGrid.marginRight = 50;
         footerBar.setLayout(innerBarGrid);

@@ -19,6 +19,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eth.demo.sebserver.gui.service.i18n.I18nSupport;
 import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
 import org.slf4j.Logger;
@@ -64,11 +66,11 @@ public class WidgetFactory {
     }
 
     public Button buttonLocalized(final Composite parent, final String locTextKey) {
-        return new I18nButton(parent, this.i18nSupport, locTextKey);
+        return new I18nButton(parent, this.i18nSupport, new LocTextKey(locTextKey));
     }
 
     public Button buttonLocalized(final Composite parent, final String style, final String locTextKey) {
-        final I18nButton i18nButton = new I18nButton(parent, this.i18nSupport, locTextKey);
+        final I18nButton i18nButton = new I18nButton(parent, this.i18nSupport, new LocTextKey(locTextKey));
         i18nButton.setData(RWT.CUSTOM_VARIANT, style);
         return i18nButton;
     }
@@ -81,6 +83,10 @@ public class WidgetFactory {
         final I18nLabel i18nLabel = new I18nLabel(parent, this.i18nSupport, new LocTextKey(locTextKey));
         i18nLabel.setData(RWT.CUSTOM_VARIANT, style);
         return i18nLabel;
+    }
+
+    public TreeItem treeItemLocalized(final Tree parent, final String locTextKey) {
+        return new I18nTreeItem(parent, SWT.NONE, this.i18nSupport, new LocTextKey(locTextKey));
     }
 
     public Label labelSeparator(final Composite parent) {

@@ -13,6 +13,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eth.demo.sebserver.service.JSONMapper;
 import org.eth.demo.sebserver.web.CustomAuthenticationEntryPoint;
 import org.eth.demo.sebserver.web.WebSecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     private InternalUserDetailsService userDetailsService;
     @Autowired
     private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    @Autowired
+    private JSONMapper jsonMapper;
 
     @Primary
     @Bean
@@ -82,7 +85,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Bean
     public UserAuthenticationConverter userAuthenticationConverter() {
         final DefaultUserAuthenticationConverter userAuthenticationConverter =
-                new DefaultUserAuthenticationConverter();
+                new InstitutionalUserAuthenticationConverter(this.jsonMapper);
         userAuthenticationConverter.setUserDetailsService(this.userDetailsService);
         return userAuthenticationConverter;
     }

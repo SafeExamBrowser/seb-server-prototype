@@ -12,6 +12,7 @@ import org.eth.demo.sebserver.batis.gen.model.RoleRecord;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class Role implements GrantedAuthority {
@@ -59,6 +60,7 @@ public final class Role implements GrantedAuthority {
         return this.roleName;
     }
 
+    @JsonIgnore
     @Override
     public String getAuthority() {
         return this.roleName;

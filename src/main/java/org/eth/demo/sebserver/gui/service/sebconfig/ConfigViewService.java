@@ -30,6 +30,7 @@ import org.eth.demo.sebserver.gui.service.rest.GETConfigAttributeValues;
 import org.eth.demo.sebserver.gui.service.rest.POSTConfigValue;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
+import org.eth.demo.sebserver.service.JSONMapper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -40,18 +41,21 @@ public class ConfigViewService {
     private final POSTConfigValue saveConfigAttributeValue;
     private final Map<FieldType, InputComponentBuilder> builderTypeMapping;
     private final AuthorizationContextHolder authorizationContextHolder;
+    private final JSONMapper jsonMapper;
 
     public ConfigViewService(
             final GETConfigAttribute configAttributeRequest,
             final GETConfigAttributeValues configAttributeValuesRequest,
             final POSTConfigValue saveConfigAttributeValue,
             final Collection<InputComponentBuilder> builders,
-            final AuthorizationContextHolder authorizationContextHolder) {
+            final AuthorizationContextHolder authorizationContextHolder,
+            final JSONMapper jsonMapper) {
 
         this.configAttributeRequest = configAttributeRequest;
         this.configAttributeValuesRequest = configAttributeValuesRequest;
         this.saveConfigAttributeValue = saveConfigAttributeValue;
         this.builderTypeMapping = new EnumMap<>(FieldType.class);
+        this.jsonMapper = jsonMapper;
         for (final InputComponentBuilder builder : builders) {
             for (final FieldType type : builder.supportedTypes()) {
                 this.builderTypeMapping.put(type, builder);
@@ -90,7 +94,8 @@ public class ConfigViewService {
                         this.saveConfigAttributeValue,
                         this.authorizationContextHolder
                                 .getAuthorizationContext()
-                                .getRestTemplate()));
+                                .getRestTemplate(),
+                        this.jsonMapper));
     }
 
     public ViewContext createComponents(final Composite parent, final ViewContext viewContext) {

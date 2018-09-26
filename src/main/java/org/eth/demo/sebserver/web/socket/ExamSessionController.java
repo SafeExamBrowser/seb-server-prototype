@@ -11,6 +11,7 @@ package org.eth.demo.sebserver.web.socket;
 import org.eth.demo.sebserver.domain.rest.exam.ClientEvent;
 import org.eth.demo.sebserver.domain.rest.exam.ConnectionInfo;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
+import org.eth.demo.sebserver.service.JSONMapper;
 import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
 import org.eth.demo.sebserver.service.exam.run.ExamSessionService;
 import org.eth.demo.sebserver.web.clientauth.ClientConnectionAuth.SEBWebSocketAuth;
@@ -31,7 +32,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import reactor.core.publisher.Flux;
 
@@ -43,14 +43,16 @@ public class ExamSessionController {
 
     private final ExamSessionService examSessionService;
     private final ExamConnectionService examConnectionService;
-    private final ObjectMapper jsonMapper = new ObjectMapper();
+    private final JSONMapper jsonMapper;
 
     public ExamSessionController(
             final ExamSessionService examSessionService,
-            final ExamConnectionService examConnectionService) {
+            final ExamConnectionService examConnectionService,
+            final JSONMapper jsonMapper) {
 
         this.examSessionService = examSessionService;
         this.examConnectionService = examConnectionService;
+        this.jsonMapper = jsonMapper;
     }
 
     @SubscribeMapping("/runningexam/wsconnect/*")

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.domain.rest.exam.Exam.ExamStatus;
 import org.eth.demo.sebserver.domain.rest.exam.ExamLink;
+import org.eth.demo.sebserver.service.JSONMapper;
 import org.eth.demo.sebserver.service.exam.ExamDao;
 import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
 import org.eth.demo.sebserver.web.clientauth.ClientConnectionAuth.LMSConnectionAuth;
@@ -29,8 +30,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @RestController
 public class SEBClientConnectionController {
 
@@ -43,15 +42,16 @@ public class SEBClientConnectionController {
 
     private final ExamDao examDao;
     private final ExamConnectionService examConnectionService;
-    private final ObjectMapper jsonMapper;
+    private final JSONMapper jsonMapper;
 
     public SEBClientConnectionController(
             final ExamDao examDao,
-            final ExamConnectionService examConnectionService) {
+            final ExamConnectionService examConnectionService,
+            final JSONMapper jsonMapper) {
 
         this.examDao = examDao;
         this.examConnectionService = examConnectionService;
-        this.jsonMapper = new ObjectMapper();
+        this.jsonMapper = jsonMapper;
     }
 
     /** SEB-Client authentication is the fist step on SEB-Client connection setup for a running exam.

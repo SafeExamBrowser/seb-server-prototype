@@ -12,22 +12,25 @@ import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigAttributeValu
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigTableValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigViewAttribute;
 import org.eth.demo.sebserver.gui.service.rest.POSTConfigValue;
+import org.eth.demo.sebserver.service.JSONMapper;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ViewValueChangeListener implements ValueChangeListener {
 
     private final POSTConfigValue saveConfigAttributeValue;
     private final RestTemplate restTemplate;
+    private final JSONMapper jsonMapper;
 
     public ViewValueChangeListener(
             final POSTConfigValue saveConfigAttributeValue,
-            final RestTemplate restTemplate) {
+            final RestTemplate restTemplate,
+            final JSONMapper jsonMapper) {
 
         this.saveConfigAttributeValue = saveConfigAttributeValue;
         this.restTemplate = restTemplate;
+        this.jsonMapper = jsonMapper;
     }
 
     @Override
@@ -45,8 +48,7 @@ public class ViewValueChangeListener implements ValueChangeListener {
                 value);
 
         try {
-            final ObjectMapper mapper = new ObjectMapper();
-            final String jsonValue = mapper.writeValueAsString(valueObj);
+            final String jsonValue = this.jsonMapper.writeValueAsString(valueObj);
             this.saveConfigAttributeValue
                     .with(this.restTemplate)
                     .singleAttribute()
@@ -61,8 +63,7 @@ public class ViewValueChangeListener implements ValueChangeListener {
     @Override
     public void tableChanged(final ConfigTableValue tableValue) {
         try {
-            final ObjectMapper mapper = new ObjectMapper();
-            final String jsonValue = mapper.writeValueAsString(tableValue);
+            final String jsonValue = this.jsonMapper.writeValueAsString(tableValue);
             this.saveConfigAttributeValue
                     .with(this.restTemplate)
                     .tableAttribute()

@@ -10,6 +10,7 @@ package org.eth.demo.sebserver.web;
 
 import org.eth.demo.sebserver.web.clientauth.LMSClientAuthenticationFilter;
 import org.eth.demo.sebserver.web.clientauth.SEBClientAuthenticationFilter;
+import org.eth.demo.sebserver.web.oauth.ExternalAuthProvider;
 import org.eth.demo.sebserver.web.oauth.InternalUserDetailsService;
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
@@ -79,6 +80,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             new NegatedRequestMatcher(SEB_SERVER_API_IGNORE_URL);
 
     @Autowired
+    private ExternalAuthProvider externalAuthProvider;
+    @Autowired
     private InternalUserDetailsService userDetailsService;
     @Autowired
     private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
@@ -107,7 +110,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .userDetailsService(this.userDetailsService)
-                .passwordEncoder(this.userPasswordEncoder);
+                .passwordEncoder(this.userPasswordEncoder)
+                .and()
+                .authenticationProvider(this.externalAuthProvider);
     }
 
     @Override

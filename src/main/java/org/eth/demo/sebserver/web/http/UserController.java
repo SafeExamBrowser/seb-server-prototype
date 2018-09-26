@@ -8,11 +8,10 @@
 
 package org.eth.demo.sebserver.web.http;
 
-import java.security.Principal;
-
 import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.service.admin.UserDao;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,8 +28,13 @@ public class UserController {
     }
 
     @RequestMapping(value = "/me", method = RequestMethod.GET)
-    public User loggedInUser(final Principal principal) {
-        return this.userDao.byUserName(principal.getName());
+    public User loggedInUser(final Authentication auth) {
+        final Object principal = auth.getPrincipal();
+        if (principal instanceof User) {
+            return (User) principal;
+        }
+
+        return this.userDao.byUserName(auth.getName());
     }
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
