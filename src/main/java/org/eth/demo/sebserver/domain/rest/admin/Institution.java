@@ -15,11 +15,14 @@ import java.util.stream.Collectors;
 
 import org.eth.demo.sebserver.batis.gen.model.InstitutionRecord;
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
+import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantEntityType;
+import org.eth.demo.sebserver.service.authorization.GrantEntity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Institution {
+public final class Institution implements GrantEntity {
 
     public enum AuthType {
         INTERNAL,
@@ -44,6 +47,24 @@ public class Institution {
         this.sebLmsSetup = (sebLmsSetup != null)
                 ? Collections.unmodifiableCollection(sebLmsSetup)
                 : Collections.emptyList();
+    }
+
+    @Override
+    public GrantEntityType grantEntityType() {
+        return GrantEntityType.INSTITUTION;
+    }
+
+    @JsonIgnore
+    @Override
+    public Long getInstitutionId() {
+        return this.id;
+    }
+
+    @JsonIgnore
+    @Override
+    public Long getOwnerId() {
+        // NOTE: No owner for institution
+        return null;
     }
 
     public Long getId() {
@@ -97,4 +118,5 @@ public class Institution {
                         .map(SebLmsSetup::of)
                         .collect(Collectors.toList()) : Collections.emptyList());
     }
+
 }

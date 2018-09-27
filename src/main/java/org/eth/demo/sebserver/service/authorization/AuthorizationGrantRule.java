@@ -9,13 +9,16 @@
 package org.eth.demo.sebserver.service.authorization;
 
 import org.eth.demo.sebserver.domain.rest.admin.User;
+import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantEntityType;
 
-public interface AuthorizationGrantRule<T> {
+public interface AuthorizationGrantRule {
 
-    Class<T> type();
+    GrantEntityType type();
 
-    boolean hasReadGrant(T t, User user);
+    boolean hasReadGrant(GrantEntity entity, User user);
 
-    boolean hasWriteGrant(T t, User user);
+    boolean hasModifyGrant(GrantEntity entity, User user);
+
+    boolean hasWriteGrant(GrantEntity entity, User user);
 
 }

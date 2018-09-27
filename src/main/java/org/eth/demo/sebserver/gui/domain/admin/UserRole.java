@@ -9,5 +9,8 @@
 package org.eth.demo.sebserver.gui.domain.admin;
 
 public enum UserRole {
-    ADMIN_USER, STANDARD_USER
+    SEB_SERVER_ADMIN,
+    INSTITUTIONAL_ADMIN,
+    EXAM_ADMIN,
+    EXAM_SUPPORTER
 }

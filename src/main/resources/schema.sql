@@ -283,6 +283,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `email` VARCHAR(255) NOT NULL,
   `creation_date` DATETIME NOT NULL,
   `active` BIT(1) NOT NULL,
+  `locale` VARCHAR(45) NULL,
   PRIMARY KEY (`id`),
   INDEX `institutionRef_idx` (`institution_id` ASC),
   CONSTRAINT `institutionRef`
@@ -291,7 +292,6 @@ CREATE TABLE IF NOT EXISTS `user` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
-
 
 -- -----------------------------------------------------
 -- Table `user_role`

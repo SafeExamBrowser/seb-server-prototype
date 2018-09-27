@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Locale;
 
 import org.eth.demo.sebserver.domain.rest.admin.Role;
 import org.eth.demo.sebserver.domain.rest.admin.User;
@@ -83,7 +84,7 @@ public class ExternalAuthProvider implements AuthenticationProvider {
     private final User mockUser = new User(
             null, 1L,
             "extUser", "extUser", "extUser",
-            "", DateTime.now(), true,
+            "", DateTime.now(), true, Locale.ENGLISH,
             new HashSet<>(Arrays.asList(Role.EXAM_ADMIN.name())));
 
     private void createInMemoryMockExample() {

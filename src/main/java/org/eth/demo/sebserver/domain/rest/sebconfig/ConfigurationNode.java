@@ -13,11 +13,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eth.demo.sebserver.domain.rest.exam.ExamSEBConfigMapping;
+import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantEntityType;
+import org.eth.demo.sebserver.service.authorization.GrantEntity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public final class ConfigurationNode {
+public final class ConfigurationNode implements GrantEntity {
 
     public enum ConfigurationType {
         TEMPLATE,
@@ -56,14 +58,21 @@ public final class ConfigurationNode {
                 : Collections.emptyList();
     }
 
+    @Override
+    public GrantEntityType grantEntityType() {
+        return GrantEntityType.SEB_CONFIG;
+    }
+
     public Long getId() {
         return this.id;
     }
 
+    @Override
     public Long getInstitutionId() {
         return this.institutionId;
     }
 
+    @Override
     public Long getOwnerId() {
         return this.ownerId;
     }

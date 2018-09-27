@@ -23,8 +23,7 @@ public class UserInfo {
     public final String username;
     public final String email;
     public final DateTime creationDate;
-    // TODO add this to DB table and user form
-    public final Locale locale = Locale.ENGLISH;
+    public final Locale locale;
     public final Boolean active;
     public final Collection<Role> roles;
 
@@ -36,6 +35,7 @@ public class UserInfo {
             @JsonProperty("email") final String email,
             @JsonProperty("creationDate") final DateTime creationDate,
             @JsonProperty("active") final Boolean active,
+            @JsonProperty("locale") final Locale locale,
             @JsonProperty("roles") final Collection<Role> roles) {
 
         this.id = id;
@@ -44,6 +44,7 @@ public class UserInfo {
         this.email = email;
         this.creationDate = creationDate;
         this.active = active;
+        this.locale = locale;
         this.roles = roles;
     }
 
@@ -116,9 +117,11 @@ public class UserInfo {
 
     @Override
     public String toString() {
-        return "UserInfo [name=" + this.name + ", username=" + this.username + ", email=" + this.email
-                + ", creationDate="
-                + this.creationDate + ", active=" + this.active + ", roles=" + this.roles + "]";
+        return "UserInfo [id=" + this.id + ", name=" + this.name + ", username=" + this.username + ", email="
+                + this.email
+                + ", creationDate=" + this.creationDate + ", locale=" + this.locale + ", active=" + this.active
+                + ", roles=" + this.roles
+                + "]";
     }
 
     public static final class Role {
@@ -126,7 +129,7 @@ public class UserInfo {
         public final String roleName;
 
         @JsonCreator
-        public Role(@JsonProperty("role") final String roleName) {
+        public Role(@JsonProperty final String roleName) {
             this.roleName = roleName;
         }
 

@@ -11,12 +11,15 @@ package org.eth.demo.sebserver.domain.rest.exam;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantEntityType;
+import org.eth.demo.sebserver.service.authorization.GrantEntity;
 import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public final class Exam {
+public final class Exam implements GrantEntity {
 
     public enum ExamStatus {
         READY,
@@ -69,12 +72,25 @@ public final class Exam {
                 : Collections.emptyList();
     }
 
+    @Override
+    public GrantEntityType grantEntityType() {
+        return GrantEntityType.EXAM;
+    }
+
     public Long getId() {
         return this.id;
     }
 
+    @Override
     public Long getInstitutionId() {
         return this.institutionId;
+    }
+
+    @JsonIgnore
+    @Override
+    public Long getOwnerId() {
+        // NOTE: No owner for Exams so far
+        return null;
     }
 
     public Long getLmsSetupId() {

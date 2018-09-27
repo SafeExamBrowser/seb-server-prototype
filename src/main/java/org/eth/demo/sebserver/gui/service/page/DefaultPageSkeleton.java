@@ -116,6 +116,8 @@ public class DefaultPageSkeleton implements TemplateComposer {
                     // TODO error handling
                 }
 
+                // reset also CurrentUser witch is ui-session scoped
+
                 composerCtx.composerService.composePage(
                         LoginPage.class,
                         composerCtx.root,
@@ -161,7 +163,7 @@ public class DefaultPageSkeleton implements TemplateComposer {
             languageSelection.updateLocale(this.i18nSupport);
             languageSelection.addListener(SWT.MouseDown, event -> {
                 this.polyglotPageService.setPageLocale(composerCtx.root, languageSelection.locale);
-                RWT.setLocale(languageSelection.locale);
+
             });
         }
     }
@@ -256,8 +258,10 @@ public class DefaultPageSkeleton implements TemplateComposer {
 
         @Override
         public void updateLocale(final I18nSupport i18nSupport) {
-            super.setVisible(!i18nSupport.getCurrentLocale().equals(this.locale));
-            super.getParent().layout();
+            super.setVisible(
+                    !i18nSupport.getCurrentLocale()
+                            .getLanguage()
+                            .equals(this.locale.getLanguage()));
         }
     }
 

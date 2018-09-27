@@ -15,6 +15,8 @@ import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
 import org.eth.demo.sebserver.service.admin.UserFacade;
 import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService;
+import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantEntityType;
+import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantType;
 import org.eth.demo.sebserver.service.exam.ExamDao;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +41,10 @@ public class ExamController {
     @RequestMapping(method = RequestMethod.GET)
     public final Collection<Exam> exams(final Principal principal) {
         return this.examDao.getAll(
-                this.authorizationGrantService.getReadGrantFilter(Exam.class, principal));
+                this.authorizationGrantService.getGrantFilter(
+                        GrantEntityType.EXAM,
+                        GrantType.READ_ONLY,
+                        principal));
     }
 
     @RequestMapping(value = "/{examId}", method = RequestMethod.GET)

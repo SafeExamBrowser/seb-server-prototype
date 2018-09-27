@@ -14,6 +14,8 @@ import java.util.Collection;
 import org.eth.demo.sebserver.domain.rest.admin.Institution;
 import org.eth.demo.sebserver.service.admin.InstitutionDao;
 import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService;
+import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantEntityType;
+import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +38,16 @@ public class InstitutionController {
     @RequestMapping(method = RequestMethod.GET)
     public final Collection<Institution> exams(final Principal principal) {
         return this.institutionDao.all(
-                this.authorizationGrantService.getReadGrantFilter(Institution.class, principal));
+                this.authorizationGrantService.getGrantFilter(
+                        GrantEntityType.INSTITUTION,
+                        GrantType.READ_ONLY,
+                        principal));
     }
+
+//    @RequestMapping(value = "/self", method = RequestMethod.GET)
+//    public final Institution usersInstitution(final Principal principal) {
+//        return this.institutionDao.all(
+//                this.authorizationGrantService.getReadGrantFilter(Institution.class, principal));
+//    }
 
 }

@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
+import org.eth.demo.sebserver.gui.service.i18n.I18nSupport;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.ComposerServiceContext;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageAttr;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
@@ -37,13 +38,16 @@ public class LoginForm implements TemplateComposer {
 
     private final AuthorizationContextHolder authorizationContextHolder;
     private final WidgetFactory widgetFactory;
+    private final I18nSupport i18nSupport;
 
     public LoginForm(
             final AuthorizationContextHolder authorizationContextHolder,
-            final WidgetFactory widgetFactory) {
+            final WidgetFactory widgetFactory,
+            final I18nSupport i18nSupport) {
 
         this.authorizationContextHolder = authorizationContextHolder;
         this.widgetFactory = widgetFactory;
+        this.i18nSupport = i18nSupport;
     }
 
     @Override
@@ -95,8 +99,11 @@ public class LoginForm implements TemplateComposer {
                         username,
                         loginPassword.getText());
 
+                // Set users locale on page after successful login
+                this.i18nSupport.setSessionLocale(
+                        authorizationContext.getLoggedInUser().locale);
+
                 if (loggedIn) {
-                    // view main page (TODO: or users-entry-page?)
                     composerCtx.composerService.composePage(
                             MainPage.class,
                             composerCtx.root,

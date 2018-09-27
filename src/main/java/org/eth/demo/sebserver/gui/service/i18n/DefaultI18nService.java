@@ -60,7 +60,10 @@ public class DefaultI18nService implements I18nSupport {
     @Override
     public void setSessionLocale(final Locale locale) {
         try {
-            RWT.getUISession().setAttribute(ATTR_CURRENT_SESSION_LOCALE, locale);
+            RWT.getUISession()
+                    .getHttpSession()
+                    .setAttribute(ATTR_CURRENT_SESSION_LOCALE, locale);
+            RWT.setLocale(locale);
         } catch (final IllegalStateException e) {
             log.error("Set current locale for session failed: ", e);
         }
@@ -71,6 +74,7 @@ public class DefaultI18nService implements I18nSupport {
         // first session-locale if available
         try {
             final Locale sessionLocale = (Locale) RWT.getUISession()
+                    .getHttpSession()
                     .getAttribute(ATTR_CURRENT_SESSION_LOCALE);
             if (sessionLocale != null) {
                 return sessionLocale;

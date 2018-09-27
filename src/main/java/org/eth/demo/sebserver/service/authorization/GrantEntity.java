@@ -6,10 +6,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.domain.rest.admin;
+package org.eth.demo.sebserver.service.authorization;
 
-public enum Scope {
-    READ_ONLY,
-    EDIT,
-    OWNER
+import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantEntityType;
+
+public interface GrantEntity {
+
+    GrantEntityType grantEntityType();
+
+    Long getInstitutionId();
+
+    Long getOwnerId();
+
 }

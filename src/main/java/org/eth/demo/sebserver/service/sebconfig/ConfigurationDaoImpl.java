@@ -27,7 +27,6 @@ import org.eth.demo.sebserver.batis.gen.mapper.ConfigurationRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.ConfigurationNodeRecord;
 import org.eth.demo.sebserver.batis.gen.model.ConfigurationRecord;
 import org.eth.demo.sebserver.batis.gen.model.ConfigurationValueRecord;
-import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.domain.rest.exam.ExamSEBConfigMapping;
 import org.eth.demo.sebserver.domain.rest.sebconfig.Configuration;
 import org.eth.demo.sebserver.domain.rest.sebconfig.ConfigurationNode;
@@ -113,27 +112,7 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<ConfigurationNode> getOwned(final User user) {
-        return fromJoinRecords(this.configurationNodeJoinMapper
-                .selectByExample()
-                .where(ConfigurationNodeRecordDynamicSqlSupport.ownerId, isEqualTo(user.id))
-                .build()
-                .execute());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Collection<ConfigurationNode> getAll(final User user) {
-        return fromJoinRecords(this.configurationNodeJoinMapper
-                .selectByExample()
-                .where(ConfigurationNodeRecordDynamicSqlSupport.institutionId, isEqualTo(user.institutionId))
-                .build()
-                .execute());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Collection<ConfigurationNode> getAll(final Predicate<ConfigurationNode> predicate) {
+    public Collection<ConfigurationNode> all(final Predicate<ConfigurationNode> predicate) {
         return fromJoinRecords(this.configurationNodeJoinMapper
                 .selectByExample()
                 .build()
@@ -197,8 +176,6 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
     @Override
     @Transactional
     public ConfigurationNode undo(final Long configurationNodeId) {
-        final Configuration currentConfig = getCurrentConfiguration(configurationNodeId);
-
         // TODO Auto-generated method stub
         return null;
     }

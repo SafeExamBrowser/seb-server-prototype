@@ -30,11 +30,6 @@ public class CurrentUser {
     }
 
     public UserInfo get() {
-        if (this.authContext == null) {
-            this.authContext = this.authorizationContextHolder
-                    .getAuthorizationContext();
-        }
-
         if (isAvailable()) {
             return this.authContext.getLoggedInUser();
         }
@@ -45,7 +40,14 @@ public class CurrentUser {
     }
 
     public boolean isAvailable() {
+        updateContext();
         return this.authContext != null && this.authContext.isLoggedIn();
+    }
+
+    private void updateContext() {
+        if (this.authContext == null || this.authContext.isValid()) {
+            this.authContext = this.authorizationContextHolder.getAuthorizationContext();
+        }
     }
 
 }

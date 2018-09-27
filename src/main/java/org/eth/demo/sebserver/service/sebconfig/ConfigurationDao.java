@@ -11,7 +11,6 @@ package org.eth.demo.sebserver.service.sebconfig;
 import java.util.Collection;
 import java.util.function.Predicate;
 
-import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.domain.rest.sebconfig.ConfigurationNode;
 
 public interface ConfigurationDao {
@@ -22,23 +21,7 @@ public interface ConfigurationDao {
 
     ConfigurationNode byName(String name);
 
-    /** Use this all ConfigurationNode owned by specified User
-     *
-     * @param user
-     * @return */
-    Collection<ConfigurationNode> getOwned(User user);
-
-    /** use this to get all ConfigurationNode from the Institution of the specified User
-     *
-     * @param user
-     * @return */
-    Collection<ConfigurationNode> getAll(User user);
-
-    /** Use this to get all ConfigurationNode of all institutions filtered by predicate
-     *
-     * @param predicate
-     * @return */
-    Collection<ConfigurationNode> getAll(Predicate<ConfigurationNode> predicate);
+    Collection<ConfigurationNode> all(Predicate<ConfigurationNode> predicate);
 
     ConfigurationNode save(ConfigurationNode node);
 

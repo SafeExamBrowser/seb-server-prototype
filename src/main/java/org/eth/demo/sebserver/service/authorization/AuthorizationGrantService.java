@@ -9,13 +9,16 @@
 package org.eth.demo.sebserver.service.authorization;
 
 import java.security.Principal;
-import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import org.eth.demo.sebserver.domain.rest.admin.Role;
 import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.service.admin.UserFacade;
+import org.eth.demo.sebserver.service.authorization.RoleTypeGrant.RoleTypeKey;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -23,78 +26,225 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthorizationGrantService {
 
-    private final Map<String, AuthorizationGrantRule<?>> rules = new HashMap<>();
+    public enum GrantType implements Predicate<RoleTypeGrant> {
+        READ_ONLY(grant -> grant.read),
+        MODIFY(grant -> grant.modify),
+        WRITE(grant -> grant.write);
 
-    public AuthorizationGrantService(final Collection<AuthorizationGrantRule<?>> rules) {
-        if (rules == null) {
-            throw new IllegalArgumentException("No AuthorizationGrantRule found");
+        private final Predicate<RoleTypeGrant> typeCheck;
+
+        private GrantType(final Predicate<RoleTypeGrant> typeCheck) {
+            this.typeCheck = typeCheck;
         }
-        rules.stream()
-                .forEach(r -> this.rules.put(r.type().getName(), r));
+
+        @Override
+        public boolean test(final RoleTypeGrant grant) {
+            return this.typeCheck.test(grant);
+        }
     }
 
-    public <T> boolean hasReadGrant(final T value, final Principal principal) {
-        return hasReadGrant(value, UserFacade.extractFromPrincipal(principal));
+    public enum GrantEntityType {
+        INSTITUTION,
+        SEB_LMS_SETUP,
+        USER,
+        EXAM,
+        SEB_CONFIG
     }
 
-    public <T> boolean hasWriteGrant(final T value, final Principal principal) {
-        return hasWriteGrant(value, UserFacade.extractFromPrincipal(principal));
+    private final Map<RoleTypeGrant.RoleTypeKey, RoleTypeGrant> generalGrantRules = new HashMap<>();
+    private final Map<GrantEntityType, AuthorizationGrantRule> exceptionalRules =
+            new EnumMap<>(GrantEntityType.class);
+
+    public AuthorizationGrantService(final ApplicationContext appContext) {
+        //@formatter:off
+
+        // Global privileges
+
+        // r - read-only
+        // m - modify -> save but no creation nor deletion
+        // w - write  -> with creation and deletion
+        // i - institutionOnly -> sees only entities of same institution
+        // mo - modifyOnlyOwner -> like modify but only if the user is the owner
+        // wo - writeOnlyOwner -> like write but only of the user is the owner
+
+        //  r      m      w      i      mo     wo
+        add(true,  true,  true,  false, false, false, GrantEntityType.INSTITUTION,Role.SEB_SERVER_ADMIN);
+        add(true,  true,  false, true,  true,  false, GrantEntityType.INSTITUTION,Role.INSTITUTIONAL_ADMIN);
+        add(true,  false, false, true,  false, false, GrantEntityType.INSTITUTION,Role.EXAM_ADMIN);
+        add(true,  false, false, true,  false, false, GrantEntityType.INSTITUTION,Role.EXAM_SUPPORTER);
+
+        //  r      m      w      i      mo     wo
+        add(true,  false, false, false, false, false, GrantEntityType.SEB_LMS_SETUP,Role.SEB_SERVER_ADMIN);
+        add(true,  true,  true,  true,  false, false, GrantEntityType.SEB_LMS_SETUP,Role.INSTITUTIONAL_ADMIN);
+        add(true,  false, false, true,  false, false, GrantEntityType.SEB_LMS_SETUP,Role.EXAM_ADMIN);
+        add(true,  false, false, true,  false, false, GrantEntityType.SEB_LMS_SETUP,Role.EXAM_SUPPORTER);
+
+        //  r      m      w      i      mo     wo
+        add(true,  false, false, false, false, false, GrantEntityType.EXAM,Role.SEB_SERVER_ADMIN);
+        add(true,  true,  true,  true,  false, false, GrantEntityType.EXAM,Role.INSTITUTIONAL_ADMIN);
+        add(true,  false, false, true,  false, false, GrantEntityType.EXAM,Role.EXAM_ADMIN);
+        add(true,  false, false, true,  false, false, GrantEntityType.EXAM,Role.EXAM_SUPPORTER);
+
+        //@formatter:on
+
+        final Map<String, AuthorizationGrantRule> exceptions = appContext.getBeansOfType(AuthorizationGrantRule.class);
+        if (exceptions != null) {
+            exceptions.values().stream()
+                    .forEach(r -> this.exceptionalRules.put(r.type(), r));
+        }
     }
 
-    public <T> boolean hasReadGrant(final T value, final User user) {
-        @SuppressWarnings("unchecked")
-        final AuthorizationGrantRule<T> authorizationGrantRule =
-                (AuthorizationGrantRule<T>) this.rules.get(value.getClass().getName());
+    public boolean hasTypeGrant(final GrantEntityType entityType, final GrantType type, final Principal principal) {
+        final User user = UserFacade.extractFromPrincipal(principal);
+        for (final Role role : user.getRoles()) {
+            final RoleTypeGrant roleTypeGrant = this.generalGrantRules.get(new RoleTypeKey(entityType, role));
+            if (roleTypeGrant != null && type.test(roleTypeGrant)) {
+                return true;
+            }
+        }
 
+        return false;
+    }
+
+    public boolean hasGrant(final GrantEntity entity, final GrantType type, final Principal principal) {
+        return hasGrant(entity, type, UserFacade.extractFromPrincipal(principal));
+    }
+
+    public boolean hasGrant(final GrantEntity entity, final GrantType type, final User user) {
+        final AuthorizationGrantRule authorizationGrantRule = getGrantRule(entity.grantEntityType());
         if (authorizationGrantRule == null) {
             return false;
         }
 
-        return authorizationGrantRule.hasReadGrant(value, user);
+        switch (type) {
+            case READ_ONLY:
+                return authorizationGrantRule.hasReadGrant(entity, user);
+            case MODIFY:
+                return authorizationGrantRule.hasModifyGrant(entity, user);
+            case WRITE:
+                return authorizationGrantRule.hasWriteGrant(entity, user);
+            default:
+                return false;
+        }
     }
 
-    public <T> boolean hasWriteGrant(final T value, final User user) {
-        @SuppressWarnings("unchecked")
-        final AuthorizationGrantRule<T> authorizationGrantRule =
-                (AuthorizationGrantRule<T>) this.rules.get(value.getClass().getName());
+    public <T extends GrantEntity> Predicate<T> getGrantFilter(
+            final GrantEntityType entityType,
+            final GrantType type,
+            final Principal principal) {
 
-        if (authorizationGrantRule == null) {
+        return getGrantFilter(entityType, type, UserFacade.extractFromPrincipal(principal));
+    }
+
+    public <T extends GrantEntity> Predicate<T> getGrantFilter(
+            final GrantEntityType entityType,
+            final GrantType type,
+            final User user) {
+
+        final AuthorizationGrantRule authorizationGrantRule = getGrantRule(entityType);
+        if (authorizationGrantRule == null)
+            return t -> false;
+
+        switch (type) {
+            case READ_ONLY:
+                return t -> authorizationGrantRule.hasReadGrant(t, user);
+            case MODIFY:
+                return t -> authorizationGrantRule.hasModifyGrant(t, user);
+            case WRITE:
+                return t -> authorizationGrantRule.hasWriteGrant(t, user);
+            default:
+                return t -> false;
+        }
+    }
+
+    private AuthorizationGrantRule getGrantRule(final GrantEntityType type) {
+        return this.exceptionalRules.computeIfAbsent(type, entityType -> new GeneralGrantRule(entityType));
+    }
+
+    private void add(
+            final boolean read,
+            final boolean modify,
+            final boolean write,
+            final boolean institutionOnly,
+            final boolean modifyOwnerOnly,
+            final boolean writeOwnerOnly,
+            final GrantEntityType type,
+            final Role role) {
+
+        new RoleTypeGrant(read, modify, write, institutionOnly, modifyOwnerOnly, writeOwnerOnly, type, role);
+    }
+
+    private final class GeneralGrantRule implements AuthorizationGrantRule {
+
+        private final GrantEntityType type;
+        private final Map<Role, RoleTypeGrant> grants;
+
+        public GeneralGrantRule(final GrantEntityType type) {
+            this.type = type;
+            this.grants = new EnumMap<>(Role.class);
+            for (final Role role : Role.values()) {
+                this.grants.put(role,
+                        AuthorizationGrantService.this.generalGrantRules.get(new RoleTypeKey(type, role)));
+            }
+        }
+
+        @Override
+        public GrantEntityType type() {
+            return this.type;
+        }
+
+        @Override
+        public boolean hasReadGrant(final GrantEntity entity, final User user) {
+            for (final Role role : user.roles) {
+                final RoleTypeGrant roleTypeGrant = this.grants.get(role);
+                if (roleTypeGrant.read) {
+                    if (roleTypeGrant.institutionOnly
+                            && user.institutionId.longValue() == entity.getInstitutionId().longValue()) {
+                        return true;
+                    } else {
+                        return true;
+                    }
+                }
+            }
             return false;
         }
 
-        return authorizationGrantRule.hasWriteGrant(value, user);
-    }
-
-    public <T> Predicate<T> getReadGrantFilter(final Class<T> type, final Principal principal) {
-        return getReadGrantFilter(type, UserFacade.extractFromPrincipal(principal));
-    }
-
-    public <T> Predicate<T> getWriteGrantFilter(final Class<T> type, final Principal principal) {
-        return getWriteGrantFilter(type, UserFacade.extractFromPrincipal(principal));
-    }
-
-    public <T> Predicate<T> getReadGrantFilter(final Class<T> type, final User user) {
-        @SuppressWarnings("unchecked")
-        final AuthorizationGrantRule<T> authorizationGrantRule =
-                (AuthorizationGrantRule<T>) this.rules.get(type.getName());
-
-        if (authorizationGrantRule == null) {
-            return t -> false;
+        @Override
+        public boolean hasModifyGrant(final GrantEntity entity, final User user) {
+            for (final Role role : user.roles) {
+                final RoleTypeGrant roleTypeGrant = this.grants.get(role);
+                if (roleTypeGrant.modify) {
+                    if (roleTypeGrant.institutionOnly
+                            && user.institutionId.longValue() == entity.getInstitutionId().longValue()) {
+                        return true;
+                    } else {
+                        return true;
+                    }
+                }
+                if (roleTypeGrant.modifyOwnerOnly && user.id.longValue() == entity.getOwnerId()) {
+                    return true;
+                }
+            }
+            return false;
         }
 
-        return t -> authorizationGrantRule.hasReadGrant(t, user);
-    }
-
-    public <T> Predicate<T> getWriteGrantFilter(final Class<T> type, final User user) {
-        @SuppressWarnings("unchecked")
-        final AuthorizationGrantRule<T> authorizationGrantRule =
-                (AuthorizationGrantRule<T>) this.rules.get(type.getName());
-
-        if (authorizationGrantRule == null) {
-            return t -> false;
+        @Override
+        public boolean hasWriteGrant(final GrantEntity entity, final User user) {
+            for (final Role role : user.roles) {
+                final RoleTypeGrant roleTypeGrant = this.grants.get(role);
+                if (roleTypeGrant.write) {
+                    if (roleTypeGrant.institutionOnly
+                            && user.institutionId.longValue() == entity.getInstitutionId().longValue()) {
+                        return true;
+                    } else {
+                        return true;
+                    }
+                }
+                if (roleTypeGrant.writeOwnerOnly && user.id.longValue() == entity.getOwnerId()) {
+                    return true;
+                }
+            }
+            return false;
         }
-
-        return t -> authorizationGrantRule.hasWriteGrant(t, user);
     }
-
 }

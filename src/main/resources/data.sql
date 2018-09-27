@@ -8,15 +8,16 @@ INSERT INTO seb_lms_setup VALUES
     ;
 
 INSERT INTO user VALUES 
-    (1, 1, "Admin1", "admin", "$2a$08$c2GKYEYoUVXH1Yb8GXVXVu66ltPvbZgLMcVSXRH.LgZNF/YeaYB8m", "admin@nomail.nomail", '2018-01-01 00:00:00', 1),
-    (2, 1, "User1", "user1", "$2a$08$0mBB2.NPUsg0afMhYq5NE.Te.g.QnzIH8ncKs65zYtoyV/NV2X8ne", "user1@nomail.nomail", '2018-01-01 00:00:00', 1),
-    (3, 1, "User2", "user2", "$2a$08$VSQl35ERwunAEKMGt7XhkuqkDD4ze4I8j/RDdRw8jzqhjwzuqiGQi", "user2@nomail.nomail", '2018-01-01 00:00:00', 1)
+    (1, 1, "Admin1", "admin", "$2a$08$c2GKYEYoUVXH1Yb8GXVXVu66ltPvbZgLMcVSXRH.LgZNF/YeaYB8m", "admin@nomail.nomail", '2018-01-01 00:00:00', 1, "en"),
+    (2, 1, "User1", "user1", "$2a$08$0mBB2.NPUsg0afMhYq5NE.Te.g.QnzIH8ncKs65zYtoyV/NV2X8ne", "user1@nomail.nomail", '2018-01-01 00:00:00', 1, "de"),
+    (3, 1, "User2", "user2", "$2a$08$VSQl35ERwunAEKMGt7XhkuqkDD4ze4I8j/RDdRw8jzqhjwzuqiGQi", "user2@nomail.nomail", '2018-01-01 00:00:00', 1, "en")
     ;
     
 INSERT INTO user_role VALUES
     (1, 1, "EXAM_ADMIN"),
     (2, 2, "EXAM_SUPPORTER"),
-    (3, 3, "EXAM_SUPPORTER")
+    (3, 3, "EXAM_SUPPORTER"),
+    (4, 1, "EXAM_SUPPORTER")
     ;
 
 INSERT INTO configuration_attribute VALUES

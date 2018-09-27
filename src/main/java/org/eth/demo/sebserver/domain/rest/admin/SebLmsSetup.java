@@ -9,12 +9,15 @@
 package org.eth.demo.sebserver.domain.rest.admin;
 
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
+import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantEntityType;
+import org.eth.demo.sebserver.service.authorization.GrantEntity;
 import org.eth.demo.sebserver.service.lms.LmsSetup;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class SebLmsSetup implements LmsSetup {
+public final class SebLmsSetup implements LmsSetup, GrantEntity {
 
     public enum LMSType {
         MOCKUP,
@@ -51,6 +54,18 @@ public class SebLmsSetup implements LmsSetup {
         this.lmsApiUrl = lmsApiUrl;
         this.sebAuthName = sebAuthName;
         this.sebAuthSecret = sebAuthSecret;
+    }
+
+    @Override
+    public GrantEntityType grantEntityType() {
+        return GrantEntityType.SEB_LMS_SETUP;
+    }
+
+    @JsonIgnore
+    @Override
+    public Long getOwnerId() {
+        // NOTE: No owner id so far
+        return null;
     }
 
     @Override
@@ -136,5 +151,4 @@ public class SebLmsSetup implements LmsSetup {
                 record.getSebClientname(),
                 record.getSebClientsecret());
     }
-
 }

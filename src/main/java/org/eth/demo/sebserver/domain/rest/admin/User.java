@@ -11,6 +11,7 @@ package org.eth.demo.sebserver.domain.rest.admin;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,7 @@ public final class User implements UserDetails {
     public final String email;
     public final DateTime creationDate;
     public final Boolean active;
+    public final Locale locale;
     public final EnumSet<Role> roles;
 
     @JsonCreator
@@ -48,6 +50,7 @@ public final class User implements UserDetails {
             @JsonProperty("email") final String email,
             @JsonProperty("creationDate") final DateTime creationDate,
             @JsonProperty("active") final Boolean active,
+            @JsonProperty("locale") final Locale locale,
             @JsonProperty("roles") final Set<String> roles) {
 
         this.id = id;
@@ -58,6 +61,7 @@ public final class User implements UserDetails {
         this.email = email;
         this.creationDate = creationDate;
         this.active = active;
+        this.locale = locale;
         this.roles = (roles != null)
                 ? EnumSet.copyOf(roles.stream().map(r -> Role.valueOf(r)).collect(Collectors.toList()))
                 : EnumSet.noneOf(Role.class);
@@ -85,6 +89,10 @@ public final class User implements UserDetails {
 
     public Boolean getActive() {
         return this.active;
+    }
+
+    public Locale getLocale() {
+        return this.locale;
     }
 
     public Collection<Role> getRoles() {
@@ -152,7 +160,7 @@ public final class User implements UserDetails {
                 + this.username
                 + ", password=" + this.password + ", email=" + this.email + ", creationDate=" + this.creationDate
                 + ", active="
-                + this.active + ", roles=" + this.roles + "]";
+                + this.active + ", locale=" + this.locale + ", roles=" + this.roles + "]";
     }
 
     public static User fromRecord(final UserRecord record, final List<RoleRecord> roles) {
@@ -165,6 +173,7 @@ public final class User implements UserDetails {
                 record.getEmail(),
                 record.getCreationDate(),
                 record.getActive(),
+                new Locale(record.getLocale()),
                 roles.stream()
                         .map(r -> r.getRoleName())
                         .collect(Collectors.toSet()));

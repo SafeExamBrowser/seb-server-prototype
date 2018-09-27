@@ -8,8 +8,13 @@
 
 package org.eth.demo.sebserver.web.http;
 
+import java.security.Principal;
+
 import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.service.admin.UserDao;
+import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService;
+import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantEntityType;
+import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,9 +27,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserDao userDao;
+    private final AuthorizationGrantService authorizationGrantService;
 
-    public UserController(final UserDao userDao) {
+    public UserController(final UserDao userDao, final AuthorizationGrantService authorizationGrantService) {
         this.userDao = userDao;
+        this.authorizationGrantService = authorizationGrantService;
     }
 
     @RequestMapping(value = "/me", method = RequestMethod.GET)
@@ -35,6 +42,15 @@ public class UserController {
         }
 
         return this.userDao.byUserName(auth.getName());
+    }
+
+    @RequestMapping(value = "/hasTypeGrant/{entityType}/{grantType}", method = RequestMethod.GET)
+    public Boolean userGrant(
+            @PathVariable(required = true) final GrantEntityType entityType,
+            @PathVariable(required = true) final GrantType grantType,
+            final Principal principal) {
+
+        return this.authorizationGrantService.hasTypeGrant(entityType, grantType, principal);
     }
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
