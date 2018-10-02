@@ -12,6 +12,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eth.demo.sebserver.gui.service.rest.SEBServerAPICall.APICallBuilder;
+import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
+import org.eth.demo.util.Result;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +24,27 @@ public class RestServices {
 
     private final Map<String, SEBServerAPICall<?>> sebServerAPICalls = new HashMap<>();
 
-    public RestServices(final Collection<SEBServerAPICall<?>> apiCalls) {
+    private final AuthorizationContextHolder authorizationContextHolder;
+
+    public RestServices(
+            final Collection<SEBServerAPICall<?>> apiCalls,
+            final AuthorizationContextHolder authorizationContextHolder) {
+
+        this.authorizationContextHolder = authorizationContextHolder;
         for (final SEBServerAPICall<?> apiCall : apiCalls) {
             this.sebServerAPICalls.put(apiCall.getClass().getName(), apiCall);
         }
     }
 
-    public <T extends SEBServerAPICall<?>> T getSEBServerAPICall(final Class<T> type) {
+    public final <V, T extends SEBServerAPICall<V>> Result<V> sebServerCall(final Class<T> type) {
+        return sebServerAPICall(type).doAPICall();
+    }
+
+    public <V, T extends SEBServerAPICall<V>> APICallBuilder<V> sebServerAPICall(final Class<T> type) {
         if (this.sebServerAPICalls.containsKey(type.getName())) {
-            return type.cast(this.sebServerAPICalls.get(type.getName()));
+            return type
+                    .cast(this.sebServerAPICalls.get(type.getName()))
+                    .with(this.authorizationContextHolder);
         }
 
         throw new IllegalArgumentException("Unknown SEBServerAPICall of type: " + type.getName());

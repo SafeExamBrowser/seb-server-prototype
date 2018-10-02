@@ -30,7 +30,6 @@ import org.eth.demo.sebserver.gui.service.i18n.I18nSupport;
 import org.eth.demo.sebserver.gui.service.rest.GETConfigs;
 import org.eth.demo.sebserver.gui.service.rest.GETExams;
 import org.eth.demo.sebserver.gui.service.rest.RestServices;
-import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -38,33 +37,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class Dashboard implements ViewComposer {
 
-    private final GETExams examsRequest;
-    private final GETConfigs configsRequest;
-    private final AuthorizationContextHolder authorizationContextHolder;
     private final I18nSupport i18nSupport;
     private final TopToolbarComposer topToolbarComposer;
     private final ExamTablePopupMenu examTablePopupMenu;
     private final SEBConfigTablePopupMenu sebConfigTablePopupMenu;
     private final StatusToolbarComposer statusToolbarComposer;
+    private final RestServices restServices;
 
     // TODO reduce dependencies
     public Dashboard(
             final RestServices restServices,
-            final AuthorizationContextHolder authorizationContextHolder,
             final I18nSupport i18nSupport,
             final ExamTablePopupMenu examTablePopupMenu,
             final SEBConfigTablePopupMenu sebConfigTablePopupMenu,
             final TopToolbarComposer topToolbarComposer,
             final StatusToolbarComposer statusToolbarComposer) {
 
-        this.examsRequest = restServices.getSEBServerAPICall(GETExams.class);
-        this.configsRequest = restServices.getSEBServerAPICall(GETConfigs.class);
-        this.authorizationContextHolder = authorizationContextHolder;
         this.i18nSupport = i18nSupport;
         this.topToolbarComposer = topToolbarComposer;
         this.examTablePopupMenu = examTablePopupMenu;
         this.sebConfigTablePopupMenu = sebConfigTablePopupMenu;
         this.statusToolbarComposer = statusToolbarComposer;
+        this.restServices = restServices;
     }
 
     @Override
@@ -113,9 +107,8 @@ public class Dashboard implements ViewComposer {
 
     private void createConfigsTable(final Composite parent, final Composite examTableGroup) {
         // get all exams for the current logged in user from the SEBServer Web-Service API
-        final Collection<ConfigTableRow> configs = this.configsRequest
-                .with(this.authorizationContextHolder)
-                .doAPICall()
+        final Collection<ConfigTableRow> configs = this.restServices
+                .sebServerCall(GETConfigs.class)
                 .onError(t -> {
                     throw new RuntimeException(t);
                 }); // TODO error handling
@@ -132,9 +125,8 @@ public class Dashboard implements ViewComposer {
 
     private void createExamsTable(final Composite parent, final Composite examTableGroup) {
         // get all exams for the current logged in user from the SEBServer Web-Service API
-        final Collection<ExamTableRow> exams = this.examsRequest
-                .with(this.authorizationContextHolder)
-                .doAPICall()
+        final Collection<ExamTableRow> exams = this.restServices
+                .sebServerCall(GETExams.class)
                 .onError(t -> {
                     throw new RuntimeException(t);
                 }); // TODO error handling

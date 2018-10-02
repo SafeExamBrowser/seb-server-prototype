@@ -1,5 +1,5 @@
 INSERT INTO institution VALUES
-    (1, "ethz", "INTERNAL")
+    (1, "ETH Zürich", "INTERNAL")
     ;
     
 INSERT INTO seb_lms_setup VALUES
@@ -14,7 +14,7 @@ INSERT INTO user VALUES
     ;
     
 INSERT INTO user_role VALUES
-    (1, 1, "EXAM_ADMIN"),
+    (1, 1, "SEB_SERVER_ADMIN"),
     (2, 2, "EXAM_SUPPORTER"),
     (3, 3, "EXAM_SUPPORTER"),
     (4, 1, "EXAM_SUPPORTER")

@@ -42,7 +42,6 @@ import org.eth.demo.sebserver.gui.service.rest.GETConnectionInfo;
 import org.eth.demo.sebserver.gui.service.rest.GETRunningExamDetails;
 import org.eth.demo.sebserver.gui.service.rest.RestServices;
 import org.eth.demo.sebserver.gui.service.rest.SEBServerAPICall.APICallBuilder;
-import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -51,19 +50,14 @@ import org.springframework.stereotype.Component;
 public class RunningExamView implements ViewComposer {
 
     private final ServerPushService serverPushService;
-    private final GETRunningExamDetails examDetailRequest;
-    private final GETConnectionInfo indicatorValuesRequest;
-    private final AuthorizationContextHolder authorizationContextHolder;
+    private final RestServices restServices;
 
     public RunningExamView(
             final RestServices restServices,
-            final ServerPushService serverPushService,
-            final AuthorizationContextHolder authorizationContextHolder) {
+            final ServerPushService serverPushService) {
 
         this.serverPushService = serverPushService;
-        this.examDetailRequest = restServices.getSEBServerAPICall(GETRunningExamDetails.class);
-        this.indicatorValuesRequest = restServices.getSEBServerAPICall(GETConnectionInfo.class);
-        this.authorizationContextHolder = authorizationContextHolder;
+        this.restServices = restServices;
     }
 
     @Override
@@ -78,8 +72,8 @@ public class RunningExamView implements ViewComposer {
             final Map<String, String> attributes) {
 
         final String examId = attributes.get(AttributeKeys.EXAM_ID);
-        final RunningExam exam = this.examDetailRequest
-                .with(this.authorizationContextHolder)
+        final RunningExam exam = this.restServices
+                .sebServerAPICall(GETRunningExamDetails.class)
                 .exam(examId)
                 .doAPICall()
                 .onError(t -> {
@@ -154,7 +148,7 @@ public class RunningExamView implements ViewComposer {
                         root,
                         runAgainContext -> true),
                 dataPoll(
-                        this.indicatorValuesRequest.with(this.authorizationContextHolder),
+                        this.restServices.sebServerAPICall(GETConnectionInfo.class),
                         clientTable),
                 context -> {
                     clientTable.updateGUI();

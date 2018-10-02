@@ -8,11 +8,26 @@
 
 package org.eth.demo.sebserver.gui.service.page;
 
+import java.util.function.Consumer;
+
+import org.eclipse.swt.widgets.TreeItem;
+import org.eth.demo.sebserver.gui.service.AttributeKeys;
+import org.eth.demo.sebserver.gui.service.page.content.InstitutionForm;
+
 public class ActivitySelection {
+
+    public static final Consumer<TreeItem> EMPTY_FUNCTION = ti -> {
+    };
+    public static final Consumer<TreeItem> COLLAPSE_NONE_EMPTY = ti -> {
+        ti.removeAll();
+        ti.setItemCount(1);
+    };
 
     public enum Activity {
         NONE(TODOTemplate.class, TODOTemplate.class),
-        ADMIN(TODOTemplate.class, TODOTemplate.class),
+        INSTITUTIONS(TODOTemplate.class, TODOTemplate.class),
+        INSTITUTION(InstitutionForm.class, TODOTemplate.class, AttributeKeys.INSTITUTION_ID),
+
         USER(TODOTemplate.class, TODOTemplate.class),
         LMS_SETTUP(TODOTemplate.class, TODOTemplate.class),
 
@@ -23,28 +38,99 @@ public class ActivitySelection {
 
         final Class<? extends TemplateComposer> objectPaneComposer;
         final Class<? extends TemplateComposer> selectionPaneComposer;
+        final String objectIdentifierAttribute;
 
-        private Activity(final Class<? extends TemplateComposer> objectPaneComposer,
+        private Activity(
+                final Class<? extends TemplateComposer> objectPaneComposer,
                 final Class<? extends TemplateComposer> selectionPaneComposer) {
+
             this.objectPaneComposer = objectPaneComposer;
             this.selectionPaneComposer = selectionPaneComposer;
+            this.objectIdentifierAttribute = null;
+        }
+
+        private Activity(
+                final Class<? extends TemplateComposer> objectPaneComposer,
+                final Class<? extends TemplateComposer> selectionPaneComposer,
+                final String objectIdentifierAttribute) {
+
+            this.objectPaneComposer = objectPaneComposer;
+            this.selectionPaneComposer = selectionPaneComposer;
+            this.objectIdentifierAttribute = objectIdentifierAttribute;
+        }
+
+        public final ActivitySelection selection() {
+            return new ActivitySelection(this);
         }
     }
 
-    public static final ActivitySelection NONE = new ActivitySelection(Activity.NONE);
-    public static final ActivitySelection ADMIN = new ActivitySelection(Activity.ADMIN);
+    private static final String ATTR_ACTIVITY_SELECTION = "ACTIVITY_SELECTION";
 
     public final Activity activity;
-    public final String objectIdentifier;
+    String objectIdentifier;
+    Consumer<TreeItem> expandFunction = EMPTY_FUNCTION;
+    Consumer<TreeItem> collapseFunction = EMPTY_FUNCTION;
 
     public ActivitySelection(final Activity activity) {
         this.activity = activity;
-        this.objectIdentifier = null;
+        this.expandFunction = EMPTY_FUNCTION;
+        this.collapseFunction = EMPTY_FUNCTION;
     }
 
-    public ActivitySelection(final Activity activity, final String objectIdentifier) {
-        this.activity = activity;
+    public ActivitySelection withExpandFunction(final Consumer<TreeItem> expandFunction) {
+        if (expandFunction == null) {
+            this.expandFunction = EMPTY_FUNCTION;
+        }
+        this.expandFunction = expandFunction;
+        return this;
+    }
+
+    public ActivitySelection withCollapseFunction(final Consumer<TreeItem> collapseFunction) {
+        if (collapseFunction == null) {
+            this.collapseFunction = EMPTY_FUNCTION;
+        }
+        this.collapseFunction = collapseFunction;
+        return this;
+    }
+
+    public ActivitySelection with(final String objectIdentifier) {
         this.objectIdentifier = objectIdentifier;
+        return this;
     }
 
+    public static ActivitySelection get(final TreeItem item) {
+        return (ActivitySelection) item.getData(ATTR_ACTIVITY_SELECTION);
+    }
+
+    public static void set(final TreeItem item, final ActivitySelection selection) {
+        item.setData(ATTR_ACTIVITY_SELECTION, selection);
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((this.activity == null) ? 0 : this.activity.hashCode());
+        result = prime * result + ((this.objectIdentifier == null) ? 0 : this.objectIdentifier.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final ActivitySelection other = (ActivitySelection) obj;
+        if (this.activity != other.activity)
+            return false;
+        if (this.objectIdentifier == null) {
+            if (other.objectIdentifier != null)
+                return false;
+        } else if (!this.objectIdentifier.equals(other.objectIdentifier))
+            return false;
+        return true;
+    }
 }

@@ -31,6 +31,17 @@ public class I18nTreeItem extends TreeItem implements Polyglot {
         updateLocale(i18nSupport);
     }
 
+    public I18nTreeItem(
+            final TreeItem parent,
+            final int style,
+            final I18nSupport i18nSupport,
+            final LocTextKey locTextKey) {
+
+        super(parent, style);
+        this.locTextKey = locTextKey;
+        updateLocale(i18nSupport);
+    }
+
     @Override
     public void updateLocale(final I18nSupport i18nSupport) {
         if (this.locTextKey != null) {

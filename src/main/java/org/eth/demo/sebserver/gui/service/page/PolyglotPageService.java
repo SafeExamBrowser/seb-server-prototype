@@ -21,16 +21,14 @@ import org.springframework.stereotype.Component;
 public class PolyglotPageService {
 
     private final I18nSupport i18nSupport;
-    private final PageTreeTraversal pageTreeTraversal;
 
-    public PolyglotPageService(final I18nSupport i18nSupport, final PageTreeTraversal pageTreeTraversal) {
+    public PolyglotPageService(final I18nSupport i18nSupport) {
         this.i18nSupport = i18nSupport;
-        this.pageTreeTraversal = pageTreeTraversal;
     }
 
     public void setPageLocale(final Composite root, final Locale locale) {
         this.i18nSupport.setSessionLocale(locale);
-        this.pageTreeTraversal.traversePageTree(
+        PageTreeTraversal.traversePageTree(
                 root,
                 comp -> comp instanceof Polyglot,
                 p -> ((Polyglot) p).updateLocale(this.i18nSupport));

@@ -8,15 +8,22 @@
 
 package org.eth.demo.sebserver.gui.service.page;
 
-import org.eclipse.rap.rwt.RWT;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eth.demo.sebserver.gui.domain.admin.UserInfo;
+import org.eth.demo.sebserver.gui.domain.admin.UserRole;
+import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
+import org.eth.demo.sebserver.gui.service.page.ActivitySelection.Activity;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.ComposerServiceContext;
 import org.eth.demo.sebserver.gui.service.page.MainPageForm.MainPageState;
-import org.eth.demo.sebserver.gui.service.rest.GETConfigs;
+import org.eth.demo.sebserver.gui.service.rest.GETInstitutionInfo;
+import org.eth.demo.sebserver.gui.service.rest.RestServices;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory;
 import org.springframework.context.annotation.Lazy;
@@ -26,72 +33,154 @@ import org.springframework.stereotype.Component;
 @Component
 public class ActivitiesPane implements TemplateComposer {
 
-    private static final String ATTR_ACTIVITY_SELECTION = "ACTIVITY_SELECTION";
-
     private final WidgetFactory widgetFactory;
-    private final GETConfigs configsRequest;
+    private final RestServices restServices;
     private final AuthorizationContextHolder authorizationContextHolder;
 
     public ActivitiesPane(
             final WidgetFactory widgetFactory,
-            final GETConfigs configsRequest,
+            final RestServices restServices,
             final AuthorizationContextHolder authorizationContextHolder) {
 
         this.widgetFactory = widgetFactory;
-        this.configsRequest = configsRequest;
+        this.restServices = restServices;
         this.authorizationContextHolder = authorizationContextHolder;
     }
 
     @Override
     public void compose(final ComposerServiceContext composerCtx) {
-        if (composerCtx.activityListener == null) {
-            throw new IllegalStateException("No ActivityListener available");
-        }
+        final UserInfo userInfo = this.authorizationContextHolder
+                .getAuthorizationContext()
+                .getLoggedInUser();
 
-        final Label activities = new Label(composerCtx.parent, SWT.NONE);
+        final Label activities = this.widgetFactory.labelLocalized(
+                composerCtx.parent, "h3", "org.sebserver.activities");
         activities.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        activities.setText("Activities");
-        activities.setData(RWT.CUSTOM_VARIANT, "h3");
 
         final Tree navigation = new Tree(composerCtx.parent, SWT.SINGLE | SWT.FULL_SELECTION);
         navigation.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        final TreeItem item = this.widgetFactory.treeItemLocalized(navigation, "org.sebserver.activities.admin");
-        item.setData(ATTR_ACTIVITY_SELECTION, ActivitySelection.ADMIN);
-        item.setItemCount(1);
+
+        final Map<String, String> insitutionInfo = this.restServices
+                .sebServerCall(GETInstitutionInfo.class)
+                .onError(t -> {
+                    throw new RuntimeException(t);
+                });
+
+        if (userInfo.hasRole(UserRole.SEB_SERVER_ADMIN)) {
+            // institutions (list) as root
+            final TreeItem institutions = this.widgetFactory.treeItemLocalized(
+                    navigation,
+                    new LocTextKey("org.sebserver.activities.inst", insitutionInfo.size()));
+            ActivitySelection.set(institutions, Activity.INSTITUTIONS.selection());
+
+            for (final Map.Entry<String, String> inst : insitutionInfo.entrySet()) {
+                createInstitutionItem(institutions, inst);
+            }
+        } else {
+            final Entry<String, String> inst = insitutionInfo.entrySet().iterator().next();
+            createInstitutionItem(navigation, inst);
+        }
 
         navigation.addListener(SWT.Expand, event -> {
             final TreeItem treeItem = (TreeItem) event.item;
+
             System.out.println("opened: " + treeItem);
+
+            final ActivitySelection activity = ActivitySelection.get(treeItem);
+            if (activity != null) {
+                activity.expandFunction.accept(treeItem);
+            }
         });
         navigation.addListener(SWT.Collapse, event -> {
             final TreeItem treeItem = (TreeItem) event.item;
+
             System.out.println("closed: " + treeItem);
+
+            final ActivitySelection activity = ActivitySelection.get(treeItem);
+            if (activity != null) {
+                activity.collapseFunction.accept(treeItem);
+            }
         });
         navigation.addListener(SWT.Selection, event -> {
             final TreeItem treeItem = (TreeItem) event.item;
+
             System.out.println("selected: " + treeItem);
+
             final MainPageState mainPageState = MainPageState.get();
-            mainPageState.activitySelection = (ActivitySelection) treeItem.getData(ATTR_ACTIVITY_SELECTION);
-            composerCtx.activityListener.notifySelection(composerCtx);
+            mainPageState.activitySelection = ActivitySelection.get(treeItem);
+            if (mainPageState.activitySelection == null) {
+                mainPageState.activitySelection = Activity.NONE.selection();
+            }
+            composerCtx.notify(mainPageState.activitySelection);
         });
 
         applyPreSelection(navigation, composerCtx);
+    }
 
-//        // get all exams for the current logged in user from the SEBServer Web-Service API
-//        final Collection<ConfigTableRow> configs = this.configsRequest
-//                .with(this.authorizationContextHolder)
-//                .doAPICall()
-//                .onError(t -> {
-//                    throw new RuntimeException(t);
-//                }); // TODO error handling
+    private void createInstitutionItem(final Tree parent, final Map.Entry<String, String> inst) {
+        final TreeItem institution = new TreeItem(parent, SWT.NONE);
+        createInstitutionItem(inst, institution);
+    }
+
+    private void createInstitutionItem(final TreeItem parent, final Map.Entry<String, String> inst) {
+        final TreeItem institution = new TreeItem(parent, SWT.NONE);
+        createInstitutionItem(inst, institution);
+    }
+
+    private void createInstitutionItem(final Map.Entry<String, String> inst, final TreeItem institution) {
+        institution.setText(inst.getValue());
+        ActivitySelection.set(institution, Activity.INSTITUTION.selection()
+                .with(inst.getKey()));
+
+        final TreeItem lmsSetup = this.widgetFactory.treeItemLocalized(
+                institution,
+                "org.sebserver.activities.lms");
+        ActivitySelection.set(lmsSetup, Activity.LMS_SETTUP.selection());
+
+        final TreeItem user = this.widgetFactory.treeItemLocalized(
+                institution,
+                "org.sebserver.activities.user");
+        ActivitySelection.set(user, Activity.USER.selection());
     }
 
     private void applyPreSelection(final Tree navigation, final ComposerServiceContext composerCtx) {
         final MainPageState mainPageState = MainPageState.get();
-        if (mainPageState.activitySelection == null || mainPageState.activitySelection == ActivitySelection.NONE) {
+        if (mainPageState.activitySelection == null || mainPageState.activitySelection.activity == Activity.NONE) {
             return;
         }
 
+        final TreeItem itemToPreSelect = findSelectedItem(navigation.getItems(), mainPageState);
+        if (itemToPreSelect != null) {
+            navigation.select(itemToPreSelect);
+            expand(itemToPreSelect.getParentItem());
+            composerCtx.notify(mainPageState.activitySelection);
+        }
+    }
+
+    private TreeItem findSelectedItem(final TreeItem[] items, final MainPageState mainPageState) {
+        if (items == null) {
+            return null;
+        }
+
+        for (final TreeItem item : items) {
+            final ActivitySelection activitySelection = ActivitySelection.get(item);
+            if (activitySelection != null && activitySelection.equals(mainPageState.activitySelection)) {
+                return item;
+            }
+
+            return findSelectedItem(item.getItems(), mainPageState);
+        }
+
+        return null;
+    }
+
+    private static final void expand(final TreeItem item) {
+        if (item == null) {
+            return;
+        }
+
+        item.setExpanded(true);
+        expand(item.getParentItem());
     }
 
 }

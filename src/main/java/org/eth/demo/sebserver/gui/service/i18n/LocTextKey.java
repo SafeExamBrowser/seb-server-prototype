@@ -13,12 +13,14 @@ public class LocTextKey {
     public final String name;
     public final Object[] args;
 
-    public LocTextKey(final String key) {
-        this(key, null);
+    public LocTextKey(final String name) {
+        this.name = name;
+        this.args = null;
     }
 
-    public LocTextKey(final String name, final Object[] args) {
+    public LocTextKey(final String name, final Object... args) {
         this.name = name;
         this.args = args;
     }
+
 }

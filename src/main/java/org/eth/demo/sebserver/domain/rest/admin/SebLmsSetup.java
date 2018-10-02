@@ -8,6 +8,10 @@
 
 package org.eth.demo.sebserver.domain.rest.admin;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
 import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantEntityType;
 import org.eth.demo.sebserver.service.authorization.GrantEntity;
@@ -25,6 +29,9 @@ public final class SebLmsSetup implements LmsSetup, GrantEntity {
         OPEN_EDX,
         OPEN_OLAT
     }
+
+    public static final Collection<LMSType> LMS_TYPE_SELECTION = Collections
+            .unmodifiableList(Arrays.asList(LMSType.values()));
 
     public final Long id;
     public final Long institutionId;

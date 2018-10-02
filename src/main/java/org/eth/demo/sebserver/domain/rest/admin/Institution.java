@@ -8,6 +8,7 @@
 
 package org.eth.demo.sebserver.domain.rest.admin;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.eth.demo.sebserver.batis.gen.model.InstitutionRecord;
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
+import org.eth.demo.sebserver.domain.rest.admin.SebLmsSetup.LMSType;
 import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantEntityType;
 import org.eth.demo.sebserver.service.authorization.GrantEntity;
 
@@ -28,6 +30,9 @@ public final class Institution implements GrantEntity {
         INTERNAL,
         EXTERNAL_LDAP
     }
+
+    public static final Collection<AuthType> AUTH_TYPE_SELECTION =
+            Collections.unmodifiableList(Arrays.asList(AuthType.values()));
 
     public final Long id;
     public final String name;
@@ -77,6 +82,14 @@ public final class Institution implements GrantEntity {
 
     public AuthType getAuthType() {
         return this.authType;
+    }
+
+    public Collection<AuthType> getAuthTypeSelection() {
+        return AUTH_TYPE_SELECTION;
+    }
+
+    public Collection<LMSType> getLmsTypeSelection() {
+        return SebLmsSetup.LMS_TYPE_SELECTION;
     }
 
     @Override

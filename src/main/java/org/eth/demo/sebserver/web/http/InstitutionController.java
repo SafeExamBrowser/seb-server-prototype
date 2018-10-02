@@ -10,12 +10,15 @@ package org.eth.demo.sebserver.web.http;
 
 import java.security.Principal;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eth.demo.sebserver.domain.rest.admin.Institution;
 import org.eth.demo.sebserver.service.admin.InstitutionDao;
 import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService;
 import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantEntityType;
 import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantType;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,13 +38,40 @@ public class InstitutionController {
         this.authorizationGrantService = authorizationGrantService;
     }
 
+    @RequestMapping(value = "/info", method = RequestMethod.GET)
+    public final Map<Long, String> info(final Principal principal) {
+        return this.institutionDao.all(
+                this.authorizationGrantService.getGrantFilter(
+                        GrantEntityType.INSTITUTION,
+                        GrantType.READ_ONLY,
+                        principal))
+                .stream()
+                .reduce(new HashMap<Long, String>(),
+                        (acc, inst) -> {
+                            acc.put(inst.id, inst.name);
+                            return acc;
+                        },
+                        (acc1, acc2) -> {
+                            acc1.putAll(acc2);
+                            return acc1;
+                        });
+    }
+
     @RequestMapping(method = RequestMethod.GET)
-    public final Collection<Institution> exams(final Principal principal) {
+    public final Collection<Institution> all(final Principal principal) {
         return this.institutionDao.all(
                 this.authorizationGrantService.getGrantFilter(
                         GrantEntityType.INSTITUTION,
                         GrantType.READ_ONLY,
                         principal));
+    }
+
+    @RequestMapping(value = "/{instId}", method = RequestMethod.GET)
+    public final Institution institution(
+            @PathVariable(required = true) final Long instId,
+            final Principal principal) {
+
+        return this.institutionDao.byId(instId);
     }
 
 //    @RequestMapping(value = "/self", method = RequestMethod.GET)

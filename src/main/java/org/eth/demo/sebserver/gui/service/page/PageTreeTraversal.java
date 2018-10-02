@@ -13,14 +13,10 @@ import java.util.function.Predicate;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
-@Lazy
-@Component
-public class PageTreeTraversal {
+public abstract class PageTreeTraversal {
 
-    public void traversePageTree(
+    public static final void traversePageTree(
             final Composite root,
             final Predicate<Control> predicate,
             final Consumer<Control> f) {
@@ -42,4 +38,5 @@ public class PageTreeTraversal {
             }
         }
     }
+
 }

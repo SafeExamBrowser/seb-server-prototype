@@ -13,6 +13,8 @@ public interface AttributeKeys {
     public static final String USER_NAME = "USER_NAME";
     public static final String PASSWORD = "PASSWORD";
 
+    public static final String INSTITUTION_ID = "INSTITUTION_ID";
+
     public static final String CONFIG_ID = "CONFIG_ID";
     public static final String CONFIG_VIEW_NAME = "CONFIG_VIEW_NAME";
     public static final String CONFIG_ATTRIBUTE_NAMES = "CONFIG_ATTRIBUTE_NAMES";

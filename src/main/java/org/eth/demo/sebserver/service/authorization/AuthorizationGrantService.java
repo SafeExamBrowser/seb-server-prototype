@@ -171,7 +171,9 @@ public class AuthorizationGrantService {
             final GrantEntityType type,
             final Role role) {
 
-        new RoleTypeGrant(read, modify, write, institutionOnly, modifyOwnerOnly, writeOwnerOnly, type, role);
+        final RoleTypeGrant roleTypeGrant =
+                new RoleTypeGrant(read, modify, write, institutionOnly, modifyOwnerOnly, writeOwnerOnly, type, role);
+        this.generalGrantRules.put(roleTypeGrant.roleTypeKey, roleTypeGrant);
     }
 
     private final class GeneralGrantRule implements AuthorizationGrantRule {
