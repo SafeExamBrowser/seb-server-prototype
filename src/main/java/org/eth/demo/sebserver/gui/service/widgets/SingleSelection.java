@@ -20,8 +20,8 @@ public class SingleSelection extends Combo {
 
     private static final long serialVersionUID = 6522063655406404279L;
 
-    protected final List<String> valueMapping;
-    protected final List<String> keyMapping;
+    final List<String> valueMapping;
+    final List<String> keyMapping;
 
     public SingleSelection(final Composite parent, final List<Tuple<String>> mapping) {
         super(parent, SWT.READ_ONLY);

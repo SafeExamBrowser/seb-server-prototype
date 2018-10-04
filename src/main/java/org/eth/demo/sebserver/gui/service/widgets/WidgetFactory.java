@@ -25,8 +25,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eth.demo.sebserver.gui.service.i18n.I18nSupport;
 import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
+import org.eth.demo.sebserver.gui.service.i18n.PolyglotPageService;
 import org.eth.demo.util.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,11 @@ public class WidgetFactory {
 
     public enum IconButtonType {
         MAXIMIZE("maximize.png"),
-        MINIMIZE("minimize.png");
+        MINIMIZE("minimize.png"),
+        SAVE_ACTION("saveAction.png"),
+        NEW_ACTION("newAction.png"),
+        DELETE_ACTION("deleteAction.png"),
+        ;
 
         private String fileName;
         private ImageData image = null;
@@ -64,47 +68,101 @@ public class WidgetFactory {
 
     }
 
-    public final I18nSupport i18nSupport;
+    //public final I18nSupport i18nSupport;
+    private final PolyglotPageService polyglotPageService;
 
-    public WidgetFactory(final I18nSupport i18nSupport) {
-        this.i18nSupport = i18nSupport;
+    public WidgetFactory(final PolyglotPageService polyglotPageService) {
+        this.polyglotPageService = polyglotPageService;
     }
 
     public Button buttonLocalized(final Composite parent, final String locTextKey) {
-        return new I18nButton(parent, this.i18nSupport, new LocTextKey(locTextKey));
+        final Button button = new Button(parent, SWT.NONE);
+        this.polyglotPageService.injectI18n(button, new LocTextKey(locTextKey));
+        return button;
+    }
+
+    public Button buttonLocalized(final Composite parent, final LocTextKey locTextKey) {
+        final Button button = new Button(parent, SWT.NONE);
+        this.polyglotPageService.injectI18n(button, locTextKey);
+        return button;
     }
 
     public Button buttonLocalized(final Composite parent, final String style, final String locTextKey) {
-        final I18nButton i18nButton = new I18nButton(parent, this.i18nSupport, new LocTextKey(locTextKey));
-        i18nButton.setData(RWT.CUSTOM_VARIANT, style);
-        return i18nButton;
+        final Button button = new Button(parent, SWT.NONE);
+        this.polyglotPageService.injectI18n(button, new LocTextKey(locTextKey));
+        button.setData(RWT.CUSTOM_VARIANT, style);
+        return button;
     }
 
     public Label labelLocalized(final Composite parent, final String locTextKey) {
-        return new I18nLabel(parent, this.i18nSupport, new LocTextKey(locTextKey));
+        final Label label = new Label(parent, SWT.NONE);
+        this.polyglotPageService.injectI18n(label, new LocTextKey(locTextKey));
+        return label;
     }
 
-    public Label labelLocalized(final Composite parent, final String style, final String locTextKey,
-            final Object... args) {
-        final I18nLabel i18nLabel = new I18nLabel(parent, this.i18nSupport, new LocTextKey(locTextKey, args));
-        i18nLabel.setData(RWT.CUSTOM_VARIANT, style);
-        return i18nLabel;
+    public Label labelLocalized(final Composite parent, final LocTextKey locTextKey) {
+        final Label label = new Label(parent, SWT.NONE);
+        this.polyglotPageService.injectI18n(label, locTextKey);
+        return label;
+    }
+
+    public Label labelLocalized(final Composite parent, final String style, final LocTextKey locTextKey) {
+        final Label label = new Label(parent, SWT.NONE);
+        this.polyglotPageService.injectI18n(label, locTextKey);
+        label.setData(RWT.CUSTOM_VARIANT, style);
+        return label;
+    }
+
+    public Label labelLocalized(
+            final Composite parent,
+            final LocTextKey locTextKey,
+            final LocTextKey locToolTextKey) {
+
+        final Label label = new Label(parent, SWT.NONE);
+        this.polyglotPageService.injectI18n(label, locTextKey, locToolTextKey);
+        return label;
+    }
+
+    public Label labelLocalized(
+            final Composite parent,
+            final String style,
+            final LocTextKey locTextKey,
+            final LocTextKey locToolTextKey) {
+
+        final Label label = new Label(parent, SWT.NONE);
+        this.polyglotPageService.injectI18n(label, locTextKey, locToolTextKey);
+        label.setData(RWT.CUSTOM_VARIANT, style);
+        return label;
+    }
+
+    public Tree treeLocalized(final Composite parent, final int style) {
+        final Tree tree = new Tree(parent, SWT.SINGLE | SWT.FULL_SELECTION);
+        this.polyglotPageService.injectI18n(tree);
+        return tree;
     }
 
     public TreeItem treeItemLocalized(final Tree parent, final String locTextKey) {
-        return new I18nTreeItem(parent, SWT.NONE, this.i18nSupport, new LocTextKey(locTextKey));
+        final TreeItem item = new TreeItem(parent, SWT.NONE);
+        this.polyglotPageService.injectI18n(item, new LocTextKey(locTextKey));
+        return item;
     }
 
     public TreeItem treeItemLocalized(final Tree parent, final LocTextKey locTextKey) {
-        return new I18nTreeItem(parent, SWT.NONE, this.i18nSupport, locTextKey);
+        final TreeItem item = new TreeItem(parent, SWT.NONE);
+        this.polyglotPageService.injectI18n(item, locTextKey);
+        return item;
     }
 
     public TreeItem treeItemLocalized(final TreeItem parent, final String locTextKey) {
-        return new I18nTreeItem(parent, SWT.NONE, this.i18nSupport, new LocTextKey(locTextKey));
+        final TreeItem item = new TreeItem(parent, SWT.NONE);
+        this.polyglotPageService.injectI18n(item, new LocTextKey(locTextKey));
+        return item;
     }
 
     public TreeItem treeItemLocalized(final TreeItem parent, final LocTextKey locTextKey) {
-        return new I18nTreeItem(parent, SWT.NONE, this.i18nSupport, locTextKey);
+        final TreeItem item = new TreeItem(parent, SWT.NONE);
+        this.polyglotPageService.injectI18n(item, locTextKey);
+        return item;
     }
 
     public Label labelSeparator(final Composite parent) {
@@ -115,13 +173,10 @@ public class WidgetFactory {
     public Label imageButton(
             final IconButtonType type,
             final Composite parent,
-            final String toolTip,
+            final LocTextKey toolTip,
             final Listener listener) {
 
-        final I18nLabel imageButton = new I18nLabel(parent, this.i18nSupport, null);
-        if (toolTip != null) {
-            imageButton.setLocToolTipKey(new LocTextKey(toolTip), this.i18nSupport);
-        }
+        final Label imageButton = labelLocalized(parent, (LocTextKey) null, toolTip);
         imageButton.setData(RWT.CUSTOM_VARIANT, "imageButton");
         imageButton.setImage(type.getImage(parent.getDisplay()));
         if (listener != null) {
@@ -132,7 +187,7 @@ public class WidgetFactory {
 
     public Label formLabelLocalized(final Composite parent, final String locTextKey) {
         final Label label = labelLocalized(parent, locTextKey);
-        final GridData gridData = new GridData(SWT.LEFT, SWT.CENTER, true, false);
+        final GridData gridData = new GridData(SWT.RIGHT, SWT.CENTER, true, false);
         label.setLayoutData(gridData);
         return label;
     }
@@ -143,7 +198,9 @@ public class WidgetFactory {
 
     public Text formTextInput(final Composite parent, final String value, final int hspan, final int vspan) {
         final Text textInput = new Text(parent, SWT.LEFT | SWT.BORDER);
-        textInput.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, hspan, vspan));
+        final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false, hspan, vspan);
+        gridData.heightHint = 15;
+        textInput.setLayoutData(gridData);
         textInput.setText(value);
         return textInput;
     }
@@ -162,8 +219,11 @@ public class WidgetFactory {
             final List<Tuple<String>> items,
             final int hspan, final int vspan) {
 
-        final I18nSingleSelection combo = new I18nSingleSelection(parent, items, this.i18nSupport);
-        combo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, hspan, vspan));
+        final SingleSelection combo = new SingleSelection(parent, items);
+        this.polyglotPageService.injectI18n(combo, combo.valueMapping);
+        final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false, hspan, vspan);
+        gridData.heightHint = 25;
+        combo.setLayoutData(gridData);
         combo.select(selection);
         return combo;
     }

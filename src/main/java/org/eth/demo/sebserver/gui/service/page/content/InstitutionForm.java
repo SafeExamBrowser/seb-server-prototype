@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eth.demo.sebserver.gui.domain.admin.InstitutionData;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
+import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.ComposerServiceContext;
 import org.eth.demo.sebserver.gui.service.page.TemplateComposer;
 import org.eth.demo.sebserver.gui.service.rest.GETInstitutionData;
@@ -66,7 +67,9 @@ public class InstitutionForm implements TemplateComposer {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         final Label labelLocalized = this.widgetFactory.labelLocalized(
-                content, "h2", "org.sebserver.activities.instName", institutionData.name);
+                content, "h2", new LocTextKey(
+                        "org.sebserver.activities.instName",
+                        institutionData.name));
         labelLocalized.setLayoutData(new GridData(SWT.TOP, SWT.LEFT, false, false, 4, 1));
 
         final Form form = new Form(content, this.widgetFactory);
@@ -111,7 +114,7 @@ public class InstitutionForm implements TemplateComposer {
         form.processSelection(authSelection.getSelectionIndex());
     }
 
-    private final class Form {
+    private static final class Form {
 
         final Collection<Control> ldapFormComponents = new ArrayList<>();
         final Collection<Control> switchedFormComponents = new ArrayList<>();
@@ -139,5 +142,4 @@ public class InstitutionForm implements TemplateComposer {
             }
         }
     }
-
 }

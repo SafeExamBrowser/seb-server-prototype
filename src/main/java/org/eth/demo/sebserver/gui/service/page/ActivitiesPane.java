@@ -19,9 +19,10 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eth.demo.sebserver.gui.domain.admin.UserInfo;
 import org.eth.demo.sebserver.gui.domain.admin.UserRole;
 import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
-import org.eth.demo.sebserver.gui.service.page.ActivitySelection.Activity;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.ComposerServiceContext;
 import org.eth.demo.sebserver.gui.service.page.MainPageForm.MainPageState;
+import org.eth.demo.sebserver.gui.service.page.event.ActivitySelection;
+import org.eth.demo.sebserver.gui.service.page.event.ActivitySelection.Activity;
 import org.eth.demo.sebserver.gui.service.rest.GETInstitutionInfo;
 import org.eth.demo.sebserver.gui.service.rest.RestServices;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
@@ -54,10 +55,10 @@ public class ActivitiesPane implements TemplateComposer {
                 .getLoggedInUser();
 
         final Label activities = this.widgetFactory.labelLocalized(
-                composerCtx.parent, "h3", "org.sebserver.activities");
+                composerCtx.parent, "h3", new LocTextKey("org.sebserver.activities"));
         activities.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-        final Tree navigation = new Tree(composerCtx.parent, SWT.SINGLE | SWT.FULL_SELECTION);
+        final Tree navigation = this.widgetFactory.treeLocalized(composerCtx.parent, SWT.SINGLE | SWT.FULL_SELECTION);
         navigation.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         final Map<String, String> insitutionInfo = this.restServices
@@ -81,6 +82,21 @@ public class ActivitiesPane implements TemplateComposer {
             createInstitutionItem(navigation, inst);
         }
 
+        final TreeItem exams = this.widgetFactory.treeItemLocalized(
+                navigation,
+                "org.sebserver.activities.exam");
+        ActivitySelection.set(exams, Activity.EXAM.selection());
+
+        final TreeItem configs = this.widgetFactory.treeItemLocalized(
+                navigation,
+                "org.sebserver.activities.sebconfig");
+        ActivitySelection.set(configs, Activity.SEB_CONFIG.selection());
+
+        final TreeItem monitoring = this.widgetFactory.treeItemLocalized(
+                navigation,
+                "org.sebserver.activities.monitoring");
+        ActivitySelection.set(monitoring, Activity.MONITORING.selection());
+
         navigation.addListener(SWT.Expand, event -> {
             final TreeItem treeItem = (TreeItem) event.item;
 
@@ -88,7 +104,7 @@ public class ActivitiesPane implements TemplateComposer {
 
             final ActivitySelection activity = ActivitySelection.get(treeItem);
             if (activity != null) {
-                activity.expandFunction.accept(treeItem);
+                activity.processExpand(treeItem);
             }
         });
         navigation.addListener(SWT.Collapse, event -> {
@@ -98,7 +114,7 @@ public class ActivitiesPane implements TemplateComposer {
 
             final ActivitySelection activity = ActivitySelection.get(treeItem);
             if (activity != null) {
-                activity.collapseFunction.accept(treeItem);
+                activity.processCollapse(treeItem);
             }
         });
         navigation.addListener(SWT.Selection, event -> {
@@ -135,7 +151,7 @@ public class ActivitiesPane implements TemplateComposer {
         final TreeItem lmsSetup = this.widgetFactory.treeItemLocalized(
                 institution,
                 "org.sebserver.activities.lms");
-        ActivitySelection.set(lmsSetup, Activity.LMS_SETTUP.selection());
+        ActivitySelection.set(lmsSetup, Activity.LMS_SETUP.selection());
 
         final TreeItem user = this.widgetFactory.treeItemLocalized(
                 institution,

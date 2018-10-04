@@ -12,7 +12,7 @@
 
 /* Label default theme */
 Label {
-    font: 14px Verdana, "Lucida Sans", Arial, Helvetica, sans-serif;
+    font: 12px Verdana, "Lucida Sans", Arial, Helvetica, sans-serif;
     color: #4a4a4a;
     background-color: transparent;
     background-image: none;
@@ -250,10 +250,11 @@ Sash:hover {
 
 /*Standard Einstellungen fuer Trees*/
 Tree {
-    font: bold 12px Arial, Helvetica, sans-serif;
-    background-color: white;
+    font: bold 14px Arial, Helvetica, sans-serif;
+    background-color: transparent;
     border: none;
     color: #1f407a;
+    margin: 0 0 0 0;
 }
 
 Tree[BORDER] {
@@ -261,12 +262,14 @@ Tree[BORDER] {
 }
 
 TreeItem {
-    font: bold 12px Arial, Helvetica, sans-serif;
+    font: bold 14px Arial, Helvetica, sans-serif;
     background-color: transparent;
     color: #1f407a;
     text-decoration: none;
     text-shadow: none;
     background-image: none;
+    margin: 20px 0px 20px 0px;
+    padding: 20px 0px 20px 0px;
 }
 
 TreeItem:linesvisible:even {
@@ -297,4 +300,26 @@ Tree-RowOverlay:selected:unfocused {
 Tree-RowOverlay:selected:hover {
     background-color: #82be1e;
     color: #000000;
+}
+
+Tree.actions {
+    font: 12px Verdana, "Lucida Sans", Arial, Helvetica, sans-serif;
+    color: #4a4a4a;
+    background-color: transparent;
+    border: none;
+    margin: 0 0 0 0;
+}
+
+Tree[BORDER].actions {
+    border: 1px solid #eceeef;
+}
+
+TreeItem.actions {
+    font: 12px Verdana, "Lucida Sans", Arial, Helvetica, sans-serif;
+    color: #4a4a4a;
+    background-color: transparent;
+    text-decoration: none;
+    text-shadow: none;
+    background-image: none;
+    margin: 0 0 0 0;
 }

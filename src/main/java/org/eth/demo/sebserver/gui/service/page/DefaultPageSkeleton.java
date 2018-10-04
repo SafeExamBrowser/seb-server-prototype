@@ -8,7 +8,6 @@
 
 package org.eth.demo.sebserver.gui.service.page;
 
-import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.rap.rwt.RWT;
@@ -20,8 +19,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
-import org.eth.demo.sebserver.gui.service.i18n.I18nSupport;
-import org.eth.demo.sebserver.gui.service.i18n.Polyglot;
+import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
+import org.eth.demo.sebserver.gui.service.i18n.PolyglotPageService;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.ComposerServiceContext;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageAttr;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
@@ -36,18 +35,15 @@ public class DefaultPageSkeleton implements TemplateComposer {
     public static final String ATTR_CONTENT_COMPOSER_NAME = "CONTENT_COMPOSER_NAME";
 
     private final WidgetFactory widgetFactory;
-    private final I18nSupport i18nSupport;
     private final PolyglotPageService polyglotPageService;
     private final AuthorizationContextHolder authorizationContextHolder;
 
     public DefaultPageSkeleton(
             final WidgetFactory widgetFactory,
-            final I18nSupport i18nSupport,
             final PolyglotPageService polyglotPageService,
             final AuthorizationContextHolder authorizationContextHolder) {
 
         this.widgetFactory = widgetFactory;
-        this.i18nSupport = i18nSupport;
         this.polyglotPageService = polyglotPageService;
         this.authorizationContextHolder = authorizationContextHolder;
     }
@@ -75,6 +71,8 @@ public class DefaultPageSkeleton implements TemplateComposer {
         composeLogoBar(composerCtx);
         composeContent(composerCtx);
         composeFooter(composerCtx);
+
+        this.polyglotPageService.setDefaultPageLocale(composerCtx.root);
     }
 
     private void composeHeader(final ComposerServiceContext composerCtx) {
@@ -158,14 +156,15 @@ public class DefaultPageSkeleton implements TemplateComposer {
         rowLayout.marginRight = 70;
         langSupport.setLayout(rowLayout);
 
-        for (final Locale locale : this.i18nSupport.supportedLanguages()) {
-            final LanguageSelection languageSelection = new LanguageSelection(langSupport, locale);
-            languageSelection.updateLocale(this.i18nSupport);
-            languageSelection.addListener(SWT.MouseDown, event -> {
-                this.polyglotPageService.setPageLocale(composerCtx.root, languageSelection.locale);
-
-            });
-        }
+        this.polyglotPageService.createLanguageSelector(composerCtx.of(langSupport));
+//        for (final Locale locale : this.i18nSupport.supportedLanguages()) {
+//            final LanguageSelection languageSelection = new LanguageSelection(langSupport, locale);
+//            languageSelection.updateLocale(this.i18nSupport);
+//            languageSelection.addListener(SWT.MouseDown, event -> {
+//                this.polyglotPageService.setPageLocale(composerCtx.root, languageSelection.locale);
+//
+//            });
+//        }
     }
 
     private void composeContent(final ComposerServiceContext composerCtx) {
@@ -239,30 +238,30 @@ public class DefaultPageSkeleton implements TemplateComposer {
         rowLayout.marginRight = 20;
         footerRight.setLayout(rowLayout);
 
-        this.widgetFactory.labelLocalized(footerLeft, "footer", "org.sebserver.overall.imprint");
-        this.widgetFactory.labelLocalized(footerLeft, "footer", "org.sebserver.overall.disclaimer");
-        this.widgetFactory.labelLocalized(footerRight, "footer", "org.sebserver.overall.copyright");
+        this.widgetFactory.labelLocalized(footerLeft, "footer", new LocTextKey("org.sebserver.overall.imprint"));
+        this.widgetFactory.labelLocalized(footerLeft, "footer", new LocTextKey("org.sebserver.overall.disclaimer"));
+        //this.widgetFactory.labelLocalized(footerRight, "footer", "org.sebserver.overall.copyright");
     }
 
-    private final class LanguageSelection extends Label implements Polyglot {
-
-        private static final long serialVersionUID = 8110167162843383940L;
-        private final Locale locale;
-
-        public LanguageSelection(final Composite parent, final Locale locale) {
-            super(parent, SWT.NONE);
-            this.locale = locale;
-            super.setData(RWT.CUSTOM_VARIANT, "header");
-            super.setText("|  " + locale.getLanguage().toUpperCase());
-        }
-
-        @Override
-        public void updateLocale(final I18nSupport i18nSupport) {
-            super.setVisible(
-                    !i18nSupport.getCurrentLocale()
-                            .getLanguage()
-                            .equals(this.locale.getLanguage()));
-        }
-    }
+//    private final class LanguageSelection extends Label implements Polyglot {
+//
+//        private static final long serialVersionUID = 8110167162843383940L;
+//        private final Locale locale;
+//
+//        public LanguageSelection(final Composite parent, final Locale locale) {
+//            super(parent, SWT.NONE);
+//            this.locale = locale;
+//            super.setData(RWT.CUSTOM_VARIANT, "header");
+//            super.setText("|  " + locale.getLanguage().toUpperCase());
+//        }
+//
+//        @Override
+//        public void updateLocale(final I18nSupport i18nSupport) {
+//            super.setVisible(
+//                    !i18nSupport.getCurrentLocale()
+//                            .getLanguage()
+//                            .equals(this.locale.getLanguage()));
+//        }
+//    }
 
 }

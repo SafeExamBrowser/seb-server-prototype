@@ -8,8 +8,6 @@
 
 package org.eth.demo.sebserver.gui.service.page.event;
 
-import org.eth.demo.sebserver.gui.service.page.ActivitySelection;
-
 public interface ActivitySelectionListener extends PageComponentListener<ActivitySelection> {
 
     @Override

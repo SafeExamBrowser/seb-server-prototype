@@ -10,10 +10,22 @@ package org.eth.demo.sebserver.gui.service.page.event;
 
 public class PageActionEvent {
 
+    public enum PageActionEventType {
+        REGISTER,
+        UNREGISTER,
+        PROCESS
+    }
+
+    public final PageActionEventType eventType;
     public final PageActionDef actionDefinition;
     public final Object source;
 
-    public PageActionEvent(final PageActionDef actionDefinition, final Object source) {
+    public PageActionEvent(
+            final PageActionEventType eventType,
+            final PageActionDef actionDefinition,
+            final Object source) {
+
+        this.eventType = eventType;
         this.actionDefinition = actionDefinition;
         this.source = source;
     }

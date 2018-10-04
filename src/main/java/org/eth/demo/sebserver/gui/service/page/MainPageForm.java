@@ -20,12 +20,12 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eth.demo.sebserver.gui.service.i18n.I18nSupport;
 import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
-import org.eth.demo.sebserver.gui.service.page.ActivitySelection.Activity;
+import org.eth.demo.sebserver.gui.service.i18n.PolyglotPageService;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.ComposerServiceContext;
+import org.eth.demo.sebserver.gui.service.page.event.ActivitySelection;
+import org.eth.demo.sebserver.gui.service.page.event.ActivitySelection.Activity;
 import org.eth.demo.sebserver.gui.service.page.event.ActivitySelectionListener;
-import org.eth.demo.sebserver.gui.service.widgets.I18nLabel;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory.IconButtonType;
 import org.slf4j.Logger;
@@ -41,9 +41,9 @@ public class MainPageForm implements TemplateComposer {
 
     public static final String ATTR_MAIN_PAGE_STATE = "MAIN_PAGE_STATE";
 
-    private static final int ACTIVITY_PANE_WEIGHT = 15;
+    private static final int ACTIVITY_PANE_WEIGHT = 20;
     private static final int OBJECTS_PANE_WEIGHT = 65;
-    private static final int SELECTION_PANE_WEIGHT = 20;
+    private static final int SELECTION_PANE_WEIGHT = 15;
     private static final int[] DEFAULT_SASH_WEIGHTS = new int[] {
             ACTIVITY_PANE_WEIGHT,
             OBJECTS_PANE_WEIGHT,
@@ -52,11 +52,14 @@ public class MainPageForm implements TemplateComposer {
     private static final int[] OPENED_SASH_WEIGHTS = new int[] { 0, 100, 0 };
 
     private final WidgetFactory widgetFactory;
-    private final I18nSupport i18nSupport;
+    private final PolyglotPageService polyglotPageService;
 
-    public MainPageForm(final WidgetFactory widgetFactory, final I18nSupport i18nSupport) {
+    public MainPageForm(
+            final WidgetFactory widgetFactory,
+            final PolyglotPageService polyglotPageService) {
+
         this.widgetFactory = widgetFactory;
-        this.i18nSupport = i18nSupport;
+        this.polyglotPageService = polyglotPageService;
     }
 
     @Override
@@ -87,21 +90,25 @@ public class MainPageForm implements TemplateComposer {
         final Label toggleView = this.widgetFactory.imageButton(
                 IconButtonType.MAXIMIZE,
                 content,
-                "org.sebserver.mainpage.maximize.tooltip",
+                new LocTextKey("org.sebserver.mainpage.maximize.tooltip"),
                 event -> {
-                    final I18nLabel ib = (I18nLabel) event.widget;
+                    final Label ib = (Label) event.widget;
                     if ((Boolean) ib.getData("fullScreen")) {
                         mainSash.setWeights(DEFAULT_SASH_WEIGHTS);
                         ib.setData("fullScreen", false);
                         ib.setImage(WidgetFactory.IconButtonType.MAXIMIZE.getImage(ib.getDisplay()));
-                        ib.setLocToolTipKey(new LocTextKey("org.sebserver.mainpage.maximize.tooltip"),
-                                this.i18nSupport);
+                        this.polyglotPageService.injectI18n(
+                                ib,
+                                null,
+                                new LocTextKey("org.sebserver.mainpage.maximize.tooltip"));
                     } else {
                         mainSash.setWeights(OPENED_SASH_WEIGHTS);
                         ib.setData("fullScreen", true);
                         ib.setImage(WidgetFactory.IconButtonType.MINIMIZE.getImage(ib.getDisplay()));
-                        ib.setLocToolTipKey(new LocTextKey("org.sebserver.mainpage.minimize.tooltip"),
-                                this.i18nSupport);
+                        this.polyglotPageService.injectI18n(
+                                ib,
+                                null,
+                                new LocTextKey("org.sebserver.mainpage.minimize.tooltip"));
                     }
                 });
         final GridData gridData = new GridData(SWT.RIGHT, SWT.TOP, true, false);
@@ -171,7 +178,7 @@ public class MainPageForm implements TemplateComposer {
         @Override
         public void notify(final ActivitySelection activitySelection) {
             final Map<String, String> attrs = new HashMap<>(this.composerCtx.attributes);
-            attrs.put(activitySelection.activity.objectIdentifierAttribute, activitySelection.objectIdentifier);
+            attrs.put(activitySelection.activity.objectIdentifierAttribute, activitySelection.getObjectIdentifier());
             this.composerCtx.composerService.compose(
                     activitySelection.activity.objectPaneComposer,
                     this.composerCtx.of(this, attrs));
@@ -192,7 +199,7 @@ public class MainPageForm implements TemplateComposer {
         @Override
         public void notify(final ActivitySelection activitySelection) {
             final Map<String, String> attrs = new HashMap<>(this.composerCtx.attributes);
-            attrs.put(activitySelection.activity.objectIdentifierAttribute, activitySelection.objectIdentifier);
+            attrs.put(activitySelection.activity.objectIdentifierAttribute, activitySelection.getObjectIdentifier());
             this.composerCtx.composerService.compose(
                     activitySelection.activity.selectionPaneComposer,
                     this.composerCtx.of(this, attrs));

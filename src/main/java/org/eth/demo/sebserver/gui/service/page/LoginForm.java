@@ -58,8 +58,8 @@ public class LoginForm implements TemplateComposer {
         if (attributes.containsKey(AttributeKeys.LGOUT_SUCCESS)) {
             final MessageBox logoutSuccess = new Message(
                     composerCtx.root.getShell(),
-                    this.widgetFactory.i18nSupport.getText("org.sebserver.logout"),
-                    this.widgetFactory.i18nSupport.getText("org.sebserver.logout.success.message"),
+                    this.i18nSupport.getText("org.sebserver.logout"),
+                    this.i18nSupport.getText("org.sebserver.logout.success.message"),
                     SWT.ICON_INFORMATION);
             logoutSuccess.open(null);
         }
@@ -126,6 +126,7 @@ public class LoginForm implements TemplateComposer {
                 button.setFocus();
             }
         });
+
     }
 
     private void loginError(
@@ -134,8 +135,8 @@ public class LoginForm implements TemplateComposer {
 
         final MessageBox error = new Message(
                 composerCtx.root.getShell(),
-                this.widgetFactory.i18nSupport.getText("org.sebserver.login.failed.title"),
-                this.widgetFactory.i18nSupport.getText(message, message),
+                this.i18nSupport.getText("org.sebserver.login.failed.title"),
+                this.i18nSupport.getText(message, message),
                 SWT.ERROR);
         error.open(null);
 
