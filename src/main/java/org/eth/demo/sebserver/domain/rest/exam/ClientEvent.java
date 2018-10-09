@@ -87,7 +87,7 @@ public final class ClientEvent {
         return new ClientEventRecord(
                 null,
                 this.auth.connectionId,
-                this.auth.userIdentifier,
+                this.auth.username,
                 this.type.id,
                 this.timestamp,
                 this.numValue,

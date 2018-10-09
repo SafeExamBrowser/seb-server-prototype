@@ -36,7 +36,7 @@ public interface ConfigurationNodeJoinMapper {
     @ConstructorArgs({
             @Arg(column = "id", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "institution_id", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
-            @Arg(column = "owner_id", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
+            @Arg(column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR, id = true),
             @Arg(column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
 
@@ -57,7 +57,7 @@ public interface ConfigurationNodeJoinMapper {
                 this::selectMany,
                 configurationNodeRecord.id,
                 configurationNodeRecord.institutionId,
-                configurationNodeRecord.ownerId,
+                configurationNodeRecord.owner,
                 configurationNodeRecord.name,
                 configurationNodeRecord.type,
 
@@ -81,7 +81,7 @@ public interface ConfigurationNodeJoinMapper {
     public static final class ConfigNodeJoinRecord {
         public final Long id;
         public final Long institutionId;
-        public final Long ownerId;
+        public final String owner;
         public final String name;
         public final String type;
 
@@ -97,7 +97,7 @@ public interface ConfigurationNodeJoinMapper {
         public ConfigNodeJoinRecord(
                 final Long id,
                 final Long institutionId,
-                final Long ownerId,
+                final String owner,
                 final String name,
                 final String type,
                 final Long configVersionId,
@@ -110,7 +110,7 @@ public interface ConfigurationNodeJoinMapper {
 
             this.id = id;
             this.institutionId = institutionId;
-            this.ownerId = ownerId;
+            this.owner = owner;
             this.name = name;
             this.type = type;
             this.configVersionId = configVersionId;

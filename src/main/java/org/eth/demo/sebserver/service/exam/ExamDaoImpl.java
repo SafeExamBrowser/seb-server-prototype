@@ -168,12 +168,16 @@ public class ExamDaoImpl implements ExamDao {
                     first.id,
                     lmsAPIConnection.lmsSetup().getInstitutionId(),
                     first.lmsSetupId,
+                    first.externalUuid,
                     course.name,
                     course.description,
                     course.getStatus(),
                     course.startTime,
                     course.endTime,
-                    course.enrollmentURL);
+                    course.enrollmentURL,
+                    first.type,
+                    first.owner,
+                    first.supporter);
         }
 
         return null;

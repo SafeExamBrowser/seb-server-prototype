@@ -62,7 +62,7 @@ public class ConnectionListener {
             final SEBWebSocketAuth user = (SEBWebSocketAuth) principal;
 
             log.info("Closing connection for user: {} to status: {}",
-                    user.userIdentifier,
+                    user.username,
                     (aborted) ? ConnectionStatus.ABORTED : ConnectionStatus.CLOSED);
 
             try {

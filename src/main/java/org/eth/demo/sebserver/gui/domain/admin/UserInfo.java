@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UserInfo {
 
-    public final Long id;
+    public final String id;
     public final String name;
     public final String username;
     public final String email;
@@ -29,7 +29,7 @@ public class UserInfo {
 
     @JsonCreator
     public UserInfo(
-            @JsonProperty("id") final Long id,
+            @JsonProperty("id") final String id,
             @JsonProperty("name") final String name,
             @JsonProperty("username") final String username,
             @JsonProperty("email") final String email,

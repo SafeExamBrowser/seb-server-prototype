@@ -8,7 +8,7 @@
 
 package org.eth.demo.sebserver.web.clientauth;
 
-import static org.eth.demo.sebserver.web.clientauth.SEBClientConnectionController.CONNECTION_TOKEN_KEY_NAME;
+import static org.eth.demo.sebserver.web.clientauth.SEBClientConnectionController.*;
 
 import java.io.IOException;
 
@@ -18,6 +18,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eth.demo.sebserver.batis.gen.model.ClientConnectionRecord;
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
@@ -95,7 +96,10 @@ public class SEBClientAuthenticationFilter extends AbstractClientAuthenticationF
 
         SecurityContextHolder
                 .getContext()
-                .setAuthentication(ClientConnectionAuth.sebWebSocketAuthOf(connection));
+                .setAuthentication(ClientConnectionAuth.sebWebSocketAuthOf(
+                        connection,
+                        getBooleanAttr(httpRequest, VDI_FLAG_KEY_NAME),
+                        getBooleanAttr(httpRequest, VIRTUAL_CLIENT_FLAG_KEY_NAME)));
     }
 
     @Override
@@ -116,12 +120,19 @@ public class SEBClientAuthenticationFilter extends AbstractClientAuthenticationF
 
         return ClientConnectionAuth.sebAuthOf(
                 matching,
-                httpRequest.getRemoteAddr());
+                httpRequest.getRemoteAddr(),
+                getBooleanAttr(httpRequest, VDI_FLAG_KEY_NAME),
+                getBooleanAttr(httpRequest, VIRTUAL_CLIENT_FLAG_KEY_NAME));
     }
 
     @Override
     protected Role getRole() {
         return Role.SEB_CLIENT;
+    }
+
+    private boolean getBooleanAttr(final HttpServletRequest httpRequest, final String name) {
+        final Object flag = httpRequest.getAttribute(name);
+        return (flag != null && BooleanUtils.toBoolean(String.valueOf(flag)));
     }
 
 }

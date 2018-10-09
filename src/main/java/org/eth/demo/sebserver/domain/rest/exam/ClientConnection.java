@@ -27,22 +27,28 @@ public class ClientConnection {
     public final Long id;
     public final Long examId;
     public final ConnectionStatus status;
-    public final String userIdentifier;
+    public final String username;
+    public final boolean vdi;
     public final String clientAddress;
+    public final String virtualClientAddress;
 
     @JsonCreator
     public ClientConnection(
             @JsonProperty("id") final Long id,
             @JsonProperty("examId") final Long examId,
             @JsonProperty("status") final ConnectionStatus status,
-            @JsonProperty("userIdentifier") final String userIdentifier,
-            @JsonProperty("clientAddress") final String clientAddress) {
+            @JsonProperty("username") final String username,
+            @JsonProperty("vdi") final boolean vdi,
+            @JsonProperty("clientAddress") final String clientAddress,
+            @JsonProperty("virtualClientAddress") final String virtualClientAddress) {
 
         this.id = id;
         this.examId = examId;
         this.status = status;
-        this.userIdentifier = userIdentifier;
+        this.username = username;
+        this.vdi = vdi;
         this.clientAddress = clientAddress;
+        this.virtualClientAddress = virtualClientAddress;
     }
 
     public Long getId() {
@@ -57,12 +63,20 @@ public class ClientConnection {
         return this.status;
     }
 
-    public String getUserIdentifier() {
-        return this.userIdentifier;
-    }
-
     public String getClientAddress() {
         return this.clientAddress;
+    }
+
+    public String getUsername() {
+        return this.username;
+    }
+
+    public boolean isVdi() {
+        return this.vdi;
+    }
+
+    public String getVirtualClientAddress() {
+        return this.virtualClientAddress;
     }
 
     public static final ClientConnection fromRecord(final ClientConnectionRecord record) {
@@ -71,8 +85,10 @@ public class ClientConnection {
                 record.getId(),
                 record.getExamId(),
                 ClientConnection.ConnectionStatus.valueOf(record.getStatus()),
-                record.getUserIdentifier(),
-                record.getClientAddress());
+                record.getUserName(),
+                record.getVdi(),
+                record.getClientAddress(),
+                record.getVirtualClientAddress());
     }
 
     @Override
@@ -102,9 +118,11 @@ public class ClientConnection {
 
     @Override
     public String toString() {
-        return "ClientConnection [id=" + this.id + ", examId=" + this.examId + ", status=" + this.status
-                + ", userIdentifier="
-                + this.userIdentifier + ", clientAddress=" + this.clientAddress + "]";
+        return "ClientConnection [id=" + this.id + ", examId=" + this.examId + ", status=" + this.status + ", username="
+                + this.username
+                + ", vdi=" + this.vdi + ", clientAddress=" + this.clientAddress + ", virtualClientAddress="
+                + this.virtualClientAddress
+                + "]";
     }
 
 }

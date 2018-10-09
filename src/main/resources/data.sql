@@ -3,14 +3,14 @@ INSERT INTO institution VALUES
     ;
     
 INSERT INTO seb_lms_setup VALUES
-    (1, 1, "MOCKUP", "lmsclient", "$2a$04$KtWx03i61fPqibYXyzd/6.ZKsmxJuPlQgFKaDnZLmHbnSuhjbmi3a", "https://localhost:8090/lms/authorisationRequest", "sebclient", "$2a$04$SkWmoq0fL2wWyEk.cQj98ewdBH0Jtj.JWH/2vo6fJpo8wgK2/iv1W"),
-    (2, 1, "MOCKUP", "lmsclient2", "$2a$04$KtWx03i61fPqibYXyzd/6.ZKsmxJuPlQgFKaDnZLmHbnSuhjbmi3a", null, "sebclient2", "$2a$04$GnvmGGhTz8O3XA6w0Rrwk.gDsdgLmwOfApmxmoVmWkl3bZ.oP0.ry")
+    (1, 1, "Setup 1", "MOCKUP", "https://localhost:8090/lms/authorisationRequest", "lmsclient", "$2a$04$KtWx03i61fPqibYXyzd/6.ZKsmxJuPlQgFKaDnZLmHbnSuhjbmi3a", null, "sebclient", "$2a$04$SkWmoq0fL2wWyEk.cQj98ewdBH0Jtj.JWH/2vo6fJpo8wgK2/iv1W"),
+    (2, 1, "Setup 2", "MOCKUP", null, "lmsclient2", "$2a$04$KtWx03i61fPqibYXyzd/6.ZKsmxJuPlQgFKaDnZLmHbnSuhjbmi3a", null, "sebclient2", "$2a$04$GnvmGGhTz8O3XA6w0Rrwk.gDsdgLmwOfApmxmoVmWkl3bZ.oP0.ry")
     ;
 
 INSERT INTO user VALUES 
-    (1, 1, "Admin1", "admin", "$2a$08$c2GKYEYoUVXH1Yb8GXVXVu66ltPvbZgLMcVSXRH.LgZNF/YeaYB8m", "admin@nomail.nomail", '2018-01-01 00:00:00', 1, "en"),
-    (2, 1, "User1", "user1", "$2a$08$0mBB2.NPUsg0afMhYq5NE.Te.g.QnzIH8ncKs65zYtoyV/NV2X8ne", "user1@nomail.nomail", '2018-01-01 00:00:00', 1, "de"),
-    (3, 1, "User2", "user2", "$2a$08$VSQl35ERwunAEKMGt7XhkuqkDD4ze4I8j/RDdRw8jzqhjwzuqiGQi", "user2@nomail.nomail", '2018-01-01 00:00:00', 1, "en")
+    (1, 1, "internalDemoAdmin", "Admin1", "admin", "$2a$08$c2GKYEYoUVXH1Yb8GXVXVu66ltPvbZgLMcVSXRH.LgZNF/YeaYB8m", "admin@nomail.nomail", '2018-01-01 00:00:00', 1, "en"),
+    (2, 1, "internalUser1", "User1", "user1", "$2a$08$0mBB2.NPUsg0afMhYq5NE.Te.g.QnzIH8ncKs65zYtoyV/NV2X8ne", "user1@nomail.nomail", '2018-01-01 00:00:00', 1, "de"),
+    (3, 1, "internalUser2", "User2", "user2", "$2a$08$VSQl35ERwunAEKMGt7XhkuqkDD4ze4I8j/RDdRw8jzqhjwzuqiGQi", "user2@nomail.nomail", '2018-01-01 00:00:00', 1, "en")
     ;
     
 INSERT INTO user_role VALUES
@@ -77,10 +77,10 @@ INSERT INTO configuration VALUES
     ;
     
 INSERT INTO `exam` VALUES 
-    (1, 1,'Demo Exam 1'),
-    (2, 1,'Demo Exam 2'),
-    (3, 1,'Demo Exam 3'),
-    (4, 1,'Demo Exam 4')
+    (1, 1, "Demo Exam 1", "internalUser1", null, 'MANAGED'),
+    (2, 1, "Demo Exam 2", "internalUser1", null, 'BYOD'),
+    (3, 1, "Demo Exam 3", "internalUser2", null, 'MANAGED'),
+    (4, 1, "Demo Exam 4", "internalUser2", null, 'BYOD')
     ;
 
 INSERT INTO indicator VALUES 

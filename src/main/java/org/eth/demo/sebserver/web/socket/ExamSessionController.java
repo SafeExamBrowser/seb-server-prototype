@@ -64,6 +64,10 @@ public class ExamSessionController {
 
         try {
 
+            // TODO handle VDI case here
+            //      If we have a VDI case, two different clients with the same token will connect here
+            //      If the connection is not already verified by the LMS block here until it is and send confirmation/deny after
+
             final Exam connectClientToExam = this.examConnectionService
                     .establishConnection(auth);
 

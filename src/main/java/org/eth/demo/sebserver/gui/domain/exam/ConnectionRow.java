@@ -11,41 +11,57 @@ package org.eth.demo.sebserver.gui.domain.exam;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ConnectionRow {
 
-    public final String userIdentifier;
+    public final String username;
     public final String status;
-    public final String address;
+    public final boolean vdi;
+    public final String clientAddress;
+    public final String virtualClientAddress;
     public final Collection<IndicatorValue> indicatorValues;
 
     @JsonCreator
     public ConnectionRow(
-            @JsonProperty("userIdentifier") final String userIdentifier,
+            @JsonProperty("username") final String username,
             @JsonProperty("status") final String status,
-            @JsonProperty("address") final String address,
+            @JsonProperty("vdi") final Boolean vdi,
+            @JsonProperty("clientAddress") final String clientAddress,
+            @JsonProperty("virtualClientAddress") final String virtualClientAddress,
             @JsonProperty("indicatorValues") final Collection<IndicatorValue> indicatorValues) {
 
-        this.userIdentifier = userIdentifier;
+        this.username = username;
         this.status = status;
-        this.address = address;
+        this.vdi = BooleanUtils.isTrue(vdi);
+        this.clientAddress = clientAddress;
+        this.virtualClientAddress = virtualClientAddress;
         this.indicatorValues = (indicatorValues != null)
                 ? Collections.unmodifiableCollection(indicatorValues)
                 : Collections.emptyList();
-    }
-
-    public String getUserIdentifier() {
-        return this.userIdentifier;
     }
 
     public String getStatus() {
         return this.status;
     }
 
-    public String getAddress() {
-        return this.address;
+    public String getUsername() {
+        return this.username;
+    }
+
+    public boolean isVdi() {
+        return this.vdi;
+    }
+
+    public String getClientAddress() {
+        return this.clientAddress;
+    }
+
+    public String getVirtualClientAddress() {
+        return this.virtualClientAddress;
     }
 
     public Collection<IndicatorValue> getIndicatorValues() {
@@ -54,9 +70,10 @@ public class ConnectionRow {
 
     @Override
     public String toString() {
-        return "ConnectionInfo [userIdentifier=" + this.userIdentifier + ", status=" + this.status + ", address="
-                + this.address
-                + ", indicatorValues=" + this.indicatorValues + "]";
+        return "ConnectionRow [username=" + this.username + ", status=" + this.status + ", vdi=" + this.vdi
+                + ", clientAddress="
+                + this.clientAddress + ", virtualClientAddress=" + this.virtualClientAddress + ", indicatorValues="
+                + this.indicatorValues + "]";
     }
 
     public static final class IndicatorValue {

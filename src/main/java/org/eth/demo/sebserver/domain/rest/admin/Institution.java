@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 import org.eth.demo.sebserver.batis.gen.model.InstitutionRecord;
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
-import org.eth.demo.sebserver.domain.rest.admin.SebLmsSetup.LMSType;
+import org.eth.demo.sebserver.domain.rest.admin.LmsSetup.LMSType;
 import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantEntityType;
 import org.eth.demo.sebserver.service.authorization.GrantEntity;
 
@@ -37,20 +37,20 @@ public final class Institution implements GrantEntity {
     public final Long id;
     public final String name;
     public final AuthType authType;
-    public final Collection<SebLmsSetup> sebLmsSetup;
+    public final Collection<LmsSetup> lmsSetup;
 
     @JsonCreator
     public Institution(
             @JsonProperty("id") final Long id,
             @JsonProperty(value = "name", required = true) final String name,
             @JsonProperty("authType") final AuthType authType,
-            @JsonProperty("sebLmsSetup") final Collection<SebLmsSetup> sebLmsSetup) {
+            @JsonProperty("sebLmsSetup") final Collection<LmsSetup> lmsSetup) {
 
         this.id = id;
         this.name = name;
         this.authType = authType;
-        this.sebLmsSetup = (sebLmsSetup != null)
-                ? Collections.unmodifiableCollection(sebLmsSetup)
+        this.lmsSetup = (lmsSetup != null)
+                ? Collections.unmodifiableCollection(lmsSetup)
                 : Collections.emptyList();
     }
 
@@ -67,7 +67,7 @@ public final class Institution implements GrantEntity {
 
     @JsonIgnore
     @Override
-    public Long getOwnerId() {
+    public String getOwner() {
         // NOTE: No owner for institution
         return null;
     }
@@ -89,7 +89,7 @@ public final class Institution implements GrantEntity {
     }
 
     public Collection<LMSType> getLmsTypeSelection() {
-        return SebLmsSetup.LMS_TYPE_SELECTION;
+        return LmsSetup.LMS_TYPE_SELECTION;
     }
 
     @Override
@@ -128,7 +128,7 @@ public final class Institution implements GrantEntity {
                 record.getName(),
                 AuthType.valueOf(record.getAuthtype()),
                 (setups != null) ? setups.stream()
-                        .map(SebLmsSetup::of)
+                        .map(LmsSetup::of)
                         .collect(Collectors.toList()) : Collections.emptyList());
     }
 

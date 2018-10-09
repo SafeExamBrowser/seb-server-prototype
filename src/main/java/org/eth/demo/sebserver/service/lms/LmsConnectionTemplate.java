@@ -10,6 +10,8 @@ package org.eth.demo.sebserver.service.lms;
 
 import java.util.Collection;
 
+import org.eth.demo.sebserver.domain.rest.admin.LmsSetup;
+
 public interface LmsConnectionTemplate {
 
     LmsSetup lmsSetup();

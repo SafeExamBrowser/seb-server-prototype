@@ -223,7 +223,7 @@ public class AuthorizationGrantService {
                         return true;
                     }
                 }
-                if (roleTypeGrant.modifyOwnerOnly && user.id.longValue() == entity.getOwnerId()) {
+                if (roleTypeGrant.modifyOwnerOnly && user.uuid.equals(entity.getOwner())) {
                     return true;
                 }
             }
@@ -242,7 +242,7 @@ public class AuthorizationGrantService {
                         return true;
                     }
                 }
-                if (roleTypeGrant.writeOwnerOnly && user.id.longValue() == entity.getOwnerId()) {
+                if (roleTypeGrant.writeOwnerOnly && user.uuid.equals(entity.getOwner())) {
                     return true;
                 }
             }

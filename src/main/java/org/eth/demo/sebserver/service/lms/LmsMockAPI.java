@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
+import org.eth.demo.sebserver.domain.rest.admin.LmsSetup;
 import org.joda.time.DateTime;
 
 public class LmsMockAPI implements LmsConnectionTemplate {

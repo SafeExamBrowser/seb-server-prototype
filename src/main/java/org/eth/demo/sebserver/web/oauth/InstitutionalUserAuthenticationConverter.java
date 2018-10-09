@@ -48,7 +48,7 @@ public class InstitutionalUserAuthenticationConverter extends DefaultUserAuthent
         final Object principal = authentication.getPrincipal();
         if (principal instanceof User) {
             final User user = (User) principal;
-            if (isExternal(user)) {
+            if (user.isExternal) {
                 final Map<String, Object> response = new LinkedHashMap<>();
                 response.put("EXTERNAL", true);
                 try {
@@ -80,11 +80,6 @@ public class InstitutionalUserAuthenticationConverter extends DefaultUserAuthent
         }
 
         return super.extractAuthentication(map);
-    }
-
-    // TODO This should be verified by the related institution of the user where authentication method is defined
-    private boolean isExternal(final User user) {
-        return user.id == null;
     }
 
 }

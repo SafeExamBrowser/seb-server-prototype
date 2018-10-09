@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.function.Predicate;
 
 import org.eth.demo.sebserver.domain.rest.admin.Institution;
-import org.eth.demo.sebserver.domain.rest.admin.SebLmsSetup;
+import org.eth.demo.sebserver.domain.rest.admin.LmsSetup;
 import org.eth.demo.sebserver.domain.rest.admin.User;
 
 public interface InstitutionDao {
@@ -29,8 +29,8 @@ public interface InstitutionDao {
 
     boolean delete(Long id);
 
-    SebLmsSetup save(SebLmsSetup setup);
+    LmsSetup save(LmsSetup setup);
 
-    boolean delete(SebLmsSetup setup);
+    boolean delete(LmsSetup setup);
 
 }

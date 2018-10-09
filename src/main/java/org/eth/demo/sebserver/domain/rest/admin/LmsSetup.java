@@ -15,13 +15,12 @@ import java.util.Collections;
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
 import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantEntityType;
 import org.eth.demo.sebserver.service.authorization.GrantEntity;
-import org.eth.demo.sebserver.service.lms.LmsSetup;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public final class SebLmsSetup implements LmsSetup, GrantEntity {
+public final class LmsSetup implements GrantEntity {
 
     public enum LMSType {
         MOCKUP,
@@ -35,30 +34,36 @@ public final class SebLmsSetup implements LmsSetup, GrantEntity {
 
     public final Long id;
     public final Long institutionId;
+    public final String name;
     public final LMSType lmsType;
     public final String lmsAuthName;
     public final String lmsAuthSecret;
     public final String lmsApiUrl;
+    public final String lmsRestApiToken;
     public final String sebAuthName;
     public final String sebAuthSecret;
 
     @JsonCreator
-    public SebLmsSetup(
+    public LmsSetup(
             @JsonProperty("id") final Long id,
             @JsonProperty(value = "institutionId", required = true) final Long institutionId,
+            @JsonProperty(value = "name, required = true") final String name,
             @JsonProperty(value = "lmsType", required = true) final LMSType lmsType,
             @JsonProperty(value = "lmsAuthName, required = true") final String lmsAuthName,
             @JsonProperty(value = "lmsAuthSecret, required = true") final String lmsAuthSecret,
             @JsonProperty(value = "lmsApiUrl, required = true") final String lmsApiUrl,
+            @JsonProperty(value = "lmsRestApiToken, required = true") final String lmsRestApiToken,
             @JsonProperty(value = "sebAuthName, required = true") final String sebAuthName,
             @JsonProperty(value = "sebAuthSecret, required = true") final String sebAuthSecret) {
 
         this.id = id;
         this.institutionId = institutionId;
+        this.name = name;
         this.lmsType = lmsType;
         this.lmsAuthName = lmsAuthName;
         this.lmsAuthSecret = lmsAuthSecret;
         this.lmsApiUrl = lmsApiUrl;
+        this.lmsRestApiToken = lmsRestApiToken;
         this.sebAuthName = sebAuthName;
         this.sebAuthSecret = sebAuthSecret;
     }
@@ -70,12 +75,11 @@ public final class SebLmsSetup implements LmsSetup, GrantEntity {
 
     @JsonIgnore
     @Override
-    public Long getOwnerId() {
+    public String getOwner() {
         // NOTE: No owner id so far
         return null;
     }
 
-    @Override
     public Long getId() {
         return this.id;
     }
@@ -85,24 +89,28 @@ public final class SebLmsSetup implements LmsSetup, GrantEntity {
         return this.institutionId;
     }
 
-    @Override
+    public String getName() {
+        return this.name;
+    }
+
     public LMSType getLmsType() {
         return this.lmsType;
     }
 
-    @Override
     public String getLmsAuthName() {
         return this.lmsAuthName;
     }
 
-    @Override
     public String getLmsAuthSecret() {
         return this.lmsAuthSecret;
     }
 
-    @Override
     public String getLmsApiUrl() {
         return this.lmsApiUrl;
+    }
+
+    public String getLmsRestApiToken() {
+        return this.lmsRestApiToken;
     }
 
     public String getSebAuthName() {
@@ -129,7 +137,7 @@ public final class SebLmsSetup implements LmsSetup, GrantEntity {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final SebLmsSetup other = (SebLmsSetup) obj;
+        final LmsSetup other = (LmsSetup) obj;
         if (this.id == null) {
             if (other.id != null)
                 return false;
@@ -140,21 +148,24 @@ public final class SebLmsSetup implements LmsSetup, GrantEntity {
 
     @Override
     public String toString() {
-        return "SebLmsSetup [id=" + this.id + ", institutionId=" + this.institutionId + ", lmsType=" + this.lmsType
-                + ", lmsAuthName="
-                + this.lmsAuthName + ", lmsAuthSecret=" + this.lmsAuthSecret + ", lmsApiUrl=" + this.lmsApiUrl
-                + ", sebAuthName="
-                + this.sebAuthName + ", sebAuthSecret=" + this.sebAuthSecret + "]";
+        return "SebLmsSetup [id=" + this.id + ", institutionId=" + this.institutionId + ", name=" + this.name
+                + ", lmsType=" + this.lmsType
+                + ", lmsAuthName=" + this.lmsAuthName + ", lmsAuthSecret=" + this.lmsAuthSecret + ", lmsApiUrl="
+                + this.lmsApiUrl
+                + ", lmsRestApiToken=" + this.lmsRestApiToken + ", sebAuthName=" + this.sebAuthName + ", sebAuthSecret="
+                + this.sebAuthSecret + "]";
     }
 
-    public static SebLmsSetup of(final SebLmsSetupRecord record) {
-        return new SebLmsSetup(
+    public static LmsSetup of(final SebLmsSetupRecord record) {
+        return new LmsSetup(
                 record.getId(),
                 record.getInstitutionId(),
+                record.getName(),
                 LMSType.valueOf(record.getLmsType()),
                 record.getLmsClientname(),
                 record.getLmsClientsecret(),
                 record.getLmsUrl(),
+                record.getLmsRestApiToken(),
                 record.getSebClientname(),
                 record.getSebClientsecret());
     }

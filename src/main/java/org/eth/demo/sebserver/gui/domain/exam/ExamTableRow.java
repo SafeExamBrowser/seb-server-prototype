@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ExamTableRow {
 
     public final String id;
-    public final Long ownerId;
+    public final String owner;
     public final String name;
     public final String status;
     public final DateTime startTime;
@@ -25,13 +25,13 @@ public class ExamTableRow {
     @JsonCreator
     public ExamTableRow(
             @JsonProperty("id") final String id,
-            @JsonProperty("ownerId") final Long ownerId,
+            @JsonProperty("owner") final String owner,
             @JsonProperty("name") final String name,
             @JsonProperty("status") final String status,
             @JsonProperty("startTime") final DateTime startTime) {
 
         this.id = id;
-        this.ownerId = ownerId;
+        this.owner = owner;
         this.name = name;
         this.status = status;
         this.startTime = startTime;
@@ -41,8 +41,8 @@ public class ExamTableRow {
         return this.id;
     }
 
-    public Long getOwnerId() {
-        return this.ownerId;
+    public String getOwner() {
+        return this.owner;
     }
 
     public String getName() {
@@ -69,7 +69,7 @@ public class ExamTableRow {
     public boolean isOwner(final AuthorizationContextHolder authorizationContextHolder) {
         return authorizationContextHolder
                 .getAuthorizationContext()
-                .getLoggedInUser().id.longValue() == this.ownerId.longValue();
+                .getLoggedInUser().id.equals(this.owner);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class ExamTableRow {
 
     @Override
     public String toString() {
-        return "ExamTableRow [id=" + this.id + ", ownerId=" + this.ownerId + ", name=" + this.name + ", status="
+        return "ExamTableRow [id=" + this.id + ", owner=" + this.owner + ", name=" + this.name + ", status="
                 + this.status
                 + ", startTime=" + this.startTime + "]";
     }

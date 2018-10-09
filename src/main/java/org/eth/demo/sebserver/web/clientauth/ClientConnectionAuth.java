@@ -62,27 +62,39 @@ public abstract class ClientConnectionAuth implements Authentication {
         return new LMSConnectionAuth(setup.getInstitutionId(), setup.getLmsClientname(), clientAddress);
     }
 
-    public static final ClientConnectionAuth sebAuthOf(final SebLmsSetupRecord setup, final String clientAddress) {
+    public static final ClientConnectionAuth sebAuthOf(
+            final SebLmsSetupRecord setup,
+            final String clientAddress,
+            final boolean vdi,
+            final boolean virtualClient) {
+
         return new SEBConnectionAuth(
                 setup.getInstitutionId(),
                 setup.getSebClientname(),
-                clientAddress, setup.getLmsUrl());
-    }
-
-    public static final ClientConnectionAuth sebWebSocketAuthOf(final ClientConnectionRecord connection) {
-        return new SEBWebSocketAuth(
-                connection.getExamId(),
-                connection.getId(),
-                connection.getUserIdentifier());
+                clientAddress, setup.getLmsUrl(),
+                vdi, virtualClient);
     }
 
     public static final ClientConnectionAuth sebWebSocketAuthOf(
-            final Long examId,
-            final Long connectionId,
-            final String userIdentifier) {
+            final ClientConnectionRecord connection,
+            final boolean vdi,
+            final boolean virtualClient) {
 
-        return new SEBWebSocketAuth(examId, connectionId, userIdentifier);
+        return new SEBWebSocketAuth(
+                connection.getExamId(),
+                connection.getId(),
+                connection.getUserName(),
+                vdi,
+                virtualClient);
     }
+
+//    public static final ClientConnectionAuth sebWebSocketAuthOf(
+//            final Long examId,
+//            final Long connectionId,
+//            final String userIdentifier) {
+//
+//        return new SEBWebSocketAuth(examId, connectionId, userIdentifier);
+//    }
 
     public static final class SEBConnectionAuth extends ClientConnectionAuth {
 
@@ -92,18 +104,24 @@ public abstract class ClientConnectionAuth implements Authentication {
         public final String sebClientname;
         public final String clientAddress;
         public final String lmsUrl;
+        public final boolean vdi;
+        public final boolean virtualClient;
 
         private SEBConnectionAuth(
                 final Long institutionId,
                 final String sebClientname,
                 final String clientAddress,
-                final String lmsUrl) {
+                final String lmsUrl,
+                final boolean vdi,
+                final boolean virtualClient) {
 
             super(Role.SEB_CLIENT);
             this.institutionId = institutionId;
             this.sebClientname = sebClientname;
             this.clientAddress = clientAddress;
             this.lmsUrl = lmsUrl;
+            this.vdi = vdi;
+            this.virtualClient = virtualClient;
         }
 
         @Override
@@ -122,29 +140,35 @@ public abstract class ClientConnectionAuth implements Authentication {
 
         private static final long serialVersionUID = -2254669992045447197L;
 
-        public final String userIdentifier;
+        public final String username;
         public final Long examId;
         public final Long connectionId;
+        public final boolean vdi;
+        public final boolean virtualClient;
 
         private SEBWebSocketAuth(
                 final Long examId,
                 final Long connectionId,
-                final String userIdentifier) {
+                final String username,
+                final boolean vdi,
+                final boolean virtualClient) {
 
             super(Role.SEB_CLIENT);
             this.examId = examId;
             this.connectionId = connectionId;
-            this.userIdentifier = userIdentifier;
+            this.username = username;
+            this.vdi = vdi;
+            this.virtualClient = virtualClient;
         }
 
         @Override
         public String getName() {
-            return this.userIdentifier;
+            return this.username;
         }
 
         @Override
         public String toString() {
-            return "SEBWebSocketAuth [userIdentifier=" + this.userIdentifier + ", examId=" + this.examId
+            return "SEBWebSocketAuth [username=" + this.username + ", examId=" + this.examId
                     + ", connectionId="
                     + this.connectionId + "]";
         }

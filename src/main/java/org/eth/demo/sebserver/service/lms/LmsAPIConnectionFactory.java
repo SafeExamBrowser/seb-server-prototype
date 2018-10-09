@@ -10,8 +10,8 @@ package org.eth.demo.sebserver.service.lms;
 
 import org.eth.demo.sebserver.batis.gen.mapper.SebLmsSetupRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
-import org.eth.demo.sebserver.domain.rest.admin.SebLmsSetup;
-import org.eth.demo.sebserver.domain.rest.admin.SebLmsSetup.LMSType;
+import org.eth.demo.sebserver.domain.rest.admin.LmsSetup;
+import org.eth.demo.sebserver.domain.rest.admin.LmsSetup.LMSType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -50,7 +50,7 @@ public class LmsAPIConnectionFactory {
                 throw new UnsupportedOperationException("TODO");
             }
             default: {
-                return new LmsMockAPI(SebLmsSetup.of(sebLmsSetup));
+                return new LmsMockAPI(LmsSetup.of(sebLmsSetup));
             }
         }
     }

@@ -50,9 +50,11 @@ public class ExamSessionService {
         return this.examConnectionService.getActiveConnectionData(examId)
                 .stream()
                 .map(data -> new ConnectionInfo(
-                        data.clientConnection.userIdentifier,
+                        data.clientConnection.username,
                         data.clientConnection.status.name(),
+                        data.clientConnection.vdi,
                         data.clientConnection.clientAddress,
+                        data.clientConnection.virtualClientAddress,
                         indicatorValues(data)))
                 .collect(Collectors.toList());
     }

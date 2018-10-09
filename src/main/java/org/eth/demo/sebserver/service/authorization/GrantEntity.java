@@ -16,6 +16,6 @@ public interface GrantEntity {
 
     Long getInstitutionId();
 
-    Long getOwnerId();
+    String getOwner();
 
 }

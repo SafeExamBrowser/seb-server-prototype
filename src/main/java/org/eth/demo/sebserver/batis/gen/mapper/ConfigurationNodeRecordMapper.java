@@ -32,57 +32,57 @@ import org.mybatis.dynamic.sql.util.SqlProviderAdapter;
 
 @Mapper
 public interface ConfigurationNodeRecordMapper {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.419+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.691+02:00", comments="Source Table: configuration_node")
     @SelectProvider(type=SqlProviderAdapter.class, method="select")
     long count(SelectStatementProvider selectStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.419+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.691+02:00", comments="Source Table: configuration_node")
     @DeleteProvider(type=SqlProviderAdapter.class, method="delete")
     int delete(DeleteStatementProvider deleteStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.419+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.691+02:00", comments="Source Table: configuration_node")
     @InsertProvider(type=SqlProviderAdapter.class, method="insert")
     @SelectKey(statement="SELECT LAST_INSERT_ID()", keyProperty="record.id", before=false, resultType=Long.class)
     int insert(InsertStatementProvider<ConfigurationNodeRecord> insertStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.419+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.691+02:00", comments="Source Table: configuration_node")
     @SelectProvider(type=SqlProviderAdapter.class, method="select")
     @ConstructorArgs({
         @Arg(column="id", javaType=Long.class, jdbcType=JdbcType.BIGINT, id=true),
         @Arg(column="institution_id", javaType=Long.class, jdbcType=JdbcType.BIGINT),
-        @Arg(column="owner_id", javaType=Long.class, jdbcType=JdbcType.BIGINT),
+        @Arg(column="owner", javaType=String.class, jdbcType=JdbcType.VARCHAR),
         @Arg(column="name", javaType=String.class, jdbcType=JdbcType.VARCHAR),
         @Arg(column="type", javaType=String.class, jdbcType=JdbcType.VARCHAR)
     })
     ConfigurationNodeRecord selectOne(SelectStatementProvider selectStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.420+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.691+02:00", comments="Source Table: configuration_node")
     @SelectProvider(type=SqlProviderAdapter.class, method="select")
     @ConstructorArgs({
         @Arg(column="id", javaType=Long.class, jdbcType=JdbcType.BIGINT, id=true),
         @Arg(column="institution_id", javaType=Long.class, jdbcType=JdbcType.BIGINT),
-        @Arg(column="owner_id", javaType=Long.class, jdbcType=JdbcType.BIGINT),
+        @Arg(column="owner", javaType=String.class, jdbcType=JdbcType.VARCHAR),
         @Arg(column="name", javaType=String.class, jdbcType=JdbcType.VARCHAR),
         @Arg(column="type", javaType=String.class, jdbcType=JdbcType.VARCHAR)
     })
     List<ConfigurationNodeRecord> selectMany(SelectStatementProvider selectStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.420+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.691+02:00", comments="Source Table: configuration_node")
     @UpdateProvider(type=SqlProviderAdapter.class, method="update")
     int update(UpdateStatementProvider updateStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.420+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.691+02:00", comments="Source Table: configuration_node")
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<Long>> countByExample() {
         return SelectDSL.selectWithMapper(this::count, SqlBuilder.count())
                 .from(configurationNodeRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.421+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.691+02:00", comments="Source Table: configuration_node")
     default DeleteDSL<MyBatis3DeleteModelAdapter<Integer>> deleteByExample() {
         return DeleteDSL.deleteFromWithMapper(this::delete, configurationNodeRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.421+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.691+02:00", comments="Source Table: configuration_node")
     default int deleteByPrimaryKey(Long id_) {
         return DeleteDSL.deleteFromWithMapper(this::delete, configurationNodeRecord)
                 .where(id, isEqualTo(id_))
@@ -90,74 +90,74 @@ public interface ConfigurationNodeRecordMapper {
                 .execute();
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.421+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.691+02:00", comments="Source Table: configuration_node")
     default int insert(ConfigurationNodeRecord record) {
         return insert(SqlBuilder.insert(record)
                 .into(configurationNodeRecord)
                 .map(institutionId).toProperty("institutionId")
-                .map(ownerId).toProperty("ownerId")
+                .map(owner).toProperty("owner")
                 .map(name).toProperty("name")
                 .map(type).toProperty("type")
                 .build()
                 .render(RenderingStrategy.MYBATIS3));
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.421+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.691+02:00", comments="Source Table: configuration_node")
     default int insertSelective(ConfigurationNodeRecord record) {
         return insert(SqlBuilder.insert(record)
                 .into(configurationNodeRecord)
                 .map(institutionId).toPropertyWhenPresent("institutionId", record::getInstitutionId)
-                .map(ownerId).toPropertyWhenPresent("ownerId", record::getOwnerId)
+                .map(owner).toPropertyWhenPresent("owner", record::getOwner)
                 .map(name).toPropertyWhenPresent("name", record::getName)
                 .map(type).toPropertyWhenPresent("type", record::getType)
                 .build()
                 .render(RenderingStrategy.MYBATIS3));
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.421+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.692+02:00", comments="Source Table: configuration_node")
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<List<ConfigurationNodeRecord>>> selectByExample() {
-        return SelectDSL.selectWithMapper(this::selectMany, id, institutionId, ownerId, name, type)
+        return SelectDSL.selectWithMapper(this::selectMany, id, institutionId, owner, name, type)
                 .from(configurationNodeRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.421+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.692+02:00", comments="Source Table: configuration_node")
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<List<ConfigurationNodeRecord>>> selectDistinctByExample() {
-        return SelectDSL.selectDistinctWithMapper(this::selectMany, id, institutionId, ownerId, name, type)
+        return SelectDSL.selectDistinctWithMapper(this::selectMany, id, institutionId, owner, name, type)
                 .from(configurationNodeRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.422+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.692+02:00", comments="Source Table: configuration_node")
     default ConfigurationNodeRecord selectByPrimaryKey(Long id_) {
-        return SelectDSL.selectWithMapper(this::selectOne, id, institutionId, ownerId, name, type)
+        return SelectDSL.selectWithMapper(this::selectOne, id, institutionId, owner, name, type)
                 .from(configurationNodeRecord)
                 .where(id, isEqualTo(id_))
                 .build()
                 .execute();
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.422+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.692+02:00", comments="Source Table: configuration_node")
     default UpdateDSL<MyBatis3UpdateModelAdapter<Integer>> updateByExample(ConfigurationNodeRecord record) {
         return UpdateDSL.updateWithMapper(this::update, configurationNodeRecord)
                 .set(institutionId).equalTo(record::getInstitutionId)
-                .set(ownerId).equalTo(record::getOwnerId)
+                .set(owner).equalTo(record::getOwner)
                 .set(name).equalTo(record::getName)
                 .set(type).equalTo(record::getType);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.422+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.692+02:00", comments="Source Table: configuration_node")
     default UpdateDSL<MyBatis3UpdateModelAdapter<Integer>> updateByExampleSelective(ConfigurationNodeRecord record) {
         return UpdateDSL.updateWithMapper(this::update, configurationNodeRecord)
                 .set(institutionId).equalToWhenPresent(record::getInstitutionId)
-                .set(ownerId).equalToWhenPresent(record::getOwnerId)
+                .set(owner).equalToWhenPresent(record::getOwner)
                 .set(name).equalToWhenPresent(record::getName)
                 .set(type).equalToWhenPresent(record::getType);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.422+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.692+02:00", comments="Source Table: configuration_node")
     default int updateByPrimaryKey(ConfigurationNodeRecord record) {
         return UpdateDSL.updateWithMapper(this::update, configurationNodeRecord)
                 .set(institutionId).equalTo(record::getInstitutionId)
-                .set(ownerId).equalTo(record::getOwnerId)
+                .set(owner).equalTo(record::getOwner)
                 .set(name).equalTo(record::getName)
                 .set(type).equalTo(record::getType)
                 .where(id, isEqualTo(record::getId))
@@ -165,11 +165,11 @@ public interface ConfigurationNodeRecordMapper {
                 .execute();
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.422+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.692+02:00", comments="Source Table: configuration_node")
     default int updateByPrimaryKeySelective(ConfigurationNodeRecord record) {
         return UpdateDSL.updateWithMapper(this::update, configurationNodeRecord)
                 .set(institutionId).equalToWhenPresent(record::getInstitutionId)
-                .set(ownerId).equalToWhenPresent(record::getOwnerId)
+                .set(owner).equalToWhenPresent(record::getOwner)
                 .set(name).equalToWhenPresent(record::getName)
                 .set(type).equalToWhenPresent(record::getType)
                 .where(id, isEqualTo(record::getId))

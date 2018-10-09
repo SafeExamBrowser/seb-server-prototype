@@ -29,7 +29,7 @@ public final class User implements UserDetails {
 
     private static final long serialVersionUID = -2490638288935417827L;
 
-    public final Long id;
+    public final String uuid;
     public final Long institutionId;
     public final String name;
     public final String username;
@@ -39,10 +39,11 @@ public final class User implements UserDetails {
     public final Boolean active;
     public final Locale locale;
     public final EnumSet<Role> roles;
+    public final boolean isExternal;
 
     @JsonCreator
     public User(
-            @JsonProperty("id") final Long id,
+            @JsonProperty("uuid") final String uuid,
             @JsonProperty("institutionId") final Long institutionId,
             @JsonProperty("name") final String name,
             @JsonProperty("username") final String username,
@@ -53,7 +54,7 @@ public final class User implements UserDetails {
             @JsonProperty("locale") final Locale locale,
             @JsonProperty("roles") final Set<String> roles) {
 
-        this.id = id;
+        this.uuid = uuid;
         this.institutionId = institutionId;
         this.name = name;
         this.username = username;
@@ -65,10 +66,11 @@ public final class User implements UserDetails {
         this.roles = (roles != null)
                 ? EnumSet.copyOf(roles.stream().map(r -> Role.valueOf(r)).collect(Collectors.toList()))
                 : EnumSet.noneOf(Role.class);
+        this.isExternal = false;
     }
 
-    public Long getId() {
-        return this.id;
+    public String getUuid() {
+        return this.uuid;
     }
 
     public Long getInstitutionId() {
@@ -156,16 +158,17 @@ public final class User implements UserDetails {
 
     @Override
     public String toString() {
-        return "User [id=" + this.id + ", institutionId=" + this.institutionId + ", name=" + this.name + ", username="
-                + this.username
+        return "User [uuid=" + this.uuid + ", institutionId=" + this.institutionId + ", name=" + this.name
+                + ", username=" + this.username
                 + ", password=" + this.password + ", email=" + this.email + ", creationDate=" + this.creationDate
                 + ", active="
-                + this.active + ", locale=" + this.locale + ", roles=" + this.roles + "]";
+                + this.active + ", locale=" + this.locale + ", roles=" + this.roles + ", isExternal=" + this.isExternal
+                + "]";
     }
 
     public static User fromRecord(final UserRecord record, final List<RoleRecord> roles) {
         return new User(
-                record.getId(),
+                record.getUuid(),
                 record.getInstitutionId(),
                 record.getName(),
                 record.getUserName(),

@@ -39,6 +39,8 @@ public class SEBClientConnectionController {
     public static final String USER_IDENTIFIER_KEY_NAME = "userId";
     public static final String EXAM_IDENTIFIER_KEY_NAME = "examId";
     public static final String LMS_ENROLLMENT_URL_KEY_NAME = "lmsURL";
+    public static final String VDI_FLAG_KEY_NAME = "vdi";
+    public static final String VIRTUAL_CLIENT_FLAG_KEY_NAME = "virtualClient";
 
     private final ExamDao examDao;
     private final ExamConnectionService examConnectionService;
@@ -75,6 +77,7 @@ public class SEBClientConnectionController {
      * </pre>
      *
      * @param examId The identifier of the exam that was selected by an examinee
+     * @param token the connection token used in VDI case from virtualClient connection
      * @param authentication Authentication instance with a SEBClientAuth principal
      * @return a list of currently running exams of the client's institution or a LMS login link */
     @RequestMapping(
@@ -84,11 +87,27 @@ public class SEBClientConnectionController {
             produces = Const.CONTENT_TYPE_APPLICATION_JSON)
     public ResponseEntity<String> sebHandshake(
             @RequestParam(name = EXAM_IDENTIFIER_KEY_NAME, required = false) final Long examId,
+            @RequestParam(name = CONNECTION_TOKEN_KEY_NAME, required = false) final String token,
             final SEBConnectionAuth auth) {
 
         log.debug("SEB-Client hand-shake with ClientAuth: {}", auth);
 
         try {
+
+            // The VDI user-client case (no virtual client)
+            // This create a new connection attempt and token but do not send any exam information back
+            if (auth.vdi) {
+                final String connectionToken = this.examConnectionService.handshakeSEBClientVDI(
+                        auth.clientAddress,
+                        examId,
+                        token,
+                        auth.virtualClient);
+
+                return ResponseEntity.ok()
+                        .header(CONNECTION_TOKEN_KEY_NAME, connectionToken)
+                        .build();
+            }
+
             if (examId != null) {
                 // user has already selected an exam from a previously sent list of exam links
                 // the LMS link for specified exam is sent along with a connectionToken

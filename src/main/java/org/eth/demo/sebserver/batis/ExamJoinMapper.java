@@ -39,6 +39,9 @@ public interface ExamJoinMapper {
             @Arg(column = "id", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "lmsSetupId", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "externalUuid", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Arg(column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Arg(column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Arg(column = "supporter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
 
             @Arg(column = "indicatorId", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "indicatorType", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -59,6 +62,9 @@ public interface ExamJoinMapper {
                 examRecord.id,
                 examRecord.lmsSetupId,
                 examRecord.externalUuid,
+                examRecord.type,
+                examRecord.owner,
+                examRecord.supporter,
 
                 indicatorRecord.id.as("indicatorId"),
                 indicatorRecord.type.as("indicatorType"),
@@ -84,6 +90,9 @@ public interface ExamJoinMapper {
         public final Long id;
         public final Long lmsSetupId;
         public final String externalUuid;
+        public final String type;
+        public final String owner;
+        public final String supporter;
 
         public final IndicatorDefinition indicator;
         public final ExamSEBConfigMapping configMapping;
@@ -92,6 +101,9 @@ public interface ExamJoinMapper {
                 final Long id,
                 final Long lmsSetupId,
                 final String externalUuid,
+                final String type,
+                final String owner,
+                final String supporter,
 
                 final Long indicatorId,
                 final String indicatorType,
@@ -106,6 +118,9 @@ public interface ExamJoinMapper {
             this.id = id;
             this.lmsSetupId = lmsSetupId;
             this.externalUuid = externalUuid;
+            this.type = type;
+            this.owner = owner;
+            this.supporter = supporter;
 
             indicator = (indicatorId != null)
                     ? new IndicatorDefinition(indicatorName, indicatorType, threshold1, threshold2, threshold3)

@@ -32,59 +32,63 @@ import org.mybatis.dynamic.sql.util.SqlProviderAdapter;
 
 @Mapper
 public interface ClientConnectionRecordMapper {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.434+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.703+02:00", comments="Source Table: client_connection")
     @SelectProvider(type=SqlProviderAdapter.class, method="select")
     long count(SelectStatementProvider selectStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.434+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.703+02:00", comments="Source Table: client_connection")
     @DeleteProvider(type=SqlProviderAdapter.class, method="delete")
     int delete(DeleteStatementProvider deleteStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.434+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.703+02:00", comments="Source Table: client_connection")
     @InsertProvider(type=SqlProviderAdapter.class, method="insert")
     @SelectKey(statement="SELECT LAST_INSERT_ID()", keyProperty="record.id", before=false, resultType=Long.class)
     int insert(InsertStatementProvider<ClientConnectionRecord> insertStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.434+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.703+02:00", comments="Source Table: client_connection")
     @SelectProvider(type=SqlProviderAdapter.class, method="select")
     @ConstructorArgs({
         @Arg(column="id", javaType=Long.class, jdbcType=JdbcType.BIGINT, id=true),
         @Arg(column="exam_id", javaType=Long.class, jdbcType=JdbcType.BIGINT),
         @Arg(column="status", javaType=String.class, jdbcType=JdbcType.VARCHAR),
         @Arg(column="connection_token", javaType=String.class, jdbcType=JdbcType.VARCHAR),
-        @Arg(column="user_identifier", javaType=String.class, jdbcType=JdbcType.VARCHAR),
-        @Arg(column="client_address", javaType=String.class, jdbcType=JdbcType.VARCHAR)
+        @Arg(column="user_name", javaType=String.class, jdbcType=JdbcType.VARCHAR),
+        @Arg(column="vdi", javaType=Boolean.class, jdbcType=JdbcType.BOOLEAN),
+        @Arg(column="client_address", javaType=String.class, jdbcType=JdbcType.VARCHAR),
+        @Arg(column="virtual_client_address", javaType=String.class, jdbcType=JdbcType.VARCHAR)
     })
     ClientConnectionRecord selectOne(SelectStatementProvider selectStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.434+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.703+02:00", comments="Source Table: client_connection")
     @SelectProvider(type=SqlProviderAdapter.class, method="select")
     @ConstructorArgs({
         @Arg(column="id", javaType=Long.class, jdbcType=JdbcType.BIGINT, id=true),
         @Arg(column="exam_id", javaType=Long.class, jdbcType=JdbcType.BIGINT),
         @Arg(column="status", javaType=String.class, jdbcType=JdbcType.VARCHAR),
         @Arg(column="connection_token", javaType=String.class, jdbcType=JdbcType.VARCHAR),
-        @Arg(column="user_identifier", javaType=String.class, jdbcType=JdbcType.VARCHAR),
-        @Arg(column="client_address", javaType=String.class, jdbcType=JdbcType.VARCHAR)
+        @Arg(column="user_name", javaType=String.class, jdbcType=JdbcType.VARCHAR),
+        @Arg(column="vdi", javaType=Boolean.class, jdbcType=JdbcType.BOOLEAN),
+        @Arg(column="client_address", javaType=String.class, jdbcType=JdbcType.VARCHAR),
+        @Arg(column="virtual_client_address", javaType=String.class, jdbcType=JdbcType.VARCHAR)
     })
     List<ClientConnectionRecord> selectMany(SelectStatementProvider selectStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.434+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.704+02:00", comments="Source Table: client_connection")
     @UpdateProvider(type=SqlProviderAdapter.class, method="update")
     int update(UpdateStatementProvider updateStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.434+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.704+02:00", comments="Source Table: client_connection")
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<Long>> countByExample() {
         return SelectDSL.selectWithMapper(this::count, SqlBuilder.count())
                 .from(clientConnectionRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.434+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.705+02:00", comments="Source Table: client_connection")
     default DeleteDSL<MyBatis3DeleteModelAdapter<Integer>> deleteByExample() {
         return DeleteDSL.deleteFromWithMapper(this::delete, clientConnectionRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.434+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.705+02:00", comments="Source Table: client_connection")
     default int deleteByPrimaryKey(Long id_) {
         return DeleteDSL.deleteFromWithMapper(this::delete, clientConnectionRecord)
                 .where(id, isEqualTo(id_))
@@ -92,94 +96,106 @@ public interface ClientConnectionRecordMapper {
                 .execute();
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.434+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.705+02:00", comments="Source Table: client_connection")
     default int insert(ClientConnectionRecord record) {
         return insert(SqlBuilder.insert(record)
                 .into(clientConnectionRecord)
                 .map(examId).toProperty("examId")
                 .map(status).toProperty("status")
                 .map(connectionToken).toProperty("connectionToken")
-                .map(userIdentifier).toProperty("userIdentifier")
+                .map(userName).toProperty("userName")
+                .map(vdi).toProperty("vdi")
                 .map(clientAddress).toProperty("clientAddress")
+                .map(virtualClientAddress).toProperty("virtualClientAddress")
                 .build()
                 .render(RenderingStrategy.MYBATIS3));
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.435+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.705+02:00", comments="Source Table: client_connection")
     default int insertSelective(ClientConnectionRecord record) {
         return insert(SqlBuilder.insert(record)
                 .into(clientConnectionRecord)
                 .map(examId).toPropertyWhenPresent("examId", record::getExamId)
                 .map(status).toPropertyWhenPresent("status", record::getStatus)
                 .map(connectionToken).toPropertyWhenPresent("connectionToken", record::getConnectionToken)
-                .map(userIdentifier).toPropertyWhenPresent("userIdentifier", record::getUserIdentifier)
+                .map(userName).toPropertyWhenPresent("userName", record::getUserName)
+                .map(vdi).toPropertyWhenPresent("vdi", record::getVdi)
                 .map(clientAddress).toPropertyWhenPresent("clientAddress", record::getClientAddress)
+                .map(virtualClientAddress).toPropertyWhenPresent("virtualClientAddress", record::getVirtualClientAddress)
                 .build()
                 .render(RenderingStrategy.MYBATIS3));
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.435+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.705+02:00", comments="Source Table: client_connection")
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<List<ClientConnectionRecord>>> selectByExample() {
-        return SelectDSL.selectWithMapper(this::selectMany, id, examId, status, connectionToken, userIdentifier, clientAddress)
+        return SelectDSL.selectWithMapper(this::selectMany, id, examId, status, connectionToken, userName, vdi, clientAddress, virtualClientAddress)
                 .from(clientConnectionRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.435+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.705+02:00", comments="Source Table: client_connection")
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<List<ClientConnectionRecord>>> selectDistinctByExample() {
-        return SelectDSL.selectDistinctWithMapper(this::selectMany, id, examId, status, connectionToken, userIdentifier, clientAddress)
+        return SelectDSL.selectDistinctWithMapper(this::selectMany, id, examId, status, connectionToken, userName, vdi, clientAddress, virtualClientAddress)
                 .from(clientConnectionRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.435+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.705+02:00", comments="Source Table: client_connection")
     default ClientConnectionRecord selectByPrimaryKey(Long id_) {
-        return SelectDSL.selectWithMapper(this::selectOne, id, examId, status, connectionToken, userIdentifier, clientAddress)
+        return SelectDSL.selectWithMapper(this::selectOne, id, examId, status, connectionToken, userName, vdi, clientAddress, virtualClientAddress)
                 .from(clientConnectionRecord)
                 .where(id, isEqualTo(id_))
                 .build()
                 .execute();
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.435+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.706+02:00", comments="Source Table: client_connection")
     default UpdateDSL<MyBatis3UpdateModelAdapter<Integer>> updateByExample(ClientConnectionRecord record) {
         return UpdateDSL.updateWithMapper(this::update, clientConnectionRecord)
                 .set(examId).equalTo(record::getExamId)
                 .set(status).equalTo(record::getStatus)
                 .set(connectionToken).equalTo(record::getConnectionToken)
-                .set(userIdentifier).equalTo(record::getUserIdentifier)
-                .set(clientAddress).equalTo(record::getClientAddress);
+                .set(userName).equalTo(record::getUserName)
+                .set(vdi).equalTo(record::getVdi)
+                .set(clientAddress).equalTo(record::getClientAddress)
+                .set(virtualClientAddress).equalTo(record::getVirtualClientAddress);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.435+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.706+02:00", comments="Source Table: client_connection")
     default UpdateDSL<MyBatis3UpdateModelAdapter<Integer>> updateByExampleSelective(ClientConnectionRecord record) {
         return UpdateDSL.updateWithMapper(this::update, clientConnectionRecord)
                 .set(examId).equalToWhenPresent(record::getExamId)
                 .set(status).equalToWhenPresent(record::getStatus)
                 .set(connectionToken).equalToWhenPresent(record::getConnectionToken)
-                .set(userIdentifier).equalToWhenPresent(record::getUserIdentifier)
-                .set(clientAddress).equalToWhenPresent(record::getClientAddress);
+                .set(userName).equalToWhenPresent(record::getUserName)
+                .set(vdi).equalToWhenPresent(record::getVdi)
+                .set(clientAddress).equalToWhenPresent(record::getClientAddress)
+                .set(virtualClientAddress).equalToWhenPresent(record::getVirtualClientAddress);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.435+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.706+02:00", comments="Source Table: client_connection")
     default int updateByPrimaryKey(ClientConnectionRecord record) {
         return UpdateDSL.updateWithMapper(this::update, clientConnectionRecord)
                 .set(examId).equalTo(record::getExamId)
                 .set(status).equalTo(record::getStatus)
                 .set(connectionToken).equalTo(record::getConnectionToken)
-                .set(userIdentifier).equalTo(record::getUserIdentifier)
+                .set(userName).equalTo(record::getUserName)
+                .set(vdi).equalTo(record::getVdi)
                 .set(clientAddress).equalTo(record::getClientAddress)
+                .set(virtualClientAddress).equalTo(record::getVirtualClientAddress)
                 .where(id, isEqualTo(record::getId))
                 .build()
                 .execute();
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-09-27T08:34:27.435+02:00", comments="Source Table: client_connection")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.706+02:00", comments="Source Table: client_connection")
     default int updateByPrimaryKeySelective(ClientConnectionRecord record) {
         return UpdateDSL.updateWithMapper(this::update, clientConnectionRecord)
                 .set(examId).equalToWhenPresent(record::getExamId)
                 .set(status).equalToWhenPresent(record::getStatus)
                 .set(connectionToken).equalToWhenPresent(record::getConnectionToken)
-                .set(userIdentifier).equalToWhenPresent(record::getUserIdentifier)
+                .set(userName).equalToWhenPresent(record::getUserName)
+                .set(vdi).equalToWhenPresent(record::getVdi)
                 .set(clientAddress).equalToWhenPresent(record::getClientAddress)
+                .set(virtualClientAddress).equalToWhenPresent(record::getVirtualClientAddress)
                 .where(id, isEqualTo(record::getId))
                 .build()
                 .execute();

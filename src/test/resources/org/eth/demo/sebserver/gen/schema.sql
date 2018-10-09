@@ -1,4 +1,8 @@
 -- -----------------------------------------------------
+-- Schema SEBServerDemo
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
 -- Table `institution`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `institution` ;
@@ -19,10 +23,12 @@ DROP TABLE IF EXISTS `seb_lms_setup` ;
 CREATE TABLE IF NOT EXISTS `seb_lms_setup` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `institution_id` BIGINT UNSIGNED NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
   `lms_type` VARCHAR(45) NOT NULL,
+  `lms_url` VARCHAR(255) NULL,
   `lms_clientname` VARCHAR(255) NOT NULL,
   `lms_clientsecret` VARCHAR(255) NOT NULL,
-  `lms_url` VARCHAR(255) NULL,
+  `lms_rest_api_token` VARCHAR(4000) NULL,
   `seb_clientname` VARCHAR(255) NOT NULL,
   `seb_clientsecret` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
@@ -43,6 +49,9 @@ CREATE TABLE IF NOT EXISTS `exam` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `lms_setup_id` BIGINT UNSIGNED NOT NULL,
   `external_uuid` VARCHAR(255) NOT NULL,
+  `owner` VARCHAR(255) NOT NULL,
+  `supporter` VARCHAR(4000) NULL,
+  `type` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `lms_setup_key_idx` (`lms_setup_id` ASC),
   CONSTRAINT `lms_setup_key`
@@ -62,8 +71,10 @@ CREATE TABLE IF NOT EXISTS `client_connection` (
   `exam_id` BIGINT UNSIGNED NULL,
   `status` VARCHAR(45) NOT NULL,
   `connection_token` VARCHAR(255) NOT NULL,
-  `user_identifier` VARCHAR(255) NOT NULL,
+  `user_name` VARCHAR(255) NOT NULL,
+  `VDI` BIT(1) NOT NULL,
   `client_address` VARCHAR(45) NOT NULL,
+  `virtual_client_address` VARCHAR(45) NULL,
   PRIMARY KEY (`id`),
   INDEX `connection_exam_ref_idx` (`exam_id` ASC),
   CONSTRAINT `clientConnectionExamRef`
@@ -125,7 +136,7 @@ DROP TABLE IF EXISTS `configuration_node` ;
 CREATE TABLE IF NOT EXISTS `configuration_node` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `institution_id` BIGINT UNSIGNED NOT NULL,
-  `owner_id` BIGINT UNSIGNED NOT NULL,
+  `owner` VARCHAR(255) NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `type` VARCHAR(45) NULL,
   PRIMARY KEY (`id`),
@@ -261,6 +272,7 @@ DROP TABLE IF EXISTS `user` ;
 CREATE TABLE IF NOT EXISTS `user` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `institution_id` BIGINT UNSIGNED NULL,
+  `uuid` VARCHAR(255) NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `user_name` VARCHAR(255) NOT NULL,
   `password` VARCHAR(255) NOT NULL,
@@ -319,3 +331,4 @@ CREATE TABLE IF NOT EXISTS `oauth_refresh_token` (
   `token_id` VARCHAR(255) NULL,
   `token` BLOB NULL,
   `authentication` BLOB NULL);
+

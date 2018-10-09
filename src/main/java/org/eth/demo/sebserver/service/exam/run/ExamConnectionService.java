@@ -102,7 +102,69 @@ public class ExamConnectionService {
     }
 
     @Transactional
-    public String handshakeSEBClient(final String clientAddress, final Long examId) {
+    public String handshakeSEBClientVDI(
+            final String clientAddress,
+            final Long examId,
+            final String token,
+            final boolean virtualClient) {
+
+        if (virtualClient) {
+            final ClientConnectionRecord connection = getConnectionByToken(
+                    token,
+                    ClientConnection.ConnectionStatus.CONNECTION_REQUESTED)
+                            .onError(t -> {
+                                // TODO: This indicates some irregularity on SEB-Client connection attempt.
+                                //       Later we should handle this more accurately, and maybe indicate this to the monitoring board
+                                log.error("Unable to bind virtual SEB-Client connection for {}", clientAddress);
+                                throw new IllegalStateException("Unable to establish SEB-Client connection", t);
+                            });
+
+            if (connection == null) {
+                // TODO exception handling
+            }
+
+            // Integrity check: correct token
+            if (!connection.getConnectionToken().equals(token)) {
+                // TODO deny connection attempt
+            }
+
+            // selective update
+            this.clientConnectionRecordMapper.updateByPrimaryKeySelective(new ClientConnectionRecord(
+                    connection.getId(),
+                    examId,
+                    ClientConnection.ConnectionStatus.CONNECTION_REQUESTED.name(),
+                    null, // token as is
+                    null, // user name as is
+                    null, // vdi flag as is
+                    null, // clientAddress as is
+                    clientAddress));
+
+            return token;
+        } else {
+            final String connectionToken = createToken();
+            final ClientConnectionRecord ccRecord = new ClientConnectionRecord(
+                    null,
+                    examId,
+                    ClientConnection.ConnectionStatus.CONNECTION_REQUESTED.name(),
+                    connectionToken,
+                    "[AWATING_LMS_CONFIRMATION [" + connectionToken + "]]",
+                    true,
+                    clientAddress,
+                    null);
+
+            this.clientConnectionRecordMapper.insert(ccRecord);
+            getAndUpdateCache(ccRecord.getId());
+
+            log.debug("Registered SEB-Client connection for VDI (user-client) for {}", clientAddress);
+
+            return connectionToken;
+        }
+    }
+
+    @Transactional
+    public String handshakeSEBClient(
+            final String clientAddress,
+            final Long examId) {
 
         log.debug("Connection Handshake from SEB-Client. Checking integrity first");
 
@@ -130,16 +192,16 @@ public class ExamConnectionService {
                     withSameClientAddress);
         }
 
-        // TODO maybe we need a stronger connectionToken but for now a simple UUID is used
-        final String connectionToken = UUID.randomUUID().toString();
-
+        final String connectionToken = createToken();
         final ClientConnectionRecord ccRecord = new ClientConnectionRecord(
                 null,
                 examId,
                 ClientConnection.ConnectionStatus.CONNECTION_REQUESTED.name(),
                 connectionToken,
                 "[AWATING_LMS_CONFIRMATION [" + connectionToken + "]]",
-                clientAddress);
+                false,
+                clientAddress,
+                null);
 
         this.clientConnectionRecordMapper.insert(ccRecord);
         getAndUpdateCache(ccRecord.getId());
@@ -152,7 +214,7 @@ public class ExamConnectionService {
     @Transactional
     public void handshakeLMSClient(
             final String connectionToken,
-            final String userIdentifier,
+            final String username,
             final Long examId) {
 
         log.debug("Connection Handshake from LMS-Client");
@@ -163,7 +225,7 @@ public class ExamConnectionService {
         //      if so and the connection is in RELEASED state, allow the connection
         //      if so and the connection is in some different state, we have to specify what to do, deny the connection attempt
         final List<ClientConnectionRecord> userConnectionRecords = this.clientConnectionRecordMapper.selectByExample()
-                .where(ClientConnectionRecordDynamicSqlSupport.userIdentifier, isEqualTo(userIdentifier))
+                .where(ClientConnectionRecordDynamicSqlSupport.userName, isEqualTo(username))
                 .and(ClientConnectionRecordDynamicSqlSupport.examId, isEqualTo(examId))
                 .build()
                 .execute();
@@ -196,7 +258,7 @@ public class ExamConnectionService {
                         .onError(t -> {
                             // TODO: This indicates some irregularity on SEB-Client connection attempt.
                             //       Later we should handle this more accurately, and maybe indicate this to the monitoring board
-                            log.error("Unable to establish SEB-Client connection for {}", userIdentifier);
+                            log.error("Unable to establish SEB-Client connection for {}", username);
                             throw new IllegalStateException("Unable to establish SEB-Client connection", t);
                         });
 
@@ -205,32 +267,36 @@ public class ExamConnectionService {
             throw new IllegalArgumentException("Missing exam identifier within LMS handshake");
         }
 
+        // selective update
         this.clientConnectionRecordMapper.updateByPrimaryKeySelective(new ClientConnectionRecord(
                 connection.getId(),
                 examId,
                 ClientConnection.ConnectionStatus.AUTHENTICATED.name(),
-                null,
-                userIdentifier,
-                null));
+                null, // token as is
+                username,
+                null, // vdi flag as is
+                null, // clientAddress as is
+                null)); // virtualClientAddress as is
 
         getAndUpdateCache(connection.getId());
 
-        log.debug("Established SEB-Client connection within LMS authentication {}", userIdentifier);
+        log.debug("Established SEB-Client connection within LMS authentication {}", username);
     }
 
     @Transactional
     public Exam establishConnection(final SEBWebSocketAuth auth) {
+
         final Optional<Exam> exam = this.examDao.runningExam(auth.examId);
         if (!exam.isPresent()) {
             log.error("The exam {} is not running. Unable to connect user with identifier {} ",
                     auth.examId,
-                    auth.userIdentifier);
+                    auth.username);
             throw new IllegalStateException("The exam " + auth.examId + " is not running");
         }
 
         final Exam runningExam = exam.get();
-        final Long connectionId = getConnectionId(
-                auth.userIdentifier,
+        final ClientConnectionRecord connection = getConnection(
+                auth.username,
                 ClientConnection.ConnectionStatus.AUTHENTICATED)
                         .onError(t -> {
                             // TODO: This indicates some irregularity on SEB-Client connection attempt.
@@ -238,20 +304,24 @@ public class ExamConnectionService {
                             //       For example; check if there is already a connection for the userIdentifier and
                             //       if true in which state it is.
                             log.debug("Unable to connect SEB-Client {} to exam {}",
-                                    auth.userIdentifier,
+                                    auth.username,
                                     runningExam.name);
                             throw new IllegalStateException("Unable to connect SEB-Client to exam");
                         });
 
-        log.debug("Connect client {} to exam {}", auth.userIdentifier, runningExam.name);
+        log.debug("Connect client {} to exam {}", auth.username, runningExam.name);
 
+        final Long connectionId = connection.getId();
         // update connection-record status and invalidate connectionToken
         this.clientConnectionRecordMapper.updateByPrimaryKeySelective(new ClientConnectionRecord(
                 connectionId,
                 null,
                 ClientConnection.ConnectionStatus.ESTABLISHED.name(),
                 null,
-                null, null));
+                null,
+                null,
+                null,
+                null));
 
         getAndUpdateCache(connectionId);
 
@@ -285,11 +355,11 @@ public class ExamConnectionService {
                 ? ClientConnection.ConnectionStatus.ABORTED
                 : ClientConnection.ConnectionStatus.CLOSED;
         this.clientConnectionRecordMapper.updateByPrimaryKeySelective(
-                new ClientConnectionRecord(auth.connectionId, null, state.name(), null, null, null));
+                new ClientConnectionRecord(auth.connectionId, null, state.name(), null, null, null, null, null));
 
         getAndUpdateCache(auth.connectionId);
 
-        log.debug("Connection {} {}", (aborted) ? "aborted" : "closed", auth.userIdentifier);
+        log.debug("Connection {} {}", (aborted) ? "aborted" : "closed", auth.username);
     }
 
     public Result<SebLmsSetupRecord> getLMSSetup(
@@ -393,17 +463,21 @@ public class ExamConnectionService {
                 }).orElse(Optional.empty());
     }
 
-    private Result<Long> getConnectionId(
+    private Result<ClientConnectionRecord> getConnection(
             final String clientIdentifier,
             final ConnectionStatus expectedCurrentStatus) {
 
         return Utils.getSingle(this.clientConnectionRecordMapper.selectByExample()
                 .where(ClientConnectionRecordDynamicSqlSupport.status,
                         isEqualTo(expectedCurrentStatus.name()))
-                .and(ClientConnectionRecordDynamicSqlSupport.userIdentifier, isEqualTo(clientIdentifier))
+                .and(ClientConnectionRecordDynamicSqlSupport.userName, isEqualTo(clientIdentifier))
                 .build()
-                .execute())
-                .map(t -> t.getId());
+                .execute());
+    }
+
+    // TODO maybe we need a stronger connectionToken but for now a simple UUID is used
+    private String createToken() {
+        return UUID.randomUUID().toString();
     }
 
     static final class ConnectionData {

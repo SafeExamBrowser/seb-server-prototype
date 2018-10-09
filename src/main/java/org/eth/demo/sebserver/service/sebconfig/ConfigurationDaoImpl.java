@@ -219,7 +219,7 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
                 prototype = new ConfigurationNode(
                         record.id,
                         record.institutionId,
-                        record.ownerId,
+                        record.owner,
                         record.name,
                         ConfigurationType.valueOf(record.type),
                         null, null);
@@ -260,7 +260,7 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
         return new ConfigurationNode(
                 prototype.id,
                 prototype.institutionId,
-                prototype.ownerId,
+                prototype.owner,
                 prototype.name,
                 prototype.type,
                 examMappings,
@@ -291,7 +291,7 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
         return new ConfigurationNodeRecord(
                 node.id,
                 node.institutionId,
-                node.ownerId,
+                node.owner,
                 node.name,
                 node.type.name());
     }

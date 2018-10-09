@@ -21,7 +21,7 @@ import org.eth.demo.sebserver.batis.gen.mapper.SebLmsSetupRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.InstitutionRecord;
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
 import org.eth.demo.sebserver.domain.rest.admin.Institution;
-import org.eth.demo.sebserver.domain.rest.admin.SebLmsSetup;
+import org.eth.demo.sebserver.domain.rest.admin.LmsSetup;
 import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.service.ResourceNotFoundException;
 import org.springframework.context.annotation.Lazy;
@@ -87,19 +87,19 @@ public class InstitutionDaoImpl implements InstitutionDao {
         ;
         if (data.id == null) {
             this.institutionRecordMapper.insert(record);
-            data.sebLmsSetup.stream()
+            data.lmsSetup.stream()
                     .map(InstitutionDaoImpl::toRecord)
                     .forEach(setupRecord -> this.sebLmsSetupRecordMapper.insert(setupRecord));
         } else {
             this.institutionRecordMapper.updateByPrimaryKey(record);
 
-            if (!data.sebLmsSetup.isEmpty()) {
+            if (!data.lmsSetup.isEmpty()) {
                 this.sebLmsSetupRecordMapper.deleteByExample()
                         .where(SebLmsSetupRecordDynamicSqlSupport.institutionId, isEqualTo(record.getId()))
                         .build()
                         .execute();
 
-                data.sebLmsSetup.stream()
+                data.lmsSetup.stream()
                         .map(InstitutionDaoImpl::toRecord)
                         .forEach(setupRecord -> this.sebLmsSetupRecordMapper.insert(setupRecord));
             }
@@ -117,7 +117,7 @@ public class InstitutionDaoImpl implements InstitutionDao {
 
     @Transactional
     @Override
-    public SebLmsSetup save(final SebLmsSetup setup) {
+    public LmsSetup save(final LmsSetup setup) {
         if (setup.institutionId == null) {
             return null;
         }
@@ -129,12 +129,12 @@ public class InstitutionDaoImpl implements InstitutionDao {
             this.sebLmsSetupRecordMapper.updateByPrimaryKey(record);
         }
 
-        return SebLmsSetup.of(record);
+        return LmsSetup.of(record);
     }
 
     @Transactional
     @Override
-    public boolean delete(final SebLmsSetup setup) {
+    public boolean delete(final LmsSetup setup) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -163,14 +163,16 @@ public class InstitutionDaoImpl implements InstitutionDao {
                 data.authType.name());
     }
 
-    private static SebLmsSetupRecord toRecord(final SebLmsSetup data) {
+    private static SebLmsSetupRecord toRecord(final LmsSetup data) {
         return new SebLmsSetupRecord(
                 data.id,
                 data.institutionId,
+                data.name,
                 data.lmsType.name(),
+                data.lmsApiUrl,
                 data.lmsAuthName,
                 data.lmsAuthSecret,
-                data.lmsApiUrl,
+                data.lmsRestApiToken,
                 data.sebAuthName,
                 data.sebAuthSecret);
     }

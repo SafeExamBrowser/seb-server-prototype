@@ -64,25 +64,31 @@ public class InstitutionData {
 
     public final static class LMSSetup {
 
+        public final String name;
         public final String lmsType;
         public final String lmsAuthName;
         public final String lmsAuthSecret;
         public final String lmsApiUrl;
+        public final String lmsRestApiToken;
         public final String sebAuthName;
         public final String sebAuthSecret;
 
         public LMSSetup(
+                @JsonProperty(value = "name") final String name,
                 @JsonProperty(value = "lmsType") final String lmsType,
                 @JsonProperty(value = "lmsAuthName") final String lmsAuthName,
                 @JsonProperty(value = "lmsAuthSecret") final String lmsAuthSecret,
                 @JsonProperty(value = "lmsApiUrl") final String lmsApiUrl,
+                @JsonProperty(value = "lmsRestApiToken") final String lmsRestApiToken,
                 @JsonProperty(value = "sebAuthName") final String sebAuthName,
                 @JsonProperty(value = "sebAuthSecret") final String sebAuthSecret) {
 
+            this.name = name;
             this.lmsType = lmsType;
             this.lmsAuthName = lmsAuthName;
             this.lmsAuthSecret = lmsAuthSecret;
             this.lmsApiUrl = lmsApiUrl;
+            this.lmsRestApiToken = lmsRestApiToken;
             this.sebAuthName = sebAuthName;
             this.sebAuthSecret = sebAuthSecret;
         }

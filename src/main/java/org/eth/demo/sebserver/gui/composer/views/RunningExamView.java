@@ -224,8 +224,8 @@ public class RunningExamView implements ViewComposer {
         void updateValues(final List<ConnectionRow> connectionInfo) {
             for (final ConnectionRow row : connectionInfo) {
                 final UpdatableTableItem tableItem = this.tableMapping.computeIfAbsent(
-                        row.userIdentifier,
-                        (userIdentifier -> new UpdatableTableItem(this.table, row.userIdentifier)));
+                        row.username,
+                        (userIdentifier -> new UpdatableTableItem(this.table, row.username)));
                 tableItem.push(row);
             }
         }
@@ -234,14 +234,14 @@ public class RunningExamView implements ViewComposer {
             for (final UpdatableTableItem uti : this.tableMapping.values()) {
                 if (uti.tableItem == null) {
                     uti.tableItem = new TableItem(this.table, SWT.NONE);
-                    uti.tableItem.setText(0, uti.userIdentifier);
+                    uti.tableItem.setText(0, uti.username);
                     uti.tableItem.setText(1, uti.connectionRow.status);
-                    uti.tableItem.setText(2, uti.connectionRow.address);
+                    uti.tableItem.setText(2, uti.connectionRow.clientAddress);
                     updateIndicatorValues(uti);
                     updateConnectionStatusColor(uti);
                 } else {
                     if (!uti.connectionRow.status.equals(uti.previous_connectionRow.status)) {
-                        uti.tableItem.setText(0, uti.connectionRow.userIdentifier);
+                        uti.tableItem.setText(0, uti.connectionRow.username);
                         uti.tableItem.setText(1, uti.connectionRow.status);
                         updateConnectionStatusColor(uti);
                     }
@@ -292,18 +292,18 @@ public class RunningExamView implements ViewComposer {
 
     private static final class UpdatableTableItem {
 
-        final String userIdentifier;
+        final String username;
         TableItem tableItem;
         ConnectionRow previous_connectionRow;
         ConnectionRow connectionRow;
 
-        UpdatableTableItem(final Table parent, final String userIdentifier) {
+        UpdatableTableItem(final Table parent, final String username) {
             this.tableItem = null;
-            this.userIdentifier = userIdentifier;
+            this.username = username;
         }
 
         public void push(final ConnectionRow connectionRow) {
-            if (!this.userIdentifier.equals(connectionRow.userIdentifier)) {
+            if (!this.username.equals(connectionRow.username)) {
                 throw new IllegalArgumentException("UserIdentifier mismatch");
             }
             this.previous_connectionRow = this.connectionRow;

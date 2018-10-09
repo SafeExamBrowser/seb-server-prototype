@@ -29,7 +29,7 @@ public final class ConfigurationNode implements GrantEntity {
 
     public final Long id;
     public final Long institutionId;
-    public final Long ownerId;
+    public final String owner;
     public final String name;
     public final ConfigurationType type;
     public final Collection<ExamSEBConfigMapping> examMappings;
@@ -39,7 +39,7 @@ public final class ConfigurationNode implements GrantEntity {
     public ConfigurationNode(
             @JsonProperty("id") final Long id,
             @JsonProperty("institutionId") final Long institutionId,
-            @JsonProperty("ownerId") final Long ownerId,
+            @JsonProperty("owner") final String owner,
             @JsonProperty("name") final String name,
             @JsonProperty("type") final ConfigurationType type,
             @JsonProperty("examMappings") final Collection<ExamSEBConfigMapping> examMappings,
@@ -47,7 +47,7 @@ public final class ConfigurationNode implements GrantEntity {
 
         this.id = id;
         this.institutionId = institutionId;
-        this.ownerId = ownerId;
+        this.owner = owner;
         this.name = name;
         this.type = type;
         this.examMappings = (examMappings != null)
@@ -73,8 +73,8 @@ public final class ConfigurationNode implements GrantEntity {
     }
 
     @Override
-    public Long getOwnerId() {
-        return this.ownerId;
+    public String getOwner() {
+        return this.owner;
     }
 
     public String getName() {
@@ -128,8 +128,8 @@ public final class ConfigurationNode implements GrantEntity {
 
     @Override
     public String toString() {
-        return "ConfigurationNode [id=" + this.id + ", institutionId=" + this.institutionId + ", ownerId="
-                + this.ownerId + ", name="
+        return "ConfigurationNode [id=" + this.id + ", institutionId=" + this.institutionId + ", owner="
+                + this.owner + ", name="
                 + this.name + ", type=" + this.type + ", examMappings=" + this.examMappings + ", configurationHistory="
                 + this.configurationHistory + "]";
     }
