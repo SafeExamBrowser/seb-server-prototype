@@ -25,7 +25,9 @@ import org.eth.demo.sebserver.gui.service.i18n.PolyglotPageService;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.ComposerServiceContext;
 import org.eth.demo.sebserver.gui.service.page.event.ActivitySelection;
 import org.eth.demo.sebserver.gui.service.page.event.ActivitySelection.Activity;
+import org.eth.demo.sebserver.gui.service.page.event.ActivitySelectionEvent;
 import org.eth.demo.sebserver.gui.service.page.event.ActivitySelectionListener;
+import org.eth.demo.sebserver.gui.service.page.event.PageEventListener;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory.IconButtonType;
 import org.slf4j.Logger;
@@ -115,20 +117,43 @@ public class MainPageForm implements TemplateComposer {
         toggleView.setLayoutData(gridData);
         toggleView.setData("fullScreen", false);
 
-        final Composite contentObjects = new ContentPaneComposite(content, composerCtx);
+        final Composite contentObjects = new Composite(content, SWT.NONE);
         contentObjects.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         final GridLayout contentObjectslayout = new GridLayout();
         contentObjectslayout.marginHeight = 0;
         contentObjectslayout.marginWidth = 0;
         contentObjects.setLayout(contentObjectslayout);
+        contentObjects.setData(PageEventListener.LISTENER_ATTRIBUTE_KEY,
+                new ActivitySelectionListener() {
+                    @Override
+                    public void notify(final ActivitySelectionEvent event) {
+                        final Map<String, String> attrs = new HashMap<>(composerCtx.attributes);
+                        attrs.put(event.selection.activity.objectIdentifierAttribute,
+                                event.selection.getObjectIdentifier());
+                        composerCtx.composerService.compose(
+                                event.selection.activity.objectPaneComposer,
+                                composerCtx.of(contentObjects, attrs));
+                    }
+                });
 
-        final Composite selectionPane = new SelectionPaneComposite(mainSash, composerCtx);
+        final Composite selectionPane = new Composite(mainSash, SWT.NONE);
         selectionPane.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         final GridLayout selectionPaneGrid = new GridLayout();
         selectionPane.setLayout(selectionPaneGrid);
         selectionPane.setData(RWT.CUSTOM_VARIANT, "selectionPane");
+        selectionPane.setData(PageEventListener.LISTENER_ATTRIBUTE_KEY,
+                new ActivitySelectionListener() {
+                    @Override
+                    public void notify(final ActivitySelectionEvent event) {
+                        final Map<String, String> attrs = new HashMap<>(composerCtx.attributes);
+                        attrs.put(event.selection.activity.objectIdentifierAttribute,
+                                event.selection.getObjectIdentifier());
+                        composerCtx.composerService.compose(
+                                event.selection.activity.selectionPaneComposer,
+                                composerCtx.of(selectionPane, attrs));
+                    }
+                });
 
-//        final ActivityListener activityListener = new ActivityListener(contentObjects, selectionPane);
         composerCtx.composerService.compose(
                 ActivitiesPane.class,
                 composerCtx.of(nav));
@@ -163,47 +188,4 @@ public class MainPageForm implements TemplateComposer {
             return null;
         }
     }
-
-    public static final class ContentPaneComposite extends Composite implements ActivitySelectionListener {
-
-        private final ComposerServiceContext composerCtx;
-
-        ContentPaneComposite(final Composite parent, final ComposerServiceContext composerCtx) {
-            super(parent, SWT.NONE);
-            this.composerCtx = composerCtx;
-        }
-
-        private static final long serialVersionUID = -7003168413727710543L;
-
-        @Override
-        public void notify(final ActivitySelection activitySelection) {
-            final Map<String, String> attrs = new HashMap<>(this.composerCtx.attributes);
-            attrs.put(activitySelection.activity.objectIdentifierAttribute, activitySelection.getObjectIdentifier());
-            this.composerCtx.composerService.compose(
-                    activitySelection.activity.objectPaneComposer,
-                    this.composerCtx.of(this, attrs));
-        }
-    }
-
-    public static final class SelectionPaneComposite extends Composite implements ActivitySelectionListener {
-
-        private final ComposerServiceContext composerCtx;
-
-        SelectionPaneComposite(final Composite parent, final ComposerServiceContext composerCtx) {
-            super(parent, SWT.NONE);
-            this.composerCtx = composerCtx;
-        }
-
-        private static final long serialVersionUID = -7003168413727710543L;
-
-        @Override
-        public void notify(final ActivitySelection activitySelection) {
-            final Map<String, String> attrs = new HashMap<>(this.composerCtx.attributes);
-            attrs.put(activitySelection.activity.objectIdentifierAttribute, activitySelection.getObjectIdentifier());
-            this.composerCtx.composerService.compose(
-                    activitySelection.activity.selectionPaneComposer,
-                    this.composerCtx.of(this, attrs));
-        }
-    }
-
 }

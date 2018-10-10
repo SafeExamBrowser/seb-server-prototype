@@ -22,7 +22,7 @@ public class MyBatisModelGenerator {
     private static final String USER_NAME = "MyBatisDomainModelGenerator";
 
     private static final String SCHEMA_NAME = "gen";
-    private static final String SCHEMA_URL = "'classpath:/org/eth/demo/sebserver/gen/schema.sql'";
+    private static final String SCHEMA_URL = "'classpath:/schema-h2.sql'";
     private static final String DB_URL = "jdbc:h2:mem:" + SCHEMA_NAME;
     private static final String INIT_SCRIPT = ";runscript from " + SCHEMA_URL;
     private static final String INIT = ";INIT=create schema if not exists " + SCHEMA_NAME + "\\" + INIT_SCRIPT;

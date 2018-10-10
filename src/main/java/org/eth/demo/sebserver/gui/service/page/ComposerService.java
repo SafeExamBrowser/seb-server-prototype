@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eth.demo.sebserver.gui.service.page.event.PageComponentListener;
+import org.eth.demo.sebserver.gui.service.page.event.PageEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -175,13 +175,17 @@ public class ComposerService {
             return new ComposerServiceContext(this.composerService, this.root, this.parent, attrs);
         }
 
-        @SuppressWarnings({ "rawtypes", "unchecked" })
+        @SuppressWarnings("unchecked")
         public <T> void notify(final T t) {
             final Class<?> typeClass = t.getClass();
             PageTreeTraversal.traversePageTree(
                     this.root,
-                    c -> c instanceof PageComponentListener && ((PageComponentListener) c).type() == typeClass,
-                    c -> ((PageComponentListener<T>) c).notify(t));
+                    c -> {
+                        final PageEventListener<?> listener =
+                                (PageEventListener<?>) c.getData(PageEventListener.LISTENER_ATTRIBUTE_KEY);
+                        return listener != null && listener.match(typeClass);
+                    },
+                    c -> ((PageEventListener<T>) c.getData(PageEventListener.LISTENER_ATTRIBUTE_KEY)).notify(t));
         }
 
     }

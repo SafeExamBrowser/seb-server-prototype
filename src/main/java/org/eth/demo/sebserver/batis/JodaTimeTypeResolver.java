@@ -16,18 +16,16 @@ import java.sql.Timestamp;
 
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
+import org.eth.demo.util.Const;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JodaTimeTypeResolver extends BaseTypeHandler<DateTime> {
 
-    // TODO: is this always the right patter or do we have to adapt when DB is changing!?
-    private static final DateTimeFormatter DB_DATE_TIME_PATTERN = DateTimeFormat
-            .forPattern("yyyy-MM-dd HH:mm:ss.S")
-            .withZoneUTC();
+    private static final Logger log = LoggerFactory.getLogger(JodaTimeTypeResolver.class);
 
     @Override
     public void setNonNullParameter(
@@ -55,17 +53,32 @@ public class JodaTimeTypeResolver extends BaseTypeHandler<DateTime> {
     }
 
     private DateTime getDateTime(final SupplierSQLExceptionAware<String> supplier) throws SQLException {
-        final String dateFormattedString = supplier.get();
+        String dateFormattedString = supplier.get();
         if (dateFormattedString == null) {
             return null;
         }
 
-        // NOTE: This create a DateTime in UTC time.zone with no time-zone-offset.
-        //
-        final LocalDateTime localDateTime = LocalDateTime.parse(dateFormattedString, DB_DATE_TIME_PATTERN);
-        final DateTime dateTime = localDateTime.toDateTime(DateTimeZone.UTC);
+        try {
+            // cutting milliseconds if there are some. This is needed to be able to use a general pattern
+            // independently from the different data-base-drivers format the date-time values
+            if (dateFormattedString.contains(".")) {
+                dateFormattedString = dateFormattedString.substring(
+                        0,
+                        dateFormattedString.indexOf("."));
+            }
 
-        return dateTime;
+            // NOTE: This create a DateTime in UTC time.zone with no time-zone-offset.
+            final LocalDateTime localDateTime = LocalDateTime.parse(
+                    dateFormattedString,
+                    Const.DATE_TIME_PATTERN_UTC_NO_MILLIS);
+            final DateTime dateTime = localDateTime.toDateTime(DateTimeZone.UTC);
+
+            return dateTime;
+        } catch (final Exception e) {
+            log.error("while trying to parse LocalDateTime); value: " + dateFormattedString + " format: "
+                    + Const.DATE_TIME_PATTERN_UTC_NO_MILLIS, e);
+            return null;
+        }
     }
 
     @FunctionalInterface

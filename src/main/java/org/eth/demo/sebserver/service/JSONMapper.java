@@ -23,6 +23,12 @@ public class JSONMapper extends ObjectMapper {
     public JSONMapper() {
         super();
         super.registerModule(new JodaModule());
+        super.configure(
+                com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
+                false);
+        super.configure(
+                com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_WITH_ZONE_ID,
+                false);
     }
 
 }

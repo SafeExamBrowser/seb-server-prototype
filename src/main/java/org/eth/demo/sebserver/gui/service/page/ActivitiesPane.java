@@ -23,6 +23,7 @@ import org.eth.demo.sebserver.gui.service.page.ComposerService.ComposerServiceCo
 import org.eth.demo.sebserver.gui.service.page.MainPageForm.MainPageState;
 import org.eth.demo.sebserver.gui.service.page.event.ActivitySelection;
 import org.eth.demo.sebserver.gui.service.page.event.ActivitySelection.Activity;
+import org.eth.demo.sebserver.gui.service.page.event.ActivitySelectionEvent;
 import org.eth.demo.sebserver.gui.service.rest.GETInstitutionInfo;
 import org.eth.demo.sebserver.gui.service.rest.RestServices;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
@@ -127,7 +128,7 @@ public class ActivitiesPane implements TemplateComposer {
             if (mainPageState.activitySelection == null) {
                 mainPageState.activitySelection = Activity.NONE.selection();
             }
-            composerCtx.notify(mainPageState.activitySelection);
+            composerCtx.notify(new ActivitySelectionEvent(mainPageState.activitySelection));
         });
 
         applyPreSelection(navigation, composerCtx);
@@ -169,7 +170,7 @@ public class ActivitiesPane implements TemplateComposer {
         if (itemToPreSelect != null) {
             navigation.select(itemToPreSelect);
             expand(itemToPreSelect.getParentItem());
-            composerCtx.notify(mainPageState.activitySelection);
+            composerCtx.notify(new ActivitySelectionEvent(mainPageState.activitySelection));
         }
     }
 

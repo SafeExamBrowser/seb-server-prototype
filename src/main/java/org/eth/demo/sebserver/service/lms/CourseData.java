@@ -9,7 +9,10 @@
 package org.eth.demo.sebserver.service.lms;
 
 import org.eth.demo.sebserver.domain.rest.exam.Exam.ExamStatus;
+import org.eth.demo.util.Const;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
 
 public final class CourseData {
 
@@ -33,6 +36,26 @@ public final class CourseData {
         this.description = description;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.enrollmentURL = enrollmentURL;
+    }
+
+    public CourseData(
+            final String uuid,
+            final String name,
+            final String description,
+            final String startTime,
+            final String endTime,
+            final String enrollmentURL) {
+
+        this.uuid = uuid;
+        this.name = name;
+        this.description = description;
+        this.startTime = LocalDateTime
+                .parse(startTime, Const.DATE_TIME_PATTERN_UTC_NO_MILLIS)
+                .toDateTime(DateTimeZone.UTC);
+        this.endTime = LocalDateTime
+                .parse(endTime, Const.DATE_TIME_PATTERN_UTC_NO_MILLIS)
+                .toDateTime(DateTimeZone.UTC);
         this.enrollmentURL = enrollmentURL;
     }
 
@@ -61,6 +84,7 @@ public final class CourseData {
     }
 
     public ExamStatus getStatus() {
+        final DateTime dt = new DateTime(DateTimeZone.UTC);
         if (this.startTime.isAfterNow()) {
             return ExamStatus.READY;
         } else if (this.startTime.isBeforeNow() && this.endTime.isAfterNow()) {

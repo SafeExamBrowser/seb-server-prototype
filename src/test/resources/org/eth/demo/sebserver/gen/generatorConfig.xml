@@ -65,8 +65,6 @@
         <table tableName="exam" domainObjectName="ExamRecord">
             <property name="immutable" value="true"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-            <columnOverride column="start_time" javaType="org.joda.time.DateTime" typeHandler="org.eth.demo.sebserver.batis.JodaTimeTypeResolver" />
-            <columnOverride column="end_time" javaType="org.joda.time.DateTime" typeHandler="org.eth.demo.sebserver.batis.JodaTimeTypeResolver" />
         </table>
         <table tableName="client_connection" domainObjectName="ClientConnectionRecord">
             <property name="immutable" value="true"/>

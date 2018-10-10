@@ -8,11 +8,12 @@
 
 package org.eth.demo.sebserver.gui.service.page.event;
 
-public interface PageActionListener extends PageComponentListener<PageActionEvent> {
+public interface PageEventListener<T> {
 
-    @Override
-    default Class<PageActionEvent> type() {
-        return PageActionEvent.class;
-    }
+    String LISTENER_ATTRIBUTE_KEY = "PageEventListener";
+
+    boolean match(Class<?> type);
+
+    void notify(T event);
 
 }

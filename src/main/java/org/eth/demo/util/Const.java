@@ -8,7 +8,18 @@
 
 package org.eth.demo.util;
 
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 public interface Const {
+
+    public static final DateTimeFormatter DATE_TIME_PATTERN_UTC_NO_MILLIS = DateTimeFormat
+            .forPattern("yyyy-MM-dd HH:mm:ss")
+            .withZoneUTC();
+
+    public static final DateTimeFormatter DATE_TIME_PATTERN_UTC_MILLIS = DateTimeFormat
+            .forPattern("yyyy-MM-dd HH:mm:ss.S")
+            .withZoneUTC();
 
     String CONTENT_TYPE_APPLICATION_JSON = "application/json; charset=UTF-8";
     String CONTENT_TYPE_PLAIN_TEXT = "text/plain;charset=UTF-8";

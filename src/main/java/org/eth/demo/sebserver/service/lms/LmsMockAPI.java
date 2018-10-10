@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 
 import org.eth.demo.sebserver.domain.rest.admin.LmsSetup;
-import org.joda.time.DateTime;
 
 public class LmsMockAPI implements LmsConnectionTemplate {
 
@@ -24,25 +23,24 @@ public class LmsMockAPI implements LmsConnectionTemplate {
     public LmsMockAPI(final LmsSetup setup) {
         this.setup = setup;
         this.couses = new ArrayList<>();
-//        (1, 1, 2,'Demo Exam 1','Demo Exam', 'TYPE_1', 'IN_PROGRESS', null, null, null),
-//        (2, 1, 2,'Demo Exam 2','Demo Exam', 'TYPE_1','IN_PROGRESS', null, null, null),
-//        (3, 1, 3,'Demo Exam 3','Demo Exam', 'TYPE_1','READY', '2018-07-30 09:00:00' ,'2018-08-01 00:00:00', 'https://localhost:8090/exams/exam3'),
-//        (4, 1, 3,'Demo Exam 4','Demo Exam', 'TYPE_1','RUNNING', '2018-01-01 00:00:00', '2019-01-01 00:00:00', 'https://localhost:8090/exams/exam4')
         this.couses.add(new CourseData(
-                "1", "Demo Exam 1", "Demo Exam",
-                null, null,
+                "Demo Exam 1", "Demo Exam 1", "Demo Exam",
+                "2020-01-01 09:00:00",
+                "2021-01-01 09:00:00",
                 "mock"));
         this.couses.add(new CourseData(
-                "2", "Demo Exam 1", "Demo Exam",
-                null, null,
+                "Demo Exam 2", "Demo Exam 2", "Demo Exam",
+                "2020-01-01 09:00:00",
+                "2021-01-01 09:00:00",
                 "mock"));
         this.couses.add(new CourseData(
-                "3", "Demo Exam 1", "Demo Exam",
-                DateTime.parse("2018-07-30 09:00:00"), DateTime.parse("2018-08-01 00:00:00"),
+                "Demo Exam 3", "Demo Exam 3", "Demo Exam",
+                "2018-07-30 09:00:00",
+                "2018-08-01 00:00:00",
                 "mock"));
         this.couses.add(new CourseData(
-                "4", "Demo Exam 1", "Demo Exam",
-                DateTime.parse("2018-01-01 00:00:00"), DateTime.parse("2019-01-01 00:00:00"),
+                "Demo Exam 4", "Demo Exam 4", "Demo Exam",
+                "2018-01-01 00:00:00", "2019-01-01 00:00:00",
                 "mock"));
     }
 

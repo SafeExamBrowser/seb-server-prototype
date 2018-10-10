@@ -1,6 +1,3 @@
--- -----------------------------------------------------
--- Schema SEBServerDemo
--- -----------------------------------------------------
 
 -- -----------------------------------------------------
 -- Table `institution`
@@ -13,7 +10,6 @@ CREATE TABLE IF NOT EXISTS `institution` (
   `authType` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `name_UNIQUE` (`name` ASC));
-
 
 -- -----------------------------------------------------
 -- Table `seb_lms_setup`

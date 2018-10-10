@@ -8,11 +8,12 @@
 
 package org.eth.demo.sebserver.gui.service.page.event;
 
-public abstract class ActivitySelectionListener implements PageEventListener<ActivitySelectionEvent> {
+public class ActivitySelectionEvent {
 
-    @Override
-    public boolean match(final Class<?> type) {
-        return type == ActivitySelectionEvent.class;
+    public final ActivitySelection selection;
+
+    public ActivitySelectionEvent(final ActivitySelection selection) {
+        this.selection = selection;
     }
 
 }

@@ -43,6 +43,7 @@ import org.mybatis.dynamic.sql.SqlColumn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -67,6 +68,7 @@ import org.springframework.transaction.annotation.Transactional;
  * of a connection and recalculate the indicator value for every request.
  *
  * @author anhefti */
+@Lazy
 @Service
 public class ExamConnectionService {
 

@@ -3,37 +3,37 @@ package org.eth.demo.sebserver.batis.gen.model;
 import javax.annotation.Generated;
 
 public class SebLmsSetupRecord {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.719+02:00", comments="Source field: seb_lms_setup.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.085+02:00", comments="Source field: seb_lms_setup.id")
     private Long id;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.719+02:00", comments="Source field: seb_lms_setup.institution_id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.086+02:00", comments="Source field: seb_lms_setup.institution_id")
     private Long institutionId;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.719+02:00", comments="Source field: seb_lms_setup.name")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.086+02:00", comments="Source field: seb_lms_setup.name")
     private String name;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.719+02:00", comments="Source field: seb_lms_setup.lms_type")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.086+02:00", comments="Source field: seb_lms_setup.lms_type")
     private String lmsType;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.719+02:00", comments="Source field: seb_lms_setup.lms_url")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.086+02:00", comments="Source field: seb_lms_setup.lms_url")
     private String lmsUrl;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.719+02:00", comments="Source field: seb_lms_setup.lms_clientname")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.086+02:00", comments="Source field: seb_lms_setup.lms_clientname")
     private String lmsClientname;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.720+02:00", comments="Source field: seb_lms_setup.lms_clientsecret")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.086+02:00", comments="Source field: seb_lms_setup.lms_clientsecret")
     private String lmsClientsecret;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.720+02:00", comments="Source field: seb_lms_setup.lms_rest_api_token")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.086+02:00", comments="Source field: seb_lms_setup.lms_rest_api_token")
     private String lmsRestApiToken;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.720+02:00", comments="Source field: seb_lms_setup.seb_clientname")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.087+02:00", comments="Source field: seb_lms_setup.seb_clientname")
     private String sebClientname;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.720+02:00", comments="Source field: seb_lms_setup.seb_clientsecret")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.087+02:00", comments="Source field: seb_lms_setup.seb_clientsecret")
     private String sebClientsecret;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.719+02:00", comments="Source Table: seb_lms_setup")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.085+02:00", comments="Source Table: seb_lms_setup")
     public SebLmsSetupRecord(Long id, Long institutionId, String name, String lmsType, String lmsUrl, String lmsClientname, String lmsClientsecret, String lmsRestApiToken, String sebClientname, String sebClientsecret) {
         this.id = id;
         this.institutionId = institutionId;
@@ -47,52 +47,52 @@ public class SebLmsSetupRecord {
         this.sebClientsecret = sebClientsecret;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.719+02:00", comments="Source field: seb_lms_setup.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.085+02:00", comments="Source field: seb_lms_setup.id")
     public Long getId() {
         return id;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.719+02:00", comments="Source field: seb_lms_setup.institution_id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.086+02:00", comments="Source field: seb_lms_setup.institution_id")
     public Long getInstitutionId() {
         return institutionId;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.719+02:00", comments="Source field: seb_lms_setup.name")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.086+02:00", comments="Source field: seb_lms_setup.name")
     public String getName() {
         return name;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.719+02:00", comments="Source field: seb_lms_setup.lms_type")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.086+02:00", comments="Source field: seb_lms_setup.lms_type")
     public String getLmsType() {
         return lmsType;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.719+02:00", comments="Source field: seb_lms_setup.lms_url")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.086+02:00", comments="Source field: seb_lms_setup.lms_url")
     public String getLmsUrl() {
         return lmsUrl;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.719+02:00", comments="Source field: seb_lms_setup.lms_clientname")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.086+02:00", comments="Source field: seb_lms_setup.lms_clientname")
     public String getLmsClientname() {
         return lmsClientname;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.720+02:00", comments="Source field: seb_lms_setup.lms_clientsecret")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.086+02:00", comments="Source field: seb_lms_setup.lms_clientsecret")
     public String getLmsClientsecret() {
         return lmsClientsecret;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.720+02:00", comments="Source field: seb_lms_setup.lms_rest_api_token")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.086+02:00", comments="Source field: seb_lms_setup.lms_rest_api_token")
     public String getLmsRestApiToken() {
         return lmsRestApiToken;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.720+02:00", comments="Source field: seb_lms_setup.seb_clientname")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.087+02:00", comments="Source field: seb_lms_setup.seb_clientname")
     public String getSebClientname() {
         return sebClientname;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-09T09:44:27.721+02:00", comments="Source field: seb_lms_setup.seb_clientsecret")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.087+02:00", comments="Source field: seb_lms_setup.seb_clientsecret")
     public String getSebClientsecret() {
         return sebClientsecret;
     }
@@ -101,7 +101,7 @@ public class SebLmsSetupRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table seb_lms_setup
      *
-     * @mbg.generated Tue Oct 09 09:44:27 CEST 2018
+     * @mbg.generated Wed Oct 10 15:10:20 CEST 2018
      */
     @Override
     public String toString() {
@@ -127,7 +127,7 @@ public class SebLmsSetupRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table seb_lms_setup
      *
-     * @mbg.generated Tue Oct 09 09:44:27 CEST 2018
+     * @mbg.generated Wed Oct 10 15:10:20 CEST 2018
      */
     @Override
     public boolean equals(Object that) {
@@ -157,7 +157,7 @@ public class SebLmsSetupRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table seb_lms_setup
      *
-     * @mbg.generated Tue Oct 09 09:44:27 CEST 2018
+     * @mbg.generated Wed Oct 10 15:10:20 CEST 2018
      */
     @Override
     public int hashCode() {

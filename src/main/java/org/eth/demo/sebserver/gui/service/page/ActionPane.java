@@ -14,15 +14,10 @@ import org.eclipse.rap.rwt.template.Template;
 import org.eclipse.rap.rwt.template.TextCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.ComposerServiceContext;
-import org.eth.demo.sebserver.gui.service.page.event.PageActionDef;
-import org.eth.demo.sebserver.gui.service.page.event.PageActionEvent;
-import org.eth.demo.sebserver.gui.service.page.event.PageActionEvent.PageActionEventType;
-import org.eth.demo.sebserver.gui.service.page.event.PageActionListener;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -74,36 +69,6 @@ public class ActionPane implements TemplateComposer {
 
             treeItem.getParent().deselectAll();
         });
-
-    }
-
-    private static final class ActionEventAware extends Composite implements PageActionListener {
-
-        ActionEventAware(final Composite parent) {
-            super(parent, SWT.NONE);
-        }
-
-        @Override
-        public void notify(final PageActionEvent event) {
-            if (event.eventType == PageActionEventType.REGISTER) {
-                addAction(event.actionDefinition);
-                return;
-            }
-            if (event.eventType == PageActionEventType.UNREGISTER) {
-                removeAction(event.actionDefinition);
-                return;
-            }
-        }
-
-        private void removeAction(final PageActionDef actionDefinition) {
-            // TODO Auto-generated method stub
-
-        }
-
-        private void addAction(final PageActionDef actionDefinition) {
-            // TODO Auto-generated method stub
-
-        }
 
     }
 

@@ -6,12 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.service.page.event;
+package org.eth.demo.sebserver.gui.service.page.action;
 
-public interface PageComponentListener<T> {
+public class ActionEvent {
 
-    Class<T> type();
+    public final ActionDefinition actionDefinition;
 
-    void notify(T t);
+    public ActionEvent(final ActionDefinition actionDefinition) {
+        this.actionDefinition = actionDefinition;
+    }
 
 }

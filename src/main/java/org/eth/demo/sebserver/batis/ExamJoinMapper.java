@@ -37,8 +37,8 @@ public interface ExamJoinMapper {
     @ResultType(ExamJoinMapper.ExamJoinRecord.class)
     @ConstructorArgs({
             @Arg(column = "id", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
-            @Arg(column = "lmsSetupId", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
-            @Arg(column = "externalUuid", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Arg(column = "lms_setup_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
+            @Arg(column = "external_uuid", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "supporter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
