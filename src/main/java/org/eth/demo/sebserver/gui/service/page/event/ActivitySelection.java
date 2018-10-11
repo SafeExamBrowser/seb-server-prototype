@@ -31,12 +31,10 @@ public class ActivitySelection {
         INSTITUTIONS(TODOTemplate.class, TODOTemplate.class),
         INSTITUTION(InstitutionForm.class, ActionPane.class, AttributeKeys.INSTITUTION_ID),
 
-        USER(TODOTemplate.class, TODOTemplate.class),
-        LMS_SETUP(TODOTemplate.class, TODOTemplate.class),
+        USERS(TODOTemplate.class, TODOTemplate.class),
 
         EXAMS(TODOTemplate.class, TODOTemplate.class),
-        EXAM(TODOTemplate.class, TODOTemplate.class),
-        SEB_CONFIG(TODOTemplate.class, TODOTemplate.class),
+        SEB_CONFIGS(TODOTemplate.class, TODOTemplate.class),
         MONITORING(TODOTemplate.class, TODOTemplate.class),
 
         ;
@@ -122,4 +120,33 @@ public class ActivitySelection {
     public void processCollapse(final TreeItem item) {
         this.collapseFunction.accept(item);
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((this.activity == null) ? 0 : this.activity.hashCode());
+        result = prime * result + ((this.objectIdentifier == null) ? 0 : this.objectIdentifier.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final ActivitySelection other = (ActivitySelection) obj;
+        if (this.activity != other.activity)
+            return false;
+        if (this.objectIdentifier == null) {
+            if (other.objectIdentifier != null)
+                return false;
+        } else if (!this.objectIdentifier.equals(other.objectIdentifier))
+            return false;
+        return true;
+    }
+
 }

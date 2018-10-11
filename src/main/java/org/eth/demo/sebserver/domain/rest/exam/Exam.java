@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.commons.lang3.StringUtils;
-import org.assertj.core.util.Lists;
 import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantEntityType;
 import org.eth.demo.sebserver.service.authorization.GrantEntity;
 import org.joda.time.DateTime;
@@ -205,7 +204,7 @@ public final class Exam implements GrantEntity {
         final String[] split = StringUtils.split(supporter, ",");
         final Collection<String> supp = (split != null)
                 ? Arrays.asList(split)
-                : Lists.emptyList();
+                : Collections.emptyList();
 
         return new Exam(
                 id, institutionId, lmsSetupId, external_uuid, name, description,

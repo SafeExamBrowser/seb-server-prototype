@@ -83,15 +83,20 @@ public class ActivitiesPane implements TemplateComposer {
             createInstitutionItem(navigation, inst);
         }
 
+        final TreeItem user = this.widgetFactory.treeItemLocalized(
+                navigation,
+                "org.sebserver.activities.user");
+        ActivitySelection.set(user, Activity.USERS.selection());
+
         final TreeItem exams = this.widgetFactory.treeItemLocalized(
                 navigation,
                 "org.sebserver.activities.exam");
-        ActivitySelection.set(exams, Activity.EXAM.selection());
+        ActivitySelection.set(exams, Activity.EXAMS.selection());
 
         final TreeItem configs = this.widgetFactory.treeItemLocalized(
                 navigation,
                 "org.sebserver.activities.sebconfig");
-        ActivitySelection.set(configs, Activity.SEB_CONFIG.selection());
+        ActivitySelection.set(configs, Activity.SEB_CONFIGS.selection());
 
         final TreeItem monitoring = this.widgetFactory.treeItemLocalized(
                 navigation,
@@ -149,15 +154,11 @@ public class ActivitiesPane implements TemplateComposer {
         ActivitySelection.set(institution, Activity.INSTITUTION.selection()
                 .with(inst.getKey()));
 
-        final TreeItem lmsSetup = this.widgetFactory.treeItemLocalized(
-                institution,
-                "org.sebserver.activities.lms");
-        ActivitySelection.set(lmsSetup, Activity.LMS_SETUP.selection());
+//        final TreeItem lmsSetup = this.widgetFactory.treeItemLocalized(
+//                institution,
+//                "org.sebserver.activities.lms");
+//        ActivitySelection.set(lmsSetup, Activity.LMS_SETUP.selection());
 
-        final TreeItem user = this.widgetFactory.treeItemLocalized(
-                institution,
-                "org.sebserver.activities.user");
-        ActivitySelection.set(user, Activity.USER.selection());
     }
 
     private void applyPreSelection(final Tree navigation, final ComposerServiceContext composerCtx) {

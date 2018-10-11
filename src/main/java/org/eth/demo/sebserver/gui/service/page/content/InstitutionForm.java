@@ -20,6 +20,8 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eth.demo.sebserver.gui.domain.admin.InstitutionData;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
@@ -59,27 +61,54 @@ public class InstitutionForm implements TemplateComposer {
                 });
 
         final Composite content = new Composite(composerCtx.parent, SWT.NONE);
-        final GridLayout layout = new GridLayout(4, true);
-        layout.horizontalSpacing = 10;
-        layout.verticalSpacing = 10;
-        layout.marginLeft = 10;
-        content.setLayout(layout);
+        final GridLayout contentLayout = new GridLayout();
+        contentLayout.marginLeft = 10;
+        content.setLayout(contentLayout);
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         final Label labelLocalized = this.widgetFactory.labelLocalized(
                 content, "h2", new LocTextKey(
                         "org.sebserver.activities.instName",
                         institutionData.name));
-        labelLocalized.setLayoutData(new GridData(SWT.TOP, SWT.LEFT, false, false, 4, 1));
+        labelLocalized.setLayoutData(new GridData(SWT.TOP, SWT.LEFT, true, false));
 
-        final Form form = new Form(content, this.widgetFactory);
+        final TabFolder tabs = new TabFolder(content, SWT.NONE);
+        tabs.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        final TabItem instTab = new TabItem(tabs, SWT.NONE);
+        instTab.setText("General");
+        final TabItem lmsSetupTab = new TabItem(tabs, SWT.NONE);
+        lmsSetupTab.setText("LMS Setup(s)");
 
-        this.widgetFactory.formLabelLocalized(content, "org.sebserver.form.institution.name");
-        this.widgetFactory.formTextInput(content, institutionData.name, 2, 1);
-        this.widgetFactory.formEmpty(content);
-        this.widgetFactory.formLabelLocalized(content, "org.sebserver.form.institution.authType");
+        final Composite institution = new Composite(tabs, SWT.NONE);
+        final GridLayout layout = new GridLayout(4, true);
+        layout.horizontalSpacing = 10;
+        layout.verticalSpacing = 10;
+        layout.marginLeft = 10;
+        layout.marginTop = 10;
+        institution.setLayout(layout);
+        institution.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+        instTab.setControl(institution);
+        tabs.setSelection(0);
+
+        final Composite setup = new Composite(tabs, SWT.NONE);
+        final GridLayout setupLayout = new GridLayout(4, true);
+        setupLayout.horizontalSpacing = 10;
+        setupLayout.verticalSpacing = 10;
+        setupLayout.marginLeft = 10;
+        setup.setLayout(setupLayout);
+        setup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+        lmsSetupTab.setControl(setup);
+
+        final Form form = new Form(institution, this.widgetFactory);
+
+        this.widgetFactory.formLabelLocalized(institution, "org.sebserver.form.institution.name");
+        this.widgetFactory.formTextInput(institution, institutionData.name, 2, 1);
+        this.widgetFactory.formEmpty(institution);
+        this.widgetFactory.formLabelLocalized(institution, "org.sebserver.form.institution.authType");
         final Combo authSelection = this.widgetFactory.formComboLocalized(
-                content,
+                institution,
                 institutionData.authType,
                 InstitutionData.AUTH_TYPE_SELECTION,
                 2, 1);
@@ -89,27 +118,27 @@ public class InstitutionForm implements TemplateComposer {
             form.processSelection(selectionIndex);
         });
 
-        this.widgetFactory.formEmpty(content);
+        this.widgetFactory.formEmpty(institution);
 
         form.addInputLDAP(
                 "org.sebserver.form.institution.authType.ldap.url",
-                () -> this.widgetFactory.formTextInput(content, "", 2, 1));
-        this.widgetFactory.formEmpty(content);
+                () -> this.widgetFactory.formTextInput(institution, "", 2, 1));
+        this.widgetFactory.formEmpty(institution);
         form.addInputLDAP(
                 "org.sebserver.form.institution.authType.ldap.userDN",
-                () -> this.widgetFactory.formTextInput(content, "", 2, 1));
-        this.widgetFactory.formEmpty(content);
+                () -> this.widgetFactory.formTextInput(institution, "", 2, 1));
+        this.widgetFactory.formEmpty(institution);
         form.addInputLDAP(
                 "org.sebserver.form.institution.authType.ldap.userSearch",
-                () -> this.widgetFactory.formTextInput(content, "", 2, 1));
-        this.widgetFactory.formEmpty(content);
+                () -> this.widgetFactory.formTextInput(institution, "", 2, 1));
+        this.widgetFactory.formEmpty(institution);
         form.addInputLDAP(
                 "org.sebserver.form.institution.authType.ldap.groupSearch",
-                () -> this.widgetFactory.formTextInput(content, "", 2, 1));
-        this.widgetFactory.formEmpty(content);
+                () -> this.widgetFactory.formTextInput(institution, "", 2, 1));
+        this.widgetFactory.formEmpty(institution);
         form.addInputLDAP(
                 "org.sebserver.form.institution.authType.ldap.groupFilter",
-                () -> this.widgetFactory.formTextInput(content, "", 2, 1));
+                () -> this.widgetFactory.formTextInput(institution, "", 2, 1));
 
         form.processSelection(authSelection.getSelectionIndex());
     }

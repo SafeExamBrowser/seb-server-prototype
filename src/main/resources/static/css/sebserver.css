@@ -263,8 +263,8 @@ Tree[BORDER] {
 
 TreeItem {
     font: bold 14px Arial, Helvetica, sans-serif;
-    background-color: transparent;
     color: #1f407a;
+    background-color: transparent;
     text-decoration: none;
     text-shadow: none;
     background-image: none;
@@ -323,3 +323,98 @@ TreeItem.actions {
     background-image: none;
     margin: 0 0 0 0;
 }
+
+
+
+
+
+
+
+/* TabFolder default theme */
+
+TabFolder {
+  font: 12px Verdana, "Lucida Sans", Arial, Helvetica, sans-serif;
+  color: #4a4a4a;
+  border: none;
+}
+
+TabFolder-ContentContainer {
+  border: none;
+  border-top: 1px solid #bdbdbd;
+}
+
+TabItem {
+  font: 12px Verdana, "Lucida Sans", Arial, Helvetica, sans-serif;
+  color: #4a4a4a;
+  background-color: #FFFFFF;
+  text-decoration: none;
+  text-shadow: none;
+  background-image: none;
+  margin: 1px 0px 0px -1px;
+  border: 1px solid #bdbdbd;
+  border-bottom: none;
+  border-left: none;
+}
+
+TabItem:selected {
+  background-color: #1f407a;
+  background-gradient-color: #1f407a;
+  background-image: gradient( linear, left top, left bottom, from( #1f407a ), to( #1f407a ) );
+  color: #FFFFFF;
+  margin: 0px 0px 0px 0px;
+  border: 1px solid #bdbdbd;
+  border-bottom: none;
+  border-left: none;
+}
+
+TabItem:hover {
+    background-color: #82be1e;
+    background-gradient-color: #82be1e;
+    background-image: gradient( linear, left top, left bottom, from( #82be1e ), to( #82be1e ) );
+    color: #1F407A;
+    margin: 1px 0px 0px -1px;
+    border-left: none;
+}
+
+TabItem:selected:hover {
+    background-color: #82be1e;
+    background-gradient-color: #82be1e;
+    background-image: gradient( linear, left top, left bottom, from( #82be1e ), to( #82be1e ) );
+    color: #1F407A;
+    margin: 0px 0px 0px 0px;
+    border-left: none;
+}
+
+TabItem:first {
+  font: 12px Verdana, "Lucida Sans", Arial, Helvetica, sans-serif;
+  color: #4a4a4a;
+  background-color: #FFFFFF;
+  text-decoration: none;
+  text-shadow: none;
+  background-image: none;
+  margin: 1px 0px 0px -1px;
+  border: 1px solid #bdbdbd;
+  border-bottom: none;
+}
+
+TabItem:selected:first {
+  background-color: #1f407a;
+  color: #FFFFFF;
+  margin: 0px 0px 0px 0px;
+  border-left: 1px solid #bdbdbd;
+}
+
+TabItem:selected:hover:first {
+  background-color: #1f407a;
+  color: #1F407A;
+  margin: 0px 0px 0px 0px;
+  border-left: 1px solid #bdbdbd;
+}
+
+TabItem:hover:first {
+  background-color: #1f407a;
+  color: #1F407A;
+  margin: 1px 0px 0px -1px;
+  border-left: 1px solid #bdbdbd;
+}
+
