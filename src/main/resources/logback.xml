@@ -13,6 +13,8 @@
     <Logger name="org.springframework.web.socket.messaging" level="INFO" additivity="true" />
     <Logger name="org.springframework.messaging" level="INFO" additivity="true" />
     
+    <Logger name="org.springframework.web" level="DEBUG" additivity="true" />
+    
     <Logger name="org.eth.demo.sebserver.batis.gen.mapper.ExamRecordMapper" level="INFO" additivity="true" />
 
     <root level="INFO" additivity="true">

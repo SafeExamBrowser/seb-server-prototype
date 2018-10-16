@@ -10,7 +10,7 @@ package org.eth.demo.sebserver.gui.service.page;
 
 import java.util.Map;
 
-import org.eth.demo.sebserver.gui.service.page.ComposerService.ComposerServiceContext;
+import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 
 public interface TemplateComposer {
 
@@ -22,6 +22,6 @@ public interface TemplateComposer {
         return true;
     }
 
-    void compose(ComposerServiceContext composerCtx);
+    void compose(PageContext composerCtx);
 
 }

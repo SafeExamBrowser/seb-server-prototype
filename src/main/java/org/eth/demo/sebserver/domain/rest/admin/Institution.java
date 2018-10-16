@@ -14,6 +14,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import org.eth.demo.sebserver.batis.gen.model.InstitutionRecord;
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
 import org.eth.demo.sebserver.domain.rest.admin.LmsSetup.LMSType;
@@ -35,14 +38,17 @@ public final class Institution implements GrantEntity {
             Collections.unmodifiableList(Arrays.asList(AuthType.values()));
 
     public final Long id;
+    @NotNull(message = "NotNull")
+    @Size(min = 3, max = 255, message = "text:size:3:255")
     public final String name;
+    @NotNull(message = "NotNull")
     public final AuthType authType;
     public final Collection<LmsSetup> lmsSetup;
 
     @JsonCreator
     public Institution(
             @JsonProperty("id") final Long id,
-            @JsonProperty(value = "name", required = true) final String name,
+            @JsonProperty(value = "name") final String name,
             @JsonProperty("authType") final AuthType authType,
             @JsonProperty("sebLmsSetup") final Collection<LmsSetup> lmsSetup) {
 

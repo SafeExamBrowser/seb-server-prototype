@@ -13,13 +13,12 @@ import java.util.function.Predicate;
 
 import org.eth.demo.sebserver.domain.rest.admin.Institution;
 import org.eth.demo.sebserver.domain.rest.admin.LmsSetup;
-import org.eth.demo.sebserver.domain.rest.admin.User;
 
 public interface InstitutionDao {
 
-    Institution byId(Long id);
+    Institution createNew(String name);
 
-    Institution ofUser(User user);
+    Institution byId(Long id);
 
     Collection<Institution> all();
 

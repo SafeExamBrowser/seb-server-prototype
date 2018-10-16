@@ -80,9 +80,9 @@ public class RAPConfiguration implements ApplicationConfiguration {
                             .getBean(ComposerService.class);
 
                     if (isAuthenticated(httpSession, webApplicationContext)) {
-                        composerService.composePage(MainPage.class, parent);
+                        composerService.compose(MainPage.class, parent);
                     } else {
-                        composerService.composePage(LoginPage.class, parent);
+                        composerService.compose(LoginPage.class, parent);
                     }
 //                    final ViewService viewService = webApplicationContext
 //                            .getBean(ViewService.class);

@@ -52,4 +52,8 @@ public class Result<T> {
     public static final <T> Result<T> ofError(final Throwable error) {
         return new Result<>(error);
     }
+
+    public T onErrorThrow(final String message) {
+        throw new RuntimeException(message, this.error);
+    }
 }

@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eth.demo.sebserver.gui.service.page.ComposerService.ComposerServiceContext;
+import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 import org.eth.demo.sebserver.gui.service.page.PageTreeTraversal;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -86,6 +86,7 @@ public final class PolyglotPageService {
 
     public void injectI18n(final TreeItem treeItem, final LocTextKey locTextKey) {
         treeItem.setData(POLYGLOT_TREE_ITEM_TEXT_DATA_KEY, locTextKey);
+        treeItem.setText(this.i18nSupport.getText(locTextKey));
     }
 
     public void injectI18n(final Combo combo, final List<String> items) {
@@ -94,7 +95,7 @@ public final class PolyglotPageService {
         comboFunction.accept(combo);
     }
 
-    public void createLanguageSelector(final ComposerServiceContext composerCtx) {
+    public void createLanguageSelector(final PageContext composerCtx) {
         for (final Locale locale : this.i18nSupport.supportedLanguages()) {
             final Label languageSelection = new Label(composerCtx.parent, SWT.NONE);
             languageSelection.setData(POLYGLOT_WIDGET_FUNCTION_KEY,

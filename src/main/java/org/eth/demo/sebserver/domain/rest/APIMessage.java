@@ -8,14 +8,16 @@
 
 package org.eth.demo.sebserver.domain.rest;
 
-public interface APIMessages {
+public interface APIMessage {
 
     public String getMessageCode();
 
-    public String getSystemMessage();
+    public String getMessage();
+
+    public String getDetail();
 
     //@formatter:off
-    enum ErrorMessages implements APIMessages {
+    enum ErrorMessages {
         UNEXPECTED_ERROR("1001", "Unexpected server-side error happened")
         ;
 
@@ -25,11 +27,17 @@ public interface APIMessages {
             this.messageCode = messageCode;
             this.systemMessage = systemMessage;
         }
-        @Override public String getMessageCode() { return messageCode; }
-        @Override public String getSystemMessage() { return systemMessage; }
+        public APIMessage of(final String detail) {
+            return new APIMessage() {
+                @Override public String getMessageCode() { return messageCode; }
+                @Override public String getMessage() { return systemMessage; }
+                @Override public String getDetail() { return detail; }
+            };
+        }
     }
 
-    enum ValidationMessages implements APIMessages {
+    enum ValidationMessages {
+        SIMPLE_ENTITY_FIELD("2001", "Field validation error")
         ;
 
         public final String messageCode;
@@ -38,10 +46,19 @@ public interface APIMessages {
             this.messageCode = messageCode;
             this.systemMessage = systemMessage;
         }
-        @Override public String getMessageCode() { return messageCode; }
-        @Override public String getSystemMessage() { return systemMessage; }
+        public APIMessage of(final String detail) {
+            return new APIMessage() {
+                @Override public String getMessageCode() { return messageCode; }
+                @Override public String getMessage() { return systemMessage; }
+                @Override public String getDetail() { return detail; }
+            };
+        }
     }
 
     //@formatter:on
+
+    public static APIMessage unexpectedError(final Throwable t) {
+        return ErrorMessages.UNEXPECTED_ERROR.of(t.getMessage());
+    }
 
 }

@@ -8,14 +8,13 @@
 
 package org.eth.demo.sebserver.gui.service.page.action;
 
-public class ActionEvent {
+import org.eth.demo.sebserver.gui.service.page.event.PageEventListener;
 
-    public final ActionDefinition actionDefinition;
-    public final Object source;
+public abstract class ActionPublishEventListener implements PageEventListener<ActionPublishEvent> {
 
-    public ActionEvent(final ActionDefinition actionDefinition, final Object source) {
-        this.actionDefinition = actionDefinition;
-        this.source = source;
+    @Override
+    public boolean match(final Class<?> type) {
+        return type == ActionPublishEvent.class;
     }
 
 }

@@ -17,6 +17,8 @@ import org.eclipse.rap.rwt.RWT;
 import org.eth.demo.sebserver.gui.service.AttributeMapBuilder;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.eth.demo.sebserver.gui.service.rest.auth.SEBServerAuthorizationContext;
+import org.eth.demo.sebserver.gui.service.rest.formpost.FormBinding;
+import org.eth.demo.sebserver.gui.service.rest.formpost.FormPOST;
 import org.eth.demo.util.Result;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestTemplate;
@@ -43,9 +45,7 @@ public interface SEBServerAPICall<T> {
     }
 
     default APICallBuilder<T> with(final SEBServerAuthorizationContext authorizationContext) {
-        return new APICallBuilder<>(
-                this,
-                authorizationContext.getRestTemplate());
+        return with(authorizationContext.getRestTemplate());
     }
 
     default APICallBuilder<T> with(final RestTemplate restTemplate) {
@@ -72,6 +72,7 @@ public interface SEBServerAPICall<T> {
 
         private final SEBServerAPICall<T> call;
         private RestTemplate restTemplate;
+        private FormBinding formBinding;
 
         APICallBuilder(
                 final SEBServerAPICall<T> call,
@@ -79,6 +80,11 @@ public interface SEBServerAPICall<T> {
 
             this.call = call;
             this.restTemplate = restTemplate;
+        }
+
+        public APICallBuilder<T> withFormBinding(final FormBinding formBinding) {
+            this.formBinding = formBinding;
+            return this;
         }
 
         public RestTemplate getRestTemplate() {
@@ -90,6 +96,13 @@ public interface SEBServerAPICall<T> {
         }
 
         public final Result<T> doAPICall() {
+            if (formBinding != null) {
+                try {
+                    this.attributes.put(FormPOST.JSON_FORM_POST, formBinding.getJson());
+                } catch (final Exception e) {
+                    return Result.ofError(e);
+                }
+            }
             return call.doAPICall(restTemplate, attributes);
         }
     }

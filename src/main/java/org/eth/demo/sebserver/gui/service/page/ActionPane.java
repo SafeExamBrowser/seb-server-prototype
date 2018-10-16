@@ -17,7 +17,11 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eth.demo.sebserver.gui.service.page.ComposerService.ComposerServiceContext;
+import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
+import org.eth.demo.sebserver.gui.service.page.action.ActionPublishEvent;
+import org.eth.demo.sebserver.gui.service.page.action.ActionPublishEventListener;
+import org.eth.demo.sebserver.gui.service.page.action.SaveActionExecution;
+import org.eth.demo.sebserver.gui.service.page.event.PageEventListener;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -26,8 +30,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class ActionPane implements TemplateComposer {
 
+    private static final String ACTION_EVENT_CALL_KEY = "ACTION_EVENT_CALL";
+
+    private final WidgetFactory widgetFactory;
+
+    public ActionPane(final WidgetFactory widgetFactory) {
+        super();
+        this.widgetFactory = widgetFactory;
+    }
+
     @Override
-    public void compose(final ComposerServiceContext composerCtx) {
+    public void compose(final PageContext composerCtx) {
 
         final Label label = new Label(composerCtx.parent, SWT.NONE);
         label.setData(RWT.CUSTOM_VARIANT, "h3");
@@ -37,7 +50,7 @@ public class ActionPane implements TemplateComposer {
         titleLayout.horizontalIndent = 10;
         label.setLayoutData(titleLayout);
 
-        final Tree actions = new Tree(composerCtx.parent, SWT.SINGLE | SWT.FULL_SELECTION);
+        final Tree actions = this.widgetFactory.treeLocalized(composerCtx.parent, SWT.SINGLE | SWT.FULL_SELECTION);
         actions.setData(RWT.CUSTOM_VARIANT, "actions");
         final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
         actions.setLayoutData(gridData);
@@ -50,25 +63,28 @@ public class ActionPane implements TemplateComposer {
         textCell.setBindingIndex(0);
         actions.setData(RWT.ROW_TEMPLATE, template);
 
-        final TreeItem create = new TreeItem(actions, SWT.NONE);
-        create.setImage(0, WidgetFactory.IconButtonType.NEW_ACTION.getImage(composerCtx.parent.getDisplay()));
-        create.setText(0, "Create New");
-
-        final TreeItem save = new TreeItem(actions, SWT.NONE);
-        save.setImage(0, WidgetFactory.IconButtonType.SAVE_ACTION.getImage(composerCtx.parent.getDisplay()));
-        save.setText(0, "Save");
-
-        final TreeItem delete = new TreeItem(actions, SWT.NONE);
-        delete.setImage(0, WidgetFactory.IconButtonType.DELETE_ACTION.getImage(composerCtx.parent.getDisplay()));
-        delete.setText(0, "Delete");
-
         actions.addListener(SWT.Selection, event -> {
             final TreeItem treeItem = (TreeItem) event.item;
 
-            System.out.println("TODO fire action");
+            final Runnable action = (Runnable) treeItem.getData(ACTION_EVENT_CALL_KEY);
+            action.run();
 
             treeItem.getParent().deselectAll();
         });
+
+        actions.setData(
+                PageEventListener.LISTENER_ATTRIBUTE_KEY,
+                new ActionPublishEventListener() {
+                    @Override
+                    public void notify(final ActionPublishEvent event) {
+                        final TreeItem actionItem = ActionPane.this.widgetFactory.treeItemLocalized(
+                                actions,
+                                event.actionDefinition.name);
+                        actionItem.setImage(event.actionDefinition.icon.getImage(composerCtx.parent.getDisplay()));
+                        actionItem.setData(ACTION_EVENT_CALL_KEY,
+                                new SaveActionExecution(composerCtx, event.actionDefinition, event.run));
+                    }
+                });
 
     }
 

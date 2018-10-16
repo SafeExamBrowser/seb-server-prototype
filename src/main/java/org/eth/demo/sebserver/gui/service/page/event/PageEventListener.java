@@ -14,6 +14,10 @@ public interface PageEventListener<T> {
 
     boolean match(Class<?> type);
 
+    default int priority() {
+        return 1;
+    }
+
     void notify(T event);
 
 }

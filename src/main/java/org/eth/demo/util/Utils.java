@@ -8,7 +8,9 @@
 
 package org.eth.demo.util;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 public abstract class Utils {
 
@@ -26,6 +28,13 @@ public abstract class Utils {
         }
 
         return Result.of(collection.iterator().next());
+    }
+
+    public static final <T> Collection<T> immutableCollection(final T... values) {
+        if (values == null || values.length <= 0) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableCollection(Arrays.asList(values));
     }
 
 }

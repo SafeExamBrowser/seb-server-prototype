@@ -8,7 +8,7 @@
 
 package org.eth.demo.sebserver.gui.service.page;
 
-import org.eth.demo.sebserver.gui.service.page.ComposerService.ComposerServiceContext;
+import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 
 public abstract class PageComposer implements TemplateComposer {
 
@@ -21,7 +21,7 @@ public abstract class PageComposer implements TemplateComposer {
     }
 
     @Override
-    public void compose(final ComposerServiceContext composerCtx) {
+    public void compose(final PageContext composerCtx) {
         final String skeletonComposer = composerCtx.attributes.getOrDefault(
                 ATTR_PAGE_SKELETON_COMPOSER_NAME,
                 DefaultPageSkeleton.class.getName());
@@ -32,5 +32,7 @@ public abstract class PageComposer implements TemplateComposer {
                         DefaultPageSkeleton.ATTR_CONTENT_COMPOSER_NAME,
                         this.pageContentComposerName));
     }
+
+    protected abstract void composePageContent(final PageContext composerCtx);
 
 }

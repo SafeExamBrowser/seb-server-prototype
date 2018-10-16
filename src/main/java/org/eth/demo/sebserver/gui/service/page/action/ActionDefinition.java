@@ -11,17 +11,17 @@ package org.eth.demo.sebserver.gui.service.page.action;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory.IconButtonType;
 
 public enum ActionDefinition {
-    INSTITUTION_NEW("new.institution", "", IconButtonType.NEW_ACTION)
+    INSTITUTION_NEW("actions.new.institution", IconButtonType.NEW_ACTION),
+    INSTITUTION_MODIFY("actions.modify.institution", IconButtonType.SAVE_ACTION),
+    INSTITUTION_DELETE("actions.delete.institution", IconButtonType.DELETE_ACTION),
 
     ;
 
     public final String name;
-    public final String displayNameKey;
     public final IconButtonType icon;
 
-    private ActionDefinition(final String name, final String displayNameKey, final IconButtonType icon) {
+    private ActionDefinition(final String name, final IconButtonType icon) {
         this.name = name;
-        this.displayNameKey = displayNameKey;
         this.icon = icon;
     }
 

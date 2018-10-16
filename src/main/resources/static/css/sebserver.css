@@ -405,7 +405,9 @@ TabItem:selected:first {
 }
 
 TabItem:selected:hover:first {
-  background-color: #1f407a;
+  background-color: #82be1e;
+  background-gradient-color: #82be1e;
+  background-image: gradient( linear, left top, left bottom, from( #82be1e ), to( #82be1e ) );
   color: #1F407A;
   margin: 0px 0px 0px 0px;
   border-left: 1px solid #bdbdbd;

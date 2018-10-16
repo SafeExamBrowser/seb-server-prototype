@@ -8,9 +8,12 @@
 
 package org.eth.demo.sebserver.gui.service.page;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -38,22 +41,22 @@ public class ComposerService {
                         Function.identity()));
     }
 
-    public final void composePage(
+    public final void compose(
             final Class<? extends TemplateComposer> composerType,
             final Composite root) {
 
-        compose(composerType.getName(), new ComposerServiceContext(this, root, root, Collections.emptyMap()));
+        compose(composerType.getName(), new PageContext(this, root, root, Collections.emptyMap()));
     }
 
-    public final void composePage(
+    public final void compose(
             final Class<? extends TemplateComposer> composerType,
             final Composite root,
             final Map<String, String> attributes) {
 
-        compose(composerType.getName(), new ComposerServiceContext(this, root, root, attributes));
+        compose(composerType.getName(), new PageContext(this, root, root, attributes));
     }
 
-    public final void composePage(
+    public final void compose(
             final Class<? extends TemplateComposer> composerType,
             final Composite root,
             final PageAttr... attributes) {
@@ -64,7 +67,7 @@ public class ComposerService {
                 attributesMap.put(attr.name, attr.value);
             }
         }
-        compose(composerType.getName(), new ComposerServiceContext(this, root, root, attributesMap));
+        compose(composerType.getName(), new PageContext(this, root, root, attributesMap));
     }
 
     public final void compose(
@@ -72,7 +75,7 @@ public class ComposerService {
             final Composite root,
             final Composite parent) {
 
-        compose(composerType.getName(), new ComposerServiceContext(this, root, parent, Collections.emptyMap()));
+        compose(composerType.getName(), new PageContext(this, root, parent, Collections.emptyMap()));
     }
 
     public final void compose(
@@ -81,19 +84,19 @@ public class ComposerService {
             final Composite parent,
             final Map<String, String> attributes) {
 
-        compose(composerType.getName(), new ComposerServiceContext(this, root, parent, attributes));
+        compose(composerType.getName(), new PageContext(this, root, parent, attributes));
     }
 
     public final void compose(
             final Class<? extends TemplateComposer> composerType,
-            final ComposerServiceContext context) {
+            final PageContext context) {
 
         compose(composerType.getName(), context);
     }
 
     public final void compose(
             final String name,
-            final ComposerServiceContext ctx) {
+            final PageContext ctx) {
 
         if (!this.composer.containsKey(name)) {
             log.error("No TemplateComposer with name: " + name + " found. Check Spring confiuration and beans");
@@ -105,6 +108,24 @@ public class ComposerService {
         if (composer.validateAttributes(ctx.attributes)) {
             clear(ctx.parent);
             composer.compose(ctx);
+            ctx.parent.layout();
+        } else {
+            log.error(
+                    "Invalid or missing mandatory attributes to handle compose request of ViewComposer: {} attributes: ",
+                    name,
+                    ctx.attributes);
+        }
+    }
+
+    final void composePageContent(
+            final String name,
+            final PageContext ctx) {
+
+        final PageComposer composer = (PageComposer) this.composer.get(name);
+
+        if (composer.validateAttributes(ctx.attributes)) {
+            clear(ctx.parent);
+            composer.composePageContent(ctx);
             ctx.parent.layout();
         } else {
             log.error(
@@ -131,14 +152,14 @@ public class ComposerService {
         }
     }
 
-    public static final class ComposerServiceContext {
+    public static final class PageContext {
 
         public final ComposerService composerService;
         public final Composite root;
         public final Composite parent;
         public final Map<String, String> attributes;
 
-        private ComposerServiceContext(
+        private PageContext(
                 final ComposerService composerService,
                 final Composite root,
                 final Composite parent,
@@ -150,34 +171,35 @@ public class ComposerService {
             this.attributes = Collections.unmodifiableMap(attributes);
         }
 
-        public ComposerServiceContext of(final Composite parent) {
-            return new ComposerServiceContext(this.composerService, this.root, parent, this.attributes);
+        public PageContext of(final Composite parent) {
+            return new PageContext(this.composerService, this.root, parent, this.attributes);
         }
 
-        public ComposerServiceContext of(final Composite parent, final Map<String, String> attributes) {
+        public PageContext of(final Composite parent, final Map<String, String> attributes) {
             final Map<String, String> attrs = new HashMap<>();
             attrs.putAll(this.attributes);
             attrs.putAll(attributes);
-            return new ComposerServiceContext(this.composerService, this.root, parent, attrs);
+            return new PageContext(this.composerService, this.root, parent, attrs);
         }
 
-        public ComposerServiceContext of(final Map<String, String> attributes) {
+        public PageContext of(final Map<String, String> attributes) {
             final Map<String, String> attrs = new HashMap<>();
             attrs.putAll(this.attributes);
             attrs.putAll(attributes);
-            return new ComposerServiceContext(this.composerService, this.root, this.parent, attrs);
+            return new PageContext(this.composerService, this.root, this.parent, attrs);
         }
 
-        public ComposerServiceContext withAttr(final String key, final String value) {
+        public PageContext withAttr(final String key, final String value) {
             final Map<String, String> attrs = new HashMap<>();
             attrs.putAll(this.attributes);
             attrs.put(key, value);
-            return new ComposerServiceContext(this.composerService, this.root, this.parent, attrs);
+            return new PageContext(this.composerService, this.root, this.parent, attrs);
         }
 
         @SuppressWarnings("unchecked")
         public <T> void notify(final T t) {
             final Class<?> typeClass = t.getClass();
+            final List<PageEventListener<T>> listeners = new ArrayList<>();
             PageTreeTraversal.traversePageTree(
                     this.root,
                     c -> {
@@ -185,9 +207,30 @@ public class ComposerService {
                                 (PageEventListener<?>) c.getData(PageEventListener.LISTENER_ATTRIBUTE_KEY);
                         return listener != null && listener.match(typeClass);
                     },
-                    c -> ((PageEventListener<T>) c.getData(PageEventListener.LISTENER_ATTRIBUTE_KEY)).notify(t));
+                    c -> listeners.add(((PageEventListener<T>) c.getData(PageEventListener.LISTENER_ATTRIBUTE_KEY))));
+
+            if (listeners.isEmpty()) {
+                return;
+            }
+
+            listeners.stream()
+                    .sorted(LISTENER_COMPARATOR)
+                    .forEach(listener -> listener.notify(t));
         }
 
+        private static final Comparator<PageEventListener<?>> LISTENER_COMPARATOR =
+                new Comparator<PageEventListener<?>>() {
+                    @Override
+                    public int compare(final PageEventListener<?> o1, final PageEventListener<?> o2) {
+                        final int x = o1.priority();
+                        final int y = o2.priority();
+                        return (x < y) ? -1 : ((x == y) ? 0 : 1);
+                    }
+                };
+
+        public void notifyError(final String string, final Throwable t) {
+            // TODO show a error pop-up to inform the user about unexpected error
+        }
     }
 
 }

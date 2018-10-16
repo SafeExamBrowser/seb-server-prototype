@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
 import org.eth.demo.sebserver.gui.service.i18n.PolyglotPageService;
-import org.eth.demo.sebserver.gui.service.page.ComposerService.ComposerServiceContext;
+import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageAttr;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory;
@@ -54,7 +54,7 @@ public class DefaultPageSkeleton implements TemplateComposer {
     }
 
     @Override
-    public void compose(final ComposerServiceContext composerCtx) {
+    public void compose(final PageContext composerCtx) {
 
         final GridLayout skeletonLayout = new GridLayout();
         skeletonLayout.marginBottom = 0;
@@ -75,7 +75,7 @@ public class DefaultPageSkeleton implements TemplateComposer {
         this.polyglotPageService.setDefaultPageLocale(composerCtx.root);
     }
 
-    private void composeHeader(final ComposerServiceContext composerCtx) {
+    private void composeHeader(final PageContext composerCtx) {
         final Composite header = new Composite(composerCtx.parent, SWT.NONE);
         final GridLayout gridLayout = new GridLayout();
         gridLayout.marginRight = 50;
@@ -116,7 +116,7 @@ public class DefaultPageSkeleton implements TemplateComposer {
 
                 // reset also CurrentUser witch is ui-session scoped
 
-                composerCtx.composerService.composePage(
+                composerCtx.composerService.compose(
                         LoginPage.class,
                         composerCtx.root,
                         new PageAttr(AttributeKeys.LGOUT_SUCCESS, "true"));
@@ -124,7 +124,7 @@ public class DefaultPageSkeleton implements TemplateComposer {
         }
     }
 
-    private void composeLogoBar(final ComposerServiceContext composerCtx) {
+    private void composeLogoBar(final PageContext composerCtx) {
         final Composite logoBar = new Composite(composerCtx.parent, SWT.NONE);
         final GridData logoBarCell = new GridData(SWT.FILL, SWT.TOP, false, false);
         logoBarCell.minimumHeight = 80;
@@ -167,7 +167,7 @@ public class DefaultPageSkeleton implements TemplateComposer {
 //        }
     }
 
-    private void composeContent(final ComposerServiceContext composerCtx) {
+    private void composeContent(final PageContext composerCtx) {
         final Composite contentBackground = new Composite(composerCtx.parent, SWT.NONE);
         contentBackground.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         contentBackground.setData(RWT.CUSTOM_VARIANT, "bgContent");
@@ -196,10 +196,10 @@ public class DefaultPageSkeleton implements TemplateComposer {
 
         final String contentComposerName = composerCtx.attributes.get(ATTR_CONTENT_COMPOSER_NAME);
         composerCtx.composerService
-                .compose(contentComposerName, composerCtx.of(contentInner));
+                .composePageContent(contentComposerName, composerCtx.of(contentInner));
     }
 
-    private void composeFooter(final ComposerServiceContext composerCtx) {
+    private void composeFooter(final PageContext composerCtx) {
         final Composite footerBar = new Composite(composerCtx.parent, SWT.NONE);
         final GridData footerCell = new GridData(SWT.FILL, SWT.BOTTOM, false, false);
         footerCell.minimumHeight = 30;

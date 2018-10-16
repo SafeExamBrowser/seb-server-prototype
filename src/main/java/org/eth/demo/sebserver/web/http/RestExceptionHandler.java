@@ -8,18 +8,23 @@
 
 package org.eth.demo.sebserver.web.http;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+import org.eth.demo.sebserver.domain.rest.APIMessage;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
-public class ExceptionHandler extends ResponseEntityExceptionHandler {
+public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(
@@ -31,6 +36,22 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
         // TODO here we can handle exception within the Rest API
         ex.printStackTrace();
         return super.handleExceptionInternal(ex, body, headers, status, request);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            final MethodArgumentNotValidException ex,
+            final HttpHeaders headers,
+            final HttpStatus status,
+            final WebRequest request) {
+
+        final Collection<APIMessage> valErrors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(field -> APIMessage.ValidationMessages.SIMPLE_ENTITY_FIELD.of(field.toString()))
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(valErrors, HttpStatus.BAD_REQUEST);
     }
 
 }

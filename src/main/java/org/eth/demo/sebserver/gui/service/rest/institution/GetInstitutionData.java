@@ -6,12 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.service.rest;
+package org.eth.demo.sebserver.gui.service.rest.institution;
 
 import java.util.Map;
 
 import org.eth.demo.sebserver.gui.domain.admin.InstitutionData;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
+import org.eth.demo.sebserver.gui.service.rest.RestCallBuilder;
+import org.eth.demo.sebserver.gui.service.rest.SEBServerAPICall;
 import org.eth.demo.util.Result;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -19,14 +21,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Component
-public class GETInstitutionData implements SEBServerAPICall<InstitutionData> {
+public class GetInstitutionData implements SEBServerAPICall<InstitutionData> {
 
     private final RestCallBuilder restCallBuilder;
     private final String uri;
 
-    public GETInstitutionData(final RestCallBuilder restCallBuilder) {
+    public GetInstitutionData(final RestCallBuilder restCallBuilder) {
         this.restCallBuilder = restCallBuilder;
-        this.uri = restCallBuilder.withPath("institution/");
+        this.uri = restCallBuilder.withPath("institution/get/");
     }
 
     @Override

@@ -43,7 +43,7 @@ public class SingleSelection extends Combo {
         super.select(selectionindex);
     }
 
-    public String getSelection(final String key) {
+    public String getSelectionValue() {
         final int selectionindex = super.getSelectionIndex();
         if (selectionindex < 0) {
             return null;

@@ -21,8 +21,8 @@ import org.eth.demo.sebserver.batis.gen.mapper.SebLmsSetupRecordMapper;
 import org.eth.demo.sebserver.batis.gen.model.InstitutionRecord;
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
 import org.eth.demo.sebserver.domain.rest.admin.Institution;
+import org.eth.demo.sebserver.domain.rest.admin.Institution.AuthType;
 import org.eth.demo.sebserver.domain.rest.admin.LmsSetup;
-import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.service.ResourceNotFoundException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -43,18 +43,20 @@ public class InstitutionDaoImpl implements InstitutionDao {
         this.sebLmsSetupRecordMapper = sebLmsSetupRecordMapper;
     }
 
+    @Transactional
+    @Override
+    public Institution createNew(final String name) {
+        final InstitutionRecord institutionRecord = new InstitutionRecord(null, name, AuthType.INTERNAL.name());
+        this.institutionRecordMapper.insert(institutionRecord);
+        return byId(institutionRecord.getId());
+    }
+
     @Transactional(readOnly = true)
     @Override
     public Institution byId(final Long id) {
         return toDomainModel(
                 String.valueOf(id),
                 this.institutionRecordMapper.selectByPrimaryKey(id));
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public Institution ofUser(final User user) {
-        return byId(user.institutionId);
     }
 
     @Transactional(readOnly = true)
@@ -111,8 +113,17 @@ public class InstitutionDaoImpl implements InstitutionDao {
     @Transactional
     @Override
     public boolean delete(final Long id) {
-        // TODO Auto-generated method stub
-        return false;
+        final Institution institution = byId(id);
+        if (institution == null) {
+            return false;
+        }
+
+        for (final LmsSetup lmsSetup : institution.lmsSetup) {
+            this.sebLmsSetupRecordMapper.deleteByPrimaryKey(lmsSetup.id);
+        }
+
+        this.institutionRecordMapper.deleteByPrimaryKey(institution.id);
+        return true;
     }
 
     @Transactional
