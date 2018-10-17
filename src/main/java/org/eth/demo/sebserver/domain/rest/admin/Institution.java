@@ -25,8 +25,11 @@ import org.eth.demo.sebserver.service.authorization.GrantEntity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+// TODO remove this if all fields are defined properly
+@JsonIgnoreProperties(ignoreUnknown = true)
 public final class Institution implements GrantEntity {
 
     public enum AuthType {

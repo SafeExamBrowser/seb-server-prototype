@@ -19,8 +19,9 @@ import org.eth.demo.sebserver.gui.composer.views.RunningExamView;
 import org.eth.demo.sebserver.gui.domain.exam.ExamStatus;
 import org.eth.demo.sebserver.gui.domain.exam.ExamTableRow;
 import org.eth.demo.sebserver.gui.service.ViewService;
-import org.eth.demo.sebserver.gui.service.rest.POSTExamStateChange;
+import org.eth.demo.sebserver.gui.service.page.table.TableBuilder;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
+import org.eth.demo.sebserver.gui.service.rest.exam.POSTExamStateChange;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 

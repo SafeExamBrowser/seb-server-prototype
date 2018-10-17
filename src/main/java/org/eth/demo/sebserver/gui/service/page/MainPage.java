@@ -23,10 +23,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
 import org.eth.demo.sebserver.gui.service.i18n.PolyglotPageService;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
-import org.eth.demo.sebserver.gui.service.page.event.ActivitySelection;
-import org.eth.demo.sebserver.gui.service.page.event.ActivitySelection.Activity;
-import org.eth.demo.sebserver.gui.service.page.event.ActivitySelectionEvent;
-import org.eth.demo.sebserver.gui.service.page.event.ActivitySelectionListener;
+import org.eth.demo.sebserver.gui.service.page.activity.ActivitiesPane;
+import org.eth.demo.sebserver.gui.service.page.activity.ActivitySelection;
+import org.eth.demo.sebserver.gui.service.page.activity.ActivitySelection.Activity;
+import org.eth.demo.sebserver.gui.service.page.activity.ActivitySelectionEvent;
+import org.eth.demo.sebserver.gui.service.page.activity.ActivitySelectionListener;
 import org.eth.demo.sebserver.gui.service.page.event.PageEventListener;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory.IconButtonType;
@@ -65,6 +66,8 @@ public class MainPage extends PageComposer {
 
     @Override
     public void composePageContent(final PageContext composerCtx) {
+        MainPageState.clear();
+
         final Composite parent = composerCtx.parent;
         parent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -172,12 +175,12 @@ public class MainPage extends PageComposer {
 
     public final static class MainPageState {
 
-        ActivitySelection activitySelection = Activity.NONE.selection();
+        public ActivitySelection activitySelection = Activity.NONE.selection();
 
         private MainPageState() {
         }
 
-        static MainPageState get() {
+        public static MainPageState get() {
             try {
                 final HttpSession httpSession = RWT
                         .getUISession()
@@ -195,6 +198,11 @@ public class MainPage extends PageComposer {
             }
 
             return null;
+        }
+
+        public static void clear() {
+            final MainPageState mainPageState = get();
+            mainPageState.activitySelection = Activity.NONE.selection();
         }
     }
 

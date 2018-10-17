@@ -20,16 +20,16 @@ import org.eclipse.swt.widgets.ExpandItem;
 import org.eth.demo.sebserver.gui.composer.ExamTablePopupMenu;
 import org.eth.demo.sebserver.gui.composer.SEBConfigTablePopupMenu;
 import org.eth.demo.sebserver.gui.composer.StatusToolbarComposer;
-import org.eth.demo.sebserver.gui.composer.TableBuilder;
 import org.eth.demo.sebserver.gui.composer.TopToolbarComposer;
 import org.eth.demo.sebserver.gui.composer.ViewComposer;
 import org.eth.demo.sebserver.gui.domain.exam.ExamTableRow;
 import org.eth.demo.sebserver.gui.domain.sebconfig.ConfigTableRow;
 import org.eth.demo.sebserver.gui.service.ViewService;
 import org.eth.demo.sebserver.gui.service.i18n.I18nSupport;
+import org.eth.demo.sebserver.gui.service.page.table.TableBuilder;
 import org.eth.demo.sebserver.gui.service.rest.GETConfigs;
-import org.eth.demo.sebserver.gui.service.rest.GETExams;
 import org.eth.demo.sebserver.gui.service.rest.RestServices;
+import org.eth.demo.sebserver.gui.service.rest.exam.GETExams;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 

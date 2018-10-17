@@ -8,6 +8,8 @@
 
 package org.eth.demo.sebserver.gui.service.page.form;
 
+import java.util.function.Consumer;
+
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 import org.eth.demo.sebserver.gui.service.page.action.ActionDefinition;
 import org.eth.demo.sebserver.gui.service.page.action.ActionEvent;
@@ -16,18 +18,18 @@ import org.eth.demo.sebserver.gui.service.rest.formpost.FormPostResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FormHandle {
+public class FormHandle<T> {
 
     private static final Logger log = LoggerFactory.getLogger(FormHandle.class);
 
     private final PageContext composerCtx;
     private final Form form;
-    private final APICallBuilder<FormPostResponse> post;
+    private final APICallBuilder<FormPostResponse<T>> post;
 
     public FormHandle(
             final PageContext composerCtx,
             final Form form,
-            final APICallBuilder<FormPostResponse> post) {
+            final APICallBuilder<FormPostResponse<T>> post) {
 
         this.composerCtx = composerCtx;
         this.form = form;
@@ -35,7 +37,7 @@ public class FormHandle {
     }
 
     public void doAPIPost(final ActionDefinition action) {
-        final FormPostResponse response = this.post
+        final FormPostResponse<?> response = this.post
                 .withFormBinding(this.form)
                 .doAPICall()
                 .onError(t -> {
@@ -45,10 +47,16 @@ public class FormHandle {
                 });
 
         if (response.validationErrors.isEmpty()) {
-            this.composerCtx.notify(new ActionEvent(action, response.objectId));
+            this.composerCtx.notify(new ActionEvent(action, response.response));
         } else {
             // TODO handle validation errors
+            System.out.println("******************* valErrors: " + response.validationErrors);
         }
+    }
+
+    public FormHandle<T> process(final Consumer<Form> consumer) {
+        consumer.accept(this.form);
+        return this;
     }
 
 }

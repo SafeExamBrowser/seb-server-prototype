@@ -45,7 +45,7 @@ public class CurrentUser {
     }
 
     private void updateContext() {
-        if (this.authContext == null || this.authContext.isValid()) {
+        if (this.authContext == null || !this.authContext.isValid()) {
             this.authContext = this.authorizationContextHolder.getAuthorizationContext();
         }
     }

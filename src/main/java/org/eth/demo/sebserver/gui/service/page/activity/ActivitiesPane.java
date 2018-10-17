@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.service.page;
+package org.eth.demo.sebserver.gui.service.page.activity;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,12 +22,11 @@ import org.eth.demo.sebserver.gui.domain.admin.UserRole;
 import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 import org.eth.demo.sebserver.gui.service.page.MainPage.MainPageState;
+import org.eth.demo.sebserver.gui.service.page.TemplateComposer;
 import org.eth.demo.sebserver.gui.service.page.action.ActionDefinition;
 import org.eth.demo.sebserver.gui.service.page.action.ActionEvent;
 import org.eth.demo.sebserver.gui.service.page.action.ActionEventListener;
-import org.eth.demo.sebserver.gui.service.page.event.ActivitySelection;
-import org.eth.demo.sebserver.gui.service.page.event.ActivitySelection.Activity;
-import org.eth.demo.sebserver.gui.service.page.event.ActivitySelectionEvent;
+import org.eth.demo.sebserver.gui.service.page.activity.ActivitySelection.Activity;
 import org.eth.demo.sebserver.gui.service.page.event.PageEventListener;
 import org.eth.demo.sebserver.gui.service.rest.RestServices;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
@@ -108,44 +107,49 @@ public class ActivitiesPane implements TemplateComposer {
                 "org.sebserver.activities.monitoring");
         ActivitySelection.set(monitoring, Activity.MONITORING.selection());
 
-        navigation.addListener(SWT.Expand, event -> {
-            final TreeItem treeItem = (TreeItem) event.item;
+        // TODO if we need dynamic child load on expand, this is an example
+//        navigation.addListener(SWT.Expand, event -> {
+//            final TreeItem treeItem = (TreeItem) event.item;
+//
+//            System.out.println("opened: " + treeItem);
+//
+//            final ActivitySelection activity = ActivitySelection.get(treeItem);
+//            if (activity != null) {
+//                activity.processExpand(treeItem);
+//            }
+//        });
+//        navigation.addListener(SWT.Collapse, event -> {
+//            final TreeItem treeItem = (TreeItem) event.item;
+//
+//            System.out.println("closed: " + treeItem);
+//
+//            final ActivitySelection activity = ActivitySelection.get(treeItem);
+//            if (activity != null) {
+//                activity.processCollapse(treeItem);
+//            }
+//        });
 
-            System.out.println("opened: " + treeItem);
-
-            final ActivitySelection activity = ActivitySelection.get(treeItem);
-            if (activity != null) {
-                activity.processExpand(treeItem);
-            }
-        });
-        navigation.addListener(SWT.Collapse, event -> {
-            final TreeItem treeItem = (TreeItem) event.item;
-
-            System.out.println("closed: " + treeItem);
-
-            final ActivitySelection activity = ActivitySelection.get(treeItem);
-            if (activity != null) {
-                activity.processCollapse(treeItem);
-            }
-        });
         navigation.addListener(SWT.Selection, event -> {
             final TreeItem treeItem = (TreeItem) event.item;
 
             System.out.println("selected: " + treeItem);
 
             final MainPageState mainPageState = MainPageState.get();
-            mainPageState.activitySelection = ActivitySelection.get(treeItem);
+            final ActivitySelection activitySelection = ActivitySelection.get(treeItem);
             if (mainPageState.activitySelection == null) {
                 mainPageState.activitySelection = Activity.NONE.selection();
             }
-            composerCtx.notify(new ActivitySelectionEvent(mainPageState.activitySelection));
+            if (!mainPageState.activitySelection.equals(activitySelection)) {
+                mainPageState.activitySelection = activitySelection;
+                composerCtx.notify(new ActivitySelectionEvent(mainPageState.activitySelection));
+            }
         });
 
         navigation.setData(
                 PageEventListener.LISTENER_ATTRIBUTE_KEY,
                 createActionEventListener(navigation, composerCtx));
 
-        applySelection(navigation, composerCtx);
+        //applySelection(navigation, composerCtx);
     }
 
     private ActionEventListener createActionEventListener(
@@ -161,13 +165,27 @@ public class ActivitiesPane implements TemplateComposer {
                     final IdAndName idAndName = (IdAndName) event.source;
                     final TreeItem institutions = findItemByActivity(navigation.getItems(), Activity.INSTITUTIONS);
                     final TreeItem newInstItem = createInstitutionItem(institutions, idAndName);
-                    MainPageState.get().activitySelection = ActivitySelection.get(newInstItem);
+                    final MainPageState mainPageState = MainPageState.get();
+                    mainPageState.activitySelection = ActivitySelection.get(newInstItem);
                     navigation.select(newInstItem);
-
+                    expand(newInstItem);
+                    composerCtx.notify(new ActivitySelectionEvent(mainPageState.activitySelection));
                 } else if (event.actionDefinition == ActionDefinition.INSTITUTION_MODIFY) {
-
+                    final IdAndName idAndName = (IdAndName) event.source;
+                    final TreeItem selected = findItemByActivity(
+                            navigation.getItems(),
+                            Activity.INSTITUTION,
+                            idAndName.id);
+                    selected.setText(idAndName.name);
                 } else if (event.actionDefinition == ActionDefinition.INSTITUTION_DELETE) {
-
+                    final String id = (String) event.source;
+                    final TreeItem institutions = findItemByActivity(navigation.getItems(), Activity.INSTITUTIONS);
+                    final TreeItem selected = findItemByActivity(navigation.getItems(), Activity.INSTITUTION, id);
+                    selected.dispose();
+                    final MainPageState mainPageState = MainPageState.get();
+                    mainPageState.activitySelection = ActivitySelection.get(institutions);
+                    navigation.select(institutions);
+                    composerCtx.notify(new ActivitySelectionEvent(mainPageState.activitySelection));
                 }
             }
         };
@@ -201,52 +219,59 @@ public class ActivitiesPane implements TemplateComposer {
 
     }
 
-    private void applySelection(final Tree navigation, final PageContext composerCtx) {
-        final MainPageState mainPageState = MainPageState.get();
-        if (mainPageState.activitySelection == null) {
-            mainPageState.activitySelection = Activity.NONE.selection();
-        }
+//    private void applySelection(final Tree navigation, final PageContext composerCtx) {
+//        final MainPageState mainPageState = MainPageState.get();
+//        if (mainPageState.activitySelection == null) {
+//            mainPageState.activitySelection = Activity.NONE.selection();
+//        }
+//
+//        final TreeItem itemToPreSelect = findSelectedItem(navigation.getItems(), mainPageState);
+//        if (itemToPreSelect != null) {
+//            navigation.select(itemToPreSelect);
+//            expand(itemToPreSelect.getParentItem());
+//            composerCtx.notify(new ActivitySelectionEvent(mainPageState.activitySelection));
+//        }
+//    }
+//
+//    private static final TreeItem find(final TreeItem[] items, final MainPageState mainPageState) {
+//        if (mainPageState.activitySelection == null) {
+//            return null;
+//        }
+//
+//        return findItemByActivity(
+//                items,
+//                mainPageState.activitySelection.activity,
+//                mainPageState.activitySelection.getObjectIdentifier());
+//    }
 
-        final TreeItem itemToPreSelect = findSelectedItem(navigation.getItems(), mainPageState);
-        if (itemToPreSelect != null) {
-            navigation.select(itemToPreSelect);
-            expand(itemToPreSelect.getParentItem());
-            composerCtx.notify(new ActivitySelectionEvent(mainPageState.activitySelection));
-        }
-    }
+    private static final TreeItem findItemByActivity(
+            final TreeItem[] items,
+            final Activity activity,
+            final String objectId) {
 
-    private TreeItem findItemByActivity(final TreeItem[] items, final Activity activity) {
         if (items == null) {
             return null;
         }
 
         for (final TreeItem item : items) {
             final ActivitySelection activitySelection = ActivitySelection.get(item);
-            if (activitySelection != null && activitySelection.activity == activity) {
+            final String id = activitySelection.getObjectIdentifier();
+            if (activitySelection != null && activitySelection.activity == activity &&
+                    ((objectId == null && id == null) || objectId.equals(id))) {
                 return item;
             }
 
-            return findItemByActivity(item.getItems(), activity);
+            final TreeItem _item = findItemByActivity(item.getItems(), activity, objectId);
+            if (_item != null) {
+                return _item;
+            }
         }
 
         return null;
     }
 
-    private TreeItem findSelectedItem(final TreeItem[] items, final MainPageState mainPageState) {
-        if (items == null) {
-            return null;
-        }
-
-        for (final TreeItem item : items) {
-            final ActivitySelection activitySelection = ActivitySelection.get(item);
-            if (activitySelection != null && activitySelection.equals(mainPageState.activitySelection)) {
-                return item;
-            }
-
-            return findSelectedItem(item.getItems(), mainPageState);
-        }
-
-        return null;
+    private static final TreeItem findItemByActivity(final TreeItem[] items, final Activity activity) {
+        return findItemByActivity(items, activity, null);
     }
 
     private static final void expand(final TreeItem item) {

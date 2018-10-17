@@ -18,9 +18,13 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.eclipse.rap.rwt.widgets.DialogCallback;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eth.demo.sebserver.gui.service.i18n.I18nSupport;
 import org.eth.demo.sebserver.gui.service.page.event.PageEventListener;
+import org.eth.demo.sebserver.gui.service.widgets.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -32,9 +36,14 @@ public class ComposerService {
 
     private static final Logger log = LoggerFactory.getLogger(ComposerService.class);
 
+    private final I18nSupport i18nSupport;
     private final Map<String, TemplateComposer> composer;
 
-    public ComposerService(final Collection<TemplateComposer> composer) {
+    public ComposerService(
+            final I18nSupport i18nSupport,
+            final Collection<TemplateComposer> composer) {
+
+        this.i18nSupport = i18nSupport;
         this.composer = composer.stream()
                 .collect(Collectors.toMap(
                         comp -> comp.getName(),
@@ -45,7 +54,7 @@ public class ComposerService {
             final Class<? extends TemplateComposer> composerType,
             final Composite root) {
 
-        compose(composerType.getName(), new PageContext(this, root, root, Collections.emptyMap()));
+        compose(composerType.getName(), new PageContext(this.i18nSupport, this, root, root, Collections.emptyMap()));
     }
 
     public final void compose(
@@ -53,7 +62,7 @@ public class ComposerService {
             final Composite root,
             final Map<String, String> attributes) {
 
-        compose(composerType.getName(), new PageContext(this, root, root, attributes));
+        compose(composerType.getName(), new PageContext(this.i18nSupport, this, root, root, attributes));
     }
 
     public final void compose(
@@ -67,7 +76,7 @@ public class ComposerService {
                 attributesMap.put(attr.name, attr.value);
             }
         }
-        compose(composerType.getName(), new PageContext(this, root, root, attributesMap));
+        compose(composerType.getName(), new PageContext(this.i18nSupport, this, root, root, attributesMap));
     }
 
     public final void compose(
@@ -75,7 +84,7 @@ public class ComposerService {
             final Composite root,
             final Composite parent) {
 
-        compose(composerType.getName(), new PageContext(this, root, parent, Collections.emptyMap()));
+        compose(composerType.getName(), new PageContext(this.i18nSupport, this, root, parent, Collections.emptyMap()));
     }
 
     public final void compose(
@@ -84,7 +93,7 @@ public class ComposerService {
             final Composite parent,
             final Map<String, String> attributes) {
 
-        compose(composerType.getName(), new PageContext(this, root, parent, attributes));
+        compose(composerType.getName(), new PageContext(this.i18nSupport, this, root, parent, attributes));
     }
 
     public final void compose(
@@ -154,17 +163,30 @@ public class ComposerService {
 
     public static final class PageContext {
 
+        private static final Comparator<PageEventListener<?>> LISTENER_COMPARATOR =
+                new Comparator<PageEventListener<?>>() {
+                    @Override
+                    public int compare(final PageEventListener<?> o1, final PageEventListener<?> o2) {
+                        final int x = o1.priority();
+                        final int y = o2.priority();
+                        return (x < y) ? -1 : ((x == y) ? 0 : 1);
+                    }
+                };
+
+        private final I18nSupport i18nSupport;
         public final ComposerService composerService;
         public final Composite root;
         public final Composite parent;
         public final Map<String, String> attributes;
 
         private PageContext(
+                final I18nSupport i18nSupport,
                 final ComposerService composerService,
                 final Composite root,
                 final Composite parent,
                 final Map<String, String> attributes) {
 
+            this.i18nSupport = i18nSupport;
             this.composerService = composerService;
             this.root = root;
             this.parent = parent;
@@ -172,28 +194,28 @@ public class ComposerService {
         }
 
         public PageContext of(final Composite parent) {
-            return new PageContext(this.composerService, this.root, parent, this.attributes);
+            return new PageContext(this.i18nSupport, this.composerService, this.root, parent, this.attributes);
         }
 
         public PageContext of(final Composite parent, final Map<String, String> attributes) {
             final Map<String, String> attrs = new HashMap<>();
             attrs.putAll(this.attributes);
             attrs.putAll(attributes);
-            return new PageContext(this.composerService, this.root, parent, attrs);
+            return new PageContext(this.i18nSupport, this.composerService, this.root, parent, attrs);
         }
 
         public PageContext of(final Map<String, String> attributes) {
             final Map<String, String> attrs = new HashMap<>();
             attrs.putAll(this.attributes);
             attrs.putAll(attributes);
-            return new PageContext(this.composerService, this.root, this.parent, attrs);
+            return new PageContext(this.i18nSupport, this.composerService, this.root, this.parent, attrs);
         }
 
         public PageContext withAttr(final String key, final String value) {
             final Map<String, String> attrs = new HashMap<>();
             attrs.putAll(this.attributes);
             attrs.put(key, value);
-            return new PageContext(this.composerService, this.root, this.parent, attrs);
+            return new PageContext(this.i18nSupport, this.composerService, this.root, this.parent, attrs);
         }
 
         @SuppressWarnings("unchecked")
@@ -218,15 +240,28 @@ public class ComposerService {
                     .forEach(listener -> listener.notify(t));
         }
 
-        private static final Comparator<PageEventListener<?>> LISTENER_COMPARATOR =
-                new Comparator<PageEventListener<?>>() {
-                    @Override
-                    public int compare(final PageEventListener<?> o1, final PageEventListener<?> o2) {
-                        final int x = o1.priority();
-                        final int y = o2.priority();
-                        return (x < y) ? -1 : ((x == y) ? 0 : 1);
+        @SuppressWarnings("serial")
+        public void applyConfirmDialog(final String confirmMessage, final Runnable onOK) {
+            final Message messageBox = new Message(
+                    this.root.getShell(),
+                    this.i18nSupport.getText("org.sebserver.dialog.confirm.title"),
+                    this.i18nSupport.getText(confirmMessage),
+                    SWT.OK | SWT.CANCEL);
+            messageBox.open(new DialogCallback() {
+                @Override
+                public void dialogClosed(final int returnCode) {
+                    if (returnCode == SWT.OK) {
+                        try {
+                            onOK.run();
+                        } catch (final Throwable t) {
+                            log.error(
+                                    "Unexpected on confirm callback execution. This should not happen, plase secure the given onOK Runnable",
+                                    t);
+                        }
                     }
-                };
+                }
+            });
+        }
 
         public void notifyError(final String string, final Throwable t) {
             // TODO show a error pop-up to inform the user about unexpected error

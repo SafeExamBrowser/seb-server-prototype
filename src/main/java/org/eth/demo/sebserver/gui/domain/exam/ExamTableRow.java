@@ -24,7 +24,7 @@ public class ExamTableRow {
 
     @JsonCreator
     public ExamTableRow(
-            @JsonProperty("id") final String id,
+            @JsonProperty("external_uuid") final String id,
             @JsonProperty("owner") final String owner,
             @JsonProperty("name") final String name,
             @JsonProperty("status") final String status,

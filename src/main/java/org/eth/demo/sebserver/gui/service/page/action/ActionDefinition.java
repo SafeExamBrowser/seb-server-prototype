@@ -11,9 +11,15 @@ package org.eth.demo.sebserver.gui.service.page.action;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory.IconButtonType;
 
 public enum ActionDefinition {
-    INSTITUTION_NEW("actions.new.institution", IconButtonType.NEW_ACTION),
-    INSTITUTION_MODIFY("actions.modify.institution", IconButtonType.SAVE_ACTION),
-    INSTITUTION_DELETE("actions.delete.institution", IconButtonType.DELETE_ACTION),
+    INSTITUTION_NEW(
+            "actions.new.institution",
+            IconButtonType.NEW_ACTION),
+    INSTITUTION_MODIFY(
+            "actions.modify.institution",
+            IconButtonType.SAVE_ACTION),
+    INSTITUTION_DELETE(
+            "actions.delete.institution",
+            IconButtonType.DELETE_ACTION),
 
     ;
 

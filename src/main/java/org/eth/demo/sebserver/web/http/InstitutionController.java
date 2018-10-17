@@ -119,7 +119,7 @@ public class InstitutionController {
         // TODO some additional validation!?
 
         this.institutionDao.save(institution);
-        return ResponseEntity.ok(String.valueOf(institution.id));
+        return ResponseEntity.ok(institution);
     }
 
 }

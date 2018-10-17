@@ -74,7 +74,7 @@ public interface SEBServerAPICall<T> {
         private RestTemplate restTemplate;
         private FormBinding formBinding;
 
-        APICallBuilder(
+        public APICallBuilder(
                 final SEBServerAPICall<T> call,
                 final RestTemplate restTemplate) {
 

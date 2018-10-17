@@ -54,6 +54,10 @@ public class Result<T> {
     }
 
     public T onErrorThrow(final String message) {
-        throw new RuntimeException(message, this.error);
+        if (this.error != null) {
+            throw new RuntimeException(message, this.error);
+        }
+
+        return this.value;
     }
 }

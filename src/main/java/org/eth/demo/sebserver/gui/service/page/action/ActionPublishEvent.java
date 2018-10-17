@@ -12,10 +12,39 @@ public class ActionPublishEvent {
 
     public final ActionDefinition actionDefinition;
     public final Runnable run;
+    public final String confirmationMessage;
+    public final String successMessage;
 
-    public ActionPublishEvent(final ActionDefinition actionDefinition, final Runnable run) {
-        super();
+    public ActionPublishEvent(
+            final ActionDefinition actionDefinition,
+            final Runnable run) {
+
+        this(actionDefinition, run, null, null);
+    }
+
+    public ActionPublishEvent(
+            final ActionDefinition actionDefinition,
+            final Runnable run,
+            final String confirmationMessage) {
+
+        this(actionDefinition, run, confirmationMessage, null);
+    }
+
+    public ActionPublishEvent(
+            final ActionDefinition actionDefinition,
+            final Runnable run,
+            final String confirmationMessage,
+            final String successMessage) {
+
         this.actionDefinition = actionDefinition;
         this.run = run;
+        this.confirmationMessage = confirmationMessage;
+        this.successMessage = successMessage;
+    }
+
+    @Override
+    public String toString() {
+        return "ActionPublishEvent [actionDefinition=" + this.actionDefinition + ", confirmationMessage="
+                + this.confirmationMessage + ", successMessage=" + this.successMessage + "]";
     }
 }

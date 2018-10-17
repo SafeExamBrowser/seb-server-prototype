@@ -6,13 +6,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.service.page.event;
+package org.eth.demo.sebserver.gui.service.page.activity;
 
-public abstract class ActivitySelectionListener implements PageEventListener<ActivitySelectionEvent> {
+public class ActivitySelectionEvent {
 
-    @Override
-    public boolean match(final Class<?> type) {
-        return type == ActivitySelectionEvent.class;
+    public final ActivitySelection selection;
+
+    public ActivitySelectionEvent(final ActivitySelection selection) {
+        this.selection = selection;
     }
 
 }

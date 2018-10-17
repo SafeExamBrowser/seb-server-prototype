@@ -8,6 +8,7 @@
 
 package org.eth.demo.sebserver.gui.service.rest.institution;
 
+import org.eth.demo.sebserver.gui.domain.IdAndName;
 import org.eth.demo.sebserver.gui.service.rest.RestCallBuilder;
 import org.eth.demo.sebserver.gui.service.rest.formpost.FormPOST;
 import org.springframework.context.annotation.Lazy;
@@ -15,9 +16,14 @@ import org.springframework.stereotype.Component;
 
 @Lazy
 @Component
-public class InstitutionFormPost extends FormPOST {
+public class InstitutionFormPost extends FormPOST<IdAndName> {
 
     public InstitutionFormPost(final RestCallBuilder restCallBuilder) {
         super(restCallBuilder, "institution/save");
+    }
+
+    @Override
+    protected Class<IdAndName> type() {
+        return IdAndName.class;
     }
 }

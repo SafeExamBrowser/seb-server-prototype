@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.service.page;
+package org.eth.demo.sebserver.gui.service.page.action;
 
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.template.ImageCell;
@@ -18,9 +18,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
-import org.eth.demo.sebserver.gui.service.page.action.ActionPublishEvent;
-import org.eth.demo.sebserver.gui.service.page.action.ActionPublishEventListener;
-import org.eth.demo.sebserver.gui.service.page.action.SaveActionExecution;
+import org.eth.demo.sebserver.gui.service.page.TemplateComposer;
 import org.eth.demo.sebserver.gui.service.page.event.PageEventListener;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory;
 import org.springframework.context.annotation.Lazy;
@@ -69,7 +67,9 @@ public class ActionPane implements TemplateComposer {
             final Runnable action = (Runnable) treeItem.getData(ACTION_EVENT_CALL_KEY);
             action.run();
 
-            treeItem.getParent().deselectAll();
+            if (!treeItem.isDisposed()) {
+                treeItem.getParent().deselectAll();
+            }
         });
 
         actions.setData(
@@ -82,7 +82,7 @@ public class ActionPane implements TemplateComposer {
                                 event.actionDefinition.name);
                         actionItem.setImage(event.actionDefinition.icon.getImage(composerCtx.parent.getDisplay()));
                         actionItem.setData(ACTION_EVENT_CALL_KEY,
-                                new SaveActionExecution(composerCtx, event.actionDefinition, event.run));
+                                new SaveActionExecution(composerCtx, event, event.run));
                     }
                 });
 

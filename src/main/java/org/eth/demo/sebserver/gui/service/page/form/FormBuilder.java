@@ -17,6 +17,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabItem;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 import org.eth.demo.sebserver.gui.service.rest.SEBServerAPICall.APICallBuilder;
@@ -35,6 +36,8 @@ public class FormBuilder {
     public final Composite formParent;
     public final Form form;
 
+    private boolean readonly = false;
+
     public FormBuilder(
             final WidgetFactory widgetFactory,
             final PageContext composerCtx,
@@ -52,6 +55,16 @@ public class FormBuilder {
         layout.marginTop = 10;
         this.formParent.setLayout(layout);
         this.formParent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    }
+
+    public FormBuilder readonly(final boolean readonly) {
+        this.readonly = readonly;
+        return this;
+    }
+
+    public FormBuilder setVisible(final boolean visible, final String group) {
+        this.form.setVisible(visible, group);
+        return this;
     }
 
     public FormBuilder setControl(final TabItem instTab) {
@@ -101,8 +114,12 @@ public class FormBuilder {
             final int span,
             final String group) {
 
-        this.widgetFactory.formLabelLocalized(this.formParent, label);
-        this.form.putField(name, this.widgetFactory.formTextInput(this.formParent, value, span, 1));
+        final Label lab = this.widgetFactory.formLabelLocalized(this.formParent, label);
+        if (this.readonly) {
+            this.form.putField(name, lab, this.widgetFactory.formValueLabel(this.formParent, value, span));
+        } else {
+            this.form.putField(name, lab, this.widgetFactory.formTextInput(this.formParent, value, span, 1));
+        }
         if (StringUtils.isNoneBlank(group)) {
             this.form.addToGroup(group, name);
         }
@@ -139,12 +156,17 @@ public class FormBuilder {
             final int span,
             final String group) {
 
-        this.widgetFactory.formLabelLocalized(this.formParent, label);
-        final Combo selection = this.widgetFactory.formComboLocalized(this.formParent, value, items, span, 1);
-        if (selectionListener != null) {
-            selection.addListener(SWT.Selection, e -> {
-                selectionListener.accept(this.form);
-            });
+        final Label lab = this.widgetFactory.formLabelLocalized(this.formParent, label);
+        if (this.readonly) {
+            this.form.putField(name, lab, this.widgetFactory.formValueLabel(this.formParent, value, 2));
+        } else {
+            final Combo selection = this.widgetFactory.formComboLocalized(this.formParent, value, items, span, 1);
+            this.form.putField(name, lab, selection);
+            if (selectionListener != null) {
+                selection.addListener(SWT.Selection, e -> {
+                    selectionListener.accept(this.form);
+                });
+            }
         }
         if (StringUtils.isNoneBlank(group)) {
             this.form.addToGroup(group, name);
@@ -152,8 +174,8 @@ public class FormBuilder {
         return this;
     }
 
-    public FormHandle buildFor(final APICallBuilder<FormPostResponse> post) {
-        return new FormHandle(this.composerCtx, this.form, post);
+    public <T> FormHandle<T> buildFor(final APICallBuilder<FormPostResponse<T>> post) {
+        return new FormHandle<>(this.composerCtx, this.form, post);
     }
 
 }

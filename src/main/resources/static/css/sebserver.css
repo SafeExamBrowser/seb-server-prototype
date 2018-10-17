@@ -147,8 +147,8 @@ Shell.message {
 }
 
 Shell-Titlebar.message {
-  background-color: #0069B4;
-  background-gradient-color: #0069B4;
+  background-color: #1f407a;
+  background-gradient-color: #1f407a;
   color: white;
   background-image: gradient( linear, left top, left bottom, from( #0069B4 ), to( #0069B4 ) );
   padding: 2px 5px 2px;
@@ -288,8 +288,8 @@ Tree-RowOverlay:hover {
 }
 
 Tree-RowOverlay:selected {
-    background-color: #1f407a;
-    color: #FFFFFF;
+    background-color: #eceeef;
+    color: #1f407a;
 }
 
 Tree-RowOverlay:selected:unfocused {
@@ -323,12 +323,6 @@ TreeItem.actions {
     background-image: none;
     margin: 0 0 0 0;
 }
-
-
-
-
-
-
 
 /* TabFolder default theme */
 
@@ -397,6 +391,15 @@ TabItem:first {
   border-bottom: none;
 }
 
+TabItem:first:hover {
+    background-color: #82be1e;
+    background-gradient-color: #82be1e;
+    background-image: gradient( linear, left top, left bottom, from( #82be1e ), to( #82be1e ) );
+    color: #1F407A;
+    margin: 1px 0px 0px -1px;
+    border-left: none;
+}
+
 TabItem:selected:first {
   background-color: #1f407a;
   color: #FFFFFF;
@@ -419,4 +422,192 @@ TabItem:hover:first {
   margin: 1px 0px 0px -1px;
   border-left: 1px solid #bdbdbd;
 }
+
+/* ScrollBar default theme */
+ScrollBar {
+    background-color: #c0c0c0;
+    background-image: none;
+    border: none;
+    border-radius: 0;
+    width: 10px;
+}
+
+ScrollBar-Thumb {
+    background-color: #c0c0c0;
+    border: 1px solid #bdbdbd;
+    border-radius: 15px;
+    /*background-image: url( themes/images/scrollbar/scrollbar-background.png );*/
+    min-height: 20px;
+}
+
+ScrollBar-UpButton, ScrollBar-DownButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    cursor: default;
+}
+/*
+ScrollBar-UpButton[HORIZONTAL] {
+    background-image: url( themes/images/scrollbar/right.png );
+}
+
+ScrollBar-DownButton[HORIZONTAL] {
+    background-image: url( themes/images/scrollbar/left.png );
+}
+
+ScrollBar-UpButton[VERTICAL] {
+    background-image: url( themes/images/scrollbar/down.png )
+}
+
+ScrollBar-DownButton[VERTICAL] {
+    background-image: url( themes/images/scrollbar/up.png );
+}
+*/
+
+Widget-ToolTip {
+    padding: 1px 3px 2px 3px;
+    background-color: #82be1e;
+    border: 1px solid #3C5A0F;
+    border-radius: 2px 2px 2px 2px;
+    color: #4a4a4a;
+    opacity: 1;
+    animation: fadeIn 200ms linear, fadeOut 600ms ease-out;
+    box-shadow: 3px 4px 2px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+Widget-ToolTip-Pointer {
+    background-image: none;
+}
+
+
+
+
+
+
+
+
+
+
+/* Table default theme */
+Table {
+    font: 12px Verdana, "Lucida Sans", Arial, Helvetica, sans-serif;
+    background-color: #ffffff;
+    background-image: none;
+    color: #4a4a4a;
+    border: none;
+}
+
+Table[BORDER] {
+    border: 1px solid #bdbdbd;
+}
+
+TableColumn {
+    font: 12px Verdana, "Lucida Sans", Arial, Helvetica, sans-serif;
+    background-color: #D3D9DB;
+    background-gradient-color: #D3D9DB;
+    background-image: gradient( linear, left top, left bottom, from( #D3D9DB ), to( #D3D9DB ) );
+    padding: 4px 3px 4px 3px;
+    
+    color: inherit;
+    border-bottom: 1px solid #bdbdbd;
+    text-shadow: none;
+}
+
+TableColumn:hover {
+    background-color: #D3D9DB;
+    background-gradient-color: #D3D9DB;
+    background-image: gradient( linear, left top, left bottom, from( #D3D9DB ), to( #D3D9DB ) );
+}
+
+TableItem, TableItem:linesvisible:even:rowtemplate {
+    background-color: transparent;
+    color: inherit;
+    text-decoration: none;
+    text-shadow: none;
+    background-image: none;
+}
+
+TableItem:linesvisible:even {
+    background-color: #ffffff;
+    color: inherit;
+}
+
+Table-RowOverlay {
+    background-color: transparent;
+    color: inherit;
+    background-image: none;
+}
+
+Table-RowOverlay:hover {
+    color: #4a4a4a;
+    background-color: #b5b5b5;
+    background-image: gradient(linear, left top, left bottom, from(#ebebeb), to(#d5d5d5));
+}
+
+Table-RowOverlay:selected {
+    color: #ffffff;
+    background-color: #5882b5;
+    background-image: gradient(linear, left top, left bottom, from(#5882b5),
+        to(#416693));
+}
+
+Table-RowOverlay:selected:unfocused {
+    color: #ffffff;
+    background-color: #b5b5b5;
+    background-image: gradient(linear, left top, left bottom, from(#b5b5b5),
+        to(#818181));
+}
+
+Table-RowOverlay:linesvisible:even:hover {
+    color: #4a4a4a;
+    background-color: #b5b5b5;
+    background-image: gradient(linear, left top, left bottom, from(#ebebeb),
+        to(#d5d5d5));
+}
+
+Table-RowOverlay:linesvisible:even:selected {
+    color: #ffffff;
+    background-color: #5882b5;
+    background-image: gradient(linear, left top, left bottom, from(#5882b5),
+        to(#416693));
+}
+
+Table-RowOverlay:linesvisible:even:selected:unfocused {
+    background-color: #959595;
+    background-image: gradient(linear, left top, left bottom, from(#b5b5b5),
+        to(#818181));
+    color: #ffffff;
+}
+
+TableColumn-SortIndicator {
+    background-image: none;
+}
+/*
+TableColumn-SortIndicator:up {
+    background-image: url( themes/images/column/sort-indicator-up.png );
+}
+
+TableColumn-SortIndicator:down {
+    background-image: url( themes/images/column/sort-indicator-down.png );
+}
+*/
+
+Table-Cell {
+    spacing: 3px;
+    padding: 5px 3px 5px 3px;
+}
+
+Table-GridLine, Table-GridLine:vertical:rowtemplate {
+    color: transparent;
+}
+
+Table-GridLine:vertical, Table-GridLine:header, Table-GridLine:horizontal:rowtemplate {
+    color: transparent;
+}
+
+
+
+
+
 

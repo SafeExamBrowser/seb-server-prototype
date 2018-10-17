@@ -39,9 +39,9 @@ import org.eth.demo.sebserver.gui.service.ViewService;
 import org.eth.demo.sebserver.gui.service.push.ServerPushContext;
 import org.eth.demo.sebserver.gui.service.push.ServerPushService;
 import org.eth.demo.sebserver.gui.service.rest.GETConnectionInfo;
-import org.eth.demo.sebserver.gui.service.rest.GETRunningExamDetails;
 import org.eth.demo.sebserver.gui.service.rest.RestServices;
 import org.eth.demo.sebserver.gui.service.rest.SEBServerAPICall.APICallBuilder;
+import org.eth.demo.sebserver.gui.service.rest.exam.GETRunningExamDetails;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 

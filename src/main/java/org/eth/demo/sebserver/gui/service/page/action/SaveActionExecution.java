@@ -8,6 +8,7 @@
 
 package org.eth.demo.sebserver.gui.service.page.action;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,27 +18,49 @@ public class SaveActionExecution implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(SaveActionExecution.class);
 
     private final PageContext pageContext;
-    private final ActionDefinition actionDefinition;
+    private final ActionPublishEvent actionEvent;
     private final Runnable actionExecution;
 
     public SaveActionExecution(
             final PageContext pageContext,
-            final ActionDefinition actionDefinition,
+            final ActionPublishEvent actionEvent,
             final Runnable actionExecution) {
 
         this.pageContext = pageContext;
-        this.actionDefinition = actionDefinition;
+        this.actionEvent = actionEvent;
         this.actionExecution = actionExecution;
     }
 
     @Override
     public void run() {
         try {
-            this.actionExecution.run();
+            if (StringUtils.isNotBlank(this.actionEvent.confirmationMessage)) {
+                this.pageContext.applyConfirmDialog(
+                        this.actionEvent.confirmationMessage,
+                        createConfirmationCallback());
+            } else {
+                this.actionExecution.run();
+            }
         } catch (final Throwable t) {
-            log.error("Failed to execute action: {}", this.actionDefinition, t);
+            log.error("Failed to execute action: {}", this.actionEvent, t);
             this.pageContext.notifyError("action.error.unexpected.message", t);
         }
+    }
+
+    private final Runnable createConfirmationCallback() {
+        return new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    SaveActionExecution.this.actionExecution.run();
+                } catch (final Throwable t) {
+                    log.error("Failed to execute action: {}", SaveActionExecution.this.actionEvent, t);
+                    SaveActionExecution.this.pageContext.notifyError("action.error.unexpected.message", t);
+                }
+
+            }
+        };
     }
 
 }

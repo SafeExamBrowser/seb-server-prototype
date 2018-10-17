@@ -6,13 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.composer;
+package org.eth.demo.sebserver.gui.service.page.table;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -21,10 +20,12 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eth.demo.sebserver.gui.composer.PopupMenuComposer;
 
 public class TableBuilder<R> {
 
     public static final String TABLE_ROW_DATA = "TABLE_ROW_DATA";
+    @Deprecated
     public static final String ROOT_COMPOSITE_SUPPLIER = "ROOT_COMPOSITE_SUPPLIER";
 
     private final Collection<R> rows;
@@ -56,7 +57,11 @@ public class TableBuilder<R> {
         return this;
     }
 
-    public Table compose(final Composite parent, final Composite group) {
+    public Table compose(final Composite parent) {
+        return compose(null, parent);
+    }
+
+    public Table compose(@Deprecated final Composite parent, final Composite group) {
         final Table table = new Table(group, SWT.NO_SCROLL);
         table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -74,9 +79,6 @@ public class TableBuilder<R> {
 
         if (this.menuComposer != null) {
             final Menu menu = new Menu(table);
-            menu.setData(
-                    ROOT_COMPOSITE_SUPPLIER,
-                    (Supplier<Composite>) () -> parent);
             table.setMenu(menu);
             table.addListener(
                     SWT.MenuDetect,

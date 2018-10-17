@@ -13,17 +13,17 @@ import java.util.Collections;
 
 import org.eth.demo.sebserver.gui.service.rest.validation.FieldValidationError;
 
-public class FormPostResponse {
+public class FormPostResponse<T> {
 
-    public final String objectId;
+    public final T response;
     public final Collection<FieldValidationError> validationErrors;
 
-    public FormPostResponse(final String objectId) {
-        this(objectId, Collections.emptyList());
+    public FormPostResponse(final T response) {
+        this(response, Collections.emptyList());
     }
 
-    public FormPostResponse(final String objectId, final Collection<FieldValidationError> validationErrors) {
-        this.objectId = objectId;
+    public FormPostResponse(final T response, final Collection<FieldValidationError> validationErrors) {
+        this.response = response;
         this.validationErrors = validationErrors;
     }
 

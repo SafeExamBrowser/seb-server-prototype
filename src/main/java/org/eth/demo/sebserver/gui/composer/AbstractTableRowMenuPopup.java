@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
+import org.eth.demo.sebserver.gui.service.page.table.TableBuilder;
 
 public abstract class AbstractTableRowMenuPopup<R> implements PopupMenuComposer {
 

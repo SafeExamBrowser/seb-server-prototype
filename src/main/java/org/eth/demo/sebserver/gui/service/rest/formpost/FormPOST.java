@@ -19,7 +19,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-public abstract class FormPOST implements SEBServerAPICall<FormPostResponse> {
+public abstract class FormPOST<T> implements SEBServerAPICall<FormPostResponse<T>> {
 
     public static final String JSON_FORM_POST = "JSON_FORM_POST";
 
@@ -32,14 +32,14 @@ public abstract class FormPOST implements SEBServerAPICall<FormPostResponse> {
     }
 
     @Override
-    public Result<FormPostResponse> doAPICall(
+    public Result<FormPostResponse<T>> doAPICall(
             final RestTemplate restTemplate,
             final Map<String, String> attributes) {
 
         final String json = getAttribute(attributes, JSON_FORM_POST);
 
         try {
-            final String objectId = restTemplate.exchange(
+            final T response = restTemplate.exchange(
                     this.uri,
                     HttpMethod.POST,
                     this.restCallBuilder
@@ -47,9 +47,9 @@ public abstract class FormPOST implements SEBServerAPICall<FormPostResponse> {
                             .withContentTypeJson()
                             .withBody(json)
                             .build(),
-                    String.class)
+                    type())
                     .getBody();
-            return Result.of(new FormPostResponse(objectId));
+            return Result.of(new FormPostResponse<>(response));
 
         } catch (final Throwable t) {
             if (t instanceof HttpClientErrorException) {
@@ -59,10 +59,12 @@ public abstract class FormPOST implements SEBServerAPICall<FormPostResponse> {
         }
     }
 
-    private FormPostResponse createValidationErrors(final String response) {
+    protected abstract Class<T> type();
+
+    private FormPostResponse<T> createValidationErrors(final String response) {
         final ArrayList<FieldValidationError> result = new ArrayList<>();
         // TODO extract validation errors and if possible the objectId
-        return new FormPostResponse(null, result);
+        return new FormPostResponse<>(null, result);
     }
 
 }

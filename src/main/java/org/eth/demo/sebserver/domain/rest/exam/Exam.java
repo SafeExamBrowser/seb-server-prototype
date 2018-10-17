@@ -18,6 +18,7 @@ import org.eth.demo.sebserver.service.authorization.GrantEntity;
 import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class Exam implements GrantEntity {
@@ -98,10 +99,12 @@ public final class Exam implements GrantEntity {
         return GrantEntityType.EXAM;
     }
 
+    @JsonIgnore
     public Long getId() {
         return this.id;
     }
 
+    @JsonIgnore
     @Override
     public Long getInstitutionId() {
         return this.institutionId;
@@ -109,7 +112,6 @@ public final class Exam implements GrantEntity {
 
     @Override
     public String getOwner() {
-        // NOTE: No owner for Exams so far
         return this.owner;
     }
 

@@ -10,6 +10,7 @@ package org.eth.demo.sebserver.gui.service.rest.institution;
 
 import java.util.Map;
 
+import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.eth.demo.sebserver.gui.service.rest.RestCallBuilder;
 import org.eth.demo.sebserver.gui.service.rest.SEBServerAPICall;
 import org.eth.demo.util.Result;
@@ -26,14 +27,16 @@ public class DeleteInstitution implements SEBServerAPICall<String> {
 
     public DeleteInstitution(final RestCallBuilder restCallBuilder) {
         this.restCallBuilder = restCallBuilder;
-        this.uri = restCallBuilder.withPath("institution/delete");
+        this.uri = restCallBuilder.withPath("institution/delete/");
     }
 
     @Override
     public Result<String> doAPICall(final RestTemplate restTemplate, final Map<String, String> attributes) {
+        final String instId = getAttribute(attributes, AttributeKeys.INSTITUTION_ID);
+
         try {
             return Result.of(restTemplate.postForObject(
-                    this.uri,
+                    this.uri + instId,
                     this.restCallBuilder
                             .httpEntity()
                             .withContentTypeJson()

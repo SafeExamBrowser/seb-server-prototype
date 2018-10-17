@@ -94,6 +94,12 @@ public class WidgetFactory {
         return button;
     }
 
+    public Label label(final Composite parent, final String text) {
+        final Label label = new Label(parent, SWT.NONE);
+        label.setText(text);
+        return label;
+    }
+
     public Label labelLocalized(final Composite parent, final String locTextKey) {
         final Label label = new Label(parent, SWT.NONE);
         this.polyglotPageService.injectI18n(label, new LocTextKey(locTextKey));
@@ -188,6 +194,14 @@ public class WidgetFactory {
     public Label formLabelLocalized(final Composite parent, final String locTextKey) {
         final Label label = labelLocalized(parent, locTextKey);
         final GridData gridData = new GridData(SWT.RIGHT, SWT.CENTER, true, false);
+        label.setLayoutData(gridData);
+        return label;
+    }
+
+    public Label formValueLabel(final Composite parent, final String value, final int span) {
+        final Label label = new Label(parent, SWT.NONE);
+        label.setText(value);
+        final GridData gridData = new GridData(SWT.LEFT, SWT.CENTER, true, false, span, 1);
         label.setLayoutData(gridData);
         return label;
     }

@@ -6,16 +6,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.service.page.event;
+package org.eth.demo.sebserver.gui.service.page.activity;
 
 import java.util.function.Consumer;
 
 import org.eclipse.swt.widgets.TreeItem;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
-import org.eth.demo.sebserver.gui.service.page.ActionPane;
 import org.eth.demo.sebserver.gui.service.page.TODOTemplate;
 import org.eth.demo.sebserver.gui.service.page.TemplateComposer;
+import org.eth.demo.sebserver.gui.service.page.action.ActionPane;
+import org.eth.demo.sebserver.gui.service.page.content.ExamsListPage;
 import org.eth.demo.sebserver.gui.service.page.content.InstitutionForm;
+import org.eth.demo.sebserver.gui.service.page.content.InstitutionsForm;
 
 public class ActivitySelection {
 
@@ -28,12 +30,12 @@ public class ActivitySelection {
 
     public enum Activity {
         NONE(TODOTemplate.class, TODOTemplate.class),
-        INSTITUTIONS(TODOTemplate.class, TODOTemplate.class),
+        INSTITUTIONS(InstitutionsForm.class, ActionPane.class),
         INSTITUTION(InstitutionForm.class, ActionPane.class, AttributeKeys.INSTITUTION_ID),
 
         USERS(TODOTemplate.class, TODOTemplate.class),
 
-        EXAMS(TODOTemplate.class, TODOTemplate.class),
+        EXAMS(ExamsListPage.class, ActionPane.class),
         SEB_CONFIGS(TODOTemplate.class, TODOTemplate.class),
         MONITORING(TODOTemplate.class, TODOTemplate.class),
 

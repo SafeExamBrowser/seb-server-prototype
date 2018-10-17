@@ -21,8 +21,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
 import org.eth.demo.sebserver.gui.service.i18n.PolyglotPageService;
-import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageAttr;
+import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
+import org.eth.demo.sebserver.gui.service.page.MainPage.MainPageState;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory;
 import org.springframework.context.annotation.Lazy;
@@ -114,7 +115,7 @@ public class DefaultPageSkeleton implements TemplateComposer {
                     // TODO error handling
                 }
 
-                // reset also CurrentUser witch is ui-session scoped
+                MainPageState.clear();
 
                 composerCtx.composerService.compose(
                         LoginPage.class,

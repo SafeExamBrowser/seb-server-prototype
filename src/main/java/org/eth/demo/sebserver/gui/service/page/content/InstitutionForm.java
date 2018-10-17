@@ -25,15 +25,14 @@ import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 import org.eth.demo.sebserver.gui.service.page.TemplateComposer;
 import org.eth.demo.sebserver.gui.service.page.action.ActionDefinition;
-import org.eth.demo.sebserver.gui.service.page.action.ActionEvent;
 import org.eth.demo.sebserver.gui.service.page.action.ActionPublishEvent;
+import org.eth.demo.sebserver.gui.service.page.action.InstitutionActions;
+import org.eth.demo.sebserver.gui.service.page.form.Form;
 import org.eth.demo.sebserver.gui.service.page.form.FormBuilder;
 import org.eth.demo.sebserver.gui.service.page.form.FormHandle;
 import org.eth.demo.sebserver.gui.service.rest.RestServices;
-import org.eth.demo.sebserver.gui.service.rest.institution.DeleteInstitution;
 import org.eth.demo.sebserver.gui.service.rest.institution.GetInstitutionData;
 import org.eth.demo.sebserver.gui.service.rest.institution.InstitutionFormPost;
-import org.eth.demo.sebserver.gui.service.rest.institution.NewInstitution;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -41,6 +40,8 @@ import org.springframework.stereotype.Component;
 @Lazy
 @Component
 public class InstitutionForm implements TemplateComposer {
+
+    private static final String LDAP_GROUP_NAME = "LDAP_GROUP";
 
     private final RestServices restServices;
     private final WidgetFactory widgetFactory;
@@ -85,7 +86,10 @@ public class InstitutionForm implements TemplateComposer {
         final TabItem lmsSetupTab = new TabItem(tabs, SWT.NONE);
         lmsSetupTab.setText("LMS Setup(s)");
 
-        final FormHandle formHandle = new FormBuilder(this.widgetFactory, composerCtx.of(tabs), 4)
+        // The Institution form
+        //@formatter:off
+        final FormHandle<IdAndName> formHandle = new FormBuilder(this.widgetFactory, composerCtx.of(tabs), 4)
+                .readonly(false)
                 .putStaticValue("id", instId)
                 .addTextField("name", "org.sebserver.form.institution.name", institutionData.name, 2)
                 .addEmptyCell()
@@ -94,9 +98,22 @@ public class InstitutionForm implements TemplateComposer {
                         "org.sebserver.form.institution.authType",
                         institutionData.authType,
                         InstitutionData.AUTH_TYPE_SELECTION,
-                        null, 2)
+                        InstitutionForm::processAuthTypeSelection,
+                        2)
+                .addEmptyCell()
+                .addTextField("ldapUrl", "org.sebserver.form.institution.authType.ldap.url", "", 2, LDAP_GROUP_NAME)
+                .addEmptyCell()
+                .addTextField("ldapUserDN", "org.sebserver.form.institution.authType.ldap.userDN", "", 2, LDAP_GROUP_NAME)
+                .addEmptyCell()
+                .addTextField("ldapUserSearch", "org.sebserver.form.institution.authType.ldap.userSearch", "", 2,LDAP_GROUP_NAME)
+                .addEmptyCell()
+                .addTextField("ldapGroupSearch", "org.sebserver.form.institution.authType.ldap.groupSearch", "", 2, LDAP_GROUP_NAME)
+                .addEmptyCell()
+                .addTextField("ldapGroupFilter", "org.sebserver.form.institution.authType.ldap.groupFilter", "", 2,LDAP_GROUP_NAME)
                 .setControl(instTab)
-                .buildFor(this.restServices.sebServerAPICall(InstitutionFormPost.class));
+                .buildFor(this.restServices.sebServerAPICall(InstitutionFormPost.class))
+                .process(InstitutionForm::processAuthTypeSelection);
+        //@formatter:on
 
         tabs.setSelection(0);
 
@@ -113,13 +130,8 @@ public class InstitutionForm implements TemplateComposer {
         // publish possible actions for this page
         composerCtx.notify(new ActionPublishEvent(
                 ActionDefinition.INSTITUTION_NEW,
-                () -> {
-                    final IdAndName newInstitutionId = this.restServices
-                            .sebServerAPICall(NewInstitution.class)
-                            .doAPICall()
-                            .onErrorThrow("Unexpected Error");
-                    composerCtx.notify(new ActionEvent(ActionDefinition.INSTITUTION_NEW, newInstitutionId));
-                }));
+                InstitutionActions.newInstitution(composerCtx, this.restServices),
+                "actions.new.institution.confirm"));
 
         composerCtx.notify(new ActionPublishEvent(
                 ActionDefinition.INSTITUTION_MODIFY,
@@ -127,51 +139,17 @@ public class InstitutionForm implements TemplateComposer {
 
         composerCtx.notify(new ActionPublishEvent(
                 ActionDefinition.INSTITUTION_DELETE,
-                () -> {
-                    final String newInstitutionId = this.restServices
-                            .sebServerAPICall(DeleteInstitution.class)
-                            .doAPICall()
-                            .onErrorThrow("Unexpected Error");
-                    composerCtx.notify(new ActionEvent(ActionDefinition.INSTITUTION_DELETE, newInstitutionId));
-                }));
-
-//        this.widgetFactory.formLabelLocalized(institution, "org.sebserver.form.institution.name");
-//        form.putField("name", this.widgetFactory.formTextInput(institution, institutionData.name, 2, 1));
-//        this.widgetFactory.formEmpty(institution);
-//        this.widgetFactory.formLabelLocalized(institution, "org.sebserver.form.institution.authType");
-//        final Combo authSelection = this.widgetFactory.formComboLocalized(
-//                institution,
-//                institutionData.authType,
-//                InstitutionData.AUTH_TYPE_SELECTION,
-//                2, 1);
-//
-//        authSelection.addListener(SWT.Selection, e -> {
-//            final int selectionIndex = authSelection.getSelectionIndex();
-//            form.processSelection(selectionIndex);
-//        });
-//
-//        this.widgetFactory.formEmpty(institution);
-//
-//        form.addInputLDAP(
-//                "org.sebserver.form.institution.authType.ldap.url",
-//                () -> this.widgetFactory.formTextInput(institution, "", 2, 1));
-//        this.widgetFactory.formEmpty(institution);
-//        form.addInputLDAP(
-//                "org.sebserver.form.institution.authType.ldap.userDN",
-//                () -> this.widgetFactory.formTextInput(institution, "", 2, 1));
-//        this.widgetFactory.formEmpty(institution);
-//        form.addInputLDAP(
-//                "org.sebserver.form.institution.authType.ldap.userSearch",
-//                () -> this.widgetFactory.formTextInput(institution, "", 2, 1));
-//        this.widgetFactory.formEmpty(institution);
-//        form.addInputLDAP(
-//                "org.sebserver.form.institution.authType.ldap.groupSearch",
-//                () -> this.widgetFactory.formTextInput(institution, "", 2, 1));
-//        this.widgetFactory.formEmpty(institution);
-//        form.addInputLDAP(
-//                "org.sebserver.form.institution.authType.ldap.groupFilter",
-//                () -> this.widgetFactory.formTextInput(institution, "", 2, 1));
-//
-//        form.processSelection(authSelection.getSelectionIndex());
+                InstitutionActions.deleteInstitution(composerCtx, this.restServices, instId),
+                "actions.delete.institution.confirm"));
     }
+
+    static final void processAuthTypeSelection(final Form form) {
+        final String value = form.getValue("authType");
+        if ("INTERNAL".equals(value)) {
+            form.setVisible(false, LDAP_GROUP_NAME);
+        } else if ("EXTERNAL_LDAP".equals(value)) {
+            form.setVisible(true, LDAP_GROUP_NAME);
+        }
+    }
+
 }
