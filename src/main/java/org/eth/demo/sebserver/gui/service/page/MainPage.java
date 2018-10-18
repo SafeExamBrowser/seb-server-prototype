@@ -81,7 +81,7 @@ public class MainPage extends PageComposer {
         nav.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         final GridLayout navLayout = new GridLayout();
         navLayout.marginHeight = 20;
-        navLayout.marginLeft = 10;
+        navLayout.marginWidth = 0;
         nav.setLayout(navLayout);
 
         final Composite content = new Composite(mainSash, SWT.NONE);
@@ -175,7 +175,7 @@ public class MainPage extends PageComposer {
 
     public final static class MainPageState {
 
-        public ActivitySelection activitySelection = Activity.NONE.selection();
+        public ActivitySelection activitySelection = Activity.NONE.createSelection();
 
         private MainPageState() {
         }
@@ -202,7 +202,7 @@ public class MainPage extends PageComposer {
 
         public static void clear() {
             final MainPageState mainPageState = get();
-            mainPageState.activitySelection = Activity.NONE.selection();
+            mainPageState.activitySelection = Activity.NONE.createSelection();
         }
     }
 

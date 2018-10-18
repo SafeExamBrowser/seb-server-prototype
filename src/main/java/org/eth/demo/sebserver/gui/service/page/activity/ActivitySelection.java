@@ -11,6 +11,7 @@ package org.eth.demo.sebserver.gui.service.page.activity;
 import java.util.function.Consumer;
 
 import org.eclipse.swt.widgets.TreeItem;
+import org.eth.demo.sebserver.gui.domain.IdAndName;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.eth.demo.sebserver.gui.service.page.TODOTemplate;
 import org.eth.demo.sebserver.gui.service.page.TemplateComposer;
@@ -18,6 +19,7 @@ import org.eth.demo.sebserver.gui.service.page.action.ActionPane;
 import org.eth.demo.sebserver.gui.service.page.content.ExamsListPage;
 import org.eth.demo.sebserver.gui.service.page.content.InstitutionForm;
 import org.eth.demo.sebserver.gui.service.page.content.InstitutionsForm;
+import org.eth.demo.sebserver.gui.service.page.content.RunningExamPage;
 
 public class ActivitySelection {
 
@@ -38,7 +40,9 @@ public class ActivitySelection {
         EXAMS(ExamsListPage.class, ActionPane.class),
         SEB_CONFIGS(TODOTemplate.class, TODOTemplate.class),
         MONITORING(TODOTemplate.class, TODOTemplate.class),
-
+        RUNNING_EXAMS(TODOTemplate.class, TODOTemplate.class),
+        RUNNING_EXAM(RunningExamPage.class, ActionPane.class, AttributeKeys.EXAM_ID),
+        LOGS(TODOTemplate.class, TODOTemplate.class),
         ;
 
         public final Class<? extends TemplateComposer> objectPaneComposer;
@@ -64,22 +68,29 @@ public class ActivitySelection {
             this.objectIdentifierAttribute = objectIdentifierAttribute;
         }
 
-        public final ActivitySelection selection() {
+        public final ActivitySelection createSelection() {
             return new ActivitySelection(this);
+        }
+
+        public final ActivitySelection createSelection(final IdAndName idAndName) {
+            return new ActivitySelection(this, idAndName);
         }
     }
 
     private static final String ATTR_ACTIVITY_SELECTION = "ACTIVITY_SELECTION";
 
     public final Activity activity;
-    String objectIdentifier;
+    public final IdAndName idAndName;
     Consumer<TreeItem> expandFunction = EMPTY_FUNCTION;
-    Consumer<TreeItem> collapseFunction = EMPTY_FUNCTION;
 
     ActivitySelection(final Activity activity) {
+        this(activity, null);
+    }
+
+    ActivitySelection(final Activity activity, final IdAndName idAndName) {
         this.activity = activity;
+        this.idAndName = idAndName;
         this.expandFunction = EMPTY_FUNCTION;
-        this.collapseFunction = EMPTY_FUNCTION;
     }
 
     public ActivitySelection withExpandFunction(final Consumer<TreeItem> expandFunction) {
@@ -90,37 +101,16 @@ public class ActivitySelection {
         return this;
     }
 
-    public ActivitySelection withCollapseFunction(final Consumer<TreeItem> collapseFunction) {
-        if (collapseFunction == null) {
-            this.collapseFunction = EMPTY_FUNCTION;
-        }
-        this.collapseFunction = collapseFunction;
-        return this;
-    }
-
-    public ActivitySelection with(final String objectIdentifier) {
-        this.objectIdentifier = objectIdentifier;
-        return this;
-    }
-
-    public static ActivitySelection get(final TreeItem item) {
-        return (ActivitySelection) item.getData(ATTR_ACTIVITY_SELECTION);
-    }
-
-    public static void set(final TreeItem item, final ActivitySelection selection) {
-        item.setData(ATTR_ACTIVITY_SELECTION, selection);
-    }
-
     public String getObjectIdentifier() {
-        return this.objectIdentifier;
+        if (this.idAndName == null) {
+            return null;
+        }
+
+        return this.idAndName.id;
     }
 
     public void processExpand(final TreeItem item) {
         this.expandFunction.accept(item);
-    }
-
-    public void processCollapse(final TreeItem item) {
-        this.collapseFunction.accept(item);
     }
 
     @Override
@@ -128,7 +118,7 @@ public class ActivitySelection {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((this.activity == null) ? 0 : this.activity.hashCode());
-        result = prime * result + ((this.objectIdentifier == null) ? 0 : this.objectIdentifier.hashCode());
+        result = prime * result + ((this.idAndName == null) ? 0 : this.idAndName.hashCode());
         return result;
     }
 
@@ -143,12 +133,20 @@ public class ActivitySelection {
         final ActivitySelection other = (ActivitySelection) obj;
         if (this.activity != other.activity)
             return false;
-        if (this.objectIdentifier == null) {
-            if (other.objectIdentifier != null)
+        if (this.idAndName == null) {
+            if (other.idAndName != null)
                 return false;
-        } else if (!this.objectIdentifier.equals(other.objectIdentifier))
+        } else if (!this.idAndName.equals(other.idAndName))
             return false;
         return true;
+    }
+
+    public static ActivitySelection get(final TreeItem item) {
+        return (ActivitySelection) item.getData(ATTR_ACTIVITY_SELECTION);
+    }
+
+    public static void set(final TreeItem item, final ActivitySelection selection) {
+        item.setData(ATTR_ACTIVITY_SELECTION, selection);
     }
 
 }

@@ -8,23 +8,26 @@
 
 package org.eth.demo.sebserver.gui.domain.sebconfig;
 
+import org.eth.demo.sebserver.gui.domain.IdAware;
+import org.eth.demo.sebserver.gui.domain.NameAware;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ConfigTableRow {
+public class ConfigTableRow implements IdAware, NameAware {
 
-    public final Long id;
-    public final Long institutionId;
-    public final Long ownerId;
+    public final String id;
+    public final String institutionId;
+    public final String ownerId;
     public final String name;
     public final String type;
     public final String latestVersion;
 
     @JsonCreator
     public ConfigTableRow(
-            @JsonProperty("id") final Long id,
-            @JsonProperty("institutionId") final Long institutionId,
-            @JsonProperty("ownerId") final Long ownerId,
+            @JsonProperty("id") final String id,
+            @JsonProperty("institutionId") final String institutionId,
+            @JsonProperty("ownerId") final String ownerId,
             @JsonProperty("name") final String name,
             @JsonProperty("type") final String type,
             @JsonProperty("latestVersion") final String latestVersion) {
@@ -37,18 +40,20 @@ public class ConfigTableRow {
         this.latestVersion = latestVersion;
     }
 
-    public Long getId() {
+    @Override
+    public String getId() {
         return this.id;
     }
 
-    public Long getInstitutionId() {
+    public String getInstitutionId() {
         return this.institutionId;
     }
 
-    public Long getOwnerId() {
+    public String getOwnerId() {
         return this.ownerId;
     }
 
+    @Override
     public String getName() {
         return this.name;
     }

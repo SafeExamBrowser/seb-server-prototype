@@ -21,8 +21,9 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eth.demo.sebserver.gui.composer.PopupMenuComposer;
+import org.eth.demo.sebserver.gui.domain.IdAware;
 
-public class TableBuilder<R> {
+public class TableBuilder<R extends IdAware> {
 
     public static final String TABLE_ROW_DATA = "TABLE_ROW_DATA";
     @Deprecated
@@ -62,7 +63,7 @@ public class TableBuilder<R> {
     }
 
     public Table compose(@Deprecated final Composite parent, final Composite group) {
-        final Table table = new Table(group, SWT.NO_SCROLL);
+        final Table table = new Table(group, SWT.SINGLE);
         table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         table.setHeaderVisible(true);

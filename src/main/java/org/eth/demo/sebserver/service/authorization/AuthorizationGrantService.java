@@ -68,22 +68,22 @@ public class AuthorizationGrantService {
         // wo - writeOnlyOwner -> like write but only of the user is the owner
 
         //  r      m      w      i      mo     wo
-        add(true,  true,  true,  false, false, false, GrantEntityType.INSTITUTION,Role.SEB_SERVER_ADMIN);
-        add(true,  true,  false, true,  true,  false, GrantEntityType.INSTITUTION,Role.INSTITUTIONAL_ADMIN);
-        add(true,  false, false, true,  false, false, GrantEntityType.INSTITUTION,Role.EXAM_ADMIN);
-        add(true,  false, false, true,  false, false, GrantEntityType.INSTITUTION,Role.EXAM_SUPPORTER);
+        add(true,  true,  true,  false, false, false, GrantEntityType.INSTITUTION, Role.SEB_SERVER_ADMIN);
+        add(true,  true,  false, true,  true,  false, GrantEntityType.INSTITUTION, Role.INSTITUTIONAL_ADMIN);
+        add(true,  false, false, true,  false, false, GrantEntityType.INSTITUTION, Role.EXAM_ADMIN);
+        add(true,  false, false, true,  false, false, GrantEntityType.INSTITUTION, Role.EXAM_SUPPORTER);
 
         //  r      m      w      i      mo     wo
-        add(true,  false, false, false, false, false, GrantEntityType.SEB_LMS_SETUP,Role.SEB_SERVER_ADMIN);
-        add(true,  true,  true,  true,  false, false, GrantEntityType.SEB_LMS_SETUP,Role.INSTITUTIONAL_ADMIN);
-        add(true,  false, false, true,  false, false, GrantEntityType.SEB_LMS_SETUP,Role.EXAM_ADMIN);
-        add(true,  false, false, true,  false, false, GrantEntityType.SEB_LMS_SETUP,Role.EXAM_SUPPORTER);
+        add(true,  false, false, false, false, false, GrantEntityType.SEB_LMS_SETUP, Role.SEB_SERVER_ADMIN);
+        add(true,  true,  true,  true,  false, false, GrantEntityType.SEB_LMS_SETUP, Role.INSTITUTIONAL_ADMIN);
+        add(true,  false, false, true,  false, false, GrantEntityType.SEB_LMS_SETUP, Role.EXAM_ADMIN);
+        add(true,  false, false, true,  false, false, GrantEntityType.SEB_LMS_SETUP, Role.EXAM_SUPPORTER);
 
         //  r      m      w      i      mo     wo
-        add(true,  false, false, false, false, false, GrantEntityType.EXAM,Role.SEB_SERVER_ADMIN);
-        add(true,  true,  true,  true,  false, false, GrantEntityType.EXAM,Role.INSTITUTIONAL_ADMIN);
-        add(true,  false, false, true,  false, false, GrantEntityType.EXAM,Role.EXAM_ADMIN);
-        add(true,  false, false, true,  false, false, GrantEntityType.EXAM,Role.EXAM_SUPPORTER);
+        add(true,  false, false, false, false, false, GrantEntityType.EXAM, Role.SEB_SERVER_ADMIN);
+        add(true,  true,  true,  true,  false, false, GrantEntityType.EXAM, Role.INSTITUTIONAL_ADMIN);
+        add(true,  false, false, true,  false, false, GrantEntityType.EXAM, Role.EXAM_ADMIN);
+        add(true,  false, false, true,  false, false, GrantEntityType.EXAM, Role.EXAM_SUPPORTER);
 
         //@formatter:on
 

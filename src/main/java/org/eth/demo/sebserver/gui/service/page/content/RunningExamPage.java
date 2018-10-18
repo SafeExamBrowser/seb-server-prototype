@@ -6,72 +6,70 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.composer.views;
+package org.eth.demo.sebserver.gui.service.page.content;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eth.demo.sebserver.gui.composer.ViewComposer;
 import org.eth.demo.sebserver.gui.domain.exam.ConnectionRow;
 import org.eth.demo.sebserver.gui.domain.exam.Indicator;
 import org.eth.demo.sebserver.gui.domain.exam.RunningExam;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
-import org.eth.demo.sebserver.gui.service.ViewService;
+import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
+import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
+import org.eth.demo.sebserver.gui.service.page.TemplateComposer;
 import org.eth.demo.sebserver.gui.service.push.ServerPushContext;
 import org.eth.demo.sebserver.gui.service.push.ServerPushService;
 import org.eth.demo.sebserver.gui.service.rest.RestServices;
 import org.eth.demo.sebserver.gui.service.rest.SEBServerAPICall.APICallBuilder;
 import org.eth.demo.sebserver.gui.service.rest.exam.GetConnectionInfo;
 import org.eth.demo.sebserver.gui.service.rest.exam.GetRunningExamDetails;
+import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Lazy
 @Component
-public class RunningExamView implements ViewComposer {
+public class RunningExamPage implements TemplateComposer {
 
     private final ServerPushService serverPushService;
     private final RestServices restServices;
+    private final WidgetFactory widgetFactory;
 
-    public RunningExamView(
+    public RunningExamPage(
             final RestServices restServices,
-            final ServerPushService serverPushService) {
+            final ServerPushService serverPushService,
+            final WidgetFactory widgetFactory) {
 
         this.serverPushService = serverPushService;
         this.restServices = restServices;
+        this.widgetFactory = widgetFactory;
     }
 
     @Override
     public boolean validateAttributes(final Map<String, String> attributes) {
-        return attributes.containsKey(AttributeKeys.EXAM_ID);
+        return StringUtils.isNotBlank(attributes.get(AttributeKeys.EXAM_ID));
     }
 
     @Override
-    public void composeView(
-            final ViewService viewService,
-            final Composite parent,
-            final Map<String, String> attributes) {
+    public void compose(final PageContext composerCtx) {
 
-        final String examId = attributes.get(AttributeKeys.EXAM_ID);
+        final String examId = composerCtx.attributes.get(AttributeKeys.EXAM_ID);
         final RunningExam exam = this.restServices
                 .sebServerAPICall(GetRunningExamDetails.class)
                 .exam(examId)
@@ -80,35 +78,31 @@ public class RunningExamView implements ViewComposer {
                     throw new RuntimeException(t);
                 }); // TODO error handling
 
-        final Display display = parent.getDisplay();
-        viewService.centringView(parent);
-        final Composite root = new Composite(parent, SWT.NONE);
-        root.setLayoutData(new RowData(800, 400));
+        final Display display = composerCtx.parent.getDisplay();
 
-        final RowLayout layout = new RowLayout();
-        layout.type = SWT.VERTICAL;
-        root.setLayout(layout);
+        final Composite content = new Composite(composerCtx.parent, SWT.NONE);
+        final GridLayout contentLayout = new GridLayout();
+        contentLayout.marginLeft = 10;
+        content.setLayout(contentLayout);
+        content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        final Label title = new Label(root, SWT.BOLD);
-        title.setText("Running Exam View");
-        final FontData fontData = title.getFont().getFontData()[0];
-        final Font boldFont = new Font(display,
-                new FontData(fontData.getName(),
-                        fontData.getHeight(), SWT.BOLD));
-        title.setFont(boldFont);
+        final Label title = this.widgetFactory.labelLocalized(
+                content, "h2", new LocTextKey("org.sebserver.runningexam.page.title", exam.name));
+        title.setLayoutData(new GridData(SWT.TOP, SWT.LEFT, true, false));
 
-        final Composite group = new Composite(root, SWT.NONE);
+        final Composite group = new Composite(content, SWT.NONE);
         final GridLayout gridLayout = new GridLayout();
         gridLayout.numColumns = 4;
         group.setLayout(gridLayout);
-        final Label nameT = new Label(group, SWT.NULL);
-        nameT.setText("Name: ");
-        final Label name = new Label(group, SWT.NULL);
-        name.setText(exam.name);
-        final GridData gridData = new GridData();
-        gridData.horizontalAlignment = SWT.FILL;
-        gridData.horizontalSpan = 3;
-        name.setLayoutData(gridData);
+
+//        final Label nameT = new Label(group, SWT.NULL);
+//        nameT.setText("Name: ");
+//        final Label name = new Label(group, SWT.NULL);
+//        name.setText(exam.name);
+//        final GridData gridData = new GridData();
+//        gridData.horizontalAlignment = SWT.FILL;
+//        gridData.horizontalSpan = 3;
+//        name.setLayoutData(gridData);
 
         for (final Indicator indDef : exam.getIndicators()) {
             final Label indName = new Label(group, SWT.NULL);
@@ -124,28 +118,21 @@ public class RunningExamView implements ViewComposer {
             indT3.setBackground(new Color(display, new RGB(255, 0, 0), 100));
         }
 
-        final Label clients = new Label(root, SWT.NONE);
-        clients.setText("Connected Clients:");
-        clients.setFont(boldFont);
+        this.widgetFactory.labelLocalized(content, "Connected Clients:");
 
-        final ScrolledComposite tablePane = new ScrolledComposite(root, SWT.V_SCROLL);
-        tablePane.setExpandVertical(true);
-        tablePane.setAlwaysShowScrollBars(true);
-        tablePane.setLayout(new RowLayout());
-        tablePane.setLayoutData(new RowData(800, 200));
+        final Composite tablePane = new Composite(content, SWT.NONE);
+//        final ScrolledComposite tablePane = new ScrolledComposite(content, SWT.V_SCROLL);
+//        tablePane.setExpandVertical(true);
+//        tablePane.setAlwaysShowScrollBars(true);
+        tablePane.setLayout(new GridLayout());
+        tablePane.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         final ClientTable clientTable = new ClientTable(display, tablePane, exam);
-        tablePane.setContent(clientTable.table);
-
-        final Button button = new Button(root, SWT.FLAT);
-        button.setText("To Exam Overview");
-        button.addListener(SWT.Selection, event -> {
-            viewService.composeView(parent, Dashboard.class);
-        });
+        //tablePane.setContent(clientTable.table);
 
         this.serverPushService.runServerPush(
                 new ServerPushContext(
-                        root,
+                        content,
                         runAgainContext -> true),
                 dataPoll(
                         this.restServices.sebServerAPICall(GetConnectionInfo.class),
@@ -189,35 +176,34 @@ public class RunningExamView implements ViewComposer {
 
         final Map<String, UpdatableTableItem> tableMapping;
 
+        private int tableWidth = 0;
+
         ClientTable(final Display display, final Composite tableRoot, final RunningExam exam) {
             this.exam = exam;
             this.table = new Table(tableRoot, SWT.NONE);
+            this.table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+            this.table.setLayout(new GridLayout());
+
             final TableColumn t1c = new TableColumn(this.table, SWT.NONE);
             t1c.setText("Identifier");
-            t1c.setWidth(200);
+            t1c.setAlignment(SWT.LEFT);
             final TableColumn t2c = new TableColumn(this.table, SWT.NONE);
             t2c.setText("Status");
-            t2c.setWidth(150);
             final TableColumn t3c = new TableColumn(this.table, SWT.NONE);
             t3c.setText("Address");
-            t3c.setWidth(150);
             for (final Indicator indDef : exam.getIndicators()) {
                 final TableColumn tc = new TableColumn(this.table, SWT.NONE);
                 tc.setText(indDef.name);
-                tc.setWidth(100);
             }
 
             this.table.setHeaderVisible(true);
             this.table.setLinesVisible(true);
-            this.table.layout();
 
             this.color1 = new Color(display, new RGB(0, 255, 0), 100);
             this.color2 = new Color(display, new RGB(249, 166, 2), 100);
             this.color3 = new Color(display, new RGB(255, 0, 0), 100);
 
             this.tableMapping = new HashMap<>();
-
-            this.table.pack();
             this.table.layout();
         }
 
@@ -250,6 +236,20 @@ public class RunningExamView implements ViewComposer {
                     }
                 }
                 uti.tableItem.getDisplay();
+            }
+
+            adaptTableWidth();
+        }
+
+        private void adaptTableWidth() {
+            final Rectangle area = this.table.getParent().getClientArea();
+            if (this.tableWidth != area.width) {
+                final int columnWidth = area.width / ClientTable.this.table.getColumnCount();
+                for (final TableColumn column : ClientTable.this.table.getColumns()) {
+                    column.setWidth(columnWidth);
+                }
+                ClientTable.this.table.pack();
+                this.tableWidth = area.width;
             }
         }
 

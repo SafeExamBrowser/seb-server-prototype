@@ -46,7 +46,7 @@ public class InstitutionController {
         this.authorizationGrantService = authorizationGrantService;
     }
 
-    @RequestMapping(value = "/info", method = RequestMethod.GET)
+    @RequestMapping(value = "/names", method = RequestMethod.GET)
     public final Map<Long, String> info(final Principal principal) {
         return this.institutionDao.all(
                 this.authorizationGrantService.getGrantFilter(

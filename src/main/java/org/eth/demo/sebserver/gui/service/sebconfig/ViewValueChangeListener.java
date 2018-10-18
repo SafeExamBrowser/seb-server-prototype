@@ -11,7 +11,7 @@ package org.eth.demo.sebserver.gui.service.sebconfig;
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigAttributeValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigTableValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigViewAttribute;
-import org.eth.demo.sebserver.gui.service.rest.POSTConfigValue;
+import org.eth.demo.sebserver.gui.service.rest.sebconfig.POSTConfigValue;
 import org.eth.demo.sebserver.service.JSONMapper;
 import org.springframework.web.client.RestTemplate;
 

@@ -11,13 +11,18 @@ package org.eth.demo.sebserver.gui.domain;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ObjectId {
+public class ObjectId implements IdAware {
 
     public final String id;
 
     @JsonCreator
     public ObjectId(@JsonProperty(value = "id", required = true) final String id) {
         this.id = id;
+    }
+
+    @Override
+    public String getId() {
+        return this.id;
     }
 
     @Override

@@ -22,7 +22,7 @@ import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 import org.eth.demo.sebserver.gui.service.page.TemplateComposer;
 import org.eth.demo.sebserver.gui.service.page.table.TableBuilder;
 import org.eth.demo.sebserver.gui.service.rest.RestServices;
-import org.eth.demo.sebserver.gui.service.rest.exam.GETExams;
+import org.eth.demo.sebserver.gui.service.rest.exam.GetExams;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -62,7 +62,7 @@ public class ExamsListPage implements TemplateComposer {
     private void createExamsTable(final Composite parent) {
         // get all exams for the current logged in user from the SEBServer Web-Service API
         final Collection<ExamTableRow> exams = this.restServices
-                .sebServerCall(GETExams.class)
+                .sebServerCall(GetExams.class)
                 .onError(t -> {
                     throw new RuntimeException(t);
                 }); // TODO error handling

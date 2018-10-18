@@ -24,9 +24,9 @@ public interface ExamDao {
 
     boolean isRunning(Long id);
 
-    Collection<Exam> getAll();
+    Collection<Exam> all();
 
-    Collection<Exam> getAll(Predicate<Exam> predicate);
+    Collection<Exam> all(Predicate<Exam> predicate);
 
     boolean remove(Long id);
 

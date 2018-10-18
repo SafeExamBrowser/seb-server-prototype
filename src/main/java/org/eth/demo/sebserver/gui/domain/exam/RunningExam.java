@@ -14,12 +14,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eth.demo.sebserver.gui.domain.IdAware;
+import org.eth.demo.sebserver.gui.domain.NameAware;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class RunningExam {
+public class RunningExam implements IdAware, NameAware {
 
-    public final Long id;
+    public final String id;
     public final String name;
     public final ExamStatus status;
     private final List<String> indicatorTypeList;
@@ -28,7 +31,7 @@ public class RunningExam {
 
     @JsonCreator
     public RunningExam(
-            @JsonProperty("id") final Long id,
+            @JsonProperty("id") final String id,
             @JsonProperty("name") final String name,
             @JsonProperty("status") final String status,
             @JsonProperty("indicators") final Collection<Indicator> indicatorList) {
@@ -50,10 +53,12 @@ public class RunningExam {
         }
     }
 
-    public Long getId() {
+    @Override
+    public String getId() {
         return this.id;
     }
 
+    @Override
     public String getName() {
         return this.name;
     }

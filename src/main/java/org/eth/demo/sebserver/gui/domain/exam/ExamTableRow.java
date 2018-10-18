@@ -8,15 +8,18 @@
 
 package org.eth.demo.sebserver.gui.domain.exam;
 
+import org.eth.demo.sebserver.gui.domain.IdAware;
+import org.eth.demo.sebserver.gui.domain.NameAware;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ExamTableRow {
+public class ExamTableRow implements IdAware, NameAware {
 
     public final String id;
+    public final String external_uuid;
     public final String owner;
     public final String name;
     public final String status;
@@ -24,19 +27,22 @@ public class ExamTableRow {
 
     @JsonCreator
     public ExamTableRow(
-            @JsonProperty("external_uuid") final String id,
+            @JsonProperty("id") final String id,
+            @JsonProperty("external_uuid") final String external_uuid,
             @JsonProperty("owner") final String owner,
             @JsonProperty("name") final String name,
             @JsonProperty("status") final String status,
             @JsonProperty("startTime") final DateTime startTime) {
 
         this.id = id;
+        this.external_uuid = external_uuid;
         this.owner = owner;
         this.name = name;
         this.status = status;
         this.startTime = startTime;
     }
 
+    @Override
     public String getId() {
         return this.id;
     }
@@ -45,6 +51,7 @@ public class ExamTableRow {
         return this.owner;
     }
 
+    @Override
     public String getName() {
         return this.name;
     }

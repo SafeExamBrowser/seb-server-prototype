@@ -9,11 +9,12 @@
 package org.eth.demo.sebserver.gui.domain.exam;
 
 import org.eth.demo.sebserver.domain.rest.exam.IndicatorDefinition;
+import org.eth.demo.sebserver.gui.domain.NameAware;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Indicator {
+public class Indicator implements NameAware {
 
     public final String name;
     public final String type;
@@ -36,6 +37,7 @@ public class Indicator {
         this.threshold3 = threshold3;
     }
 
+    @Override
     public String getName() {
         return this.name;
     }

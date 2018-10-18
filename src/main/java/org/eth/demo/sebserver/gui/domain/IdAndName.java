@@ -11,7 +11,7 @@ package org.eth.demo.sebserver.gui.domain;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class IdAndName {
+public class IdAndName implements IdAware, NameAware {
 
     public final String id;
     public final String name;
@@ -23,6 +23,16 @@ public class IdAndName {
 
         this.id = id;
         this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public String getId() {
+        return this.id;
     }
 
     @Override
@@ -60,4 +70,5 @@ public class IdAndName {
     public String toString() {
         return "IdAndName [id=" + this.id + ", name=" + this.name + "]";
     }
+
 }

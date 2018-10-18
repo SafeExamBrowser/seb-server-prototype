@@ -131,7 +131,7 @@ public class SEBClientConnectionController {
 
                 log.debug("SEB-Client hand-shake case 3.a. no exam choosen. Send list of running exams ");
 
-                final List<ExamLink> collect = this.examDao.getAll(
+                final List<ExamLink> collect = this.examDao.all(
                         e -> e.status == ExamStatus.RUNNING &&
                                 e.institutionId.longValue() == auth.institutionId.longValue())
                         .stream()

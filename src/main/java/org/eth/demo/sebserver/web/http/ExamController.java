@@ -10,9 +10,12 @@ package org.eth.demo.sebserver.web.http;
 
 import java.security.Principal;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eth.demo.sebserver.domain.rest.admin.User;
 import org.eth.demo.sebserver.domain.rest.exam.Exam;
+import org.eth.demo.sebserver.domain.rest.exam.Exam.ExamStatus;
 import org.eth.demo.sebserver.service.admin.UserFacade;
 import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService;
 import org.eth.demo.sebserver.service.authorization.AuthorizationGrantService.GrantEntityType;
@@ -40,7 +43,7 @@ public class ExamController {
 
     @RequestMapping(method = RequestMethod.GET)
     public final Collection<Exam> exams(final Principal principal) {
-        return this.examDao.getAll(
+        return this.examDao.all(
                 this.authorizationGrantService.getGrantFilter(
                         GrantEntityType.EXAM,
                         GrantType.READ_ONLY,
@@ -62,6 +65,25 @@ public class ExamController {
     @RequestMapping(value = "/remove/{examId}", method = RequestMethod.DELETE)
     public final void removeExam(@PathVariable final Long examId) {
         this.examDao.remove(examId);
+    }
+
+    @RequestMapping(value = "running/names", method = RequestMethod.GET)
+    public final Map<Long, String> info(final Principal principal) {
+        return this.examDao.all(exam -> exam.status == ExamStatus.RUNNING &&
+                this.authorizationGrantService.hasTypeGrant(
+                        GrantEntityType.INSTITUTION,
+                        GrantType.READ_ONLY,
+                        principal))
+                .stream()
+                .reduce(new HashMap<Long, String>(),
+                        (acc, inst) -> {
+                            acc.put(inst.id, inst.name);
+                            return acc;
+                        },
+                        (acc1, acc2) -> {
+                            acc1.putAll(acc2);
+                            return acc1;
+                        });
     }
 
 //    @RequestMapping(value = "/save", method = RequestMethod.POST)

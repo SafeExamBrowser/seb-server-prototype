@@ -8,11 +8,11 @@
 
 package org.eth.demo.sebserver.gui.service.page.activity;
 
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
@@ -30,7 +30,8 @@ import org.eth.demo.sebserver.gui.service.page.activity.ActivitySelection.Activi
 import org.eth.demo.sebserver.gui.service.page.event.PageEventListener;
 import org.eth.demo.sebserver.gui.service.rest.RestServices;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
-import org.eth.demo.sebserver.gui.service.rest.institution.GetInstitutionInfo;
+import org.eth.demo.sebserver.gui.service.rest.exam.GetRunningExamNames;
+import org.eth.demo.sebserver.gui.service.rest.institution.GetInstitutionNames;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -61,13 +62,17 @@ public class ActivitiesPane implements TemplateComposer {
 
         final Label activities = this.widgetFactory.labelLocalized(
                 composerCtx.parent, "h3", new LocTextKey("org.sebserver.activities"));
-        activities.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        final GridData activitiesGridData = new GridData(SWT.FILL, SWT.TOP, true, false);
+        activitiesGridData.horizontalIndent = 20;
+        activities.setLayoutData(activitiesGridData);
 
         final Tree navigation = this.widgetFactory.treeLocalized(composerCtx.parent, SWT.SINGLE | SWT.FULL_SELECTION);
-        navigation.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        final GridData navigationGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+        //navigationGridData.horizontalIndent = 20;
+        navigation.setLayoutData(navigationGridData);
 
-        final Map<String, String> insitutionInfo = this.restServices
-                .sebServerCall(GetInstitutionInfo.class)
+        final List<IdAndName> insitutionNames = this.restServices
+                .sebServerCall(GetInstitutionNames.class)
                 .onError(t -> {
                     throw new RuntimeException(t);
                 });
@@ -77,79 +82,100 @@ public class ActivitiesPane implements TemplateComposer {
             final TreeItem institutions = this.widgetFactory.treeItemLocalized(
                     navigation,
                     new LocTextKey("org.sebserver.activities.inst"));
-            ActivitySelection.set(institutions, Activity.INSTITUTIONS.selection());
+            ActivitySelection.set(institutions, Activity.INSTITUTIONS.createSelection());
 
-            for (final Map.Entry<String, String> inst : insitutionInfo.entrySet()) {
-                createInstitutionItem(institutions, inst.getKey(), inst.getValue());
+            for (final IdAndName inst : insitutionNames) {
+                createInstitutionItem(institutions, inst);
             }
         } else {
-            final Entry<String, String> inst = insitutionInfo.entrySet().iterator().next();
-            createInstitutionItem(navigation, inst.getKey(), inst.getValue());
+            final IdAndName inst = insitutionNames.iterator().next();
+            createInstitutionItem(navigation, inst);
         }
 
         final TreeItem user = this.widgetFactory.treeItemLocalized(
                 navigation,
                 "org.sebserver.activities.user");
-        ActivitySelection.set(user, Activity.USERS.selection());
+        ActivitySelection.set(user, Activity.USERS.createSelection());
 
         final TreeItem configs = this.widgetFactory.treeItemLocalized(
                 navigation,
                 "org.sebserver.activities.sebconfig");
-        ActivitySelection.set(configs, Activity.SEB_CONFIGS.selection());
+        ActivitySelection.set(configs, Activity.SEB_CONFIGS.createSelection());
 
         final TreeItem exams = this.widgetFactory.treeItemLocalized(
                 navigation,
                 "org.sebserver.activities.exam");
-        ActivitySelection.set(exams, Activity.EXAMS.selection());
+        ActivitySelection.set(exams, Activity.EXAMS.createSelection());
 
         final TreeItem monitoring = this.widgetFactory.treeItemLocalized(
                 navigation,
                 "org.sebserver.activities.monitoring");
-        ActivitySelection.set(monitoring, Activity.MONITORING.selection());
+        ActivitySelection.set(monitoring, Activity.MONITORING.createSelection());
 
-        // TODO if we need dynamic child load on expand, this is an example
-//        navigation.addListener(SWT.Expand, event -> {
-//            final TreeItem treeItem = (TreeItem) event.item;
-//
-//            System.out.println("opened: " + treeItem);
-//
-//            final ActivitySelection activity = ActivitySelection.get(treeItem);
-//            if (activity != null) {
-//                activity.processExpand(treeItem);
-//            }
-//        });
-//        navigation.addListener(SWT.Collapse, event -> {
-//            final TreeItem treeItem = (TreeItem) event.item;
-//
-//            System.out.println("closed: " + treeItem);
-//
-//            final ActivitySelection activity = ActivitySelection.get(treeItem);
-//            if (activity != null) {
-//                activity.processCollapse(treeItem);
-//            }
-//        });
+        final TreeItem runningExams = this.widgetFactory.treeItemLocalized(
+                monitoring,
+                "org.sebserver.activities.runningExams");
+        ActivitySelection.set(runningExams, Activity.RUNNING_EXAMS.createSelection()
+                .withExpandFunction(this::runningExamExpand));
+        runningExams.setItemCount(1);
 
-        navigation.addListener(SWT.Selection, event -> {
-            final TreeItem treeItem = (TreeItem) event.item;
+        final TreeItem logs = this.widgetFactory.treeItemLocalized(
+                monitoring,
+                "org.sebserver.activities.logs");
+        ActivitySelection.set(logs, Activity.LOGS.createSelection());
 
-            System.out.println("selected: " + treeItem);
-
-            final MainPageState mainPageState = MainPageState.get();
-            final ActivitySelection activitySelection = ActivitySelection.get(treeItem);
-            if (mainPageState.activitySelection == null) {
-                mainPageState.activitySelection = Activity.NONE.selection();
-            }
-            if (!mainPageState.activitySelection.equals(activitySelection)) {
-                mainPageState.activitySelection = activitySelection;
-                composerCtx.notify(new ActivitySelectionEvent(mainPageState.activitySelection));
-            }
-        });
+        navigation.addListener(SWT.Expand, this::handleExpand);
+        navigation.addListener(SWT.Selection, event -> handleSelection(composerCtx, event));
 
         navigation.setData(
                 PageEventListener.LISTENER_ATTRIBUTE_KEY,
                 createActionEventListener(navigation, composerCtx));
 
-        //applySelection(navigation, composerCtx);
+    }
+
+    private void runningExamExpand(final TreeItem item) {
+        item.removeAll();
+        final List<IdAndName> runningExamNames = this.restServices
+                .sebServerCall(GetRunningExamNames.class)
+                .onError(t -> {
+                    throw new RuntimeException(t);
+                });
+
+        if (runningExamNames != null) {
+            for (final IdAndName runningExamName : runningExamNames) {
+                final TreeItem runningExams = this.widgetFactory.treeItemLocalized(
+                        item,
+                        runningExamName.name);
+                ActivitySelection.set(runningExams, Activity.RUNNING_EXAM.createSelection(runningExamName));
+            }
+        }
+    }
+
+    private void handleExpand(final Event event) {
+        final TreeItem treeItem = (TreeItem) event.item;
+
+        System.out.println("opened: " + treeItem);
+
+        final ActivitySelection activity = ActivitySelection.get(treeItem);
+        if (activity != null) {
+            activity.processExpand(treeItem);
+        }
+    }
+
+    private void handleSelection(final PageContext composerCtx, final Event event) {
+        final TreeItem treeItem = (TreeItem) event.item;
+
+        System.out.println("selected: " + treeItem);
+
+        final MainPageState mainPageState = MainPageState.get();
+        final ActivitySelection activitySelection = ActivitySelection.get(treeItem);
+        if (mainPageState.activitySelection == null) {
+            mainPageState.activitySelection = Activity.NONE.createSelection();
+        }
+        if (!mainPageState.activitySelection.equals(activitySelection)) {
+            mainPageState.activitySelection = activitySelection;
+            composerCtx.notify(new ActivitySelectionEvent(mainPageState.activitySelection));
+        }
     }
 
     private ActionEventListener createActionEventListener(
@@ -191,26 +217,21 @@ public class ActivitiesPane implements TemplateComposer {
         };
     }
 
+    private TreeItem createInstitutionItem(final Tree parent, final IdAndName idAndName) {
+        final TreeItem institution = new TreeItem(parent, SWT.NONE);
+        createInstitutionItem(idAndName, institution);
+        return institution;
+    }
+
     private TreeItem createInstitutionItem(final TreeItem parent, final IdAndName idAndName) {
-        return createInstitutionItem(parent, idAndName.id, idAndName.name);
-    }
-
-    private TreeItem createInstitutionItem(final Tree parent, final String id, final String name) {
         final TreeItem institution = new TreeItem(parent, SWT.NONE);
-        createInstitutionItem(id, name, institution);
+        createInstitutionItem(idAndName, institution);
         return institution;
     }
 
-    private TreeItem createInstitutionItem(final TreeItem parent, final String id, final String name) {
-        final TreeItem institution = new TreeItem(parent, SWT.NONE);
-        createInstitutionItem(id, name, institution);
-        return institution;
-    }
-
-    private void createInstitutionItem(final String id, final String name, final TreeItem institution) {
-        institution.setText(name);
-        ActivitySelection.set(institution, Activity.INSTITUTION.selection()
-                .with(id));
+    private void createInstitutionItem(final IdAndName idAndName, final TreeItem institution) {
+        institution.setText(idAndName.name);
+        ActivitySelection.set(institution, Activity.INSTITUTION.createSelection(idAndName));
 
 //        final TreeItem lmsSetup = this.widgetFactory.treeItemLocalized(
 //                institution,
@@ -218,31 +239,6 @@ public class ActivitiesPane implements TemplateComposer {
 //        ActivitySelection.set(lmsSetup, Activity.LMS_SETUP.selection());
 
     }
-
-//    private void applySelection(final Tree navigation, final PageContext composerCtx) {
-//        final MainPageState mainPageState = MainPageState.get();
-//        if (mainPageState.activitySelection == null) {
-//            mainPageState.activitySelection = Activity.NONE.selection();
-//        }
-//
-//        final TreeItem itemToPreSelect = findSelectedItem(navigation.getItems(), mainPageState);
-//        if (itemToPreSelect != null) {
-//            navigation.select(itemToPreSelect);
-//            expand(itemToPreSelect.getParentItem());
-//            composerCtx.notify(new ActivitySelectionEvent(mainPageState.activitySelection));
-//        }
-//    }
-//
-//    private static final TreeItem find(final TreeItem[] items, final MainPageState mainPageState) {
-//        if (mainPageState.activitySelection == null) {
-//            return null;
-//        }
-//
-//        return findItemByActivity(
-//                items,
-//                mainPageState.activitySelection.activity,
-//                mainPageState.activitySelection.getObjectIdentifier());
-//    }
 
     private static final TreeItem findItemByActivity(
             final TreeItem[] items,

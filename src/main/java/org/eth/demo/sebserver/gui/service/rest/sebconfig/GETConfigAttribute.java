@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.service.rest;
+package org.eth.demo.sebserver.gui.service.rest.sebconfig;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigViewAttribute;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
+import org.eth.demo.sebserver.gui.service.rest.RestCallBuilder;
+import org.eth.demo.sebserver.gui.service.rest.SEBServerAPICall;
 import org.eth.demo.util.Result;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;

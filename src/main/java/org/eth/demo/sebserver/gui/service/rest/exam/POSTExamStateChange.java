@@ -21,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
+@Deprecated
 public final class POSTExamStateChange implements SEBServerAPICall<ExamTableRow> {
 
     private final RestCallBuilder restCallBuilder;

@@ -97,7 +97,7 @@ public class ExamDaoImpl implements ExamDao {
 
     @Transactional(readOnly = true)
     @Override
-    public Collection<Exam> getAll() {
+    public Collection<Exam> all() {
         return getManyFromJoinRecords(this.examJoinMapper
                 .selectByExample()
                 .build()
@@ -106,8 +106,8 @@ public class ExamDaoImpl implements ExamDao {
 
     @Transactional(readOnly = true)
     @Override
-    public Collection<Exam> getAll(final Predicate<Exam> predicate) {
-        return getAll().stream()
+    public Collection<Exam> all(final Predicate<Exam> predicate) {
+        return all().stream()
                 .filter(predicate)
                 .collect(Collectors.toList());
     }
