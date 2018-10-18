@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.composer;
+package org.eth.demo.sebserver.gui.service.page.table;
 
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
-import org.eth.demo.sebserver.gui.service.page.table.TableBuilder;
+import org.eth.demo.sebserver.gui.service.page.PopupMenuComposer;
 
 public abstract class AbstractTableRowMenuPopup<R> implements PopupMenuComposer {
 

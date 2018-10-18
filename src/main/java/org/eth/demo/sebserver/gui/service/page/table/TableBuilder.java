@@ -20,8 +20,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eth.demo.sebserver.gui.composer.PopupMenuComposer;
 import org.eth.demo.sebserver.gui.domain.IdAware;
+import org.eth.demo.sebserver.gui.service.page.PopupMenuComposer;
 
 public class TableBuilder<R extends IdAware> {
 

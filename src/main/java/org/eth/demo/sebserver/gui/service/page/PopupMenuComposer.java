@@ -6,12 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.gui.composer;
+package org.eth.demo.sebserver.gui.service.page;
 
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 
-public interface ContentComponentComposer<C> {
+public interface PopupMenuComposer {
 
-    C compose(final Composite parent, final Composite group);
+    void onMenuEvent(final Event event);
 
 }
