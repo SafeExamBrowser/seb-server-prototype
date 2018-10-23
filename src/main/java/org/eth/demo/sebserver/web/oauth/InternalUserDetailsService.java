@@ -27,11 +27,15 @@ public class InternalUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
-        final org.eth.demo.sebserver.domain.rest.admin.User byUserName = this.userDao.byUserName(username);
-        if (byUserName == null) {
+        try {
+            final org.eth.demo.sebserver.domain.rest.admin.User byUserName = this.userDao.byUserName(username);
+            if (byUserName == null) {
+                throw new UsernameNotFoundException("No User with name: " + username + " found");
+            }
+            return byUserName;
+        } catch (final Exception e) {
             throw new UsernameNotFoundException("No User with name: " + username + " found");
         }
-        return byUserName;
     }
 
 }

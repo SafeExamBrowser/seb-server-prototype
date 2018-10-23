@@ -6,19 +6,19 @@ import org.mybatis.dynamic.sql.SqlColumn;
 import org.mybatis.dynamic.sql.SqlTable;
 
 public final class InstitutionRecordDynamicSqlSupport {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.082+02:00", comments="Source Table: institution")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.672+02:00", comments="Source Table: institution")
     public static final InstitutionRecord institutionRecord = new InstitutionRecord();
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.082+02:00", comments="Source field: institution.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.673+02:00", comments="Source field: institution.id")
     public static final SqlColumn<Long> id = institutionRecord.id;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.082+02:00", comments="Source field: institution.name")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.673+02:00", comments="Source field: institution.name")
     public static final SqlColumn<String> name = institutionRecord.name;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.082+02:00", comments="Source field: institution.authtype")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.673+02:00", comments="Source field: institution.authtype")
     public static final SqlColumn<String> authtype = institutionRecord.authtype;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-10T15:10:20.082+02:00", comments="Source Table: institution")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.673+02:00", comments="Source Table: institution")
     public static final class InstitutionRecord extends SqlTable {
         public final SqlColumn<Long> id = column("id", JDBCType.BIGINT);
 

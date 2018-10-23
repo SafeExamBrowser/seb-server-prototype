@@ -46,7 +46,7 @@ public class RAPSpringConfig {
 
     @Bean
     public ServletRegistrationBean<RWTServlet> servletRegistrationBean() {
-        return new ServletRegistrationBean<>(new RWTServlet(), "/gui");
+        return new ServletRegistrationBean<>(new RWTServlet(), "/gui/*");
     }
 
     // NOTE Profiles seems not to work as expected for now. This bean is initialized if the

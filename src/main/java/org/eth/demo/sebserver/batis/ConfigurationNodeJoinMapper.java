@@ -39,6 +39,7 @@ public interface ConfigurationNodeJoinMapper {
             @Arg(column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR, id = true),
             @Arg(column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Arg(column = "template", javaType = String.class, jdbcType = JdbcType.VARCHAR),
 
             @Arg(column = "configVersionId", javaType = Long.class, jdbcType = JdbcType.BIGINT, id = true),
             @Arg(column = "version", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -60,6 +61,7 @@ public interface ConfigurationNodeJoinMapper {
                 configurationNodeRecord.owner,
                 configurationNodeRecord.name,
                 configurationNodeRecord.type,
+                configurationNodeRecord.template,
 
                 configurationRecord.id.as("configVersionId"),
                 configurationRecord.version,
@@ -84,6 +86,7 @@ public interface ConfigurationNodeJoinMapper {
         public final String owner;
         public final String name;
         public final String type;
+        public final String template;
 
         public final Long configVersionId;
         public final String version;
@@ -99,6 +102,7 @@ public interface ConfigurationNodeJoinMapper {
                 final Long institutionId,
                 final String owner,
                 final String name,
+                final String template,
                 final String type,
                 final Long configVersionId,
                 final String version,
@@ -113,6 +117,7 @@ public interface ConfigurationNodeJoinMapper {
             this.owner = owner;
             this.name = name;
             this.type = type;
+            this.template = template;
             this.configVersionId = configVersionId;
             this.version = version;
             this.versionDate = versionDate;

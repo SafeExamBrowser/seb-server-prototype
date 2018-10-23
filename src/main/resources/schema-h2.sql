@@ -1,3 +1,6 @@
+-- -----------------------------------------------------
+-- Schema SEBServerDemo
+-- -----------------------------------------------------
 
 -- -----------------------------------------------------
 -- Table `institution`
@@ -10,6 +13,7 @@ CREATE TABLE IF NOT EXISTS `institution` (
   `authType` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `name_UNIQUE` (`name` ASC));
+
 
 -- -----------------------------------------------------
 -- Table `seb_lms_setup`
@@ -46,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `exam` (
   `lms_setup_id` BIGINT UNSIGNED NOT NULL,
   `external_uuid` VARCHAR(255) NOT NULL,
   `owner` VARCHAR(255) NOT NULL,
-  `supporter` VARCHAR(4000) NULL,
+  `supporter` VARCHAR(4000) NULL COMMENT 'comma separated list of user_uuid',
   `type` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `lms_setup_key_idx` (`lms_setup_id` ASC),
@@ -135,6 +139,7 @@ CREATE TABLE IF NOT EXISTS `configuration_node` (
   `owner` VARCHAR(255) NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `type` VARCHAR(45) NULL,
+  `template` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
   INDEX `configurationInstitutionRef_idx` (`institution_id` ASC),
   CONSTRAINT `configurationInstitutionRef`
@@ -215,6 +220,18 @@ CREATE TABLE IF NOT EXISTS `configuration_value` (
 
 
 -- -----------------------------------------------------
+-- Table `template`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `template` ;
+
+CREATE TABLE IF NOT EXISTS `template` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `description` VARCHAR(4000) NULL,
+  PRIMARY KEY (`id`));
+
+
+-- -----------------------------------------------------
 -- Table `orientation`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `orientation` ;
@@ -224,13 +241,22 @@ CREATE TABLE IF NOT EXISTS `orientation` (
   `config_attribute_id` BIGINT UNSIGNED NOT NULL,
   `view` VARCHAR(45) NOT NULL,
   `group` VARCHAR(45) NULL,
-  `x_position` INT NOT NULL DEFAULT 0,
-  `y_position` INT NOT NULL DEFAULT 0,
+  `x_position` INT UNSIGNED NOT NULL DEFAULT 0,
+  `y_position` INT UNSIGNED NOT NULL DEFAULT 0,
+  `width` INT UNSIGNED NULL,
+  `height` INT UNSIGNED NULL,
+  `template_id` BIGINT UNSIGNED NULL,
   PRIMARY KEY (`id`),
   INDEX `config_attribute_orientation_rev_idx` (`config_attribute_id` ASC),
+  INDEX `orientation_template_id_idx` (`template_id` ASC),
   CONSTRAINT `config_attribute_orientation_rev`
     FOREIGN KEY (`config_attribute_id`)
     REFERENCES `configuration_attribute` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `orientation_template_id`
+    FOREIGN KEY (`template_id`)
+    REFERENCES `template` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
@@ -275,7 +301,8 @@ CREATE TABLE IF NOT EXISTS `user` (
   `email` VARCHAR(255) NOT NULL,
   `creation_date` DATETIME NOT NULL,
   `active` BIT(1) NOT NULL,
-  `locale` VARCHAR(45) NULL,
+  `locale` VARCHAR(45) NOT NULL,
+  `timeZone` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `institutionRef_idx` (`institution_id` ASC),
   CONSTRAINT `institutionRef`

@@ -8,9 +8,9 @@ INSERT INTO seb_lms_setup VALUES
     ;
 
 INSERT INTO user VALUES 
-    (1, 1, 'internalDemoAdmin', 'Admin1', 'admin', '$2a$08$c2GKYEYoUVXH1Yb8GXVXVu66ltPvbZgLMcVSXRH.LgZNF/YeaYB8m', 'admin@nomail.nomail', '2018-01-01 00:00:00', 1, 'en'),
-    (2, 1, 'internalUser1', 'User1', 'user1', '$2a$08$0mBB2.NPUsg0afMhYq5NE.Te.g.QnzIH8ncKs65zYtoyV/NV2X8ne', 'user1@nomail.nomail', '2018-01-01 00:00:00', 1, 'de'),
-    (3, 1, 'internalUser2', 'User2', 'user2', '$2a$08$VSQl35ERwunAEKMGt7XhkuqkDD4ze4I8j/RDdRw8jzqhjwzuqiGQi', 'user2@nomail.nomail', '2018-01-01 00:00:00', 1, 'en')
+    (1, 1, 'internalDemoAdmin', 'Admin1', 'admin', '$2a$08$c2GKYEYoUVXH1Yb8GXVXVu66ltPvbZgLMcVSXRH.LgZNF/YeaYB8m', 'admin@nomail.nomail', '2018-01-01 00:00:00', 1, 'en', 'UTC'),
+    (2, 1, 'internalUser1', 'User1', 'user1', '$2a$08$0mBB2.NPUsg0afMhYq5NE.Te.g.QnzIH8ncKs65zYtoyV/NV2X8ne', 'user1@nomail.nomail', '2018-01-01 00:00:00', 1, 'de', 'UTC'),
+    (3, 1, 'internalUser2', 'User2', 'user2', '$2a$08$VSQl35ERwunAEKMGt7XhkuqkDD4ze4I8j/RDdRw8jzqhjwzuqiGQi', 'user2@nomail.nomail', '2018-01-01 00:00:00', 1, 'en', 'UTC')
     ;
     
 INSERT INTO user_role VALUES
@@ -45,31 +45,31 @@ INSERT INTO configuration_attribute VALUES
     ;
     
 INSERT INTO orientation VALUES 
-    (1, 1, 'view1', null, 0, 13),
-    (2, 2, 'view1', null, 0, 0),
-    (3, 3, 'view1', null, 1, 0),
-    (4, 4, 'view1', null, 2, 0),
+    (1, 1, 'view1', null, 0, 13, 1, 1, null),
+    (2, 2, 'view1', null, 0, 0, 1, 1, null),
+    (3, 3, 'view1', null, 1, 0, 1, 1, null),
+    (4, 4, 'view1', null, 2, 0, 1, 1, null),
     
-    (5, 5, 'view1', null, 0, 0),
-    (6, 6, 'view1', null, 0, 1),
+    (5, 5, 'view1', null, 0, 0, 1, 1, null),
+    (6, 6, 'view1', null, 0, 1, 1, 1, null),
     
-    (7, 7, 'view1', null, 1, 0),
-    (8, 8, 'view1', null, 1, 1),
-    (9, 9, 'view1', null, 1, 2),
+    (7, 7, 'view1', null, 1, 0, 1, 1, null),
+    (8, 8, 'view1', null, 1, 1, 1, 1, null),
+    (9, 9, 'view1', null, 1, 2, 1, 1, null),
     
-    (10, 10, 'view1', 'Group1', 2, 0),
-    (11, 11, 'view1', 'Group1', 2, 1),
-    (12, 12, 'view1', 'Group1', 2, 2),
+    (10, 10, 'view1', 'Group1', 2, 0, 1, 1, null),
+    (11, 11, 'view1', 'Group1', 2, 1, 1, 1, null),
+    (12, 12, 'view1', 'Group1', 2, 2, 1, 1, null),
     
-    (13, 13, 'view1', null, 1, 6),
-    (14, 14, 'view1', null, 1, 7),
-    (15, 15, 'view1', null, 1, 8),
-    (16, 16, 'view1', null, 1, 9),
-    (17, 17, 'view1', null, 1, 10)
+    (13, 13, 'view1', null, 1, 6, 1, 1, null),
+    (14, 14, 'view1', null, 1, 7, 1, 1, null),
+    (15, 15, 'view1', null, 1, 8, 1, 1, null),
+    (16, 16, 'view1', null, 1, 9, 1, 1, null),
+    (17, 17, 'view1', null, 1, 10, 1, 1, null)
     ;
     
 INSERT INTO configuration_node VALUES
-    (1, 1, 3, 'Demo Config', 'CLIENT')
+    (1, 1, 3, 'Demo Config', 'CLIENT', null)
     ;
     
 INSERT INTO configuration VALUES

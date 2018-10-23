@@ -8,6 +8,7 @@
 
 package org.eth.demo.sebserver.domain.rest.admin;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
@@ -67,6 +68,42 @@ public final class User implements UserDetails {
                 ? EnumSet.copyOf(roles.stream().map(r -> Role.valueOf(r)).collect(Collectors.toList()))
                 : EnumSet.noneOf(Role.class);
         this.isExternal = false;
+    }
+
+    /** Use this to create a User after successful external authentication
+     *
+     * @param uuid The uuid of the user --> provided by the external authentication and authorization provider
+     * @param name The real name of the user --> provided by the external authentication and authorization provider
+     * @param username The username of the user --> provided by the external authentication and authorization provider
+     * @param email The email address of the user --> provided by the external authentication and authorization provider
+     *            or null
+     * @param creationDate The creation date of the user --> provided by the external authentication and authorization
+     *            provider or null
+     * @param locale The preferred locale of the user --> provided by the external authentication and authorization
+     *            provider or null
+     * @param roles The roles of the user --> provided by the external authentication and authorization provider */
+    public User(
+            final String uuid,
+            final String name,
+            final String username,
+            final String email,
+            final DateTime creationDate,
+            final Locale locale,
+            final Role... roles) {
+
+        this.uuid = uuid;
+        this.institutionId = -1L;
+        this.name = name;
+        this.username = username;
+        this.password = null;
+        this.email = email;
+        this.creationDate = creationDate;
+        this.active = true;
+        this.locale = locale;
+        this.roles = (roles != null)
+                ? EnumSet.copyOf(Arrays.asList(roles))
+                : EnumSet.noneOf(Role.class);
+        this.isExternal = true;
     }
 
     public String getUuid() {

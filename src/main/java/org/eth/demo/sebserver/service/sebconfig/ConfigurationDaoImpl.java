@@ -222,6 +222,7 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
                         record.owner,
                         record.name,
                         ConfigurationType.valueOf(record.type),
+                        record.template,
                         null, null);
             } else {
                 if (prototype.id.longValue() != record.id.longValue()) {
@@ -263,6 +264,7 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
                 prototype.owner,
                 prototype.name,
                 prototype.type,
+                prototype.templateName,
                 examMappings,
                 configHistory);
     }
@@ -293,7 +295,8 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
                 node.institutionId,
                 node.owner,
                 node.name,
-                node.type.name());
+                node.type.name(),
+                node.templateName);
     }
 
     public static final ConfigurationRecord toRecord(final Configuration config) {

@@ -44,6 +44,10 @@
             <property name="immutable" value="true"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
+        <table tableName="template" domainObjectName="TemplateRecord">
+            <property name="immutable" value="true"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
         <table tableName="orientation" domainObjectName="OrientationRecord">
             <property name="immutable" value="true"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>

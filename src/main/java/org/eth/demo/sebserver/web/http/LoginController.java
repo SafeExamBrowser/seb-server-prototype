@@ -8,11 +8,14 @@
 
 package org.eth.demo.sebserver.web.http;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.eth.demo.util.Const;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping("/gui")
@@ -25,9 +28,26 @@ public class LoginController {
 //    }
 
     // NOTE: this is working with RAP
-    @GetMapping("/login/{institution}")
-    public ModelAndView redirectWithUsingRedirectPrefix(final ModelMap model) {
-        return new ModelAndView("redirect:/gui", model);
+//    @GetMapping("/login/{institution}")
+//    public ModelAndView redirectWithUsingRedirectPrefix(
+//            final ModelMap model,
+//            @PathVariable final String institution) {
+//
+//        return new ModelAndView("redirect:/gui?institutionName=" + institution, model);
+//    }
+
+    @GetMapping("/login/**")
+    public String redirectWithUsingRedirectPrefix(
+            final HttpServletRequest request,
+            final HttpServletResponse response,
+            @PathVariable final String institution) {
+
+        response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setHeader("institutionName", institution);
+        response.setDateHeader("Expires", 0);
+        return "redirect:/gui?" + Const.INSTITUTION_ID + "=" + institution;
+
     }
 
 }

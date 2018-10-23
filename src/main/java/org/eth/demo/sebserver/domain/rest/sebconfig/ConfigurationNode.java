@@ -32,6 +32,7 @@ public final class ConfigurationNode implements GrantEntity {
     public final String owner;
     public final String name;
     public final ConfigurationType type;
+    public final String templateName;
     public final Collection<ExamSEBConfigMapping> examMappings;
     public final List<Configuration> configurationHistory;
 
@@ -42,6 +43,7 @@ public final class ConfigurationNode implements GrantEntity {
             @JsonProperty("owner") final String owner,
             @JsonProperty("name") final String name,
             @JsonProperty("type") final ConfigurationType type,
+            @JsonProperty("templateName") final String templateName,
             @JsonProperty("examMappings") final Collection<ExamSEBConfigMapping> examMappings,
             @JsonProperty("configurationHistory") final List<Configuration> configurationHistory) {
 
@@ -50,6 +52,7 @@ public final class ConfigurationNode implements GrantEntity {
         this.owner = owner;
         this.name = name;
         this.type = type;
+        this.templateName = templateName;
         this.examMappings = (examMappings != null)
                 ? Collections.unmodifiableCollection(examMappings)
                 : Collections.emptyList();
@@ -93,6 +96,10 @@ public final class ConfigurationNode implements GrantEntity {
         return this.type;
     }
 
+    public String getTemplateName() {
+        return this.templateName;
+    }
+
     public Collection<ExamSEBConfigMapping> getExamMappings() {
         return this.examMappings;
     }
@@ -128,10 +135,11 @@ public final class ConfigurationNode implements GrantEntity {
 
     @Override
     public String toString() {
-        return "ConfigurationNode [id=" + this.id + ", institutionId=" + this.institutionId + ", owner="
-                + this.owner + ", name="
-                + this.name + ", type=" + this.type + ", examMappings=" + this.examMappings + ", configurationHistory="
-                + this.configurationHistory + "]";
+        return "ConfigurationNode [id=" + this.id + ", institutionId=" + this.institutionId + ", owner=" + this.owner
+                + ", name="
+                + this.name + ", type=" + this.type + ", templateName=" + this.templateName + ", examMappings="
+                + this.examMappings
+                + ", configurationHistory=" + this.configurationHistory + "]";
     }
 
 }

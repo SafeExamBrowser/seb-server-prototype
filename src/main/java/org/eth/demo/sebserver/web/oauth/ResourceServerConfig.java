@@ -84,6 +84,10 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     @Bean
     public UserAuthenticationConverter userAuthenticationConverter() {
+//        final DefaultUserAuthenticationConverter userAuthenticationConverter =
+//                new DefaultUserAuthenticationConverter();
+//        userAuthenticationConverter.setUserDetailsService(this.userDetailsService);
+//        return userAuthenticationConverter;
         final DefaultUserAuthenticationConverter userAuthenticationConverter =
                 new InstitutionalUserAuthenticationConverter(this.jsonMapper);
         userAuthenticationConverter.setUserDetailsService(this.userDetailsService);
