@@ -25,6 +25,7 @@ import org.springframework.security.authentication.dao.AbstractUserDetailsAuthen
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 /** This adapts to external authentication methods that may be used in the future to provide LDAP or Shibboleth (SAML
@@ -112,13 +113,18 @@ public class ExternalAuthProvider implements AuthenticationProvider {
                     final UsernamePasswordAuthenticationToken authentication)
                     throws AuthenticationException {
 
-                // NOTE here we can implement external authentication and authorization. For example within an LDAP
+                // NOTE: like so we can implement external authentication and authorization. For example within an LDAP
+                // TODO: get institutionId from authentication if possible,
+                //       within this institution or over all institution for a specified method (LDAP /AAI)...
+                //       check if this institution supports the specified external authentication method
+                //       and if yes, try to authenticate this user within the given credentials on the server
+                //       configured within the institutional attributes for authentication server binding.
 
                 if ("extUser".equals(username)) {
                     return ExternalAuthProvider.this.mockUser;
                 }
 
-                return null;
+                throw new UsernameNotFoundException(username);
             }
 
         });

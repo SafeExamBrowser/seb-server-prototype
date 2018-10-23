@@ -3,25 +3,25 @@ package org.eth.demo.sebserver.batis.gen.model;
 import javax.annotation.Generated;
 
 public class ConfigurationNodeRecord {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.639+02:00", comments="Source field: configuration_node.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.074+02:00", comments="Source field: configuration_node.id")
     private Long id;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.640+02:00", comments="Source field: configuration_node.institution_id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.074+02:00", comments="Source field: configuration_node.institution_id")
     private Long institutionId;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.640+02:00", comments="Source field: configuration_node.owner")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.074+02:00", comments="Source field: configuration_node.owner")
     private String owner;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.640+02:00", comments="Source field: configuration_node.name")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.074+02:00", comments="Source field: configuration_node.name")
     private String name;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.640+02:00", comments="Source field: configuration_node.type")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.075+02:00", comments="Source field: configuration_node.type")
     private String type;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.640+02:00", comments="Source field: configuration_node.template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.075+02:00", comments="Source field: configuration_node.template")
     private String template;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.639+02:00", comments="Source Table: configuration_node")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.074+02:00", comments="Source Table: configuration_node")
     public ConfigurationNodeRecord(Long id, Long institutionId, String owner, String name, String type, String template) {
         this.id = id;
         this.institutionId = institutionId;
@@ -31,32 +31,32 @@ public class ConfigurationNodeRecord {
         this.template = template;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.640+02:00", comments="Source field: configuration_node.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.074+02:00", comments="Source field: configuration_node.id")
     public Long getId() {
         return id;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.640+02:00", comments="Source field: configuration_node.institution_id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.074+02:00", comments="Source field: configuration_node.institution_id")
     public Long getInstitutionId() {
         return institutionId;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.640+02:00", comments="Source field: configuration_node.owner")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.074+02:00", comments="Source field: configuration_node.owner")
     public String getOwner() {
         return owner;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.640+02:00", comments="Source field: configuration_node.name")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.075+02:00", comments="Source field: configuration_node.name")
     public String getName() {
         return name;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.640+02:00", comments="Source field: configuration_node.type")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.075+02:00", comments="Source field: configuration_node.type")
     public String getType() {
         return type;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.640+02:00", comments="Source field: configuration_node.template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.075+02:00", comments="Source field: configuration_node.template")
     public String getTemplate() {
         return template;
     }
@@ -65,7 +65,7 @@ public class ConfigurationNodeRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table configuration_node
      *
-     * @mbg.generated Tue Oct 23 08:28:57 CEST 2018
+     * @mbg.generated Tue Oct 23 16:13:43 CEST 2018
      */
     @Override
     public String toString() {
@@ -87,7 +87,7 @@ public class ConfigurationNodeRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table configuration_node
      *
-     * @mbg.generated Tue Oct 23 08:28:57 CEST 2018
+     * @mbg.generated Tue Oct 23 16:13:43 CEST 2018
      */
     @Override
     public boolean equals(Object that) {
@@ -113,7 +113,7 @@ public class ConfigurationNodeRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table configuration_node
      *
-     * @mbg.generated Tue Oct 23 08:28:57 CEST 2018
+     * @mbg.generated Tue Oct 23 16:13:43 CEST 2018
      */
     @Override
     public int hashCode() {

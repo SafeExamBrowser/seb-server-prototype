@@ -41,11 +41,6 @@ public class AttributeMapBuilder<T extends AttributeMapBuilder<T>> {
         return (T) this;
     }
 
-    public T configAttributeNames(final String configAttrs) {
-        this.attributes.put(AttributeKeys.CONFIG_ATTRIBUTE_NAMES, configAttrs);
-        return (T) this;
-    }
-
     public T singleAttribute() {
         this.attributes.put(AttributeKeys.CONFIG_ATTRIBUTE_SAVE_TYPE, "saveValue");
         return (T) this;

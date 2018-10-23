@@ -12,6 +12,7 @@
         <plugin type="org.mybatis.generator.plugins.VirtualPrimaryKeyPlugin"/>
         <plugin type="org.mybatis.generator.plugins.ToStringPlugin"/>
         <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin"/>
+        <plugin type="org.eth.demo.sebserver.batis.AdditionalMapperMethodsPlugin"/>
 
         <commentGenerator>
             <property name="addRemarkComments" value="false"/>
@@ -34,7 +35,6 @@
                              targetPackage="org.eth.demo.sebserver.batis.gen.mapper">
             <property name="enableSubPackages" value="false"/>
         </javaClientGenerator>
-        
         
         <table tableName="configuration_attribute" domainObjectName="ConfigurationAttributeRecord">
             <property name="immutable" value="true"/>

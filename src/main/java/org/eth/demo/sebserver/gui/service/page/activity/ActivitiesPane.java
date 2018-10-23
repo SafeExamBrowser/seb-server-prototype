@@ -99,8 +99,18 @@ public class ActivitiesPane implements TemplateComposer {
 
         final TreeItem configs = this.widgetFactory.treeItemLocalized(
                 navigation,
-                "org.sebserver.activities.sebconfig");
+                "org.sebserver.activities.sebconfigs");
         ActivitySelection.set(configs, Activity.SEB_CONFIGS.createSelection());
+
+        final TreeItem config = this.widgetFactory.treeItemLocalized(
+                configs,
+                "org.sebserver.activities.sebconfig");
+        ActivitySelection.set(config, Activity.SEB_CONFIG.createSelection());
+
+        final TreeItem configTemplates = this.widgetFactory.treeItemLocalized(
+                configs,
+                "org.sebserver.activities.sebconfig.templates");
+        ActivitySelection.set(configTemplates, Activity.SEB_CONFIG_TEMPLATES.createSelection());
 
         final TreeItem exams = this.widgetFactory.treeItemLocalized(
                 navigation,

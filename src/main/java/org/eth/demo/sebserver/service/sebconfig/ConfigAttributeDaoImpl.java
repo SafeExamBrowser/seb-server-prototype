@@ -8,12 +8,10 @@
 
 package org.eth.demo.sebserver.service.sebconfig;
 
-import static org.eth.demo.sebserver.batis.gen.mapper.ConfigurationAttributeRecordDynamicSqlSupport.name;
 import static org.eth.demo.sebserver.batis.gen.mapper.ConfigurationValueRecordDynamicSqlSupport.*;
 import static org.mybatis.dynamic.sql.SqlBuilder.equalTo;
 import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +19,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.executor.BatchResult;
 import org.eth.demo.sebserver.batis.AttributeOfViewJoinMapper;
 import org.eth.demo.sebserver.batis.AttributeOfViewJoinMapper.AttributeOfViewRecord;
 import org.eth.demo.sebserver.batis.BulkSaveAttributeValuesMapper;
@@ -162,54 +161,9 @@ public class ConfigAttributeDaoImpl implements ConfigAttributeDao {
                 .execute();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eth.demo.sebserver.service.dao.SEBConfigDao#getValues(java.lang.Long, java.util.List)
-     */
-    @Deprecated
-    @Override
-    @Transactional(readOnly = true)
-    public Collection<AttributeValue> getValues(final Long configId, final List<String> attributeNames) {
-
-        final List<String> tableAttributeNames = attributeNames.stream()
-                .filter(a -> a.contains("."))
-                .collect(Collectors.toList());
-        final List<String> singleAttributeNames = new ArrayList<>(attributeNames);
-        singleAttributeNames.removeAll(tableAttributeNames);
-
-        // TODO do this with a join!?
-
-        final List<Long> attributeIds = this.configurationAttributeRecordMapper.selectByExample()
-                .where(name, SqlBuilder.isIn(singleAttributeNames))
-                .build()
-                .execute()
-                .stream()
-                .map(a -> a.getId())
-                .collect(Collectors.toList());
-
-        attributeIds.addAll(
-                tableAttributeNames.stream()
-                        .map(name -> {
-                            final String[] names = StringUtils.split(name, ".");
-                            return getAttribute(names[1], names[0]).getId();
-                        })
-                        .collect(Collectors.toList()));
-
-        return this.configurationValueRecordMapper.selectByExample()
-                .where(configurationId, SqlBuilder.isEqualTo(configId))
-                .and(configurationAttributeId, SqlBuilder.isIn(attributeIds))
-                .build()
-                .execute()
-                .stream()
-                .map(this::attributeValueFromRecord)
-                .collect(Collectors.toList());
-
-    }
-
     @Override
     @Transactional
-    public Collection<ConfigurationValueRecord> saveValues(final Collection<ConfigurationValueRecord> records) {
+    public void saveValues(final Collection<ConfigurationValueRecord> records) {
         for (final ConfigurationValueRecord record : records) {
             if (record.getId() == null) {
                 this.bulkSaveAttributeValuesMapper.insert(record);
@@ -219,8 +173,8 @@ public class ConfigAttributeDaoImpl implements ConfigAttributeDao {
         }
 
         // TODO test this and check what exactly flush is returning
-        final List flush = this.bulkSaveAttributeValuesMapper.flush();
-        return flush;
+        @SuppressWarnings("unused")
+        final List<BatchResult> flush = this.bulkSaveAttributeValuesMapper.flush();
     }
 
     /*

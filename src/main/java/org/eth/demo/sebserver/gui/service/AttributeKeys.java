@@ -17,7 +17,7 @@ public interface AttributeKeys {
 
     public static final String CONFIG_ID = "CONFIG_ID";
     public static final String CONFIG_VIEW_NAME = "CONFIG_VIEW_NAME";
-    public static final String CONFIG_ATTRIBUTE_NAMES = "CONFIG_ATTRIBUTE_NAMES";
+    //public static final String CONFIG_ATTRIBUTE_NAMES = "CONFIG_ATTRIBUTE_NAMES";
     public static final String CONFIG_ATTRIBUTE_SAVE_TYPE = "CONFIG_ATTRIBUTE_SAVE_TYPE";
     public static final String CONFIG_ATTRIBUTE_VALUE = "CONFIG_ATTRIBUTE_VALUE";
 

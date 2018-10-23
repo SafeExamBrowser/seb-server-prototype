@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormData;
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigAttributeValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigViewAttribute;
@@ -26,7 +25,6 @@ public final class ViewContext {
     public final String name;
     public final String configurationId;
 
-    public final int xpos, ypos, width, height;
     public final int columns, rows;
     private final ConfigViewGridCell protoCell;
 
@@ -38,10 +36,6 @@ public final class ViewContext {
     ViewContext(
             final String name,
             final String configurationId,
-            final int xpos,
-            final int ypos,
-            final int width,
-            final int height,
             final int columns,
             final int rows,
             final Map<String, ConfigViewAttribute> attributes,
@@ -49,19 +43,16 @@ public final class ViewContext {
 
         this.name = name;
         this.configurationId = configurationId;
-        this.xpos = xpos;
-        this.ypos = ypos;
-        this.width = width;
-        this.height = height;
         this.columns = columns;
         this.rows = rows;
 
+        // TODO use GridLayout instead of FormLayout
         this.protoCell = new ConfigViewGridCell(
                 0, 0,
                 100 / columns,
                 100 / rows,
-                width / columns,
-                height / rows);
+                800 / columns,
+                500 / rows);
 
         this.attributes = attributes;
         this.inputFields = new HashMap<>();
@@ -74,22 +65,6 @@ public final class ViewContext {
 
     public String getConfigurationId() {
         return this.configurationId;
-    }
-
-    public int getXpos() {
-        return this.xpos;
-    }
-
-    public int getYpos() {
-        return this.ypos;
-    }
-
-    public int getWidth() {
-        return this.width;
-    }
-
-    public int getHeight() {
-        return this.height;
     }
 
     public int getColumns() {
@@ -114,10 +89,6 @@ public final class ViewContext {
 
     public int getCellPixelHeight() {
         return this.protoCell.pixelHeight;
-    }
-
-    public Rectangle getViewBounds() {
-        return new Rectangle(this.xpos, this.ypos, this.width, this.height);
     }
 
     public ConfigViewGridCell getCell(final int column, final int row) {
@@ -158,10 +129,11 @@ public final class ViewContext {
 
     @Override
     public String toString() {
-        return "ViewContext [name=" + this.name + ", xpos=" + this.xpos + ", ypos=" + this.ypos + ", width="
-                + this.width + ", height="
-                + this.height + ", columns=" + this.columns + ", rows=" + this.rows + ", protoCell=" + this.protoCell
-                + "]";
+        return "ViewContext [name=" + this.name + ", configurationId=" + this.configurationId + ", columns="
+                + this.columns + ", rows="
+                + this.rows + ", protoCell=" + this.protoCell + ", attributes=" + this.attributes + ", inputFields="
+                + this.inputFields
+                + ", valueChangeListener=" + this.valueChangeListener + "]";
     }
 
 }

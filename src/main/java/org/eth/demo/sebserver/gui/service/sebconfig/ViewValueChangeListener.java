@@ -11,7 +11,7 @@ package org.eth.demo.sebserver.gui.service.sebconfig;
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigAttributeValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigTableValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigViewAttribute;
-import org.eth.demo.sebserver.gui.service.rest.sebconfig.POSTConfigValue;
+import org.eth.demo.sebserver.gui.service.rest.sebconfig.PostConfigValue;
 import org.eth.demo.sebserver.service.JSONMapper;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,12 +19,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class ViewValueChangeListener implements ValueChangeListener {
 
-    private final POSTConfigValue saveConfigAttributeValue;
+    private final PostConfigValue saveConfigAttributeValue;
     private final RestTemplate restTemplate;
     private final JSONMapper jsonMapper;
 
     public ViewValueChangeListener(
-            final POSTConfigValue saveConfigAttributeValue,
+            final PostConfigValue saveConfigAttributeValue,
             final RestTemplate restTemplate,
             final JSONMapper jsonMapper) {
 

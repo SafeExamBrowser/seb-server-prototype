@@ -28,11 +28,11 @@ import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
-public class GETConfigAttribute implements SEBServerAPICall<Map<String, ConfigViewAttribute>> {
+public class GetConfigAttributes implements SEBServerAPICall<Map<String, ConfigViewAttribute>> {
 
     private final RestCallBuilder restCallBuilder;
 
-    public GETConfigAttribute(final RestCallBuilder restCallBuilder) {
+    public GetConfigAttributes(final RestCallBuilder restCallBuilder) {
         this.restCallBuilder = restCallBuilder;
     }
 

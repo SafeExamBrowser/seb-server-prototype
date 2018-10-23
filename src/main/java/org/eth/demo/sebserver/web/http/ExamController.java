@@ -43,6 +43,7 @@ public class ExamController {
 
     @RequestMapping(method = RequestMethod.GET)
     public final Collection<Exam> exams(final Principal principal) {
+
         return this.examDao.all(
                 this.authorizationGrantService.getGrantFilter(
                         GrantEntityType.EXAM,

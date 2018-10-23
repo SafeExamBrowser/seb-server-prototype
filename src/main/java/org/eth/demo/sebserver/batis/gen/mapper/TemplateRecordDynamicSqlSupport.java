@@ -6,19 +6,19 @@ import org.mybatis.dynamic.sql.SqlColumn;
 import org.mybatis.dynamic.sql.SqlTable;
 
 public final class TemplateRecordDynamicSqlSupport {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.605+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.049+02:00", comments="Source Table: template")
     public static final TemplateRecord templateRecord = new TemplateRecord();
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.605+02:00", comments="Source field: template.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.049+02:00", comments="Source field: template.id")
     public static final SqlColumn<Long> id = templateRecord.id;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.606+02:00", comments="Source field: template.name")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.049+02:00", comments="Source field: template.name")
     public static final SqlColumn<String> name = templateRecord.name;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.607+02:00", comments="Source field: template.description")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.049+02:00", comments="Source field: template.description")
     public static final SqlColumn<String> description = templateRecord.description;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.605+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.049+02:00", comments="Source Table: template")
     public static final class TemplateRecord extends SqlTable {
         public final SqlColumn<Long> id = column("id", JDBCType.BIGINT);
 

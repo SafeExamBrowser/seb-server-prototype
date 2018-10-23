@@ -20,6 +20,7 @@ import org.eth.demo.sebserver.gui.service.page.content.ExamsListPage;
 import org.eth.demo.sebserver.gui.service.page.content.InstitutionForm;
 import org.eth.demo.sebserver.gui.service.page.content.InstitutionsForm;
 import org.eth.demo.sebserver.gui.service.page.content.RunningExamPage;
+import org.eth.demo.sebserver.gui.service.page.content.SEBConfigurationPage;
 
 public class ActivitySelection {
 
@@ -38,7 +39,9 @@ public class ActivitySelection {
         USERS(TODOTemplate.class, TODOTemplate.class),
 
         EXAMS(ExamsListPage.class, ActionPane.class),
-        SEB_CONFIGS(TODOTemplate.class, TODOTemplate.class),
+        SEB_CONFIGS(TODOTemplate.class, ActionPane.class),
+        SEB_CONFIG(SEBConfigurationPage.class, ActionPane.class),
+        SEB_CONFIG_TEMPLATES(TODOTemplate.class, ActionPane.class),
         MONITORING(TODOTemplate.class, TODOTemplate.class),
         RUNNING_EXAMS(TODOTemplate.class, TODOTemplate.class),
         RUNNING_EXAM(RunningExamPage.class, ActionPane.class, AttributeKeys.EXAM_ID),

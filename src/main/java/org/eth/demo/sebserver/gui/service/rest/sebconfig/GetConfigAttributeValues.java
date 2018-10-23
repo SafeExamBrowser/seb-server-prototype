@@ -24,11 +24,11 @@ import org.springframework.web.client.RestTemplate;
 
 @Lazy
 @Component
-public class GETConfigAttributeValues implements SEBServerAPICall<Collection<ConfigAttributeValue>> {
+public class GetConfigAttributeValues implements SEBServerAPICall<Collection<ConfigAttributeValue>> {
 
     private final RestCallBuilder restCallBuilder;
 
-    public GETConfigAttributeValues(final RestCallBuilder restCallBuilder) {
+    public GetConfigAttributeValues(final RestCallBuilder restCallBuilder) {
         this.restCallBuilder = restCallBuilder;
     }
 
@@ -38,18 +38,17 @@ public class GETConfigAttributeValues implements SEBServerAPICall<Collection<Con
             final Map<String, String> attributes) {
 
         final String configId = getAttribute(attributes, AttributeKeys.CONFIG_ID);
-        final String configAttrs = getAttribute(attributes, AttributeKeys.CONFIG_ATTRIBUTE_NAMES);
+        final String viewName = getAttribute(attributes, AttributeKeys.CONFIG_VIEW_NAME);
 
         try {
             return Result.of(
                     restTemplate.exchange(
                             this.restCallBuilder
-                                    .withPath("sebconfig/values/" + configId),
+                                    .withPath("sebconfig/values/" + configId + "/" + viewName),
                             HttpMethod.GET,
                             this.restCallBuilder
                                     .httpEntity()
                                     .withContentTypeJson()
-                                    .withHeader("attributeNames", configAttrs)
                                     .build(),
                             new ParameterizedTypeReference<Collection<ConfigAttributeValue>>() {
                             })

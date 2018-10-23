@@ -26,9 +26,9 @@ import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigAttributeValu
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigViewAttribute;
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigViewGridCell;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
-import org.eth.demo.sebserver.gui.service.rest.sebconfig.GETConfigAttribute;
-import org.eth.demo.sebserver.gui.service.rest.sebconfig.GETConfigAttributeValues;
-import org.eth.demo.sebserver.gui.service.rest.sebconfig.POSTConfigValue;
+import org.eth.demo.sebserver.gui.service.rest.sebconfig.GetConfigAttributeValues;
+import org.eth.demo.sebserver.gui.service.rest.sebconfig.GetConfigAttributes;
+import org.eth.demo.sebserver.gui.service.rest.sebconfig.PostConfigValue;
 import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
 import org.eth.demo.sebserver.service.JSONMapper;
 import org.springframework.stereotype.Service;
@@ -36,17 +36,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class ConfigViewService {
 
-    private final GETConfigAttribute configAttributeRequest;
-    private final GETConfigAttributeValues configAttributeValuesRequest;
-    private final POSTConfigValue saveConfigAttributeValue;
+    private final GetConfigAttributes configAttributeRequest;
+    private final GetConfigAttributeValues configAttributeValuesRequest;
+    private final PostConfigValue saveConfigAttributeValue;
     private final Map<FieldType, InputComponentBuilder> builderTypeMapping;
     private final AuthorizationContextHolder authorizationContextHolder;
     private final JSONMapper jsonMapper;
 
     public ConfigViewService(
-            final GETConfigAttribute configAttributeRequest,
-            final GETConfigAttributeValues configAttributeValuesRequest,
-            final POSTConfigValue saveConfigAttributeValue,
+            final GetConfigAttributes configAttributeRequest,
+            final GetConfigAttributeValues configAttributeValuesRequest,
+            final PostConfigValue saveConfigAttributeValue,
             final Collection<InputComponentBuilder> builders,
             final AuthorizationContextHolder authorizationContextHolder,
             final JSONMapper jsonMapper) {
@@ -67,10 +67,6 @@ public class ConfigViewService {
     public ViewContext createViewContext(
             final String name,
             final String configurationId,
-            final int xpos,
-            final int ypos,
-            final int width,
-            final int height,
             final int columns,
             final int rows) {
 
@@ -86,8 +82,6 @@ public class ConfigViewService {
         return new ViewContext(
                 name,
                 configurationId,
-                xpos, ypos,
-                width, height,
                 columns, rows,
                 attributes,
                 new ViewValueChangeListener(
@@ -147,11 +141,10 @@ public class ConfigViewService {
 
     public ViewContext initInputFieldValues(final ViewContext viewContext) {
 
-        final String attributeNames = StringUtils.join(viewContext.getAttributeNames(), ",");
         final Collection<ConfigAttributeValue> attributeValues = this.configAttributeValuesRequest
                 .with(this.authorizationContextHolder)
                 .config(viewContext.configurationId)
-                .configAttributeNames(attributeNames)
+                .configViewName(viewContext.name)
                 .doAPICall()
                 .onError(t -> {
                     throw new RuntimeException(t);

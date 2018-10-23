@@ -12,6 +12,8 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eth.demo.sebserver.gui.service.sebconfig.ViewContext;
 
+@Deprecated
+// TODO use GridLayout instead of FormLayout
 public class ConfigViewGridCell {
 
     public static final int GROUP_CELL_HEIGHT_ADJUSTMENT = 2;

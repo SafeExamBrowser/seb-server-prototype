@@ -32,20 +32,20 @@ import org.mybatis.dynamic.sql.util.SqlProviderAdapter;
 
 @Mapper
 public interface TemplateRecordMapper {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.607+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.050+02:00", comments="Source Table: template")
     @SelectProvider(type=SqlProviderAdapter.class, method="select")
     long count(SelectStatementProvider selectStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.607+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.050+02:00", comments="Source Table: template")
     @DeleteProvider(type=SqlProviderAdapter.class, method="delete")
     int delete(DeleteStatementProvider deleteStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.612+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.050+02:00", comments="Source Table: template")
     @InsertProvider(type=SqlProviderAdapter.class, method="insert")
     @SelectKey(statement="SELECT LAST_INSERT_ID()", keyProperty="record.id", before=false, resultType=Long.class)
     int insert(InsertStatementProvider<TemplateRecord> insertStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.612+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.050+02:00", comments="Source Table: template")
     @SelectProvider(type=SqlProviderAdapter.class, method="select")
     @ConstructorArgs({
         @Arg(column="id", javaType=Long.class, jdbcType=JdbcType.BIGINT, id=true),
@@ -54,7 +54,7 @@ public interface TemplateRecordMapper {
     })
     TemplateRecord selectOne(SelectStatementProvider selectStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.614+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.053+02:00", comments="Source Table: template")
     @SelectProvider(type=SqlProviderAdapter.class, method="select")
     @ConstructorArgs({
         @Arg(column="id", javaType=Long.class, jdbcType=JdbcType.BIGINT, id=true),
@@ -63,22 +63,22 @@ public interface TemplateRecordMapper {
     })
     List<TemplateRecord> selectMany(SelectStatementProvider selectStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.615+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.053+02:00", comments="Source Table: template")
     @UpdateProvider(type=SqlProviderAdapter.class, method="update")
     int update(UpdateStatementProvider updateStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.616+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.053+02:00", comments="Source Table: template")
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<Long>> countByExample() {
         return SelectDSL.selectWithMapper(this::count, SqlBuilder.count())
                 .from(templateRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.616+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.053+02:00", comments="Source Table: template")
     default DeleteDSL<MyBatis3DeleteModelAdapter<Integer>> deleteByExample() {
         return DeleteDSL.deleteFromWithMapper(this::delete, templateRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.617+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.053+02:00", comments="Source Table: template")
     default int deleteByPrimaryKey(Long id_) {
         return DeleteDSL.deleteFromWithMapper(this::delete, templateRecord)
                 .where(id, isEqualTo(id_))
@@ -86,7 +86,7 @@ public interface TemplateRecordMapper {
                 .execute();
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.617+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.054+02:00", comments="Source Table: template")
     default int insert(TemplateRecord record) {
         return insert(SqlBuilder.insert(record)
                 .into(templateRecord)
@@ -96,7 +96,7 @@ public interface TemplateRecordMapper {
                 .render(RenderingStrategy.MYBATIS3));
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.617+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.054+02:00", comments="Source Table: template")
     default int insertSelective(TemplateRecord record) {
         return insert(SqlBuilder.insert(record)
                 .into(templateRecord)
@@ -106,19 +106,19 @@ public interface TemplateRecordMapper {
                 .render(RenderingStrategy.MYBATIS3));
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.617+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.054+02:00", comments="Source Table: template")
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<List<TemplateRecord>>> selectByExample() {
         return SelectDSL.selectWithMapper(this::selectMany, id, name, description)
                 .from(templateRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.617+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.054+02:00", comments="Source Table: template")
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<List<TemplateRecord>>> selectDistinctByExample() {
         return SelectDSL.selectDistinctWithMapper(this::selectMany, id, name, description)
                 .from(templateRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.617+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.054+02:00", comments="Source Table: template")
     default TemplateRecord selectByPrimaryKey(Long id_) {
         return SelectDSL.selectWithMapper(this::selectOne, id, name, description)
                 .from(templateRecord)
@@ -127,21 +127,21 @@ public interface TemplateRecordMapper {
                 .execute();
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.617+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.054+02:00", comments="Source Table: template")
     default UpdateDSL<MyBatis3UpdateModelAdapter<Integer>> updateByExample(TemplateRecord record) {
         return UpdateDSL.updateWithMapper(this::update, templateRecord)
                 .set(name).equalTo(record::getName)
                 .set(description).equalTo(record::getDescription);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.617+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.054+02:00", comments="Source Table: template")
     default UpdateDSL<MyBatis3UpdateModelAdapter<Integer>> updateByExampleSelective(TemplateRecord record) {
         return UpdateDSL.updateWithMapper(this::update, templateRecord)
                 .set(name).equalToWhenPresent(record::getName)
                 .set(description).equalToWhenPresent(record::getDescription);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.617+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.054+02:00", comments="Source Table: template")
     default int updateByPrimaryKey(TemplateRecord record) {
         return UpdateDSL.updateWithMapper(this::update, templateRecord)
                 .set(name).equalTo(record::getName)
@@ -151,7 +151,7 @@ public interface TemplateRecordMapper {
                 .execute();
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T08:28:57.618+02:00", comments="Source Table: template")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.054+02:00", comments="Source Table: template")
     default int updateByPrimaryKeySelective(TemplateRecord record) {
         return UpdateDSL.updateWithMapper(this::update, templateRecord)
                 .set(name).equalToWhenPresent(record::getName)
@@ -159,5 +159,15 @@ public interface TemplateRecordMapper {
                 .where(id, isEqualTo(record::getId))
                 .build()
                 .execute();
+    }
+
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator",comments="Source Table: exam")
+    @SelectProvider(type=SqlProviderAdapter.class, method="select")
+    @ConstructorArgs({@Arg(column="id", javaType=Long.class, jdbcType=JdbcType.BIGINT, id=true)})
+    List<Long> selectIds(SelectStatementProvider select);
+
+    default QueryExpressionDSL<MyBatis3SelectModelAdapter<List<Long>>> selectIdsByExample() {
+        return SelectDSL.selectDistinctWithMapper(this::selectIds, id)
+                        .from(templateRecord);
     }
 }

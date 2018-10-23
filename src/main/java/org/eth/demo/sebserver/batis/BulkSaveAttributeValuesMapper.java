@@ -18,6 +18,7 @@ import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.SelectKey;
 import org.apache.ibatis.annotations.UpdateProvider;
+import org.apache.ibatis.executor.BatchResult;
 import org.eth.demo.sebserver.batis.gen.model.ConfigurationValueRecord;
 import org.mybatis.dynamic.sql.SqlBuilder;
 import org.mybatis.dynamic.sql.insert.render.InsertStatementProvider;
@@ -30,7 +31,10 @@ import org.mybatis.dynamic.sql.util.SqlProviderAdapter;
 public interface BulkSaveAttributeValuesMapper {
 
     @InsertProvider(type = SqlProviderAdapter.class, method = "insert")
-    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "record.id", before = false,
+    @SelectKey(
+            statement = "SELECT LAST_INSERT_ID()",
+            keyProperty = "record.id",
+            before = false,
             resultType = Long.class)
     int insert(InsertStatementProvider<ConfigurationValueRecord> insertStatement);
 
@@ -62,8 +66,7 @@ public interface BulkSaveAttributeValuesMapper {
     }
 
     // TODO test this and check what exactly flush is returning
-    @SuppressWarnings("rawtypes")
     @Flush
-    List flush();
+    List<BatchResult> flush();
 
 }
