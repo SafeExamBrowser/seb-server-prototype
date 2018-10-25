@@ -9,7 +9,6 @@
 package org.eth.demo.sebserver.gui.service.sebconfig.typebuilder;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.eclipse.swt.SWT;
@@ -71,7 +70,7 @@ public class TextFieldBuilder implements InputComponentBuilder {
             control.addListener(
                     SWT.FocusOut,
                     event -> valueListener.valueChanged(
-                            viewContext.configurationId,
+                            viewContext,
                             attribute,
                             String.valueOf(control.getText()),
                             0));
@@ -90,7 +89,7 @@ public class TextFieldBuilder implements InputComponentBuilder {
                 final String text = control.getText();
                 numberCheck.accept(text);
                 control.setBackground(null);
-                valueListener.valueChanged(viewContext.configurationId, attribute, text, 0);
+                valueListener.valueChanged(viewContext, attribute, text, 0);
             } catch (final NumberFormatException e) {
                 control.setBackground(new Color(control.getDisplay(), 255, 0, 0, 50));
             }
@@ -99,19 +98,27 @@ public class TextFieldBuilder implements InputComponentBuilder {
 
     static final class TextInputField extends ControlFieldAdapter<Text> {
 
+        private String initValue = "";
+
         TextInputField(final ConfigViewAttribute attribute, final Text control) {
             super(attribute, control);
         }
 
         @Override
         public void initValue(final Collection<ConfigAttributeValue> values) {
-            final Optional<ConfigAttributeValue> value = values.stream()
+            values.stream()
                     .filter(a -> this.attribute.name.equals(a.attributeName))
-                    .findFirst();
+                    .findFirst()
+                    .map(v -> {
+                        this.initValue = v.value;
+                        setDefaultValue();
+                        return this.initValue;
+                    });
+        }
 
-            if (value.isPresent()) {
-                this.control.setText(value.get().value);
-            }
+        @Override
+        protected void setDefaultValue() {
+            this.control.setText(this.initValue);
         }
     }
 }

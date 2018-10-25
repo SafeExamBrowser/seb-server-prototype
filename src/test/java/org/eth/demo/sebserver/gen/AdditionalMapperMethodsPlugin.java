@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.eth.demo.sebserver.batis;
+package org.eth.demo.sebserver.gen;
 
 import java.util.List;
 

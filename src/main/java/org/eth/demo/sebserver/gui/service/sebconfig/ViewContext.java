@@ -15,18 +15,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.eclipse.swt.layout.FormData;
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigAttributeValue;
 import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigViewAttribute;
-import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigViewGridCell;
 
 public final class ViewContext {
 
     public final String name;
     public final String configurationId;
-
     public final int columns, rows;
-    private final ConfigViewGridCell protoCell;
 
     private final Map<String, ConfigViewAttribute> attributes;
     private final Map<String, InputField> inputFields;
@@ -45,14 +41,6 @@ public final class ViewContext {
         this.configurationId = configurationId;
         this.columns = columns;
         this.rows = rows;
-
-        // TODO use GridLayout instead of FormLayout
-        this.protoCell = new ConfigViewGridCell(
-                0, 0,
-                100 / columns,
-                100 / rows,
-                800 / columns,
-                500 / rows);
 
         this.attributes = attributes;
         this.inputFields = new HashMap<>();
@@ -75,28 +63,8 @@ public final class ViewContext {
         return this.rows;
     }
 
-    public int getCellRelativeWidth() {
-        return this.protoCell.relWidth;
-    }
-
-    public int getCellRelativeHeight() {
-        return this.protoCell.relHeight;
-    }
-
-    public int getCellPixelWidth() {
-        return this.protoCell.pixelWidth;
-    }
-
-    public int getCellPixelHeight() {
-        return this.protoCell.pixelHeight;
-    }
-
-    public ConfigViewGridCell getCell(final int column, final int row) {
-        return this.protoCell.copyOf(column, row);
-    }
-
-    public FormData getFormData(final int column, final int row) {
-        return ConfigViewGridCell.createFormData(getCell(column, row));
+    public ConfigViewAttribute getAttribute(final String attributeName) {
+        return this.attributes.get(attributeName);
     }
 
     public List<ConfigViewAttribute> getAttributes() {
@@ -111,6 +79,15 @@ public final class ViewContext {
         return this.attributes.values().stream()
                 .filter(a -> attribute.name.equals(a.parentAttributeName))
                 .sorted((a1, a2) -> Integer.valueOf(a1.xpos).compareTo(a2.xpos))
+                .collect(Collectors.toList());
+    }
+
+    public List<ConfigViewAttribute> getAttributesOfGroup(final String groupName) {
+        return this.attributes.values().stream()
+                .filter(a -> groupName.equals(a.group))
+                .sorted((a1, a2) -> (a1.ypos == a2.ypos)
+                        ? Integer.valueOf(a1.xpos).compareTo(a2.xpos)
+                        : Integer.valueOf(a1.ypos).compareTo(a2.ypos))
                 .collect(Collectors.toList());
     }
 
@@ -131,9 +108,9 @@ public final class ViewContext {
     public String toString() {
         return "ViewContext [name=" + this.name + ", configurationId=" + this.configurationId + ", columns="
                 + this.columns + ", rows="
-                + this.rows + ", protoCell=" + this.protoCell + ", attributes=" + this.attributes + ", inputFields="
-                + this.inputFields
-                + ", valueChangeListener=" + this.valueChangeListener + "]";
+                + this.rows + ", attributes=" + this.attributes + ", inputFields=" + this.inputFields
+                + ", valueChangeListener="
+                + this.valueChangeListener + "]";
     }
 
 }

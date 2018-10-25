@@ -8,13 +8,12 @@
 
 package org.eth.demo.sebserver.gui.service.sebconfig;
 
-import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigTableValue;
-import org.eth.demo.sebserver.gui.domain.sebconfig.attribute.ConfigViewAttribute;
+import java.util.Collection;
 
-public interface ValueChangeListener {
+public interface ConfigValueChangeRule {
 
-    void valueChanged(ViewContext context, ConfigViewAttribute attribute, String value, int listIndex);
+    Collection<String> observedAttributeNames();
 
-    void tableChanged(ConfigTableValue tableValue);
+    void applyRule(ViewContext context, String attributeName, String value);
 
 }

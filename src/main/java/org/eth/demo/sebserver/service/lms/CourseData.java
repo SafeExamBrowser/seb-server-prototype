@@ -84,7 +84,6 @@ public final class CourseData {
     }
 
     public ExamStatus getStatus() {
-        final DateTime dt = new DateTime(DateTimeZone.UTC);
         if (this.startTime.isAfterNow()) {
             return ExamStatus.READY;
         } else if (this.startTime.isBeforeNow() && this.endTime.isAfterNow()) {

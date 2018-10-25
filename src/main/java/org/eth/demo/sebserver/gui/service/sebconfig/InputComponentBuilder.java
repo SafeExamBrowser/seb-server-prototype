@@ -14,11 +14,17 @@ import org.eth.demo.sebserver.gui.service.sebconfig.InputField.FieldType;
 
 public interface InputComponentBuilder {
 
+    String RES_BUNDLE_KEY_PREFIX = "org.sebserver.configuration_attribute.inputresources.";
+
     FieldType[] supportedTypes();
 
     InputField createInputComponent(
             final Composite parent,
             final ConfigViewAttribute attribute,
             final ViewContext viewContext);
+
+    static String createResourceBundleKey(final String paramName, final String value) {
+        return RES_BUNDLE_KEY_PREFIX + paramName + "." + value;
+    }
 
 }

@@ -9,7 +9,6 @@
 package org.eth.demo.sebserver.gui.service.sebconfig.typebuilder;
 
 import java.util.Collection;
-import java.util.Optional;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
@@ -47,7 +46,7 @@ public class CheckBoxBuilder implements InputComponentBuilder {
         checkbox.addListener(
                 SWT.Selection,
                 event -> viewContext.getValueChangeListener().valueChanged(
-                        viewContext.configurationId,
+                        viewContext,
                         attribute,
                         String.valueOf(checkbox.getSelection()),
                         0));
@@ -57,20 +56,27 @@ public class CheckBoxBuilder implements InputComponentBuilder {
 
     static final class CheckboxField extends ControlFieldAdapter<Button> {
 
+        private boolean initValue = false;
+
         CheckboxField(final ConfigViewAttribute attribute, final Button control) {
             super(attribute, control);
         }
 
         @Override
         public void initValue(final Collection<ConfigAttributeValue> values) {
-            final Optional<ConfigAttributeValue> value = values.stream()
+            values.stream()
                     .filter(a -> this.attribute.name.equals(a.attributeName))
-                    .findFirst();
+                    .findFirst()
+                    .map(v -> {
+                        this.initValue = Boolean.valueOf(v.value);
+                        this.control.setSelection(this.initValue);
+                        return this.initValue;
+                    });
+        }
 
-            if (value.isPresent()) {
-                this.control.setSelection(Boolean.valueOf(value.get().value));
-            }
+        @Override
+        protected void setDefaultValue() {
+            this.control.setSelection(this.initValue);
         }
     }
-
 }

@@ -160,7 +160,8 @@ public class FormBuilder {
         if (this.readonly) {
             this.form.putField(name, lab, this.widgetFactory.formValueLabel(this.formParent, value, 2));
         } else {
-            final Combo selection = this.widgetFactory.formComboLocalized(this.formParent, value, items, span, 1);
+            final Combo selection =
+                    this.widgetFactory.formSingleSelectionLocalized(this.formParent, value, items, span, 1);
             this.form.putField(name, lab, selection);
             if (selectionListener != null) {
                 selection.addListener(SWT.Selection, e -> {

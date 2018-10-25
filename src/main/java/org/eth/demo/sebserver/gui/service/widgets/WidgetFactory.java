@@ -22,6 +22,8 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
@@ -68,7 +70,6 @@ public class WidgetFactory {
 
     }
 
-    //public final I18nSupport i18nSupport;
     private final PolyglotPageService polyglotPageService;
 
     public WidgetFactory(final PolyglotPageService polyglotPageService) {
@@ -171,6 +172,18 @@ public class WidgetFactory {
         return item;
     }
 
+    public Table tableLocalized(final Composite parent) {
+        final Table table = new Table(parent, SWT.NONE);
+        this.polyglotPageService.injectI18n(table);
+        return table;
+    }
+
+    public TableColumn tableColumnLocalized(final Table table, final String locTextKey) {
+        final TableColumn tableColumn = new TableColumn(table, SWT.NONE);
+        this.polyglotPageService.injectI18n(tableColumn, new LocTextKey(locTextKey));
+        return tableColumn;
+    }
+
     public Label labelSeparator(final Composite parent) {
         final Label label = new Label(parent, SWT.SEPARATOR);
         return label;
@@ -219,22 +232,21 @@ public class WidgetFactory {
         return textInput;
     }
 
-    public Combo formComboLocalized(
+    public Combo formSingleSelectionLocalized(
             final Composite parent,
             final String selection,
             final List<Tuple<String>> items) {
 
-        return formComboLocalized(parent, selection, items, 1, 1);
+        return formSingleSelectionLocalized(parent, selection, items, 1, 1);
     }
 
-    public Combo formComboLocalized(
+    public Combo formSingleSelectionLocalized(
             final Composite parent,
             final String selection,
             final List<Tuple<String>> items,
             final int hspan, final int vspan) {
 
-        final SingleSelection combo = new SingleSelection(parent, items);
-        this.polyglotPageService.injectI18n(combo, combo.valueMapping);
+        final SingleSelection combo = singleSelectionLocalized(parent, items);
         final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false, hspan, vspan);
         gridData.heightHint = 25;
         combo.setLayoutData(gridData);
@@ -250,6 +262,15 @@ public class WidgetFactory {
         final Label empty = new Label(parent, SWT.LEFT);
         empty.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, hspan, vspan));
         empty.setText("");
+    }
+
+    public SingleSelection singleSelectionLocalized(
+            final Composite parent,
+            final List<Tuple<String>> items) {
+
+        final SingleSelection combo = new SingleSelection(parent, items);
+        this.polyglotPageService.injectI18n(combo, combo.valueMapping);
+        return combo;
     }
 
 }

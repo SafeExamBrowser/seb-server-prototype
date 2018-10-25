@@ -20,6 +20,8 @@ public final class AttributeOfView {
     public final String group;
     public final int xpos;
     public final int ypos;
+    public final int width;
+    public final int height;
 
     public AttributeOfView(final String name,
             final AttributeType type,
@@ -29,7 +31,9 @@ public final class AttributeOfView {
             final String view,
             final String group,
             final int xpos,
-            final int ypos) {
+            final int ypos,
+            final int width,
+            final int height) {
 
         this.name = name;
         this.type = type;
@@ -40,6 +44,8 @@ public final class AttributeOfView {
         this.group = group;
         this.xpos = xpos;
         this.ypos = ypos;
+        this.width = width;
+        this.height = height;
     }
 
     public String getName() {
@@ -74,6 +80,14 @@ public final class AttributeOfView {
         return this.ypos;
     }
 
+    public int getWidth() {
+        return this.width;
+    }
+
+    public int getHeight() {
+        return this.height;
+    }
+
     @Override
     public boolean equals(final Object obj) {
         if (this == obj)
@@ -100,11 +114,12 @@ public final class AttributeOfView {
 
     @Override
     public String toString() {
-        return "ViewAttribute [name=" + this.name + ", type=" + this.type + ", parentAttributeName="
+        return "AttributeOfView [name=" + this.name + ", type=" + this.type + ", parentAttributeName="
                 + this.parentAttributeName
                 + ", resources=" + this.resources + ", dependencies=" + this.dependencies + ", view=" + this.view
                 + ", group=" + this.group
-                + ", xpos=" + this.xpos + ", ypos=" + this.ypos + "]";
+                + ", xpos=" + this.xpos + ", ypos=" + this.ypos + ", width=" + this.width + ", height=" + this.height
+                + "]";
     }
 
 }

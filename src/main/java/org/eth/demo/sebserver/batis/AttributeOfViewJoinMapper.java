@@ -42,7 +42,9 @@ public interface AttributeOfViewJoinMapper {
             @Arg(column = "view", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "group", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Arg(column = "x_position", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Arg(column = "y_position", javaType = Integer.class, jdbcType = JdbcType.INTEGER)
+            @Arg(column = "y_position", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Arg(column = "width", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Arg(column = "height", javaType = Integer.class, jdbcType = JdbcType.INTEGER)
     })
     Collection<AttributeOfViewRecord> selectMany(SelectStatementProvider select);
 
@@ -59,7 +61,9 @@ public interface AttributeOfViewJoinMapper {
                 orientationRecord.view,
                 orientationRecord.group,
                 orientationRecord.xPosition,
-                orientationRecord.yPosition)
+                orientationRecord.yPosition,
+                orientationRecord.width,
+                orientationRecord.height)
                 .from(configurationAttributeRecord)
                 .leftJoin(orientationRecord)
                 .on(configurationAttributeRecord.id, equalTo(orientationRecord.configAttributeId))
@@ -80,11 +84,14 @@ public interface AttributeOfViewJoinMapper {
         public final String group;
         public final Integer xPosition;
         public final Integer yPosition;
+        public final Integer width;
+        public final Integer height;
 
-        public AttributeOfViewRecord(final Long id, final String name, final String type, final Long parentId,
+        public AttributeOfViewRecord(
+                final Long id, final String name, final String type, final Long parentId,
                 final String resources, final String dependencies,
-                final Long orientationId, final String view, final String group, final Integer xPosition,
-                final Integer yPosition) {
+                final Long orientationId, final String view, final String group,
+                final Integer xPosition, final Integer yPosition, final Integer width, final Integer height) {
 
             this.id = id;
             this.name = name;
@@ -97,6 +104,8 @@ public interface AttributeOfViewJoinMapper {
             this.group = group;
             this.xPosition = xPosition;
             this.yPosition = yPosition;
+            this.width = width;
+            this.height = height;
         }
     }
 

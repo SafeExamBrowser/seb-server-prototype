@@ -221,6 +221,7 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
                         record.institutionId,
                         record.owner,
                         record.name,
+                        record.description,
                         ConfigurationType.valueOf(record.type),
                         record.template,
                         null, null);
@@ -263,6 +264,7 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
                 prototype.institutionId,
                 prototype.owner,
                 prototype.name,
+                prototype.description,
                 prototype.type,
                 prototype.templateName,
                 examMappings,
@@ -295,6 +297,7 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
                 node.institutionId,
                 node.owner,
                 node.name,
+                node.description,
                 node.type.name(),
                 node.templateName);
     }

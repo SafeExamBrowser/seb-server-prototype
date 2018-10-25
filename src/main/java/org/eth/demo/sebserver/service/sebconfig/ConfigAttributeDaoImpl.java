@@ -113,7 +113,9 @@ public class ConfigAttributeDaoImpl implements ConfigAttributeDao {
                         r.view,
                         r.group,
                         r.xPosition,
-                        r.yPosition))
+                        r.yPosition,
+                        r.width,
+                        r.height))
                 .collect(Collectors.toList());
     }
 

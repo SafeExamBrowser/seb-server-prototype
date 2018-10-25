@@ -60,4 +60,8 @@ public interface InputField {
 
     ConfigViewAttribute getAttribute();
 
+    void disable();
+
+    void enable();
+
 }

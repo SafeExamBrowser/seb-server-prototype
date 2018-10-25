@@ -100,13 +100,14 @@ public class OAuth2AuthorizationContextHolder implements AuthorizationContextHol
                     resource,
                     new DefaultOAuth2ClientContext(new DefaultAccessTokenRequest()) {
 
+                        private static final long serialVersionUID = 3921115327670719271L;
+
                         @Override
                         public AccessTokenRequest getAccessTokenRequest() {
                             final AccessTokenRequest accessTokenRequest = super.getAccessTokenRequest();
                             accessTokenRequest.set("Institution", "testInstitution");
                             return accessTokenRequest;
                         }
-
                     });
         }
 

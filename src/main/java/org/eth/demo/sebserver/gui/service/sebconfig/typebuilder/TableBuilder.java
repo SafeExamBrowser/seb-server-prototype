@@ -67,8 +67,10 @@ public class TableBuilder implements InputComponentBuilder {
             final ConfigViewAttribute attribute,
             final ViewContext viewContext) {
 
+        // TODO i18n
         final List<ConfigViewAttribute> columnAttributes = viewContext.getChildAttributes(attribute);
         final Table table = new Table(parent, SWT.NONE);
+
         final Menu menu = new Menu(table);
         table.setMenu(menu);
 
@@ -90,7 +92,6 @@ public class TableBuilder implements InputComponentBuilder {
         table.addMouseListener(new TableCellListener(tableField));
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
-        table.layout();
 
         return tableField;
     }
@@ -206,7 +207,7 @@ public class TableBuilder implements InputComponentBuilder {
 
         public void valueChanged(final int columnIndex, final int rowIndex, final String value) {
             this.viewContext.getValueChangeListener().valueChanged(
-                    this.viewContext.configurationId,
+                    this.viewContext,
                     this.columnAttributes.get(columnIndex),
                     value,
                     rowIndex);
@@ -219,6 +220,29 @@ public class TableBuilder implements InputComponentBuilder {
                     editor.dispose();
                 }
             }
+        }
+
+        @Override
+        protected void setDefaultValue() {
+            // NOTE this just empty the list for now
+            // TODO do we need default values for lists?
+            this.control.setSelection(-1);
+            if (this.control.getItemCount() > 0) {
+                for (final TableItem item : this.control.getItems()) {
+                    item.dispose();
+                }
+            }
+
+            final List<String> values = new ArrayList<>();
+            final List<String> columnNames = this.columnAttributes.stream()
+                    .map(a -> a.name)
+                    .collect(Collectors.toList());
+            this.viewContext.getValueChangeListener().tableChanged(
+                    new ConfigTableValue(
+                            this.viewContext.configurationId,
+                            this.attribute.name,
+                            columnNames,
+                            values));
         }
     };
 

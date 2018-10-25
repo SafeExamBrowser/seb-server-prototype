@@ -20,6 +20,9 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
@@ -89,6 +92,26 @@ public final class PolyglotPageService {
         treeItem.setText(this.i18nSupport.getText(locTextKey));
     }
 
+    public void injectI18n(final Table table) {
+        table.setData(POLYGLOT_WIDGET_FUNCTION_KEY, tableFunction());
+    }
+
+    public void injectI18n(final TableColumn tableColumn, final LocTextKey locTextKey) {
+        tableColumn.setData(POLYGLOT_TREE_ITEM_TEXT_DATA_KEY, locTextKey);
+        tableColumn.setText(this.i18nSupport.getText(locTextKey));
+    }
+
+    public void injectI18n(final TableItem tableItem, final LocTextKey... locTextKey) {
+        if (locTextKey == null) {
+            return;
+        }
+
+        tableItem.setData(POLYGLOT_TREE_ITEM_TEXT_DATA_KEY, locTextKey);
+        for (int i = 0; i < locTextKey.length; i++) {
+            tableItem.setText(i, this.i18nSupport.getText(locTextKey[i]));
+        }
+    }
+
     public void injectI18n(final Combo combo, final List<String> items) {
         final Consumer<Combo> comboFunction = comboFunction(items, this.i18nSupport);
         combo.setData(POLYGLOT_WIDGET_FUNCTION_KEY, comboFunction);
@@ -111,6 +134,13 @@ public final class PolyglotPageService {
 
     private Consumer<Tree> treeFunction() {
         return tree -> updateLocale(tree.getItems(), this.i18nSupport);
+    }
+
+    private Consumer<Table> tableFunction() {
+        return table -> {
+            updateLocale(table.getColumns(), this.i18nSupport);
+            updateLocale(table.getItems(), this.i18nSupport);
+        };
     }
 
     private static final Consumer<Label> langSelectionLabelFunction(
@@ -167,10 +197,7 @@ public final class PolyglotPageService {
         };
     }
 
-    private static final void updateLocale(
-            final TreeItem[] items,
-            final I18nSupport i18nSupport) {
-
+    private static final void updateLocale(final TreeItem[] items, final I18nSupport i18nSupport) {
         if (items == null) {
             return;
         }
@@ -181,6 +208,36 @@ public final class PolyglotPageService {
                 childItem.setText(i18nSupport.getText(locTextKey));
             }
             updateLocale(childItem.getItems(), i18nSupport);
+        }
+    }
+
+    private static void updateLocale(final TableItem[] items, final I18nSupport i18nSupport) {
+        if (items == null) {
+            return;
+        }
+
+        for (final TableItem childItem : items) {
+            final LocTextKey[] locTextKey = (LocTextKey[]) childItem.getData(POLYGLOT_TREE_ITEM_TEXT_DATA_KEY);
+            if (locTextKey != null) {
+                for (int i = 0; i < locTextKey.length; i++) {
+                    if (locTextKey[i] != null) {
+                        childItem.setText(i, i18nSupport.getText(locTextKey[i]));
+                    }
+                }
+            }
+        }
+    }
+
+    private static void updateLocale(final TableColumn[] columns, final I18nSupport i18nSupport) {
+        if (columns == null) {
+            return;
+        }
+
+        for (final TableColumn childItem : columns) {
+            final LocTextKey locTextKey = (LocTextKey) childItem.getData(POLYGLOT_TREE_ITEM_TEXT_DATA_KEY);
+            if (locTextKey != null) {
+                childItem.setText(i18nSupport.getText(locTextKey));
+            }
         }
     }
 

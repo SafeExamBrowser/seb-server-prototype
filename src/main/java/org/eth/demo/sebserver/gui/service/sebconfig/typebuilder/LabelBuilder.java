@@ -51,6 +51,11 @@ public class LabelBuilder implements InputComponentBuilder {
         public void initValue(final Collection<ConfigAttributeValue> values) {
             // Does Nothing
         }
+
+        @Override
+        protected void setDefaultValue() {
+            // Does Nothing
+        }
     };
 
 }

@@ -29,6 +29,8 @@ public class ConfigViewAttribute {
     public final String group;
     public final int xpos;
     public final int ypos;
+    public final int width;
+    public final int height;
 
     @JsonCreator
     public ConfigViewAttribute(
@@ -40,7 +42,9 @@ public class ConfigViewAttribute {
             @JsonProperty("view") final String view,
             @JsonProperty("group") final String group,
             @JsonProperty("xpos") final int xpos,
-            @JsonProperty("ypos") final int ypos) {
+            @JsonProperty("ypos") final int ypos,
+            @JsonProperty("width") final int width,
+            @JsonProperty("height") final int height) {
 
         this.name = name;
         this.type = type;
@@ -51,6 +55,8 @@ public class ConfigViewAttribute {
         this.group = group;
         this.xpos = xpos;
         this.ypos = ypos;
+        this.width = width;
+        this.height = height;
     }
 
     public String getName() {
@@ -83,6 +89,14 @@ public class ConfigViewAttribute {
 
     public int getYpos() {
         return this.ypos;
+    }
+
+    public int getWidth() {
+        return this.width;
+    }
+
+    public int getHeight() {
+        return this.height;
     }
 
     public FieldType getFieldType() {

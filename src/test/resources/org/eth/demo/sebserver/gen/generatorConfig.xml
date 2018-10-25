@@ -12,7 +12,7 @@
         <plugin type="org.mybatis.generator.plugins.VirtualPrimaryKeyPlugin"/>
         <plugin type="org.mybatis.generator.plugins.ToStringPlugin"/>
         <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin"/>
-        <plugin type="org.eth.demo.sebserver.batis.AdditionalMapperMethodsPlugin"/>
+        <plugin type="org.eth.demo.sebserver.gen.AdditionalMapperMethodsPlugin"/>
 
         <commentGenerator>
             <property name="addRemarkComments" value="false"/>
@@ -41,10 +41,6 @@
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
         <table tableName="configuration_value" domainObjectName="ConfigurationValueRecord">
-            <property name="immutable" value="true"/>
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
-        <table tableName="template" domainObjectName="TemplateRecord">
             <property name="immutable" value="true"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>

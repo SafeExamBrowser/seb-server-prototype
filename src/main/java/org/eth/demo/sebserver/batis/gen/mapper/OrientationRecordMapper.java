@@ -32,20 +32,20 @@ import org.mybatis.dynamic.sql.util.SqlProviderAdapter;
 
 @Mapper
 public interface OrientationRecordMapper {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.061+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.822+02:00", comments="Source Table: orientation")
     @SelectProvider(type=SqlProviderAdapter.class, method="select")
     long count(SelectStatementProvider selectStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.061+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.822+02:00", comments="Source Table: orientation")
     @DeleteProvider(type=SqlProviderAdapter.class, method="delete")
     int delete(DeleteStatementProvider deleteStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.061+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.822+02:00", comments="Source Table: orientation")
     @InsertProvider(type=SqlProviderAdapter.class, method="insert")
     @SelectKey(statement="SELECT LAST_INSERT_ID()", keyProperty="record.id", before=false, resultType=Long.class)
     int insert(InsertStatementProvider<OrientationRecord> insertStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.061+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.822+02:00", comments="Source Table: orientation")
     @SelectProvider(type=SqlProviderAdapter.class, method="select")
     @ConstructorArgs({
         @Arg(column="id", javaType=Long.class, jdbcType=JdbcType.BIGINT, id=true),
@@ -56,11 +56,11 @@ public interface OrientationRecordMapper {
         @Arg(column="y_position", javaType=Integer.class, jdbcType=JdbcType.INTEGER),
         @Arg(column="width", javaType=Integer.class, jdbcType=JdbcType.INTEGER),
         @Arg(column="height", javaType=Integer.class, jdbcType=JdbcType.INTEGER),
-        @Arg(column="template_id", javaType=Long.class, jdbcType=JdbcType.BIGINT)
+        @Arg(column="template", javaType=String.class, jdbcType=JdbcType.VARCHAR)
     })
     OrientationRecord selectOne(SelectStatementProvider selectStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.061+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.822+02:00", comments="Source Table: orientation")
     @SelectProvider(type=SqlProviderAdapter.class, method="select")
     @ConstructorArgs({
         @Arg(column="id", javaType=Long.class, jdbcType=JdbcType.BIGINT, id=true),
@@ -71,26 +71,26 @@ public interface OrientationRecordMapper {
         @Arg(column="y_position", javaType=Integer.class, jdbcType=JdbcType.INTEGER),
         @Arg(column="width", javaType=Integer.class, jdbcType=JdbcType.INTEGER),
         @Arg(column="height", javaType=Integer.class, jdbcType=JdbcType.INTEGER),
-        @Arg(column="template_id", javaType=Long.class, jdbcType=JdbcType.BIGINT)
+        @Arg(column="template", javaType=String.class, jdbcType=JdbcType.VARCHAR)
     })
     List<OrientationRecord> selectMany(SelectStatementProvider selectStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.061+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.822+02:00", comments="Source Table: orientation")
     @UpdateProvider(type=SqlProviderAdapter.class, method="update")
     int update(UpdateStatementProvider updateStatement);
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.061+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.823+02:00", comments="Source Table: orientation")
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<Long>> countByExample() {
         return SelectDSL.selectWithMapper(this::count, SqlBuilder.count())
                 .from(orientationRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.061+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.823+02:00", comments="Source Table: orientation")
     default DeleteDSL<MyBatis3DeleteModelAdapter<Integer>> deleteByExample() {
         return DeleteDSL.deleteFromWithMapper(this::delete, orientationRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.062+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.823+02:00", comments="Source Table: orientation")
     default int deleteByPrimaryKey(Long id_) {
         return DeleteDSL.deleteFromWithMapper(this::delete, orientationRecord)
                 .where(id, isEqualTo(id_))
@@ -98,7 +98,7 @@ public interface OrientationRecordMapper {
                 .execute();
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.062+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.823+02:00", comments="Source Table: orientation")
     default int insert(OrientationRecord record) {
         return insert(SqlBuilder.insert(record)
                 .into(orientationRecord)
@@ -109,12 +109,12 @@ public interface OrientationRecordMapper {
                 .map(yPosition).toProperty("yPosition")
                 .map(width).toProperty("width")
                 .map(height).toProperty("height")
-                .map(templateId).toProperty("templateId")
+                .map(template).toProperty("template")
                 .build()
                 .render(RenderingStrategy.MYBATIS3));
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.062+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.823+02:00", comments="Source Table: orientation")
     default int insertSelective(OrientationRecord record) {
         return insert(SqlBuilder.insert(record)
                 .into(orientationRecord)
@@ -125,33 +125,33 @@ public interface OrientationRecordMapper {
                 .map(yPosition).toPropertyWhenPresent("yPosition", record::getyPosition)
                 .map(width).toPropertyWhenPresent("width", record::getWidth)
                 .map(height).toPropertyWhenPresent("height", record::getHeight)
-                .map(templateId).toPropertyWhenPresent("templateId", record::getTemplateId)
+                .map(template).toPropertyWhenPresent("template", record::getTemplate)
                 .build()
                 .render(RenderingStrategy.MYBATIS3));
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.062+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.823+02:00", comments="Source Table: orientation")
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<List<OrientationRecord>>> selectByExample() {
-        return SelectDSL.selectWithMapper(this::selectMany, id, configAttributeId, view, group, xPosition, yPosition, width, height, templateId)
+        return SelectDSL.selectWithMapper(this::selectMany, id, configAttributeId, view, group, xPosition, yPosition, width, height, template)
                 .from(orientationRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.062+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.823+02:00", comments="Source Table: orientation")
     default QueryExpressionDSL<MyBatis3SelectModelAdapter<List<OrientationRecord>>> selectDistinctByExample() {
-        return SelectDSL.selectDistinctWithMapper(this::selectMany, id, configAttributeId, view, group, xPosition, yPosition, width, height, templateId)
+        return SelectDSL.selectDistinctWithMapper(this::selectMany, id, configAttributeId, view, group, xPosition, yPosition, width, height, template)
                 .from(orientationRecord);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.062+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.823+02:00", comments="Source Table: orientation")
     default OrientationRecord selectByPrimaryKey(Long id_) {
-        return SelectDSL.selectWithMapper(this::selectOne, id, configAttributeId, view, group, xPosition, yPosition, width, height, templateId)
+        return SelectDSL.selectWithMapper(this::selectOne, id, configAttributeId, view, group, xPosition, yPosition, width, height, template)
                 .from(orientationRecord)
                 .where(id, isEqualTo(id_))
                 .build()
                 .execute();
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.062+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.824+02:00", comments="Source Table: orientation")
     default UpdateDSL<MyBatis3UpdateModelAdapter<Integer>> updateByExample(OrientationRecord record) {
         return UpdateDSL.updateWithMapper(this::update, orientationRecord)
                 .set(configAttributeId).equalTo(record::getConfigAttributeId)
@@ -161,10 +161,10 @@ public interface OrientationRecordMapper {
                 .set(yPosition).equalTo(record::getyPosition)
                 .set(width).equalTo(record::getWidth)
                 .set(height).equalTo(record::getHeight)
-                .set(templateId).equalTo(record::getTemplateId);
+                .set(template).equalTo(record::getTemplate);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.062+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.824+02:00", comments="Source Table: orientation")
     default UpdateDSL<MyBatis3UpdateModelAdapter<Integer>> updateByExampleSelective(OrientationRecord record) {
         return UpdateDSL.updateWithMapper(this::update, orientationRecord)
                 .set(configAttributeId).equalToWhenPresent(record::getConfigAttributeId)
@@ -174,10 +174,10 @@ public interface OrientationRecordMapper {
                 .set(yPosition).equalToWhenPresent(record::getyPosition)
                 .set(width).equalToWhenPresent(record::getWidth)
                 .set(height).equalToWhenPresent(record::getHeight)
-                .set(templateId).equalToWhenPresent(record::getTemplateId);
+                .set(template).equalToWhenPresent(record::getTemplate);
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.062+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.824+02:00", comments="Source Table: orientation")
     default int updateByPrimaryKey(OrientationRecord record) {
         return UpdateDSL.updateWithMapper(this::update, orientationRecord)
                 .set(configAttributeId).equalTo(record::getConfigAttributeId)
@@ -187,13 +187,13 @@ public interface OrientationRecordMapper {
                 .set(yPosition).equalTo(record::getyPosition)
                 .set(width).equalTo(record::getWidth)
                 .set(height).equalTo(record::getHeight)
-                .set(templateId).equalTo(record::getTemplateId)
+                .set(template).equalTo(record::getTemplate)
                 .where(id, isEqualTo(record::getId))
                 .build()
                 .execute();
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-23T16:13:43.063+02:00", comments="Source Table: orientation")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-10-25T10:22:09.824+02:00", comments="Source Table: orientation")
     default int updateByPrimaryKeySelective(OrientationRecord record) {
         return UpdateDSL.updateWithMapper(this::update, orientationRecord)
                 .set(configAttributeId).equalToWhenPresent(record::getConfigAttributeId)
@@ -203,7 +203,7 @@ public interface OrientationRecordMapper {
                 .set(yPosition).equalToWhenPresent(record::getyPosition)
                 .set(width).equalToWhenPresent(record::getWidth)
                 .set(height).equalToWhenPresent(record::getHeight)
-                .set(templateId).equalToWhenPresent(record::getTemplateId)
+                .set(template).equalToWhenPresent(record::getTemplate)
                 .where(id, isEqualTo(record::getId))
                 .build()
                 .execute();

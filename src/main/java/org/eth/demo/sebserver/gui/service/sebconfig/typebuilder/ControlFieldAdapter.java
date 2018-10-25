@@ -42,6 +42,23 @@ public abstract class ControlFieldAdapter<T extends Control> implements InputFie
         return this.control;
     }
 
+    @Override
+    public void disable() {
+        if (this.control.isEnabled()) {
+            setDefaultValue();
+            this.control.setEnabled(false);
+        }
+    }
+
+    @Override
+    public void enable() {
+        if (!this.control.isEnabled()) {
+            this.control.setEnabled(true);
+        }
+    }
+
+    protected abstract void setDefaultValue();
+
 //    public void setValueChangeListener(final ValueChangeListener listener) {
 //        this.control.addListener(
 //                SWT.Verify,

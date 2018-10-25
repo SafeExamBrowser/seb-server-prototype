@@ -23,7 +23,7 @@ INSERT INTO user_role VALUES
 INSERT INTO configuration_attribute VALUES
     (1, 'table1', 'TABLE', null, '', '', '', ''),
     (2, 'param1', 'TEXT_FIELD', 1, '', '', '', ''),
-    (3, 'param2', 'SINGLE_SELECTION', 1, 'One,Two,Three', '', '', ''),
+    (3, 'param2', 'SINGLE_SELECTION', 1, '1,2,3', '', '', ''),
     (4, 'param3', 'TEXT_FIELD', 1, '', '', '', ''),
     
     (5, 'check1', 'CHECKBOX', null, '', '', '', ''),
@@ -45,7 +45,7 @@ INSERT INTO configuration_attribute VALUES
     ;
     
 INSERT INTO orientation VALUES 
-    (1, 1, 'view1', null, 0, 13, 1, 1, null),
+    (1, 1, 'view1', null, 0, 13, 4, 4, null),
     (2, 2, 'view1', null, 0, 0, 1, 1, null),
     (3, 3, 'view1', null, 1, 0, 1, 1, null),
     (4, 4, 'view1', null, 2, 0, 1, 1, null),
@@ -69,7 +69,7 @@ INSERT INTO orientation VALUES
     ;
     
 INSERT INTO configuration_node VALUES
-    (1, 1, 3, 'Demo Config', 'CLIENT', null)
+    (1, 1, 3, 'Demo Config', 'Demo Config', 'CLIENT', null)
     ;
     
 INSERT INTO configuration VALUES
