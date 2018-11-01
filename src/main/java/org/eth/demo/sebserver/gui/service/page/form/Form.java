@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -177,6 +178,7 @@ public final class Form extends FormBinding {
 
         public final Label label;
         public final T control;
+        private boolean hasError;
 
         public FormFieldAccessor(final Label label, final T control) {
             this.label = label;
@@ -190,6 +192,24 @@ public final class Form extends FormBinding {
         public void setVisible(final boolean visible) {
             this.label.setVisible(visible);
             this.control.setVisible(visible);
+        }
+
+        public void setError(final String errorTooltip) {
+            if (!this.hasError) {
+                this.control.setData(RWT.CUSTOM_VARIANT, "error");
+                //this.control.setBackground(new Color(this.control.getDisplay(), 255, 0, 0, 50));
+                this.control.setToolTipText(errorTooltip);
+                this.hasError = true;
+            }
+        }
+
+        public void resetError() {
+            if (this.hasError) {
+                this.control.setData(RWT.CUSTOM_VARIANT, null);
+                //this.control.setBackground(new Color(this.control.getDisplay(), 0, 0, 0, 0));
+                this.control.setToolTipText(null);
+                this.hasError = false;
+            }
         }
     }
 

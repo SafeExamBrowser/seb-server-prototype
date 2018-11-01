@@ -8,7 +8,10 @@
 
 package org.eth.demo.sebserver.gui.service.page.activity;
 
+import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -44,14 +47,22 @@ public class ActivitiesPane implements TemplateComposer {
     private final RestServices restServices;
     private final AuthorizationContextHolder authorizationContextHolder;
 
+    private final Map<ActionDefinition, ActivityActionHandler> activityActionHandler =
+            new EnumMap<>(ActionDefinition.class);
+
     public ActivitiesPane(
             final WidgetFactory widgetFactory,
             final RestServices restServices,
-            final AuthorizationContextHolder authorizationContextHolder) {
+            final AuthorizationContextHolder authorizationContextHolder,
+            final Collection<ActivityActionHandler> activityActionHandler) {
 
         this.widgetFactory = widgetFactory;
         this.restServices = restServices;
         this.authorizationContextHolder = authorizationContextHolder;
+
+        for (final ActivityActionHandler aah : activityActionHandler) {
+            this.activityActionHandler.put(aah.handlesAction(), aah);
+        }
     }
 
     @Override
@@ -68,7 +79,7 @@ public class ActivitiesPane implements TemplateComposer {
 
         final Tree navigation = this.widgetFactory.treeLocalized(composerCtx.parent, SWT.SINGLE | SWT.FULL_SELECTION);
         final GridData navigationGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-        //navigationGridData.horizontalIndent = 20;
+        navigationGridData.horizontalIndent = 10;
         navigation.setLayoutData(navigationGridData);
 
         final List<IdAndName> insitutionNames = this.restServices
@@ -139,7 +150,16 @@ public class ActivitiesPane implements TemplateComposer {
 
         navigation.setData(
                 PageEventListener.LISTENER_ATTRIBUTE_KEY,
-                createActionEventListener(navigation, composerCtx));
+                new ActionEventListener() {
+                    @Override
+                    public void notify(final ActionEvent event) {
+                        final ActivityActionHandler aah =
+                                ActivitiesPane.this.activityActionHandler.get(event.actionDefinition);
+                        if (aah != null) {
+                            aah.notifyAction(event, navigation, composerCtx);
+                        }
+                    }
+                });
 
     }
 
@@ -188,69 +208,24 @@ public class ActivitiesPane implements TemplateComposer {
         }
     }
 
-    private ActionEventListener createActionEventListener(
-            final Tree navigation,
-            final PageContext composerCtx) {
-
-        // TODO create handler mapping for action types instead of if else...
-        return new ActionEventListener() {
-
-            @Override
-            public void notify(final ActionEvent event) {
-                if (event.actionDefinition == ActionDefinition.INSTITUTION_NEW) {
-                    final IdAndName idAndName = (IdAndName) event.source;
-                    final TreeItem institutions = findItemByActivity(navigation.getItems(), Activity.INSTITUTIONS);
-                    final TreeItem newInstItem = createInstitutionItem(institutions, idAndName);
-                    final MainPageState mainPageState = MainPageState.get();
-                    mainPageState.activitySelection = ActivitySelection.get(newInstItem);
-                    navigation.select(newInstItem);
-                    expand(newInstItem);
-                    composerCtx.notify(new ActivitySelectionEvent(mainPageState.activitySelection));
-                } else if (event.actionDefinition == ActionDefinition.INSTITUTION_MODIFY) {
-                    final IdAndName idAndName = (IdAndName) event.source;
-                    final TreeItem selected = findItemByActivity(
-                            navigation.getItems(),
-                            Activity.INSTITUTION,
-                            idAndName.id);
-                    selected.setText(idAndName.name);
-                } else if (event.actionDefinition == ActionDefinition.INSTITUTION_DELETE) {
-                    final String id = (String) event.source;
-                    final TreeItem institutions = findItemByActivity(navigation.getItems(), Activity.INSTITUTIONS);
-                    final TreeItem selected = findItemByActivity(navigation.getItems(), Activity.INSTITUTION, id);
-                    selected.dispose();
-                    final MainPageState mainPageState = MainPageState.get();
-                    mainPageState.activitySelection = ActivitySelection.get(institutions);
-                    navigation.select(institutions);
-                    composerCtx.notify(new ActivitySelectionEvent(mainPageState.activitySelection));
-                }
-            }
-        };
-    }
-
-    private TreeItem createInstitutionItem(final Tree parent, final IdAndName idAndName) {
+    static TreeItem createInstitutionItem(final Tree parent, final IdAndName idAndName) {
         final TreeItem institution = new TreeItem(parent, SWT.NONE);
         createInstitutionItem(idAndName, institution);
         return institution;
     }
 
-    private TreeItem createInstitutionItem(final TreeItem parent, final IdAndName idAndName) {
+    static TreeItem createInstitutionItem(final TreeItem parent, final IdAndName idAndName) {
         final TreeItem institution = new TreeItem(parent, SWT.NONE);
         createInstitutionItem(idAndName, institution);
         return institution;
     }
 
-    private void createInstitutionItem(final IdAndName idAndName, final TreeItem institution) {
+    static void createInstitutionItem(final IdAndName idAndName, final TreeItem institution) {
         institution.setText(idAndName.name);
         ActivitySelection.set(institution, Activity.INSTITUTION.createSelection(idAndName));
-
-//        final TreeItem lmsSetup = this.widgetFactory.treeItemLocalized(
-//                institution,
-//                "org.sebserver.activities.lms");
-//        ActivitySelection.set(lmsSetup, Activity.LMS_SETUP.selection());
-
     }
 
-    private static final TreeItem findItemByActivity(
+    static final TreeItem findItemByActivity(
             final TreeItem[] items,
             final Activity activity,
             final String objectId) {
@@ -276,11 +251,11 @@ public class ActivitiesPane implements TemplateComposer {
         return null;
     }
 
-    private static final TreeItem findItemByActivity(final TreeItem[] items, final Activity activity) {
+    static final TreeItem findItemByActivity(final TreeItem[] items, final Activity activity) {
         return findItemByActivity(items, activity, null);
     }
 
-    private static final void expand(final TreeItem item) {
+    static final void expand(final TreeItem item) {
         if (item == null) {
             return;
         }

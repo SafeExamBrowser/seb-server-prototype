@@ -9,8 +9,10 @@
 package org.eth.demo.sebserver.gui.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class IdAndName implements IdAware, NameAware {
 
     public final String id;

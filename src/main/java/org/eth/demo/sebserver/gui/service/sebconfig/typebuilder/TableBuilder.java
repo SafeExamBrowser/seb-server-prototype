@@ -77,7 +77,7 @@ public class TableBuilder implements InputComponentBuilder {
         for (final ConfigViewAttribute columnAttr : columnAttributes) {
             final TableColumn column = new TableColumn(table, SWT.NONE);
             column.setText(columnAttr.name);
-            // TODO this information should also come within the orientation form back-end
+            // TODO this information should also come within the orientation from back-end
             column.setWidth(200);
         }
 
@@ -161,7 +161,7 @@ public class TableBuilder implements InputComponentBuilder {
 
         void addRow() {
             final int listIndex = this.control.getItemCount();
-            final TableItem item = new TableItem(this.control, SWT.NONE);
+            final TableItem item = new TableItem(this.control, SWT.NO_SCROLL);
 
             int index = 0;
             for (final ConfigViewAttribute attr : this.columnAttributes) {
@@ -173,6 +173,7 @@ public class TableBuilder implements InputComponentBuilder {
             }
 
             item.setData(LIST_INDEX_REF, listIndex);
+            this.control.getParent().getParent().layout(true, true);
         }
 
         void deleteRow(final int index) {

@@ -44,6 +44,10 @@ public final class PolyglotPageService {
         this.i18nSupport = i18nSupport;
     }
 
+    public I18nSupport getI18nSupport() {
+        return this.i18nSupport;
+    }
+
     public void setDefaultPageLocale(final Composite root) {
         setPageLocale(root, this.i18nSupport.getCurrentLocale());
     }

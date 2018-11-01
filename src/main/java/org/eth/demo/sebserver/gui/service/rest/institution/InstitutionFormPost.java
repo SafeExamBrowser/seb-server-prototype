@@ -11,6 +11,7 @@ package org.eth.demo.sebserver.gui.service.rest.institution;
 import org.eth.demo.sebserver.gui.domain.IdAndName;
 import org.eth.demo.sebserver.gui.service.rest.RestCallBuilder;
 import org.eth.demo.sebserver.gui.service.rest.formpost.FormPOST;
+import org.eth.demo.sebserver.service.JSONMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +19,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class InstitutionFormPost extends FormPOST<IdAndName> {
 
-    public InstitutionFormPost(final RestCallBuilder restCallBuilder) {
-        super(restCallBuilder, "institution/save");
+    public InstitutionFormPost(final RestCallBuilder restCallBuilder, final JSONMapper jsonMapper) {
+        super(restCallBuilder, jsonMapper, "institution/save");
     }
 
     @Override

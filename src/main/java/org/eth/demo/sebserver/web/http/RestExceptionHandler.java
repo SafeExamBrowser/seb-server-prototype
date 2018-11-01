@@ -50,7 +50,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         final Collection<APIMessage> valErrors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(field -> APIMessage.ValidationMessages.SIMPLE_ENTITY_FIELD.of(field.toString()))
+                .map(field -> APIMessage.fieldValidationError(field))
                 .collect(Collectors.toList());
 
         return new ResponseEntity<>(valErrors, HttpStatus.BAD_REQUEST);

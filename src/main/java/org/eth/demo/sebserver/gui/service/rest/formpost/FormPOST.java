@@ -8,26 +8,36 @@
 
 package org.eth.demo.sebserver.gui.service.rest.formpost;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
+import org.eth.demo.sebserver.gui.domain.validation.FieldValidationError;
 import org.eth.demo.sebserver.gui.service.rest.RestCallBuilder;
 import org.eth.demo.sebserver.gui.service.rest.SEBServerAPICall;
-import org.eth.demo.sebserver.gui.service.rest.validation.FieldValidationError;
+import org.eth.demo.sebserver.service.JSONMapper;
 import org.eth.demo.util.Result;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 public abstract class FormPOST<T> implements SEBServerAPICall<FormPostResponse<T>> {
 
     public static final String JSON_FORM_POST = "JSON_FORM_POST";
 
     private final RestCallBuilder restCallBuilder;
+    private final JSONMapper jsonMapper;
     private final String uri;
 
-    protected FormPOST(final RestCallBuilder restCallBuilder, final String path) {
+    protected FormPOST(
+            final RestCallBuilder restCallBuilder,
+            final JSONMapper jsonMapper,
+            final String path) {
+
         this.restCallBuilder = restCallBuilder;
+        this.jsonMapper = jsonMapper;
         this.uri = restCallBuilder.withPath(path);
     }
 
@@ -49,22 +59,26 @@ public abstract class FormPOST<T> implements SEBServerAPICall<FormPostResponse<T
                             .build(),
                     type())
                     .getBody();
-            return Result.of(new FormPostResponse<>(response));
+            return Result.of(FormPostResponse.of(response));
 
         } catch (final Throwable t) {
+
             if (t instanceof HttpClientErrorException) {
-                return Result.of(createValidationErrors(((HttpClientErrorException) t).getResponseBodyAsString()));
+                try {
+                    final String responseBody = ((HttpClientErrorException) t).getResponseBodyAsString();
+                    final List<FieldValidationError> errors = this.jsonMapper.readValue(
+                            responseBody,
+                            new TypeReference<List<FieldValidationError>>() {
+                            });
+                    return Result.of(FormPostResponse.ofValidationErrors(errors));
+                } catch (final IOException e) {
+                    return Result.ofError(e);
+                }
             }
             return Result.ofError(t);
         }
     }
 
     protected abstract Class<T> type();
-
-    private FormPostResponse<T> createValidationErrors(final String response) {
-        final ArrayList<FieldValidationError> result = new ArrayList<>();
-        // TODO extract validation errors and if possible the objectId
-        return new FormPostResponse<>(null, result);
-    }
 
 }

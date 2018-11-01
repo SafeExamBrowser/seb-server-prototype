@@ -8,57 +8,82 @@
 
 package org.eth.demo.sebserver.domain.rest;
 
-public interface APIMessage {
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.validation.FieldError;
 
-    public String getMessageCode();
+public class APIMessage {
 
-    public String getMessage();
+    public enum ErrorMessages {
+        UNEXPECTED_ERROR("1000", "Unexpected server-side error"),
+        FIELD_VALIDATION_ERROR("1500", "Field validation error")
 
-    public String getDetail();
-
-    //@formatter:off
-    enum ErrorMessages {
-        UNEXPECTED_ERROR("1001", "Unexpected server-side error happened")
         ;
 
         public final String messageCode;
         public final String systemMessage;
+
         private ErrorMessages(final String messageCode, final String systemMessage) {
             this.messageCode = messageCode;
             this.systemMessage = systemMessage;
         }
+
         public APIMessage of(final String detail) {
-            return new APIMessage() {
-                @Override public String getMessageCode() { return messageCode; }
-                @Override public String getMessage() { return systemMessage; }
-                @Override public String getDetail() { return detail; }
-            };
+            return new APIMessage(this.messageCode, this.systemMessage, detail);
+        }
+
+        public APIMessage of(final String detail, final String... attributes) {
+            return new APIMessage(this.messageCode, this.systemMessage, detail, attributes);
+        }
+
+        public APIMessage of(final Throwable error) {
+            return new APIMessage(this.messageCode, this.systemMessage, error.getMessage());
         }
     }
 
-    enum ValidationMessages {
-        SIMPLE_ENTITY_FIELD("2001", "Field validation error")
-        ;
+    public final String messageCode;
+    public final String systemMessage;
+    public final String details;
+    public final String[] attributes;
 
-        public final String messageCode;
-        public final String systemMessage;
-        private ValidationMessages(final String messageCode, final String systemMessage) {
-            this.messageCode = messageCode;
-            this.systemMessage = systemMessage;
-        }
-        public APIMessage of(final String detail) {
-            return new APIMessage() {
-                @Override public String getMessageCode() { return messageCode; }
-                @Override public String getMessage() { return systemMessage; }
-                @Override public String getDetail() { return detail; }
-            };
-        }
+    public APIMessage(
+            final String messageCode,
+            final String systemMessage,
+            final String details,
+            final String[] attributes) {
+
+        this.messageCode = messageCode;
+        this.systemMessage = systemMessage;
+        this.details = details;
+        this.attributes = attributes;
     }
 
-    //@formatter:on
+    public APIMessage(final String messageCode, final String systemMessage, final String details) {
+        this(messageCode, systemMessage, details, null);
+    }
 
-    public static APIMessage unexpectedError(final Throwable t) {
-        return ErrorMessages.UNEXPECTED_ERROR.of(t.getMessage());
+    public APIMessage(final String messageCode, final String systemMessage) {
+        this(messageCode, systemMessage, null, null);
+    }
+
+    public String getMessageCode() {
+        return this.messageCode;
+    }
+
+    public String getSystemMessage() {
+        return this.systemMessage;
+    }
+
+    public String getDetails() {
+        return this.details;
+    }
+
+    public String[] getAttributes() {
+        return this.attributes;
+    }
+
+    public static final APIMessage fieldValidationError(final FieldError error) {
+        final String[] args = StringUtils.split(error.getDefaultMessage(), ":");
+        return ErrorMessages.FIELD_VALIDATION_ERROR.of(error.toString(), args);
     }
 
 }

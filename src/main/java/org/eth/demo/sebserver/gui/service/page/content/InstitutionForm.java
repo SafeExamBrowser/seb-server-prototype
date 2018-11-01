@@ -22,14 +22,16 @@ import org.eth.demo.sebserver.gui.domain.IdAndName;
 import org.eth.demo.sebserver.gui.domain.admin.InstitutionData;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
+import org.eth.demo.sebserver.gui.service.i18n.PolyglotPageService;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 import org.eth.demo.sebserver.gui.service.page.TemplateComposer;
 import org.eth.demo.sebserver.gui.service.page.action.ActionDefinition;
+import org.eth.demo.sebserver.gui.service.page.action.ActionEventListener;
 import org.eth.demo.sebserver.gui.service.page.action.ActionPublishEvent;
 import org.eth.demo.sebserver.gui.service.page.action.InstitutionActions;
 import org.eth.demo.sebserver.gui.service.page.form.Form;
-import org.eth.demo.sebserver.gui.service.page.form.FormBuilder;
 import org.eth.demo.sebserver.gui.service.page.form.FormHandle;
+import org.eth.demo.sebserver.gui.service.page.form.PageFormService;
 import org.eth.demo.sebserver.gui.service.rest.RestServices;
 import org.eth.demo.sebserver.gui.service.rest.institution.GetInstitutionData;
 import org.eth.demo.sebserver.gui.service.rest.institution.InstitutionFormPost;
@@ -44,11 +46,14 @@ public class InstitutionForm implements TemplateComposer {
     private static final String LDAP_GROUP_NAME = "LDAP_GROUP";
 
     private final RestServices restServices;
-    private final WidgetFactory widgetFactory;
+    private final PageFormService pageFormService;
 
-    public InstitutionForm(final RestServices restServices, final WidgetFactory widgetFactory) {
+    public InstitutionForm(
+            final RestServices restServices,
+            final PageFormService pageFormService) {
+
         this.restServices = restServices;
-        this.widgetFactory = widgetFactory;
+        this.pageFormService = pageFormService;
     }
 
     @Override
@@ -58,6 +63,9 @@ public class InstitutionForm implements TemplateComposer {
 
     @Override
     public void compose(final PageContext composerCtx) {
+        final PolyglotPageService polyglotPageService = this.pageFormService.getPolyglotPageService();
+        final WidgetFactory widgetFactory = this.pageFormService.getWidgetFactory();
+
         final String instId = composerCtx.attributes.get(AttributeKeys.INSTITUTION_ID);
 
         final InstitutionData institutionData = this.restServices.sebServerAPICall(GetInstitutionData.class)
@@ -73,11 +81,20 @@ public class InstitutionForm implements TemplateComposer {
         content.setLayout(contentLayout);
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        final Label labelLocalized = this.widgetFactory.labelLocalized(
+        final Label pageTitle = widgetFactory.labelLocalized(
                 content, "h2", new LocTextKey(
                         "org.sebserver.activities.instName",
                         institutionData.name));
-        labelLocalized.setLayoutData(new GridData(SWT.TOP, SWT.LEFT, true, false));
+        pageTitle.setLayoutData(new GridData(SWT.TOP, SWT.LEFT, true, false));
+        ActionEventListener.injectListener(
+                pageTitle,
+                ActionDefinition.INSTITUTION_MODIFY,
+                event -> {
+                    final IdAndName idAndName = (IdAndName) event.source;
+                    polyglotPageService.injectI18n(pageTitle, new LocTextKey(
+                            "org.sebserver.activities.instName",
+                            idAndName.name));
+                });
 
         final TabFolder tabs = new TabFolder(content, SWT.NONE);
         tabs.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -88,7 +105,7 @@ public class InstitutionForm implements TemplateComposer {
 
         // The Institution form
         //@formatter:off
-        final FormHandle<IdAndName> formHandle = new FormBuilder(this.widgetFactory, composerCtx.of(tabs), 4)
+        final FormHandle<IdAndName> formHandle = this.pageFormService.getBuilder(composerCtx.of(tabs), 4)
                 .readonly(false)
                 .putStaticValue("id", instId)
                 .addTextField("name", "org.sebserver.form.institution.name", institutionData.name, 2)

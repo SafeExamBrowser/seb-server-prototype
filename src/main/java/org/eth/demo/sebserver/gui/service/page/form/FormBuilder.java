@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabItem;
+import org.eth.demo.sebserver.gui.service.i18n.PolyglotPageService;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 import org.eth.demo.sebserver.gui.service.rest.SEBServerAPICall.APICallBuilder;
 import org.eth.demo.sebserver.gui.service.rest.formpost.FormPostResponse;
@@ -32,18 +33,21 @@ public class FormBuilder {
     private static final Logger log = LoggerFactory.getLogger(FormBuilder.class);
 
     private final WidgetFactory widgetFactory;
+    private final PolyglotPageService polyglotPageService;
     public final PageContext composerCtx;
     public final Composite formParent;
     public final Form form;
 
     private boolean readonly = false;
 
-    public FormBuilder(
+    FormBuilder(
             final WidgetFactory widgetFactory,
+            final PolyglotPageService polyglotPageService,
             final PageContext composerCtx,
             final int rows) {
 
         this.widgetFactory = widgetFactory;
+        this.polyglotPageService = polyglotPageService;
         this.composerCtx = composerCtx;
         this.form = new Form();
 
@@ -176,7 +180,7 @@ public class FormBuilder {
     }
 
     public <T> FormHandle<T> buildFor(final APICallBuilder<FormPostResponse<T>> post) {
-        return new FormHandle<>(this.composerCtx, this.form, post);
+        return new FormHandle<>(this.composerCtx, this.form, post, this.polyglotPageService.getI18nSupport());
     }
 
 }

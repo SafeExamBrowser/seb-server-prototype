@@ -263,9 +263,18 @@ public class ComposerService {
             });
         }
 
+//        public void applyValidationErrorDialog(final Collection<FieldValidationError> validationErrors) {
+//            final Message messageBox = new Message(
+//                    this.root.getShell(),
+//                    this.i18nSupport.getText("org.sebserver.dialog.validationErrors.title"),
+//                    this.i18nSupport.getText(confirmMessage),
+//                    SWT.OK);
+//        }
+
         public void notifyError(final String string, final Throwable t) {
             // TODO show a error pop-up to inform the user about unexpected error
         }
+
     }
 
 }

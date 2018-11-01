@@ -42,7 +42,7 @@ public final class Institution implements GrantEntity {
 
     public final Long id;
     @NotNull(message = "NotNull")
-    @Size(min = 3, max = 255, message = "text:size:3:255")
+    @Size(min = 3, max = 255, message = "institution:name:size:{min}:{max}:${validatedValue}")
     public final String name;
     @NotNull(message = "NotNull")
     public final AuthType authType;

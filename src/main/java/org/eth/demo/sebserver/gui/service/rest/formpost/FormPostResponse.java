@@ -8,23 +8,39 @@
 
 package org.eth.demo.sebserver.gui.service.rest.formpost;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.eth.demo.sebserver.gui.service.rest.validation.FieldValidationError;
+import org.eth.demo.sebserver.gui.domain.validation.FieldValidationError;
 
 public class FormPostResponse<T> {
 
     public final T response;
     public final Collection<FieldValidationError> validationErrors;
 
-    public FormPostResponse(final T response) {
-        this(response, Collections.emptyList());
+    private FormPostResponse(final T response) {
+        this.response = response;
+        this.validationErrors = Collections.emptyList();
     }
 
-    public FormPostResponse(final T response, final Collection<FieldValidationError> validationErrors) {
-        this.response = response;
+    private FormPostResponse(final Collection<FieldValidationError> validationErrors) {
+        this.response = null;
         this.validationErrors = validationErrors;
+    }
+
+    public static final <T> FormPostResponse<T> of(final T response) {
+        return new FormPostResponse<>(response);
+    }
+
+    public static final <T> FormPostResponse<T> ofValidationErrors(
+            final Collection<FieldValidationError> validationErrors) {
+        return new FormPostResponse<>(validationErrors);
+    }
+
+    public static final <T> FormPostResponse<T> ofValidationErrors(
+            final FieldValidationError... validationErrors) {
+        return new FormPostResponse<>(Arrays.asList(validationErrors));
     }
 
 }
