@@ -24,7 +24,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eth.demo.sebserver.gui.service.rest.formpost.FormBinding;
 import org.eth.demo.sebserver.gui.service.widgets.SingleSelection;
-import org.json.JSONException;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -45,7 +44,7 @@ public final class Form extends FormBinding {
         return null;
     }
 
-    public void putStatic(final String name, final String value) throws JSONException {
+    public void putStatic(final String name, final String value) {
         super.objectRoot.put(name, value);
     }
 
