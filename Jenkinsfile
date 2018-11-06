@@ -4,7 +4,7 @@ pipeline {
 	stages {
 		stage('Maven build') {
             steps {
-                withMaven(maven: 'Maven', options: [findbugsPublisher(disabled: true)]) {
+                withMaven(maven: 'Maven', options: [findbugsPublisher(disabled: false)]) {
                     sh "mvn clean install -e -P let_reporting"
                 }
             }		
