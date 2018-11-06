@@ -18,9 +18,15 @@ pipeline {
 		}
 		
 		stage('Tag') {
+			steps {
+				echo 'Build is tagged here.'
+			}
 		}
 		
 		stage('Push to Nexus') {
+			steps {
+				echo 'Build is pushed to Nexus here.'
+			}
 		}
 		
 	}
