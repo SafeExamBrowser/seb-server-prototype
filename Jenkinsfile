@@ -33,7 +33,7 @@ pipeline {
 
 	post {
 		failure {
-			emailext body: "The build of the LET Application (${env.JOB_NAME}) failed! See ${env.BUILD_URL}", recipientProviders: developers, subject: 'LET Application Build Failure'
+			emailext body: "The build of the LET Application (${env.JOB_NAME}) failed! See ${env.BUILD_URL}", recipientProviders: [ [$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider'] ], subject: 'LET Application Build Failure'
 		}
 	}
 	options {
