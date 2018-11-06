@@ -2,10 +2,10 @@ pipeline {
     agent any
 
 	stages {
-		stage('Clone git') {
+		stage('Maven build') {
 		}
 		
-		stage('Build') {
+		stage('Reporting') {
 		}
 		
 		stage('Tag') {
@@ -23,7 +23,10 @@ pipeline {
 	}
 	options {
 		timeout(time: 10, unit: 'MINUTES')
-		buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '9'))
+		buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '7'))
 	}
+    triggers {
+        pollSCM('H/5 * * * *')
+    }  
 	   
 }    
