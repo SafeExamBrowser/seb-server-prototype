@@ -13,6 +13,7 @@
         <plugin type="org.mybatis.generator.plugins.ToStringPlugin"/>
         <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin"/>
         <plugin type="org.eth.demo.sebserver.gen.AdditionalMapperMethodsPlugin"/>
+        <plugin type="org.eth.demo.sebserver.gen.DomainModelNameReferencePlugin"/>
 
         <commentGenerator>
             <property name="addRemarkComments" value="false"/>
