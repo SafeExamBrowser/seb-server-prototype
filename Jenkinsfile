@@ -13,7 +13,7 @@ pipeline {
 		stage('Reporting') {
             steps {
                 pmd canComputeNew: false, defaultEncoding: '', healthy: '', pattern: '**/target/pmd.xml', thresholdLimit: 'high', unHealthy: ''
-                findbugs canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', isRankActivated: true, pattern: '**/target/findbugsXml.xml', unHealthy: ''
+                findbugs canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', isRankActivated: true, pattern: '**/target/findbugs/findbugsXml.xml', unHealthy: ''
             }		
 		}
 		
