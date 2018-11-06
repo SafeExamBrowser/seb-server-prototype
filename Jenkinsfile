@@ -3,9 +3,18 @@ pipeline {
 
 	stages {
 		stage('Maven build') {
+            steps {
+                withMaven(maven: 'Maven', options: [findbugsPublisher(disabled: true)]) {
+                    sh "mvn clean install -e -P let_reporting"
+                }
+            }		
 		}
 		
 		stage('Reporting') {
+            steps {
+                pmd canComputeNew: false, defaultEncoding: '', healthy: '', pattern: '**/target/pmd.xml', thresholdLimit: 'high', unHealthy: ''
+                findbugs canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', isRankActivated: true, pattern: '**/target/findbugsXml.xml', unHealthy: ''
+            }		
 		}
 		
 		stage('Tag') {
