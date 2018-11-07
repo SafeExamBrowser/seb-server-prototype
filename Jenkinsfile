@@ -34,7 +34,11 @@ pipeline {
 
     post {
         failure {
+            githubNotify status: "FAILURE"
             emailext body: "The build of the LET Application (${env.JOB_NAME}) failed! See ${env.BUILD_URL}", recipientProviders: [[$class: 'CulpritsRecipientProvider']], subject: 'LET Application Build Failure'
+        }
+        success {
+            githubNotify status: "SUCCESS"
         }
     }
     options {
