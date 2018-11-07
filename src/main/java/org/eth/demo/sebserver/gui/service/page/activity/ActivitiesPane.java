@@ -238,7 +238,7 @@ public class ActivitiesPane implements TemplateComposer {
             final ActivitySelection activitySelection = ActivitySelection.get(item);
             final String id = activitySelection.getObjectIdentifier();
             if (activitySelection != null && activitySelection.activity == activity &&
-                    ((objectId == null && id == null) || objectId.equals(id))) {
+                    (id == null || (objectId != null && objectId.equals(id)))) {
                 return item;
             }
 

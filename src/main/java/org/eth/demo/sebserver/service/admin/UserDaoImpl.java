@@ -73,7 +73,7 @@ public class UserDaoImpl implements UserDao {
                 .execute();
 
         if (records == null) {
-            Collections.emptyList();
+            return Collections.emptyList();
         }
 
         return records.stream()
