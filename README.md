@@ -1,6 +1,8 @@
 # seb-server-prototype
 SEB-Server prototype used to get familiar with the technology stack and proof of concept(s)
 
+image https://sebsrv-ci.ethz.ch/ci/buildStatus/icon?job=check-manifest
+
 ## Getting Started
 
 ### Prerequisites
