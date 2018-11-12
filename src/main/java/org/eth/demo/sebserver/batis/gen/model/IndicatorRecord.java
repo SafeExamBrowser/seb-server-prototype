@@ -4,28 +4,28 @@ import java.math.BigDecimal;
 import javax.annotation.Generated;
 
 public class IndicatorRecord {
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-01T16:16:54.838+01:00", comments="Source field: indicator.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-07T16:15:38.303+01:00", comments="Source field: indicator.id")
     private Long id;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-01T16:16:54.838+01:00", comments="Source field: indicator.exam_id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-07T16:15:38.303+01:00", comments="Source field: indicator.exam_id")
     private Long examId;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-01T16:16:54.838+01:00", comments="Source field: indicator.type")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-07T16:15:38.303+01:00", comments="Source field: indicator.type")
     private String type;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-01T16:16:54.838+01:00", comments="Source field: indicator.name")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-07T16:15:38.303+01:00", comments="Source field: indicator.name")
     private String name;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-01T16:16:54.838+01:00", comments="Source field: indicator.threshold1")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-07T16:15:38.303+01:00", comments="Source field: indicator.threshold1")
     private BigDecimal threshold1;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-01T16:16:54.839+01:00", comments="Source field: indicator.threshold2")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-07T16:15:38.303+01:00", comments="Source field: indicator.threshold2")
     private BigDecimal threshold2;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-01T16:16:54.839+01:00", comments="Source field: indicator.threshold3")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-07T16:15:38.304+01:00", comments="Source field: indicator.threshold3")
     private BigDecimal threshold3;
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-01T16:16:54.838+01:00", comments="Source Table: indicator")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-07T16:15:38.303+01:00", comments="Source Table: indicator")
     public IndicatorRecord(Long id, Long examId, String type, String name, BigDecimal threshold1, BigDecimal threshold2, BigDecimal threshold3) {
         this.id = id;
         this.examId = examId;
@@ -36,37 +36,37 @@ public class IndicatorRecord {
         this.threshold3 = threshold3;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-01T16:16:54.838+01:00", comments="Source field: indicator.id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-07T16:15:38.303+01:00", comments="Source field: indicator.id")
     public Long getId() {
         return id;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-01T16:16:54.838+01:00", comments="Source field: indicator.exam_id")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-07T16:15:38.303+01:00", comments="Source field: indicator.exam_id")
     public Long getExamId() {
         return examId;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-01T16:16:54.838+01:00", comments="Source field: indicator.type")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-07T16:15:38.303+01:00", comments="Source field: indicator.type")
     public String getType() {
         return type;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-01T16:16:54.838+01:00", comments="Source field: indicator.name")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-07T16:15:38.303+01:00", comments="Source field: indicator.name")
     public String getName() {
         return name;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-01T16:16:54.839+01:00", comments="Source field: indicator.threshold1")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-07T16:15:38.303+01:00", comments="Source field: indicator.threshold1")
     public BigDecimal getThreshold1() {
         return threshold1;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-01T16:16:54.839+01:00", comments="Source field: indicator.threshold2")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-07T16:15:38.303+01:00", comments="Source field: indicator.threshold2")
     public BigDecimal getThreshold2() {
         return threshold2;
     }
 
-    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-01T16:16:54.840+01:00", comments="Source field: indicator.threshold3")
+    @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2018-11-07T16:15:38.304+01:00", comments="Source field: indicator.threshold3")
     public BigDecimal getThreshold3() {
         return threshold3;
     }
@@ -75,7 +75,7 @@ public class IndicatorRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table indicator
      *
-     * @mbg.generated Thu Nov 01 16:16:54 CET 2018
+     * @mbg.generated Wed Nov 07 16:15:38 CET 2018
      */
     @Override
     public String toString() {
@@ -98,7 +98,7 @@ public class IndicatorRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table indicator
      *
-     * @mbg.generated Thu Nov 01 16:16:54 CET 2018
+     * @mbg.generated Wed Nov 07 16:15:38 CET 2018
      */
     @Override
     public boolean equals(Object that) {
@@ -125,7 +125,7 @@ public class IndicatorRecord {
      * This method was generated by MyBatis Generator.
      * This method corresponds to the database table indicator
      *
-     * @mbg.generated Thu Nov 01 16:16:54 CET 2018
+     * @mbg.generated Wed Nov 07 16:15:38 CET 2018
      */
     @Override
     public int hashCode() {

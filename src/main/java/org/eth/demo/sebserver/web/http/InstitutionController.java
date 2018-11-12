@@ -80,6 +80,7 @@ public class InstitutionController {
             final Principal principal) {
 
         String _name = name;
+        System.out.println("name = " + name);
         if (StringUtils.isBlank(_name)) {
             _name = "New Institution (" + UUID.randomUUID() + ")";
         }

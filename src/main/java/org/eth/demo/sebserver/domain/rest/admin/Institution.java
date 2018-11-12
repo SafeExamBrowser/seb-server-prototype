@@ -41,10 +41,7 @@ public final class Institution implements GrantEntity {
             Collections.unmodifiableList(Arrays.asList(AuthType.values()));
 
     public final Long id;
-    @NotNull(message = "NotNull")
-    @Size(min = 3, max = 255, message = "institution:name:size:{min}:{max}:${validatedValue}")
     public final String name;
-    @NotNull(message = "NotNull")
     public final AuthType authType;
     public final Collection<LmsSetup> lmsSetup;
 
@@ -85,10 +82,13 @@ public final class Institution implements GrantEntity {
         return this.id;
     }
 
+    @NotNull(message = "NotNull")
+    @Size(min = 3, max = 255, message = "institution:name:size:{min}:{max}:${validatedValue}")
     public String getName() {
         return this.name;
     }
 
+    @NotNull(message = "NotNull")
     public AuthType getAuthType() {
         return this.authType;
     }

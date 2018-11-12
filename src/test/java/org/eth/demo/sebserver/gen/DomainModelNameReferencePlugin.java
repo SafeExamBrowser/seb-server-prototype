@@ -14,6 +14,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.mybatis.generator.api.GeneratedJavaFile;
+import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.PluginAdapter;
 import org.mybatis.generator.api.dom.java.Field;
@@ -42,7 +43,7 @@ public class DomainModelNameReferencePlugin extends PluginAdapter {
 
         final Interface domain = (Interface) this.properties.get(DOMAIN_INTERFACE);
 
-        final String typeName = toTypeName(introspectedTable.getFullyQualifiedTableNameAtRuntime());
+        final String typeName = toTypeName(introspectedTable.getFullyQualifiedTableNameAtRuntime(), true);
         final InnerInterface innerInterface = new InnerInterface(new FullyQualifiedJavaType(typeName));
 
         final Field field = new Field(
@@ -51,18 +52,31 @@ public class DomainModelNameReferencePlugin extends PluginAdapter {
         field.setInitializationString("\"" + typeName + "\"");
         innerInterface.addField(field);
 
+        final List<IntrospectedColumn> baseColumns = introspectedTable.getBaseColumns();
+        if (baseColumns != null) {
+            for (final IntrospectedColumn column : baseColumns) {
+                final Field columnNameField = new Field(
+                        "ATTR_" + column.getActualColumnName().toUpperCase(),
+                        FullyQualifiedJavaType.getStringInstance());
+                columnNameField.setInitializationString("\"" + toTypeName(column.getActualColumnName(), false) + "\"");
+                innerInterface.addField(columnNameField);
+            }
+        }
+
         domain.addInnerInterfaces(innerInterface);
 
         return result;
     }
 
-    private String toTypeName(final String tableName) {
+    private String toTypeName(final String tableName, final boolean upperCamelCase) {
         final String[] split = StringUtils.split(tableName, "_");
         final StringBuilder builder = new StringBuilder();
         if (split != null) {
-            for (final String s : split) {
-                final char[] charArray = s.toCharArray();
-                charArray[0] = Character.toUpperCase(charArray[0]);
+            for (int i = 0; i < split.length; i++) {
+                final char[] charArray = split[i].toCharArray();
+                if (upperCamelCase || i > 0) {
+                    charArray[0] = Character.toUpperCase(charArray[0]);
+                }
                 builder.append(charArray);
             }
         }
