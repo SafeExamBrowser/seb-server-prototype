@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
 import org.eth.demo.sebserver.domain.rest.admin.Role;
 import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
+import org.eth.demo.sebserver.web.WebSecurityConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -60,6 +61,11 @@ public class LMSClientAuthenticationFilter extends AbstractClientAuthenticationF
     @Override
     protected Role getRole() {
         return Role.LMS_CLIENT;
+    }
+
+    @Override
+    protected boolean filterMatch(final HttpServletRequest httpRequest) {
+        return WebSecurityConfig.LMS_HANDSHAKE_ENDPOINT.matches(httpRequest);
     }
 
 }

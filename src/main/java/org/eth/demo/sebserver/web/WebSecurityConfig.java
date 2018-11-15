@@ -86,12 +86,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     @Autowired
+    private LMSClientAuthenticationFilter lmsClientAuthenticationFilter;
+    @Autowired
     private SEBClientAuthenticationFilter sebClientAuthenticationFilter;
     @Autowired
     @Qualifier(EncodingConfig.USER_PASSWORD_ENCODER_BEAN_NAME)
     private PasswordEncoder userPasswordEncoder;
-    @Value("${sebserver.encrypt.password}")
-    private String encryptPass;
 
     @Override
     public void configure(final WebSecurity web) {
@@ -122,13 +122,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                    .requestMatcher(SEB_CLIENT_ENDPOINTS)
+                    .requestMatcher(SEB_CONNECTION_PROTECTED_URLS)
                     .addFilterBefore(
                             this.sebClientAuthenticationFilter,
                             BasicAuthenticationFilter.class)
+                    .addFilterBefore(
+                            this.lmsClientAuthenticationFilter,
+                            SEBClientAuthenticationFilter.class)
                     .authorizeRequests()
                     .requestMatchers(SEB_CONNECTION_PROTECTED_URLS)
                     .authenticated()
+
                 .and()
                     .exceptionHandling()
                     .defaultAuthenticationEntryPointFor(
@@ -154,76 +158,74 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return registration;
     }
 
-    @Bean(name = "encryptorBean")
-    public StringEncryptor stringEncryptor() {
-        final PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
-        final SimpleStringPBEConfig config = new SimpleStringPBEConfig();
-        config.setPassword(this.encryptPass);
-        config.setAlgorithm("PBEWithMD5AndDES");
-        config.setKeyObtentionIterations("1000");
-        config.setPoolSize("1");
-        config.setProviderName("SunJCE");
-        config.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator");
-        config.setStringOutputType("base64");
-        encryptor.setConfig(config);
-        return encryptor;
+    @Bean
+    public FilterRegistrationBean<LMSClientAuthenticationFilter> lmsClientAuthenticationFilter(
+            final LMSClientAuthenticationFilter filter) {
+
+        final FilterRegistrationBean<LMSClientAuthenticationFilter> registration =
+                new FilterRegistrationBean<>(filter);
+        registration.setEnabled(false);
+        return registration;
     }
 
-    @Configuration
-    @EnableWebSecurity
-    @Order(2) // NOTE: Places this HttpSecurity-Filter before the OAuth Security-Filter defined by the ResourceServerConfig
-              //       and after the SEBAuthConfig Security-Filter
-    public static class LMSAuthConfig extends WebSecurityConfigurerAdapter {
-
-        @Autowired
-        private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-        @Autowired
-        private LMSClientAuthenticationFilter lmsClientAuthenticationFilter;
-
-        @Override
-        protected void configure(final HttpSecurity http) throws Exception {
-          //@formatter:off
-            http
-                        .sessionManagement()
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                    .and()
-                        .requestMatcher(LMS_HANDSHAKE_ENDPOINT)
-                        .addFilterBefore(
-                                this.lmsClientAuthenticationFilter,
-                                BasicAuthenticationFilter.class)
-                        .authorizeRequests()
-                        .requestMatchers(LMS_HANDSHAKE_ENDPOINT)
-                        .authenticated()
-                    .and()
-                        .exceptionHandling()
-                        .defaultAuthenticationEntryPointFor(
-                                this.customAuthenticationEntryPoint,
-                                LMS_HANDSHAKE_ENDPOINT)
-                    .and()
-                        .formLogin().disable()
-                        .httpBasic().disable()
-                        .logout().disable()
-                        .headers().frameOptions().disable()
-                     .and()
-                        .csrf().disable(); // TODO enable?
-          //@formatter:on
-        }
-
-        @Bean
-        public FilterRegistrationBean<LMSClientAuthenticationFilter> lmsClientAuthenticationFilter(
-                final LMSClientAuthenticationFilter filter) {
-
-            final FilterRegistrationBean<LMSClientAuthenticationFilter> registration =
-                    new FilterRegistrationBean<>(filter);
-            registration.setEnabled(false);
-            return registration;
-        }
-    }
+//    @Configuration
+//    @EnableWebSecurity
+//    @Order(2) // NOTE: Places this HttpSecurity-Filter before the OAuth Security-Filter defined by the ResourceServerConfig
+//              //       and after the SEBAuthConfig Security-Filter
+//    public static class LMSAuthConfig extends WebSecurityConfigurerAdapter {
+//
+//        @Autowired
+//        private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+//        @Autowired
+//        private LMSClientAuthenticationFilter lmsClientAuthenticationFilter;
+//
+//        @Override
+//        protected void configure(final HttpSecurity http) throws Exception {
+//          //@formatter:off
+//            http
+//                        .sessionManagement()
+//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                    .and()
+//                        .requestMatcher(LMS_HANDSHAKE_ENDPOINT)
+//                        .addFilterBefore(
+//                                this.lmsClientAuthenticationFilter,
+//                                BasicAuthenticationFilter.class)
+//                        .authorizeRequests()
+//                        .requestMatchers(LMS_HANDSHAKE_ENDPOINT)
+//                        .authenticated()
+//                    .and()
+//                        .exceptionHandling()
+//                        .defaultAuthenticationEntryPointFor(
+//                                this.customAuthenticationEntryPoint,
+//                                LMS_HANDSHAKE_ENDPOINT)
+//                    .and()
+//                        .formLogin().disable()
+//                        .httpBasic().disable()
+//                        .logout().disable()
+//                        .headers().frameOptions().disable()
+//                     .and()
+//                        .csrf().disable(); // TODO enable?
+//          //@formatter:on
+//        }
+//
+//        @Bean
+//        public FilterRegistrationBean<LMSClientAuthenticationFilter> lmsClientAuthenticationFilter(
+//                final LMSClientAuthenticationFilter filter) {
+//
+//            final FilterRegistrationBean<LMSClientAuthenticationFilter> registration =
+//                    new FilterRegistrationBean<>(filter);
+//            registration.setEnabled(false);
+//            return registration;
+//        }
+//    }
 
     @Configuration
     public static class EncodingConfig {
         public static final String USER_PASSWORD_ENCODER_BEAN_NAME = "userPasswordEncoder";
         public static final String CLIENT_PASSWORD_ENCODER_BEAN_NAME = "clientPasswordEncoder";
+
+        @Value("${sebserver.encrypt.password}")
+        private String encryptPass;
 
         @Bean(USER_PASSWORD_ENCODER_BEAN_NAME)
         public PasswordEncoder userPasswordEncoder() {
@@ -233,6 +235,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         @Bean(CLIENT_PASSWORD_ENCODER_BEAN_NAME)
         public PasswordEncoder clientPasswordEncoder() {
             return new BCryptPasswordEncoder(4);
+        }
+
+        @Bean(name = "encryptorBean")
+        public StringEncryptor stringEncryptor() {
+            final PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
+            final SimpleStringPBEConfig config = new SimpleStringPBEConfig();
+            config.setPassword(this.encryptPass);
+            config.setAlgorithm("PBEWithMD5AndDES");
+            config.setKeyObtentionIterations("1000");
+            config.setPoolSize("1");
+            config.setProviderName("SunJCE");
+            config.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator");
+            config.setStringOutputType("base64");
+            encryptor.setConfig(config);
+            return encryptor;
         }
     }
 

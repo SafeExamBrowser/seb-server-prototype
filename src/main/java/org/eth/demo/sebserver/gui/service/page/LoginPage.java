@@ -21,8 +21,8 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 import org.eth.demo.sebserver.gui.service.AttributeKeys;
 import org.eth.demo.sebserver.gui.service.i18n.I18nSupport;
-import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageAttr;
+import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 import org.eth.demo.sebserver.gui.service.rest.auth.AuthorizationContextHolder;
 import org.eth.demo.sebserver.gui.service.rest.auth.SEBServerAuthorizationContext;
 import org.eth.demo.sebserver.gui.service.widgets.Message;
@@ -102,11 +102,11 @@ public class LoginPage extends PageComposer {
                         username,
                         loginPassword.getText());
 
-                // Set users locale on page after successful login
-                this.i18nSupport.setSessionLocale(
-                        authorizationContext.getLoggedInUser().locale);
-
                 if (loggedIn) {
+                    // Set users locale on page after successful login
+                    this.i18nSupport.setSessionLocale(
+                            authorizationContext.getLoggedInUser().locale);
+
                     composerCtx.composerService.compose(
                             MainPage.class,
                             composerCtx.root,

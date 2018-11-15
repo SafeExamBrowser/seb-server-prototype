@@ -53,10 +53,12 @@ public abstract class AbstractClientAuthenticationFilter extends GenericFilterBe
 
         try {
             final HttpServletRequest httpRequest = (HttpServletRequest) request;
-            final ClientConnectionAuth clientAuth = verifyClientFromCredentials(httpRequest);
-            SecurityContextHolder
-                    .getContext()
-                    .setAuthentication(clientAuth);
+            if (filterMatch(httpRequest)) {
+                final ClientConnectionAuth clientAuth = verifyClientFromCredentials(httpRequest);
+                SecurityContextHolder
+                        .getContext()
+                        .setAuthentication(clientAuth);
+            }
         } catch (final Exception e) {
             log.error("Unexpected error while trying to verify client-user from credientials", e);
             this.defaultAuthenticationEventPublisher.publishAuthenticationFailure(
@@ -113,5 +115,7 @@ public abstract class AbstractClientAuthenticationFilter extends GenericFilterBe
             HttpServletRequest httpRequest);
 
     protected abstract Role getRole();
+
+    protected abstract boolean filterMatch(HttpServletRequest httpRequest);
 
 }

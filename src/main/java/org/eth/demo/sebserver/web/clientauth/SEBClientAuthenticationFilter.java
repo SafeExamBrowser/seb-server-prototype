@@ -25,6 +25,7 @@ import org.eth.demo.sebserver.batis.gen.model.SebLmsSetupRecord;
 import org.eth.demo.sebserver.domain.rest.admin.Role;
 import org.eth.demo.sebserver.domain.rest.exam.ClientConnection.ConnectionStatus;
 import org.eth.demo.sebserver.service.exam.run.ExamConnectionService;
+import org.eth.demo.sebserver.web.WebSecurityConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -56,6 +57,7 @@ public class SEBClientAuthenticationFilter extends AbstractClientAuthenticationF
 
         try {
             final HttpServletRequest httpRequest = (HttpServletRequest) request;
+
             if (httpRequest.getRequestURI().startsWith("/ws")) {
 
                 log.debug("SEB-Client Web-Socket connection authentication step");
@@ -133,6 +135,11 @@ public class SEBClientAuthenticationFilter extends AbstractClientAuthenticationF
     private boolean getBooleanAttr(final HttpServletRequest httpRequest, final String name) {
         final Object flag = httpRequest.getAttribute(name);
         return (flag != null && BooleanUtils.toBoolean(String.valueOf(flag)));
+    }
+
+    @Override
+    protected boolean filterMatch(final HttpServletRequest httpRequest) {
+        return WebSecurityConfig.SEB_CLIENT_ENDPOINTS.matches(httpRequest);
     }
 
 }

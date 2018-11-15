@@ -8,10 +8,15 @@
 
 package org.eth.demo.util;
 
+import java.util.Calendar;
+import java.util.TimeZone;
+
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 public interface Const {
+
+    Calendar UTC = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
     DateTimeFormatter DATE_TIME_PATTERN_UTC_NO_MILLIS = DateTimeFormat
             .forPattern("yyyy-MM-dd HH:mm:ss")

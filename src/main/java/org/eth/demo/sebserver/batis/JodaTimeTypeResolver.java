@@ -34,7 +34,10 @@ public class JodaTimeTypeResolver extends BaseTypeHandler<DateTime> {
             final DateTime parameter,
             final JdbcType jdbcType) throws SQLException {
 
-        ps.setTimestamp(i, new Timestamp(parameter.getMillis()));
+        ps.setTimestamp(
+                i,
+                new Timestamp(parameter.getMillis()),
+                Const.UTC);
     }
 
     @Override
