@@ -121,6 +121,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                     .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
                 .and()
                     .requestMatcher(SEB_CONNECTION_PROTECTED_URLS)
                     .addFilterBefore(
@@ -137,7 +138,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .exceptionHandling()
                     .defaultAuthenticationEntryPointFor(
                             this.customAuthenticationEntryPoint,
-                            WebSecurityConfig.SEB_CONNECTION_PROTECTED_URLS)
+                            SEB_CONNECTION_PROTECTED_URLS)
                 .and()
                     .formLogin().disable()
                     .httpBasic().disable()

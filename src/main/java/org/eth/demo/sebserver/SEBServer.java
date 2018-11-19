@@ -21,4 +21,11 @@ public class SEBServer {
         SpringApplication.run(SEBServer.class, args);
     }
 
+// TODO_ check out what we can do with that in the means of security TLS token binding
+//    @Bean
+//    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> tomcatCustomizer() {
+//        return (tomcat) -> tomcat
+//                .addContextCustomizers((context) -> context.setUseHttpOnly(false));
+//    }
+
 }
