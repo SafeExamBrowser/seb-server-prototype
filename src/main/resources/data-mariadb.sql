@@ -85,9 +85,9 @@ INSERT INTO `exam` VALUES
 
 INSERT INTO indicator VALUES 
     (1,1,'DemoIndicator1', 'Demo Indicator', 20.0000,40.0000,60.0000),
-    (2,1,'errorCountIndicator', 'Error Count', 1.0000,2.0000,3.0000),
-    (3,3,'errorCountIndicator', 'Error Count', 1.0000,2.0000,3.0000),
-    (4,4,'errorCountIndicator', 'Error Count', 1.0000,2.0000,3.0000),
+    (2,1,'errorCountIndicator', 'Incident Count', 1.0000,2.0000,3.0000),
+    (3,3,'errorCountIndicator', 'Incident Count', 1.0000,2.0000,3.0000),
+    (4,4,'errorCountIndicator', 'Incident Count', 1.0000,2.0000,3.0000),
     (5,3,'pingIntervalIndicator', 'Ping', 1000,2000,5000),
     (6,4,'pingIntervalIndicator', 'Ping', 1000,2000,5000)
     ;

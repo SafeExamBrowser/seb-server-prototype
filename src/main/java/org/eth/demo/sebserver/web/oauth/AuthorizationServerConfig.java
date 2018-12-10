@@ -80,8 +80,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                     .scopes(GUI_CLIENT_SCOPES)
                     .resourceIds(SEB_SERVER_API_RESOURCE_ID)
                     .accessTokenValiditySeconds(this.guiClientAccessTokenValiditySeconds)
-                    .refreshTokenValiditySeconds(this.guiClientRefreshTokenValiditySeconds)
-                .and();
+                    .refreshTokenValiditySeconds(this.guiClientRefreshTokenValiditySeconds);
       //@formatter:on
     }
 
@@ -98,7 +97,12 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .tokenStore(tokenStore())
                 .authenticationManager(this.authenticationManager)
                 .userDetailsService(this.userDetailsService)
-                .accessTokenConverter(jwtAccessTokenConverter);
+                .accessTokenConverter(jwtAccessTokenConverter)
+//                .pathMapping("/oauth/token", "/api/oauth/token")
+//                .pathMapping("/oauth/revoke-token", "/api/oauth/revoke-token")
+//                .pathMapping("/oauth/check_token", "/api/oauth/check_token")
+//                .prefix("/api")
+        ;
     }
 
 }

@@ -19,8 +19,12 @@ import org.eth.demo.sebserver.gui.service.page.action.ActionPane;
 import org.eth.demo.sebserver.gui.service.page.content.ExamsListPage;
 import org.eth.demo.sebserver.gui.service.page.content.InstitutionForm;
 import org.eth.demo.sebserver.gui.service.page.content.InstitutionsForm;
+import org.eth.demo.sebserver.gui.service.page.content.MonitoringForm;
+import org.eth.demo.sebserver.gui.service.page.content.RunningExamForm;
 import org.eth.demo.sebserver.gui.service.page.content.RunningExamPage;
+import org.eth.demo.sebserver.gui.service.page.content.SEBConfigurationForm;
 import org.eth.demo.sebserver.gui.service.page.content.SEBConfigurationPage;
+import org.eth.demo.sebserver.gui.service.page.content.UserAccountsForm;
 
 public class ActivitySelection {
 
@@ -36,16 +40,16 @@ public class ActivitySelection {
         INSTITUTIONS(InstitutionsForm.class, ActionPane.class),
         INSTITUTION(InstitutionForm.class, ActionPane.class, AttributeKeys.INSTITUTION_ID),
 
-        USERS(TODOTemplate.class, TODOTemplate.class),
+        USERS(UserAccountsForm.class, ActionPane.class),
 
         EXAMS(ExamsListPage.class, ActionPane.class),
-        SEB_CONFIGS(TODOTemplate.class, ActionPane.class),
+        SEB_CONFIGS(SEBConfigurationForm.class, ActionPane.class),
         SEB_CONFIG(SEBConfigurationPage.class, ActionPane.class),
         SEB_CONFIG_TEMPLATES(TODOTemplate.class, ActionPane.class),
-        MONITORING(TODOTemplate.class, TODOTemplate.class),
-        RUNNING_EXAMS(TODOTemplate.class, TODOTemplate.class),
+        MONITORING(MonitoringForm.class, ActionPane.class),
+        RUNNING_EXAMS(RunningExamForm.class, ActionPane.class),
         RUNNING_EXAM(RunningExamPage.class, ActionPane.class, AttributeKeys.EXAM_ID),
-        LOGS(TODOTemplate.class, TODOTemplate.class),
+        LOGS(TODOTemplate.class, ActionPane.class),
         ;
 
         public final Class<? extends TemplateComposer> objectPaneComposer;
