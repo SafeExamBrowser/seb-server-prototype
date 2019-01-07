@@ -122,13 +122,15 @@ public class RunningExamPage implements TemplateComposer {
 
         final Composite tablePane = new Composite(content, SWT.NONE);
 //        final ScrolledComposite tablePane = new ScrolledComposite(content, SWT.V_SCROLL);
-//        tablePane.setExpandVertical(true);
+//        tablePane.setExpandVertical(false);
 //        tablePane.setAlwaysShowScrollBars(true);
         tablePane.setLayout(new GridLayout());
-        tablePane.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+        gridData.heightHint = 100;
+        tablePane.setLayoutData(gridData);
 
         final ClientTable clientTable = new ClientTable(display, tablePane, exam);
-        //tablePane.setContent(clientTable.table);
+//        tablePane.setContent(clientTable.table);
 
         this.serverPushService.runServerPush(
                 new ServerPushContext(
@@ -248,6 +250,7 @@ public class RunningExamPage implements TemplateComposer {
                 for (final TableColumn column : ClientTable.this.table.getColumns()) {
                     column.setWidth(columnWidth);
                 }
+                ClientTable.this.table.layout(true, true);
                 ClientTable.this.table.pack();
                 this.tableWidth = area.width;
             }

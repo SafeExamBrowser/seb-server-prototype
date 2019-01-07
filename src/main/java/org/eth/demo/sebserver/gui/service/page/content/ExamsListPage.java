@@ -20,6 +20,8 @@ import org.eth.demo.sebserver.gui.service.i18n.I18nSupport;
 import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 import org.eth.demo.sebserver.gui.service.page.TemplateComposer;
+import org.eth.demo.sebserver.gui.service.page.action.ActionDefinition;
+import org.eth.demo.sebserver.gui.service.page.action.ActionPublishEvent;
 import org.eth.demo.sebserver.gui.service.page.table.TableBuilder;
 import org.eth.demo.sebserver.gui.service.rest.RestServices;
 import org.eth.demo.sebserver.gui.service.rest.exam.GetExams;
@@ -57,6 +59,19 @@ public class ExamsListPage implements TemplateComposer {
 
         createExamsTable(content);
 
+        // publish possible actions for this page
+        composerCtx.notify(new ActionPublishEvent(
+                ActionDefinition.EXAM_IMPORT,
+                () -> {
+                }));
+        composerCtx.notify(new ActionPublishEvent(
+                ActionDefinition.EXAM_EDIT,
+                () -> {
+                }));
+        composerCtx.notify(new ActionPublishEvent(
+                ActionDefinition.EXAM_DELETE,
+                () -> {
+                }));
     }
 
     private void createExamsTable(final Composite parent) {
@@ -74,6 +89,7 @@ public class ExamsListPage implements TemplateComposer {
                         row -> this.i18nSupport.formatDisplayDate(row.startTime))
                 .withEmptyNote("No Exams Available")
                 .compose(parent);
+
     }
 
 }

@@ -82,7 +82,7 @@ public class ActionPane implements TemplateComposer {
                                 event.actionDefinition.name);
                         actionItem.setImage(event.actionDefinition.icon.getImage(composerCtx.parent.getDisplay()));
                         actionItem.setData(ACTION_EVENT_CALL_KEY,
-                                new SaveActionExecution(composerCtx, event, event.run));
+                                new SafeActionExecution(composerCtx, event, event.run));
                     }
                 });
 

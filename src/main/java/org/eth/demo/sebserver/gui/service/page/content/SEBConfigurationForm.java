@@ -16,6 +16,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eth.demo.sebserver.gui.service.i18n.LocTextKey;
 import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 import org.eth.demo.sebserver.gui.service.page.TemplateComposer;
+import org.eth.demo.sebserver.gui.service.page.action.ActionDefinition;
+import org.eth.demo.sebserver.gui.service.page.action.ActionPublishEvent;
 import org.eth.demo.sebserver.gui.service.rest.RestServices;
 import org.eth.demo.sebserver.gui.service.widgets.WidgetFactory;
 import org.springframework.context.annotation.Lazy;
@@ -49,10 +51,11 @@ public class SEBConfigurationForm implements TemplateComposer {
 
         this.widgetFactory.labelLocalized(content, "h3", new LocTextKey("org.sebserver.sebconfig.info"));
 
-//        // publish possible actions for this page
-//        composerCtx.notify(new ActionPublishEvent(
-//                ActionDefinition.INSTITUTION_NEW,
-//                InstitutionActions.newInstitution(composerCtx, this.restServices)));
+        // publish possible actions for this page
+        composerCtx.notify(new ActionPublishEvent(
+                ActionDefinition.SEB_CONFIG_NEW,
+                () -> {
+                }));
     }
 
 }

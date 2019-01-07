@@ -13,15 +13,15 @@ import org.eth.demo.sebserver.gui.service.page.ComposerService.PageContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SaveActionExecution implements Runnable {
+public class SafeActionExecution implements Runnable {
 
-    private static final Logger log = LoggerFactory.getLogger(SaveActionExecution.class);
+    private static final Logger log = LoggerFactory.getLogger(SafeActionExecution.class);
 
     private final PageContext pageContext;
     private final ActionPublishEvent actionEvent;
     private final Runnable actionExecution;
 
-    public SaveActionExecution(
+    public SafeActionExecution(
             final PageContext pageContext,
             final ActionPublishEvent actionEvent,
             final Runnable actionExecution) {
@@ -53,10 +53,10 @@ public class SaveActionExecution implements Runnable {
             @Override
             public void run() {
                 try {
-                    SaveActionExecution.this.actionExecution.run();
+                    SafeActionExecution.this.actionExecution.run();
                 } catch (final Throwable t) {
-                    log.error("Failed to execute action: {}", SaveActionExecution.this.actionEvent, t);
-                    SaveActionExecution.this.pageContext.notifyError("action.error.unexpected.message", t);
+                    log.error("Failed to execute action: {}", SafeActionExecution.this.actionEvent, t);
+                    SafeActionExecution.this.pageContext.notifyError("action.error.unexpected.message", t);
                 }
 
             }
