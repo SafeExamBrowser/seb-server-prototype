@@ -264,7 +264,7 @@
     <profile>
       <id>Java 8</id>
       <activation>
-        <activeByDefault>false</activeByDefault>
+        <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
         <java.version>1.8</java.version>
