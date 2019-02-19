@@ -45,6 +45,10 @@ public final class ServerPushContext {
         return this.anchor.getDisplay();
     }
 
+    public Composite getAnchor() {
+        return this.anchor;
+    }
+
     public void layout() {
         this.anchor.pack();
         this.anchor.layout();

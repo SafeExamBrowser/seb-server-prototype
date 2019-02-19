@@ -14,6 +14,9 @@ public enum ActionDefinition {
     INSTITUTION_NEW(
             "actions.new.institution",
             IconButtonType.NEW_ACTION),
+    INSTITUTION_VIEW(
+            "actions.view.institution",
+            IconButtonType.NEW_ACTION),
     INSTITUTION_MODIFY(
             "actions.modify.institution",
             IconButtonType.SAVE_ACTION),

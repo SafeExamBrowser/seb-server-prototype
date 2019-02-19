@@ -178,9 +178,20 @@ public class WidgetFactory {
         return table;
     }
 
-    public TableColumn tableColumnLocalized(final Table table, final String locTextKey) {
+    public TableColumn tableColumnLocalized(
+            final Table table,
+            final LocTextKey locTextKey) {
+
+        return tableColumnLocalized(table, locTextKey, null);
+    }
+
+    public TableColumn tableColumnLocalized(
+            final Table table,
+            final LocTextKey locTextKey,
+            final LocTextKey locToolTextKey) {
+
         final TableColumn tableColumn = new TableColumn(table, SWT.NONE);
-        this.polyglotPageService.injectI18n(tableColumn, new LocTextKey(locTextKey));
+        this.polyglotPageService.injectI18n(tableColumn, locTextKey, locToolTextKey);
         return tableColumn;
     }
 

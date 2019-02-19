@@ -37,6 +37,7 @@ public final class PolyglotPageService {
 
     public static final String POLYGLOT_WIDGET_FUNCTION_KEY = "POLYGLOT_WIDGET_FUNCTION";
     private static final String POLYGLOT_TREE_ITEM_TEXT_DATA_KEY = "POLYGLOT_TREE_ITEM_TEXT_DATA";
+    private static final String POLYGLOT_TREE_ITEM_TOOLTIP_DATA_KEY = "POLYGLOT_TREE_ITEM_TOOLTIP_DATA";
 
     private final I18nSupport i18nSupport;
 
@@ -100,9 +101,14 @@ public final class PolyglotPageService {
         table.setData(POLYGLOT_WIDGET_FUNCTION_KEY, tableFunction());
     }
 
-    public void injectI18n(final TableColumn tableColumn, final LocTextKey locTextKey) {
+    public void injectI18n(final TableColumn tableColumn, final LocTextKey locTextKey, final LocTextKey locToolTipKey) {
         tableColumn.setData(POLYGLOT_TREE_ITEM_TEXT_DATA_KEY, locTextKey);
         tableColumn.setText(this.i18nSupport.getText(locTextKey));
+
+        if (locToolTipKey != null) {
+            tableColumn.setData(POLYGLOT_TREE_ITEM_TOOLTIP_DATA_KEY, locToolTipKey);
+            tableColumn.setToolTipText(this.i18nSupport.getText(locToolTipKey));
+        }
     }
 
     public void injectI18n(final TableItem tableItem, final LocTextKey... locTextKey) {
@@ -241,6 +247,10 @@ public final class PolyglotPageService {
             final LocTextKey locTextKey = (LocTextKey) childItem.getData(POLYGLOT_TREE_ITEM_TEXT_DATA_KEY);
             if (locTextKey != null) {
                 childItem.setText(i18nSupport.getText(locTextKey));
+            }
+            final LocTextKey locTooltipKey = (LocTextKey) childItem.getData(POLYGLOT_TREE_ITEM_TOOLTIP_DATA_KEY);
+            if (locTooltipKey != null) {
+                childItem.setToolTipText(i18nSupport.getText(locTooltipKey));
             }
         }
     }

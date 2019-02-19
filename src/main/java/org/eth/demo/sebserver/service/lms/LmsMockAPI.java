@@ -40,7 +40,7 @@ public class LmsMockAPI implements LmsConnectionTemplate {
                 "mock"));
         this.couses.add(new CourseData(
                 "Demo Exam 4", "Demo Exam 4", "Demo Exam",
-                "2018-01-01 00:00:00", "2019-01-01 00:00:00",
+                "2018-01-01 00:00:00", "2020-01-01 00:00:00",
                 "mock"));
     }
 
